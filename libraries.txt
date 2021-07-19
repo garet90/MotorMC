@@ -1,0 +1,7 @@
+MotorMC uses several libraries to aid in cryptography, compression, and other essential functions. Below are some of the libraries MotorMC uses.
+
+TomsFastMath - for RSA encryption and math
+libTomCrypt - for cryptographic hashes, and AES encryption
+libcURL - for auth requests
+yyjson - for auth, chat, and server list ping
+libdeflate - for compression
