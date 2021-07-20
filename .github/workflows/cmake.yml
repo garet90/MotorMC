@@ -1,0 +1,254 @@
+name: CMake
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build-windows:
+    
+    strategy:
+      matrix:
+        include:
+            - COMPILER: gcc
+              SSL: schannel
+            - COMPILER: clang
+              SSL: schannel
+    
+    runs-on: windows-latest
+
+    defaults:
+        run:
+          shell: msys2 {0}
+
+    steps:      
+    - uses: actions/checkout@v2
+    - uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: >-
+          autoconf
+          automake
+          m4
+          make
+          cmake
+          libtool
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-clang
+          git
+
+    - name: Set Workspace
+      run: |
+        echo "::set-env name=workspace::${github_workspace//\\//}"
+      shell: bash
+      env:
+        github_workspace: ${{github.workspace}}
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+    - name: Install Tom's Fast Math
+      run: |
+        git clone https://github.com/libtom/tomsfastmath.git $workspace/libs/libtom/tomsfastmath
+        cd $workspace/libs/libtom/tomsfastmath
+        make install
+      
+    - name: Install Tom Crypt
+      run: |
+        git clone https://github.com/libtom/libtomcrypt.git $workspace/libs/libtom/libtomcrypt
+        cd $workspace/libs/libtom/libtomcrypt
+        make install
+        
+    - name: Install cURL
+      run: |
+        git clone https://github.com/curl/curl.git $workspace/libs/curl/curl
+        cd $workspace/libs/curl/curl
+        autoreconf -fi
+        ./configure --with-${{ matrix.SSL }}
+        make install
+        
+    - name: Install yyjson
+      run: |
+        git clone https://github.com/ibireme/yyjson.git $workspace/libs/ibireme/yyjson
+        cd $workspace/libs/ibireme/yyjson
+        cmake .
+        make install
+        
+    - name: Install libdeflate
+      run: |
+        git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
+        cd $workspace/libs/ebiggers/libdeflate
+        make libdeflate.a
+        cp libdeflate.a /usr/local/lib/
+        cp libdeflate.h /usr/local/include/
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: |
+        cmake -B $workspace/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER=${{ matrix.COMPILER }} -DWIN32=true
+
+    - name: Build
+      # Build your program with the given configuration
+      run: |
+        cmake --build $workspace/build --config ${{env.BUILD_TYPE}}
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: MotorMC-${{ matrix.COMPILER }}.exe
+        path: ${{github.workspace}}/build/MotorMC.exe
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+  build-osx:
+    
+    strategy:
+      matrix:
+        include:
+          - COMPILER: clang
+            SSL: secure-transport
+    
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Automake
+      run: |
+        brew install automake
+
+    - name: Install Tom's Fast Math
+      run: |
+        git clone https://github.com/libtom/tomsfastmath.git ${{github.workspace}}/libs/libtom/tomsfastmath
+        cd ${{github.workspace}}/libs/libtom/tomsfastmath
+        sudo make install
+
+    - name: Install Tom Crypt
+      run: |
+        git clone https://github.com/libtom/libtomcrypt.git ${{github.workspace}}/libs/libtom/libtomcrypt
+        cd ${{github.workspace}}/libs/libtom/libtomcrypt
+        sudo make install
+    
+    - name: Install cURL
+      run: |
+        git clone https://github.com/curl/curl.git ${{github.workspace}}/libs/curl/curl
+        cd ${{github.workspace}}/libs/curl/curl
+        autoreconf -fi
+        sudo ./configure --with-${{ matrix.SSL }}
+        sudo make install
+
+    - name: Install yyjson
+      run: |
+        git clone https://github.com/ibireme/yyjson.git ${{github.workspace}}/libs/ibireme/yyjson
+        cd ${{github.workspace}}/libs/ibireme/yyjson
+        cmake . -DCMAKE_C_COMPILER=gcc
+        sudo make install
+    
+    - name: Install libdeflate
+      run: |
+        git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
+        cd ${{github.workspace}}/libs/ebiggers/libdeflate
+        sudo make libdeflate.a
+        sudo cp libdeflate.a /usr/local/lib/
+        sudo cp libdeflate.h /usr/local/include/
+      
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER=${{ matrix.COMPILER }}
+
+    - name: Build
+      # Build your program with the given configuration
+      run: |
+        cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: MotorMC-OSX
+        path: ${{github.workspace}}/build/MotorMC
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+  build-ubuntu:
+
+    strategy:
+      matrix:
+        include:
+          - COMPILER: gcc
+            SSL: openssl
+          - COMPILER: clang
+            SSL: openssl
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Tom's Fast Math
+      run: |
+        git clone https://github.com/libtom/tomsfastmath.git ${{github.workspace}}/libs/libtom/tomsfastmath
+        cd ${{github.workspace}}/libs/libtom/tomsfastmath
+        sudo make install
+
+    - name: Install Tom Crypt
+      run: |
+        git clone https://github.com/libtom/libtomcrypt.git ${{github.workspace}}/libs/libtom/libtomcrypt
+        cd ${{github.workspace}}/libs/libtom/libtomcrypt
+        sudo make install
+    
+    - name: Install cURL
+      run: |
+        git clone https://github.com/curl/curl.git ${{github.workspace}}/libs/curl/curl
+        cd ${{github.workspace}}/libs/curl/curl
+        autoreconf -fi
+        sudo ./configure --with-${{ matrix.SSL }}
+        sudo make install
+
+    - name: Install yyjson
+      run: |
+        git clone https://github.com/ibireme/yyjson.git ${{github.workspace}}/libs/ibireme/yyjson
+        cd ${{github.workspace}}/libs/ibireme/yyjson
+        cmake . -DCMAKE_C_COMPILER=gcc
+        sudo make install
+    
+    - name: Install libdeflate
+      run: |
+        git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
+        cd ${{github.workspace}}/libs/ebiggers/libdeflate
+        sudo make libdeflate.a
+        sudo cp libdeflate.a /usr/local/lib/
+        sudo cp libdeflate.h /usr/local/include/
+      
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER=${{ matrix.COMPILER }}
+
+    - name: Build
+      # Build your program with the given configuration
+      run: |
+        cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: MotorMC-Ubuntu-${{ matrix.COMPILER }}
+        path: ${{github.workspace}}/build/MotorMC
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+      
