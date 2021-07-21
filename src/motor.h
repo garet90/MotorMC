@@ -64,18 +64,22 @@ typedef struct {
 		uint16_t max_height;
 	} world;
 
-	sky_status_t status;
-	
 	const uint16_t protocol;
+
+	sky_status_t status;
+	cmd_op_level_t op_permission_level;
 
 	bool_t hardcore;
 	uint8_t gamemode;
 	uint8_t render_distance;
 	bool_t reduced_debug_info;
 
-	struct {
-		bool_t enable_respawn_screen;
-	} gamerule;
+	uint32_t max_tick_time;
+
+	bool_t enable_respawn_screen;
+	bool_t enforce_whitelist;
+	bool_t enable_command_block;
+	bool_t pvp;
 	
 	/* listener */
 	ltg_main_t listener;

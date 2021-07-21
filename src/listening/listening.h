@@ -80,7 +80,9 @@ typedef struct {
 		uint16_t max;
 	} online;
 
+	uint16_t network_compression_threshold;
 	bool_t online_mode;
+	bool_t prevent_proxy_connections;
 
 	cry_RSAkeypair_t keypair;
 
