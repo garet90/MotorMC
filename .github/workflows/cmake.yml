@@ -82,8 +82,8 @@ jobs:
       run: |
         git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
         cd $workspace/libs/ebiggers/libdeflate
-        make libdeflate.a
-        cp libdeflate.a /usr/local/lib/
+        make libdeflatestatic.lib
+        cp libdeflatestatic.lib /usr/local/lib/
         cp libdeflate.h /usr/local/include/
 
     - name: Configure CMake

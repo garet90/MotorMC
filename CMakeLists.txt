@@ -16,12 +16,18 @@ file(GLOB_RECURSE src
      "src/*.c"
 )
 
-link_libraries(tomcrypt curl tfm pthread yyjson deflate)
+link_libraries(tomcrypt curl tfm pthread yyjson)
 
 if(DEFINED WIN32)
      link_libraries(ws2_32)
 elseif(DEFINED UNIX)
      link_libraries(dl)
+endif()
+
+if(DEFINED WIN32)
+     link_libraries(deflatestatic)
+else()
+     link_libraries(deflate)
 endif()
 
 add_executable(MotorMC ${src})
