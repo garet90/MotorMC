@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#if defined(__MINGW32__) || defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
+#if defined(__MINGW32__) || defined(__MINGW64__) || defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
 #define __WINDOWS__
 #endif
 

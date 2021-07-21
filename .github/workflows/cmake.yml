@@ -17,9 +17,7 @@ jobs:
       matrix:
         include:
             - COMPILER: gcc
-              SSL: schannel
             - COMPILER: clang
-              SSL: schannel
     
     runs-on: windows-latest
 
@@ -33,11 +31,9 @@ jobs:
       with:
         update: true
         install: >-
-          autoconf
-          automake
-          m4
           make
           cmake
+          autoconf
           libtool
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-clang
@@ -68,7 +64,7 @@ jobs:
         git clone https://github.com/curl/curl.git $workspace/libs/curl/curl
         cd $workspace/libs/curl/curl
         autoreconf -fi
-        ./configure --with-${{ matrix.SSL }}
+        ./configure --disable-shared --with-schannel --disable-ldap --disable-sspi --without-librtmp --disable-ftp --disable-file --disable-dict --disable-telnet --disable-tftp --disable-rtsp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-smb --without-libidn
         make install
         
     - name: Install yyjson
@@ -114,16 +110,11 @@ jobs:
       matrix:
         include:
           - COMPILER: clang
-            SSL: secure-transport
     
     runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Install Automake
-      run: |
-        brew install automake
 
     - name: Install Tom's Fast Math
       run: |
@@ -135,14 +126,6 @@ jobs:
       run: |
         git clone https://github.com/libtom/libtomcrypt.git ${{github.workspace}}/libs/libtom/libtomcrypt
         cd ${{github.workspace}}/libs/libtom/libtomcrypt
-        sudo make install
-    
-    - name: Install cURL
-      run: |
-        git clone https://github.com/curl/curl.git ${{github.workspace}}/libs/curl/curl
-        cd ${{github.workspace}}/libs/curl/curl
-        autoreconf -fi
-        sudo ./configure --with-${{ matrix.SSL }}
         sudo make install
 
     - name: Install yyjson
@@ -157,8 +140,8 @@ jobs:
         git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
         cd ${{github.workspace}}/libs/ebiggers/libdeflate
         sudo make libdeflate.a
-        sudo cp libdeflate.a /usr/local/lib/
-        sudo cp libdeflate.h /usr/local/include/
+        sudo mv libdeflate.a /usr/local/lib/
+        sudo mv libdeflate.h /usr/local/include/
       
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -187,9 +170,7 @@ jobs:
       matrix:
         include:
           - COMPILER: gcc
-            SSL: openssl
           - COMPILER: clang
-            SSL: openssl
     
     runs-on: ubuntu-latest
 
@@ -207,15 +188,11 @@ jobs:
         git clone https://github.com/libtom/libtomcrypt.git ${{github.workspace}}/libs/libtom/libtomcrypt
         cd ${{github.workspace}}/libs/libtom/libtomcrypt
         sudo make install
-    
-    - name: Install cURL
-      run: |
-        git clone https://github.com/curl/curl.git ${{github.workspace}}/libs/curl/curl
-        cd ${{github.workspace}}/libs/curl/curl
-        autoreconf -fi
-        sudo ./configure --with-${{ matrix.SSL }}
-        sudo make install
 
+    - name: Install libcurl
+      run: |
+        sudo apt-get install libcurl4-openssl-dev
+      
     - name: Install yyjson
       run: |
         git clone https://github.com/ibireme/yyjson.git ${{github.workspace}}/libs/ibireme/yyjson
@@ -228,8 +205,8 @@ jobs:
         git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
         cd ${{github.workspace}}/libs/ebiggers/libdeflate
         sudo make libdeflate.a
-        sudo cp libdeflate.a /usr/local/lib/
-        sudo cp libdeflate.h /usr/local/include/
+        sudo mv libdeflate.a /usr/local/lib/
+        sudo mv libdeflate.h /usr/local/include/
       
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.

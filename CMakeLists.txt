@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 project(MotorMC)
 
 # Fix linking on 10.14+. See https://stackoverflow.com/questions/54068035
-LINK_DIRECTORIES(/usr/local/lib)
+link_directories(/usr/local/lib)
 include_directories(/usr/local/include)
 
 set(CMAKE_C_STANDARD 11)
@@ -16,18 +16,23 @@ file(GLOB_RECURSE src
      "src/*.c"
 )
 
-link_libraries(tomcrypt curl tfm pthread yyjson)
+link_libraries(tomcrypt tfm yyjson)
 
-if(DEFINED WIN32)
-     link_libraries(ws2_32)
-elseif(DEFINED UNIX)
-     link_libraries(dl)
-endif()
+if(DEFINED WIN32 OR DEFINED MSYS)
+     # LINK CURL
+     add_compile_definitions(
+          CURL_STATICLIB
+          WITH_SSL=STATIC
+     )
+     link_libraries(-l:libcurl.a crypt32 advapi32 -l:libzstd.a -l:libz.a)
 
-if(DEFINED WIN32)
-     link_libraries(deflatestatic)
+     link_libraries(deflatestatic -l:libpthread.a ws2_32)
 else()
-     link_libraries(deflate)
+     link_libraries(deflate pthread curl)
+
+     if(DEFINED UNIX)
+          link_libraries(dl)
+     endif()
 endif()
 
 add_executable(MotorMC ${src})
