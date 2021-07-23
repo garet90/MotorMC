@@ -24,9 +24,9 @@ if(DEFINED WIN32 OR DEFINED MSYS)
           CURL_STATICLIB
           WITH_SSL=STATIC
      )
-     link_libraries(-l:libcurl.a crypt32 advapi32 -l:libzstd.a -l:libz.a)
+     link_libraries(-l:libcurl.a advapi32 crypt32 -l:libzstd.a -l:libz.a ws2_32)
 
-     link_libraries(deflatestatic -l:libpthread.a ws2_32)
+     link_libraries(deflatestatic -l:libpthread.a)
 else()
      link_libraries(deflate pthread curl)
 
