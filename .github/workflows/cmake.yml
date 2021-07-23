@@ -34,6 +34,7 @@ jobs:
           make
           cmake
           automake
+          autoconf
           libtool
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-clang
