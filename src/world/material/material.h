@@ -1,144 +1,280 @@
 #pragma once
 #include "../../main.h"
-#include "../../util/vector.h"
-
-typedef struct mat_hitbox mat_hitbox_t;
-
-typedef struct mat_modifier mat_modifier_t;
-
-typedef struct mat_block_entity mat_block_entity_t;
-typedef struct mat_block mat_block_t;
-
-typedef enum mat_tool_type {
-
-	mat_none = 0,
-	mat_shears,
-	mat_hoe,
-	mat_axe,
-	mat_pickaxe,
-	mat_shovel,
-	mat_sword
-
-} mat_tool_type_t;
-
-typedef uint8_t mat_hitbox_id_t;
-typedef uint8_t mat_modifier_id_t;
-typedef uint8_t mat_block_entity_id_t;
-typedef uint8_t mat_block_id_t;
 
 /*
-#define MAT_ITEMTYPE_NONE 0
-#define MAT_ITEMTYPE_FOOD 1
-#define MAT_ITEMTYPE_ARMOR 2
-#define MAT_ITEMTYPE_TOOL 3
+	HITBOX
+	Hitboxes are used for physics to determine collisions
+*/
 
-#define MAT_ARMORTYPE_HELMET 0
-#define MAT_ARMORTYPE_CHESTPLATE 1
-#define MAT_ARMORTYPE_LEGGINGS 2
-#define MAT_ARMORTYPE_BOOTS 3
+typedef enum {
 
-#define MAT_TOOLTYPE_MISC 0
-#define MAT_TOOLTYPE_SHEARS 1
-#define MAT_TOOLTYPE_HOE 2
-#define MAT_TOOLTYPE_AXE 3
-#define MAT_TOOLTYPE_PICKAXE 4
-#define MAT_TOOLTYPE_SHOVEL 5
-#define MAT_TOOLTYPE_SWORD 6
+	mat_hitbox_none = -1
+
+} mat_hitbox_id_t;
 
 typedef struct {
 
-	uint8_t maxStackSize;
-	uint8_t itemType;
+	size_t count;
 
-	union {
+	struct {
 
-		struct {
+		float32_t x, y, z, width, height, depth;
+	
+	} hitbox[];
 
-			uint16_t data;
+} mat_hitbox_t;
 
-		} none;
+extern const mat_hitbox_t* mat_hitboxes;
 
-		struct {
-
-			uint16_t food;
-			float32_t saturation;
-
-		} food;
-
-		struct {
-
-			uint8_t type;
-			uint8_t toughness;
-			uint16_t defense;
-			uint16_t maxDurability;
-			float32_t knockbackResistance;
-
-		} armor;
-
-		struct {
-
-			uint8_t type;
-			uint8_t toolPowerLevel;
-			float32_t attackDamage;
-			float32_t attackSpeed;
-			float32_t toolSpeed;
-			uint32_t maxDurability;
-
-		} tool;
-
-	} typeData;
-
-} mat_item_t;
+/*
+	STATE MODIFIERS
+	State modifiers are used to determine the state
 */
 
-struct mat_hitbox {
+typedef enum {
 
-	float32_t x;
-	float32_t y;
-	float32_t z;
-	float32_t width;
-	float32_t height;
-	float32_t length;
+	_mat_state_modifier_end = 0,
+	mat_state_modifier_facing_cardinal,
+	mat_state_modifier_bamboo_age,
+	mat_state_modifier_bamboo_leaves,
+	mat_state_modifier_bamboo_state
+	// TODO automatically generate this
 
-};
+} mat_state_modifier_type_t;
 
-struct mat_modifier {
+typedef struct {
 
-	size_t properties_size;
+	size_t count;
 
 	struct {
 
 		mat_hitbox_id_t hitbox;
 
-	} properties[];
+	} state[];
 
-};
+} mat_state_modifier_t;
 
-struct mat_block_entity {
-	void* null; // todo
-};
+extern const mat_state_modifier_t* mat_modifiers;
 
-struct mat_block {
+/*
+	TOOLS
+	Tools are used to determine breaking speed and drops
+	They:
+	- Can be enchanted
+	- Have a max durability (exception: enchanted books)
+	- Only appear in stacks of one
+*/
 
-	float32_t blast_resistance;
+typedef enum {
+
+	mat_tool_type_any = 0,
+	mat_tool_type_sword,
+	mat_tool_type_bow,
+	mat_tool_type_crossbow,
+	mat_tool_type_trident,
+	mat_tool_type_shield,
+	mat_tool_type_fishing_rod,
+	mat_tool_type_flint_and_steel,
+	mat_tool_type_helmet,
+	mat_tool_type_chestplate,
+	mat_tool_type_leggings,
+	mat_tool_type_boots,
+	mat_tool_type_axe,
+	mat_tool_type_pickaxe,
+	mat_tool_type_shears,
+	mat_tool_type_shovel,
+	mat_tool_type_hoe,
+	mat_tool_type_none
+
+} mat_tool_type_t;
+
+typedef enum {
+
+	mat_tool_power_any = 0,
+	mat_tool_power_wood,
+	mat_tool_power_stone,
+	mat_tool_power_gold,
+	mat_tool_power_iron,
+	mat_tool_power_diamond,
+	mat_tool_power_netherrite
+
+} mat_tool_power_t;
+
+typedef struct {
+
+	mat_tool_type_t type;
+	mat_tool_power_t power;
+
+	uint32_t max_durability;
+
+} mat_tool_t;
+
+extern const mat_tool_t* mat_tools;
+
+/*
+	BLOCK ENTITIES
+	Block entities are used to store extra information that couldn't be stored in states
+*/
+
+typedef enum {
+	mat_block_entity_type_sign,
+	mat_block_entity_type_banner,
+	mat_block_entity_type_storage,
+	mat_block_entity_type_furnace,
+	mat_block_entity_type_brewing_stand,
+	mat_block_entity_type_hopper,
+	mat_block_entity_type_chest,
+	mat_block_entity_type_beacon,
+	mat_block_entity_type_monster_spawner,
+	mat_block_entity_type_note_block,
+	mat_block_entity_type_piston,
+	mat_block_entity_type_jukebox,
+	mat_block_entity_type_enchantment_table,
+	mat_block_entity_type_particle,
+	mat_block_entity_type_mob_head,
+	mat_block_entity_type_command_block,
+	mat_block_entity_type_end_gateway,
+	mat_block_entity_type_structure_block,
+	mat_block_entity_type_daylight_sensor,
+	mat_block_entity_type_flower_pot,
+	mat_block_entity_type_redstone_comparator
+} mat_block_entity_type_t;
+
+/*
+	BLOCKS
+	Blocks are the basic building blocks of the world
+*/
+
+typedef enum {
+
+	mat_block_id_air = 0
+
+} mat_block_id_t;
+
+typedef struct {
+
+	float32_t resistance;
 	float32_t hardness;
 
-	// light
-	uint8_t light; // first 4 bits is how much light it blocks, last 4 is how much it emanates
+	uint8_t light;
+		// First 4 bits: luminance (0 = no light)
+		// Last 4 bits: transparency (0 = blocks all light)
 
-	// tool
-	mat_tool_type_t tool;
-	uint8_t tool_power; // required tool power to drop item
+	uint8_t encouragement;
+		// most significant bit = can catch fire from lava
+	uint8_t flammability;
+		// most significant bit = can burn away
 
-	// block entity
-	mat_block_entity_id_t entity;
+	struct {
+		
+		mat_tool_type_t type;
+		mat_tool_power_t power;
 
-	// optional, used if flammable
-	uint8_t encouragement; // first bit determines whether can catch from lava
-	uint8_t flamability;   // first bit determines whether can burn away
+	} best_tool;
 
-	// state modifiers
-	size_t modifier_count;
-	mat_modifier_id_t modifiers[];
+	mat_block_entity_type_t entity;
 
-};
+	struct {
+
+		size_t count;
+		mat_state_modifier_type_t modifier[];
+
+	} modifiers;
+
+} mat_block_t;
+
+extern const mat_block_t* mat_blocks;
+
+static inline uint8_t mat_getLuminance(const mat_block_t* block) {
+
+	return block->light >> 4;
+
+}
+
+static inline uint8_t mat_getTransparency(const mat_block_t* block) {
+
+	return block->light & 0xF;
+
+}
+
+static inline bool_t utl_catchesFireFromLava(const mat_block_t* block) {
+
+	return (block->encouragement & 0x80) ? true : false;
+
+}
+
+static inline bool_t utl_canBurnAway(const mat_block_t* block) {
+
+	return (block->flammability & 0x80) ? true : false;
+
+}
+
+static inline uint8_t utl_getEncouragement(const mat_block_t* block) {
+
+	return block->encouragement & 0x7F;
+
+}
+
+static inline uint8_t utl_getFlammability(const mat_block_t* block) {
+
+	return block->flammability & 0x7F;
+
+}
+
+/*
+	ITEMS
+*/
+
+typedef enum {
+
+	mat_item_id_dirt
+
+} mat_item_id_t;
+
+typedef enum {
+
+	mat_item_type_item = 0,
+	mat_item_type_tool,
+	mat_item_type_block,
+	mat_item_type_food,
+	mat_item_type_consumable
+
+} mat_item_type_t;
+
+typedef union {
+
+	mat_item_type_t type;
+
+	struct {
+
+		uint8_t max_stack_size;
+
+	} item;
+
+	struct {
+
+		mat_tool_type_t type;
+
+	} tool;
+
+	struct {
+
+		mat_block_id_t id;
+
+	} block;
+
+	struct {
+
+
+
+	} food;
+
+	struct {
+
+
+
+	} consumable;
+
+} mat_item_t;
+
+extern const mat_item_t* items;
