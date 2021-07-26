@@ -75,7 +75,7 @@ static inline const mat_state_modifier_t* mat_getStateModifierByType(mat_state_m
 
 typedef enum {
 
-	mat_equipment_type_any = -1,
+	mat_equipment_type_any = 0,
 
 	mat_equipment_type_sword,
 	mat_equipment_type_axe,
@@ -107,7 +107,7 @@ typedef enum {
 
 typedef enum {
 
-	mat_equipment_tier_any = -1,
+	mat_equipment_tier_any = 0,
 
 	mat_equipment_tier_leather,
 	mat_equipment_tier_wood,
@@ -126,6 +126,7 @@ typedef enum {
 
 typedef enum {
 
+	mat_block_entity_none = 0,
 	mat_block_entity_type_sign,
 	mat_block_entity_type_banner,
 	mat_block_entity_type_storage,
