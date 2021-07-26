@@ -945,9 +945,28 @@ typedef enum {
 	mat_block_yellow_stained_glass_pane,
 	mat_block_yellow_terracotta,
 	mat_block_yellow_wool,
-	mat_block_zombie_head
+	mat_block_zombie_head,
+	mat_block_end_portal,
+	mat_block_frosted_ice,
+	mat_block_piston_head,
+	mat_block_nether_portal,
+	mat_block_end_gateway,
+	mat_block_big_dripleaf_stem,
+	mat_block_bubble_column,
+	mat_block_glow_berries
 
 } mat_block_id_t;
+
+typedef enum {
+
+	mat_block_tag_catches_fire_from_lava,
+
+	mat_block_tag_light_filtering,
+	mat_block_tag_transparent,
+
+	mat_block_tag_max
+
+} mat_block_tag_t;
 
 typedef struct {
 
@@ -957,11 +976,9 @@ typedef struct {
 	float32_t hardness;
 		// hardness value for calculating break times
 
-	uint8_t light;
-		// First 4 bits: luminance (0 = no light)
-		// Last 4 bits: transparency (0 = blocks all light)
+	utl_bitset(mat_block_tag_max - 1, tags);
 
-	bool_t fire_from_lava;
+	uint8_t luminance;
 	uint8_t encouragement;
 	uint8_t flammability;
 
@@ -992,13 +1009,7 @@ static inline const mat_block_t* mat_getBlockById(mat_block_id_t id) {
 
 static inline uint8_t mat_getLuminance(const mat_block_t* block) {
 
-	return block->light >> 4;
-
-}
-
-static inline uint8_t mat_getTransparency(const mat_block_t* block) {
-
-	return block->light & 0xF;
+	return block->luminance;
 
 }
 

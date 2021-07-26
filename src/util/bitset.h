@@ -3,6 +3,7 @@
 
 // create a bitset n bits long
 #define utl_bitset(n, l) byte_t l [((n) >> 3) + 1]
+#define utl_arraybit(x) (1 << (x & 7))
 
 static inline void utl_setBit(byte_t set[], size_t bit) {
 
