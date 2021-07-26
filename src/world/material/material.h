@@ -961,10 +961,9 @@ typedef struct {
 		// First 4 bits: luminance (0 = no light)
 		// Last 4 bits: transparency (0 = blocks all light)
 
+	bool_t fire_from_lava;
 	uint8_t encouragement;
-		// most significant bit = can catch fire from lava
 	uint8_t flammability;
-		// most significant bit = can burn away
 
 	struct {
 		

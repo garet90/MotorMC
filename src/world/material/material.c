@@ -7,32 +7,51 @@ const mat_block_t mat_block_acacia_button_d = {
 };
 const mat_block_t mat_block_acacia_door_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_acacia_fence_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_acacia_fence_gate_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_acacia_leaves_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_acacia_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_acacia_planks_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_acacia_pressure_plate_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_acacia_sapling_d = { 
     .resistance = 0,
@@ -42,23 +61,36 @@ const mat_block_t mat_block_acacia_sapling_d = {
 const mat_block_t mat_block_acacia_sign_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_acacia_slab_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_acacia_stairs_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_acacia_trapdoor_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_acacia_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_activator_rail_d = { 
     .resistance = 0.7,
@@ -68,7 +100,9 @@ const mat_block_t mat_block_activator_rail_d = {
 const mat_block_t mat_block_allium_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_amethyst_cluster_d = { 
     .resistance = 1.5,
@@ -104,22 +138,32 @@ const mat_block_t mat_block_azalea_d = {
 };
 const mat_block_t mat_block_azalea_leaves_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_azure_bluet_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_bamboo_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 60
 };
 const mat_block_t mat_block_bamboo_shoot_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60
 };
 const mat_block_t mat_block_beetroots_d = { 
     .resistance = 0,
@@ -128,7 +172,9 @@ const mat_block_t mat_block_beetroots_d = {
 };
 const mat_block_t mat_block_barrel_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_barrier_d = {
     .resistance = 3600000.8,
@@ -149,11 +195,17 @@ const mat_block_t mat_block_bedrock_d = {
 };
 const mat_block_t mat_block_beehive_d = { 
     .resistance = 0.6,
-    .hardness = 0.6
+    .hardness = 0.6,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_bee_nest_d = { 
     .resistance = 0.3,
-    .hardness = 0.3
+    .hardness = 0.3,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 20
 };
 const mat_block_t mat_block_bell_d = {
     .resistance = 5,
@@ -170,32 +222,51 @@ const mat_block_t mat_block_birch_button_d = {
 };
 const mat_block_t mat_block_birch_door_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_birch_fence_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_birch_fence_gate_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_birch_leaves_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_birch_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_birch_planks_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_birch_pressure_plate_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_birch_sapling_d = { 
     .resistance = 0,
@@ -205,32 +276,49 @@ const mat_block_t mat_block_birch_sapling_d = {
 const mat_block_t mat_block_birch_sign_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_birch_slab_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_birch_stairs_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_birch_trapdoor_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_birch_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_black_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_black_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_black_candle_d = { 
     .resistance = 0.1,
@@ -239,7 +327,10 @@ const mat_block_t mat_block_black_candle_d = {
 };
 const mat_block_t mat_block_black_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_black_concrete_d = { 
     .resistance = 1.8,
@@ -271,7 +362,10 @@ const mat_block_t mat_block_black_terracotta_d = {
 };
 const mat_block_t mat_block_black_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_blackstone_d = {
     .resistance = 5,
@@ -299,7 +393,9 @@ const mat_block_t mat_block_block_of_amethyst_d = {
 };
 const mat_block_t mat_block_block_of_coal_d = {
     .resistance = 6,
-    .hardness = 5
+    .hardness = 5,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_block_of_copper_d = {
     .resistance = 6,
@@ -352,11 +448,15 @@ const mat_block_t mat_block_block_of_redstone_d = {
 const mat_block_t mat_block_blue_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_blue_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_blue_candle_d = { 
     .resistance = 0.1,
@@ -365,7 +465,10 @@ const mat_block_t mat_block_blue_candle_d = {
 };
 const mat_block_t mat_block_blue_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_blue_concrete_d = { 
     .resistance = 1.8,
@@ -386,7 +489,9 @@ const mat_block_t mat_block_blue_ice_d = {
 const mat_block_t mat_block_blue_orchid_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_blue_shulker_box_d = { 
     .resistance = 6,
@@ -406,7 +511,10 @@ const mat_block_t mat_block_blue_terracotta_d = {
 };
 const mat_block_t mat_block_blue_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_bone_block_d = { 
     .resistance = 2,
@@ -414,7 +522,10 @@ const mat_block_t mat_block_bone_block_d = {
 };
 const mat_block_t mat_block_bookshelf_d = { 
     .resistance = 1.5,
-    .hardness = 1.5
+    .hardness = 1.5,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 20
 };
 const mat_block_t mat_block_brain_coral_d = { 
     .resistance = 0,
@@ -454,11 +565,15 @@ const mat_block_t mat_block_bricks_d = {
 const mat_block_t mat_block_brown_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_brown_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_brown_candle_d = { 
     .resistance = 0.1,
@@ -467,7 +582,10 @@ const mat_block_t mat_block_brown_candle_d = {
 };
 const mat_block_t mat_block_brown_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_brown_concrete_d = { 
     .resistance = 1.8,
@@ -488,7 +606,9 @@ const mat_block_t mat_block_brown_mushroom_d = {
 };
 const mat_block_t mat_block_brown_mushroom_block_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_brown_shulker_box_d = { 
     .resistance = 6,
@@ -508,7 +628,10 @@ const mat_block_t mat_block_brown_terracotta_d = {
 };
 const mat_block_t mat_block_brown_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_bubble_coral_d = { 
     .resistance = 0,
@@ -544,7 +667,9 @@ const mat_block_t mat_block_calcite_d = {
 const mat_block_t mat_block_campfire_d = { 
     .resistance = 2,
     .hardness = 2,
-    .light = 0xF0
+    .light = 0xF0,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_candle_d = { 
     .resistance = 0.1,
@@ -558,7 +683,9 @@ const mat_block_t mat_block_carrots_d = {
 };
 const mat_block_t mat_block_cartography_table_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_carved_pumpkin_d = { 
     .resistance = 1,
@@ -583,7 +710,9 @@ const mat_block_t mat_block_chain_command_block_d = {
 };
 const mat_block_t mat_block_chest_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_chipped_anvil_d = { 
     .resistance = 1200,
@@ -684,7 +813,10 @@ const mat_block_t mat_block_command_block_d = {
 };
 const mat_block_t mat_block_composter_d = { 
     .resistance = 0.6,
-    .hardness = 0.6
+    .hardness = 0.6,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_conduit_d = { 
     .resistance = 3,
@@ -698,7 +830,9 @@ const mat_block_t mat_block_copper_ore_d = {
 const mat_block_t mat_block_cornflower_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_cracked_deepslate_bricks_d = { 
     .resistance = 6,
@@ -722,7 +856,9 @@ const mat_block_t mat_block_cracked_stone_bricks_d = {
 };
 const mat_block_t mat_block_crafting_table_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_creeper_head_d = { 
     .resistance = 1,
@@ -735,7 +871,9 @@ const mat_block_t mat_block_crimson_button_d = {
 };
 const mat_block_t mat_block_crimson_door_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_crimson_fence_d = { 
     .resistance = 3,
@@ -791,7 +929,7 @@ const mat_block_t mat_block_crimson_stem_d = {
 };
 const mat_block_t mat_block_crimson_trapdoor_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
 };
 const mat_block_t mat_block_crying_obsidian_d = { 
     .resistance = 1200,
@@ -829,11 +967,15 @@ const mat_block_t mat_block_cut_sandstone_slab_d = {
 const mat_block_t mat_block_cyan_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_cyan_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_cyan_candle_d = { 
     .resistance = 0.1,
@@ -842,7 +984,10 @@ const mat_block_t mat_block_cyan_candle_d = {
 };
 const mat_block_t mat_block_cyan_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_cyan_concrete_d = { 
     .resistance = 1.8,
@@ -874,7 +1019,10 @@ const mat_block_t mat_block_cyan_terracotta_d = {
 };
 const mat_block_t mat_block_cyan_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_damaged_anvil_d = { 
     .resistance = 1200,
@@ -883,7 +1031,9 @@ const mat_block_t mat_block_damaged_anvil_d = {
 const mat_block_t mat_block_dandelion_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_dark_oak_button_d = { 
     .resistance = 0.5,
@@ -892,32 +1042,51 @@ const mat_block_t mat_block_dark_oak_button_d = {
 };
 const mat_block_t mat_block_dark_oak_door_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_dark_oak_fence_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_dark_oak_fence_gate_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_dark_oak_leaves_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_dark_oak_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_dark_oak_planks_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_dark_oak_pressure_plate_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_dark_oak_sapling_d = { 
     .resistance = 0,
@@ -927,23 +1096,36 @@ const mat_block_t mat_block_dark_oak_sapling_d = {
 const mat_block_t mat_block_dark_oak_sign_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_dark_oak_slab_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_dark_oak_stairs_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_dark_oak_trapdoor_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_dark_oak_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_dark_prismarine_d = { 
     .resistance = 6,
@@ -959,7 +1141,9 @@ const mat_block_t mat_block_dark_prismarine_stairs_d = {
 };
 const mat_block_t mat_block_daylight_detector_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_dead_brain_coral_d = { 
     .resistance = 0,
@@ -992,7 +1176,10 @@ const mat_block_t mat_block_dead_bubble_coral_fan_d = {
 const mat_block_t mat_block_dead_bush_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_dead_fire_coral_d = { 
     .resistance = 0,
@@ -1152,7 +1339,9 @@ const mat_block_t mat_block_dragon_head_d = {
 };
 const mat_block_t mat_block_dried_kelp_block_d = { 
     .resistance = 2.5,
-    .hardness = 0.5
+    .hardness = 0.5,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_dripstone_block_d = { 
     .resistance = 1,
@@ -1228,7 +1417,9 @@ const mat_block_t mat_block_farmland_d = {
 const mat_block_t mat_block_fern_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_fire_d = { 
     .resistance = 0,
@@ -1251,7 +1442,9 @@ const mat_block_t mat_block_fire_coral_fan_d = {
 };
 const mat_block_t mat_block_fletching_table_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_flower_pot_d = { 
     .resistance = 0,
@@ -1263,7 +1456,10 @@ const mat_block_t mat_block_flowering_azalea_d = {
 };
 const mat_block_t mat_block_flowering_azalea_leaves_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_furnace_d = { 
     .resistance = 3.5,
@@ -1314,7 +1510,10 @@ const mat_block_t mat_block_granite_wall_d = {
 const mat_block_t mat_block_grass_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_grass_block_d = { 
     .resistance = 0.6,
@@ -1327,11 +1526,15 @@ const mat_block_t mat_block_gravel_d = {
 const mat_block_t mat_block_gray_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_gray_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_gray_candle_d = { 
     .resistance = 0.1,
@@ -1340,7 +1543,10 @@ const mat_block_t mat_block_gray_candle_d = {
 };
 const mat_block_t mat_block_gray_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_gray_concrete_d = { 
     .resistance = 1.8,
@@ -1372,16 +1578,23 @@ const mat_block_t mat_block_gray_terracotta_d = {
 };
 const mat_block_t mat_block_gray_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_green_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_green_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_green_candle_d = { 
     .resistance = 0.1,
@@ -1390,7 +1603,10 @@ const mat_block_t mat_block_green_candle_d = {
 };
 const mat_block_t mat_block_green_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_green_concrete_d = { 
     .resistance = 1.8,
@@ -1422,7 +1638,10 @@ const mat_block_t mat_block_green_terracotta_d = {
 };
 const mat_block_t mat_block_green_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_grindstone_d = { 
     .resistance = 6,
@@ -1435,12 +1654,14 @@ const mat_block_t mat_block_hanging_roots_d = {
 };
 const mat_block_t mat_block_hay_bale_d = { 
     .resistance = 0.5,
-    .hardness = 0.5
+    .hardness = 0.5,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_heavy_weighted_pressure_plate_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
-    .light = 0x0F
+    .light = 0x0F,
 };
 const mat_block_t mat_block_honey_block_d = { 
     .resistance = 0,
@@ -1527,7 +1748,9 @@ const mat_block_t mat_block_jigsaw_block_d = {
 };
 const mat_block_t mat_block_jukebox_d = { 
     .resistance = 6,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_jungle_button_d = { 
     .resistance = 0.5,
@@ -1536,32 +1759,51 @@ const mat_block_t mat_block_jungle_button_d = {
 };
 const mat_block_t mat_block_jungle_door_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_jungle_fence_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_jungle_fence_gate_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_jungle_leaves_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_jungle_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_jungle_planks_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_jungle_pressure_plate_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_jungle_sapling_d = { 
     .resistance = 0,
@@ -1571,23 +1813,36 @@ const mat_block_t mat_block_jungle_sapling_d = {
 const mat_block_t mat_block_jungle_sign_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_jungle_slab_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_jungle_stairs_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_jungle_trapdoor_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_jungle_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_kelp_d = { 
     .resistance = 0,
@@ -1613,7 +1868,10 @@ const mat_block_t mat_block_large_amethyst_bud_d = {
 };
 const mat_block_t mat_block_large_fern_d = { 
     .resistance = 0,
-    .hardness = 0
+    .hardness = 0,
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_lava_d = { 
     .resistance = 100,
@@ -1622,7 +1880,10 @@ const mat_block_t mat_block_lava_d = {
 };
 const mat_block_t mat_block_lectern_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 20
 };
 const mat_block_t mat_block_lever_d = { 
     .resistance = 0.5,
@@ -1637,11 +1898,15 @@ const mat_block_t mat_block_light_block_d = {
 const mat_block_t mat_block_light_blue_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_light_blue_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_light_blue_candle_d = { 
     .resistance = 0.1,
@@ -1650,7 +1915,10 @@ const mat_block_t mat_block_light_blue_candle_d = {
 };
 const mat_block_t mat_block_light_blue_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_light_blue_concrete_d = { 
     .resistance = 1.8,
@@ -1682,16 +1950,23 @@ const mat_block_t mat_block_light_blue_terracotta_d = {
 };
 const mat_block_t mat_block_light_blue_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_light_gray_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_light_gray_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_light_gray_candle_d = { 
     .resistance = 0.1,
@@ -1700,7 +1975,10 @@ const mat_block_t mat_block_light_gray_candle_d = {
 };
 const mat_block_t mat_block_light_gray_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_light_gray_concrete_d = { 
     .resistance = 1.8,
@@ -1732,7 +2010,10 @@ const mat_block_t mat_block_light_gray_terracotta_d = {
 };
 const mat_block_t mat_block_light_gray_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_light_weighted_pressure_plate_d = { 
     .resistance = 0.5,
@@ -1746,12 +2027,17 @@ const mat_block_t mat_block_lightning_rod_d = {
 const mat_block_t mat_block_lilac_d = {
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_lily_of_the_valley_d = {
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_lily_pad_d = { 
     .resistance = 0,
@@ -1761,11 +2047,15 @@ const mat_block_t mat_block_lily_pad_d = {
 const mat_block_t mat_block_lime_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_lime_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_lime_candle_d = { 
     .resistance = 0.1,
@@ -1774,7 +2064,10 @@ const mat_block_t mat_block_lime_candle_d = {
 };
 const mat_block_t mat_block_lime_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_lime_concrete_d = { 
     .resistance = 1.8,
@@ -1806,7 +2099,10 @@ const mat_block_t mat_block_lime_terracotta_d = {
 };
 const mat_block_t mat_block_lime_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_lodestone_d = { 
     .resistance = 3.5,
@@ -1814,16 +2110,22 @@ const mat_block_t mat_block_lodestone_d = {
 };
 const mat_block_t mat_block_loom_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_magenta_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_magenta_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_magenta_candle_d = { 
     .resistance = 0.1,
@@ -1832,7 +2134,10 @@ const mat_block_t mat_block_magenta_candle_d = {
 };
 const mat_block_t mat_block_magenta_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_magenta_concrete_d = { 
     .resistance = 1.8,
@@ -1864,7 +2169,10 @@ const mat_block_t mat_block_magenta_terracotta_d = {
 };
 const mat_block_t mat_block_magenta_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_magma_block_d = { 
     .resistance = 0.5,
@@ -1927,7 +2235,9 @@ const mat_block_t mat_block_mossy_stone_bricks_d = {
 };
 const mat_block_t mat_block_mushroom_stem_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_mycelium_d = { 
     .resistance = 0.5,
@@ -1964,7 +2274,9 @@ const mat_block_t mat_block_nether_quartz_ore_d = {
 const mat_block_t mat_block_nether_sprouts_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_nether_wart_d = { 
     .resistance = 0,
@@ -1981,7 +2293,9 @@ const mat_block_t mat_block_netherrack_d = {
 };
 const mat_block_t mat_block_note_block_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_oak_button_d = { 
     .resistance = 0.5,
@@ -1990,32 +2304,51 @@ const mat_block_t mat_block_oak_button_d = {
 };
 const mat_block_t mat_block_oak_door_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_oak_fence_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_oak_fence_gate_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_oak_leaves_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_oak_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_oak_planks_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_oak_pressure_plate_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_oak_sapling_d = { 
     .resistance = 0,
@@ -2025,23 +2358,36 @@ const mat_block_t mat_block_oak_sapling_d = {
 const mat_block_t mat_block_oak_sign_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_oak_slab_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_oak_stairs_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_oak_trapdoor_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_oak_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_observer_d = { 
     .resistance = 3.5,
@@ -2054,16 +2400,22 @@ const mat_block_t mat_block_obsidian_d = {
 const mat_block_t mat_block_ominous_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_orange_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_orange_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_orange_candle_d = { 
     .resistance = 0.1,
@@ -2072,7 +2424,10 @@ const mat_block_t mat_block_orange_candle_d = {
 };
 const mat_block_t mat_block_orange_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_orange_concrete_d = { 
     .resistance = 1.8,
@@ -2105,16 +2460,23 @@ const mat_block_t mat_block_orange_terracotta_d = {
 const mat_block_t mat_block_orange_tulip_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_orange_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_oxeye_daisy_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_oxidized_copper_d = { 
     .resistance = 6,
@@ -2139,7 +2501,10 @@ const mat_block_t mat_block_packed_ice_d = {
 const mat_block_t mat_block_peony_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_petrified_oak_slab_d = { 
     .resistance = 3,
@@ -2148,11 +2513,15 @@ const mat_block_t mat_block_petrified_oak_slab_d = {
 const mat_block_t mat_block_pink_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_pink_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_pink_candle_d = { 
     .resistance = 0.1,
@@ -2161,7 +2530,10 @@ const mat_block_t mat_block_pink_candle_d = {
 };
 const mat_block_t mat_block_pink_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_pink_concrete_d = { 
     .resistance = 1.8,
@@ -2194,11 +2566,16 @@ const mat_block_t mat_block_pink_terracotta_d = {
 const mat_block_t mat_block_pink_tulip_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_pink_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_piston_d = { 
     .resistance = 0.5
@@ -2316,7 +2693,9 @@ const mat_block_t mat_block_polished_deepslate_wall_d = {
 const mat_block_t mat_block_poppy_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_potatoes_d = { 
     .resistance = 0,
@@ -2373,11 +2752,15 @@ const mat_block_t mat_block_pumpkin_stem_d = {
 const mat_block_t mat_block_purple_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_purple_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_purple_candle_d = { 
     .resistance = 0.1,
@@ -2386,7 +2769,10 @@ const mat_block_t mat_block_purple_candle_d = {
 };
 const mat_block_t mat_block_purple_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_purple_concrete_d = { 
     .resistance = 1.8,
@@ -2418,7 +2804,10 @@ const mat_block_t mat_block_purple_terracotta_d = {
 };
 const mat_block_t mat_block_purple_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_purpur_block_d = { 
     .resistance = 6,
@@ -2460,11 +2849,15 @@ const mat_block_t mat_block_rail_d = {
 const mat_block_t mat_block_red_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_red_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_red_candle_d = { 
     .resistance = 0.1,
@@ -2473,7 +2866,10 @@ const mat_block_t mat_block_red_candle_d = {
 };
 const mat_block_t mat_block_red_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_red_concrete_d = { 
     .resistance = 1.8,
@@ -2494,7 +2890,9 @@ const mat_block_t mat_block_red_mushroom_d = {
 };
 const mat_block_t mat_block_red_mushroom_block_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_red_nether_brick_slab_d = { 
     .resistance = 6,
@@ -2551,11 +2949,16 @@ const mat_block_t mat_block_red_terracotta_d = {
 const mat_block_t mat_block_red_tulip_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_red_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_redstone_comparator_d = { 
     .resistance = 0,
@@ -2598,7 +3001,10 @@ const mat_block_t mat_block_rooted_dirt_d = {
 const mat_block_t mat_block_rose_bush_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_sand_d = { 
     .resistance = 0.5,
@@ -2622,7 +3028,10 @@ const mat_block_t mat_block_sandstone_wall_d = {
 };
 const mat_block_t mat_block_scaffolding_d = { 
     .resistance = 0,
-    .hardness = 0
+    .hardness = 0,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 60
 };
 const mat_block_t mat_block_sculk_sensor_d = { 
     .resistance = 1.5,
@@ -2671,7 +3080,9 @@ const mat_block_t mat_block_small_dripleaf_d = {
 };
 const mat_block_t mat_block_smithing_table_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_smoker_d = { 
     .resistance = 3.5,
@@ -2782,32 +3193,51 @@ const mat_block_t mat_block_spruce_button_d = {
 };
 const mat_block_t mat_block_spruce_door_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_spruce_fence_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_spruce_fence_gate_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_spruce_leaves_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_spruce_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_spruce_planks_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_spruce_pressure_plate_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_spruce_sapling_d = { 
     .resistance = 0,
@@ -2817,23 +3247,36 @@ const mat_block_t mat_block_spruce_sapling_d = {
 const mat_block_t mat_block_spruce_sign_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_spruce_slab_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_spruce_stairs_d = { 
     .resistance = 3,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 20
 };
 const mat_block_t mat_block_spruce_trapdoor_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_spruce_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_sticky_piston_d = { 
     .resistance = 0.5,
@@ -2882,19 +3325,31 @@ const mat_block_t mat_block_stonecutter_d = {
 };
 const mat_block_t mat_block_stripped_acacia_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_acacia_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_birch_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_birch_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_crimson_hyphae_d = { 
     .resistance = 2
@@ -2905,35 +3360,59 @@ const mat_block_t mat_block_stripped_crimson_stem_d = {
 };
 const mat_block_t mat_block_stripped_dark_oak_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_dark_oak_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_jungle_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_jungle_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_oak_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_oak_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_spruce_log_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_spruce_wood_d = { 
     .resistance = 2,
-    .hardness = 2
+    .hardness = 2,
+    .fire_from_lava = true,
+    .encouragement = 5,
+    .flammability = 5
 };
 const mat_block_t mat_block_stripped_warped_hyphae_d = { 
     .resistance = 2
@@ -2959,16 +3438,25 @@ const mat_block_t mat_block_sugar_cane_d = {
 const mat_block_t mat_block_sunflower_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_sweet_berry_bush_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_tall_grass_d = { 
     .resistance = 0,
-    .hardness = 0
+    .hardness = 0,
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_tall_seagrass_d = { 
     .resistance = 0,
@@ -2977,7 +3465,9 @@ const mat_block_t mat_block_tall_seagrass_d = {
 };
 const mat_block_t mat_block_target_d = { 
     .resistance = 0.5,
-    .hardness = 0.5
+    .hardness = 0.5,
+    .encouragement = 15,
+    .flammability = 20
 };
 const mat_block_t mat_block_terracotta_d = { 
     .resistance = 4.2,
@@ -2989,7 +3479,10 @@ const mat_block_t mat_block_tinted_glass_d = {
 };
 const mat_block_t mat_block_tnt_d = { 
     .resistance = 0,
-    .hardness = 0
+    .hardness = 0,
+    .fire_from_lava = true,
+    .encouragement = 15,
+    .flammability = 100
 };
 const mat_block_t mat_block_torch_d = { 
     .resistance = 0,
@@ -2998,7 +3491,9 @@ const mat_block_t mat_block_torch_d = {
 };
 const mat_block_t mat_block_trapped_chest_d = { 
     .resistance = 2.5,
-    .hardness = 2.5
+    .hardness = 2.5,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_tripwire_d = {
     .resistance = 0,
@@ -3040,7 +3535,10 @@ const mat_block_t mat_block_twisting_vines_d = {
 const mat_block_t mat_block_vines_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 15,
+    .flammability = 100
 };
 const mat_block_t mat_block_warped_button_d = { 
     .resistance = 0.5,
@@ -3049,7 +3547,9 @@ const mat_block_t mat_block_warped_button_d = {
 };
 const mat_block_t mat_block_warped_door_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_warped_fence_d = { 
     .resistance = 3,
@@ -3079,17 +3579,23 @@ const mat_block_t mat_block_warped_planks_d = {
 const mat_block_t mat_block_warped_pressure_plate_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_warped_roots_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_warped_sign_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_warped_slab_d = { 
     .resistance = 3,
@@ -3105,7 +3611,9 @@ const mat_block_t mat_block_warped_stem_d = {
 };
 const mat_block_t mat_block_warped_trapdoor_d = { 
     .resistance = 3,
-    .hardness = 3
+    .hardness = 3,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_warped_wart_block_d = {
     .resistance = 1,
@@ -3213,11 +3721,15 @@ const mat_block_t mat_block_wheat_crops_d = {
 const mat_block_t mat_block_white_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_white_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_white_candle_d = { 
     .resistance = 0.1,
@@ -3226,7 +3738,10 @@ const mat_block_t mat_block_white_candle_d = {
 };
 const mat_block_t mat_block_white_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_white_concrete_d = { 
     .resistance = 1.8,
@@ -3259,16 +3774,23 @@ const mat_block_t mat_block_white_terracotta_d = {
 const mat_block_t mat_block_white_tulip_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_white_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_wither_rose_d = { 
     .resistance = 0,
     .hardness = 0,
-    .light = 0x0F
+    .light = 0x0F,
+    .encouragement = 60,
+    .flammability = 100
 };
 const mat_block_t mat_block_wither_skeleton_skull_d = { 
     .resistance = 1,
@@ -3277,11 +3799,15 @@ const mat_block_t mat_block_wither_skeleton_skull_d = {
 const mat_block_t mat_block_yellow_banner_d = { 
     .resistance = 1,
     .hardness = 1,
-    .light = 0x0F
+    .light = 0x0F,
+    .fire_from_lava = true,
+    .encouragement = 5
 };
 const mat_block_t mat_block_yellow_bed_d = { 
     .resistance = 0.2,
-    .hardness = 0.2
+    .hardness = 0.2,
+    .fire_from_lava = true,
+    .encouragement = 30
 };
 const mat_block_t mat_block_yellow_candle_d = { 
     .resistance = 0.1,
@@ -3290,7 +3816,10 @@ const mat_block_t mat_block_yellow_candle_d = {
 };
 const mat_block_t mat_block_yellow_carpet_d = { 
     .resistance = 0.1,
-    .hardness = 0.1
+    .hardness = 0.1,
+    .fire_from_lava = true,
+    .encouragement = 60,
+    .flammability = 20
 };
 const mat_block_t mat_block_yellow_concrete_d = { 
     .resistance = 1.8,
@@ -3322,7 +3851,10 @@ const mat_block_t mat_block_yellow_terracotta_d = {
 };
 const mat_block_t mat_block_yellow_wool_d = { 
     .resistance = 0.8,
-    .hardness = 0.8
+    .hardness = 0.8,
+    .fire_from_lava = true,
+    .encouragement = 30,
+    .flammability = 60
 };
 const mat_block_t mat_block_zombie_head_d = { 
     .resistance = 1,
