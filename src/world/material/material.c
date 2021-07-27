@@ -114,7 +114,8 @@ const mat_block_t mat_block_acacia_sign_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_acacia_slab_d = { 
     .resistance = 3,
@@ -127,7 +128,8 @@ const mat_block_t mat_block_acacia_slab_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_acacia_stairs_d = { 
     .resistance = 3,
@@ -324,7 +326,8 @@ const mat_block_t mat_block_barrel_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_container
 };
 const mat_block_t mat_block_barrier_d = {
     .resistance = 3600000.8,
@@ -347,7 +350,8 @@ const mat_block_t mat_block_beacon_d = {
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
     },
-    .luminance = 15
+    .luminance = 15,
+    .entity = mat_block_entity_beacon
 };
 const mat_block_t mat_block_bedrock_d = {
     .resistance = 18000000,
@@ -364,7 +368,8 @@ const mat_block_t mat_block_beehive_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_bees
 };
 const mat_block_t mat_block_bee_nest_d = { 
     .resistance = 0.3,
@@ -377,7 +382,8 @@ const mat_block_t mat_block_bee_nest_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_bees
 };
 const mat_block_t mat_block_bell_d = {
     .resistance = 5,
@@ -388,7 +394,8 @@ const mat_block_t mat_block_bell_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_bell
 };
 const mat_block_t mat_block_big_dripleaf_d = { 
     .resistance = 0.1,
@@ -515,7 +522,8 @@ const mat_block_t mat_block_birch_sign_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_birch_slab_d = { 
     .resistance = 3,
@@ -576,14 +584,16 @@ const mat_block_t mat_block_black_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_black_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_black_candle_d = { 
     .resistance = 0.1,
@@ -634,7 +644,8 @@ const mat_block_t mat_block_black_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_black_stained_glass_d = { 
     .resistance = 0.3,
@@ -718,7 +729,8 @@ const mat_block_t mat_block_blast_furnace_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_furnace
 };
 const mat_block_t mat_block_block_of_amethyst_d = { 
     .resistance = 1.5,
@@ -843,14 +855,16 @@ const mat_block_t mat_block_blue_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_blue_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_blue_candle_d = { 
     .resistance = 0.1,
@@ -918,7 +932,8 @@ const mat_block_t mat_block_blue_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_blue_stained_glass_d = { 
     .resistance = 0.3,
@@ -1008,7 +1023,8 @@ const mat_block_t mat_block_brewing_stand_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_brewing
 };
 const mat_block_t mat_block_brick_slab_d = { 
     .resistance = 6,
@@ -1060,14 +1076,16 @@ const mat_block_t mat_block_brown_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_brown_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_brown_candle_d = { 
     .resistance = 0.1,
@@ -1137,7 +1155,8 @@ const mat_block_t mat_block_brown_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_brown_stained_glass_d = { 
     .resistance = 0.3,
@@ -1236,7 +1255,8 @@ const mat_block_t mat_block_campfire_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_container
 };
 const mat_block_t mat_block_candle_d = { 
     .resistance = 0.1,
@@ -1302,7 +1322,8 @@ const mat_block_t mat_block_chain_d = {
 };
 const mat_block_t mat_block_chain_command_block_d = { 
     .resistance = 3600000,
-    .hardness = -1
+    .hardness = -1,
+    .entity = mat_block_entity_command
 };
 const mat_block_t mat_block_chest_d = { 
     .resistance = 2.5,
@@ -1313,7 +1334,8 @@ const mat_block_t mat_block_chest_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_chipped_anvil_d = { 
     .resistance = 1200,
@@ -1534,7 +1556,8 @@ const mat_block_t mat_block_cocoa_d = {
 };
 const mat_block_t mat_block_command_block_d = {
     .resistance = 3600000,
-    .hardness = -1
+    .hardness = -1,
+    .entity = mat_block_entity_command
 };
 const mat_block_t mat_block_composter_d = { 
     .resistance = 0.6,
@@ -1559,7 +1582,8 @@ const mat_block_t mat_block_conduit_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_conduit
 };
 const mat_block_t mat_block_copper_ore_d = { 
     .resistance = 3,
@@ -1738,7 +1762,8 @@ const mat_block_t mat_block_crimson_sign_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_crimson_slab_d = { 
     .resistance = 3,
@@ -1866,14 +1891,16 @@ const mat_block_t mat_block_cyan_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_cyan_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_cyan_candle_d = { 
     .resistance = 0.1,
@@ -1924,7 +1951,8 @@ const mat_block_t mat_block_cyan_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_cyan_stained_glass_d = { 
     .resistance = 0.3,
@@ -2095,7 +2123,8 @@ const mat_block_t mat_block_dark_oak_sign_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_dark_oak_slab_d = { 
     .resistance = 3,
@@ -2186,7 +2215,8 @@ const mat_block_t mat_block_daylight_detector_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_daylight
 };
 const mat_block_t mat_block_dead_brain_coral_d = { 
     .resistance = 0,
@@ -2543,7 +2573,8 @@ const mat_block_t mat_block_dispenser_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_container
 };
 const mat_block_t mat_block_dragon_egg_d = { 
     .resistance = 9,
@@ -2584,7 +2615,8 @@ const mat_block_t mat_block_dropper_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_container
 };
 const mat_block_t mat_block_emerald_ore_d = { 
     .resistance = 3,
@@ -2603,7 +2635,8 @@ const mat_block_t mat_block_enchanting_table_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_enchanting_table
 };
 const mat_block_t mat_block_end_portal_frame_d = { 
     .resistance = 3600000,
@@ -2680,7 +2713,8 @@ const mat_block_t mat_block_ender_chest_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_end_particles
 };
 const mat_block_t mat_block_exposed_copper_d = { 
     .resistance = 6,
@@ -2810,7 +2844,8 @@ const mat_block_t mat_block_furnace_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_furnace
 };
 const mat_block_t mat_block_gilded_blackstone_d = { 
     .resistance = 6,
@@ -2936,14 +2971,16 @@ const mat_block_t mat_block_gray_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_gray_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_gray_candle_d = { 
     .resistance = 0.1,
@@ -2994,7 +3031,8 @@ const mat_block_t mat_block_gray_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_gray_stained_glass_d = { 
     .resistance = 0.3,
@@ -3040,14 +3078,16 @@ const mat_block_t mat_block_green_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_green_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_green_candle_d = { 
     .resistance = 0.1,
@@ -3098,7 +3138,8 @@ const mat_block_t mat_block_green_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_green_stained_glass_d = { 
     .resistance = 0.3,
@@ -3194,7 +3235,8 @@ const mat_block_t mat_block_hopper_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_hopper
 };
 const mat_block_t mat_block_horn_coral_d = { 
     .resistance = 0,
@@ -3312,7 +3354,8 @@ const mat_block_t mat_block_jack_o_lantern_d = {
 };
 const mat_block_t mat_block_jigsaw_block_d = { 
     .resistance = 3600000,
-    .hardness = -1
+    .hardness = -1,
+    .entity = mat_block_entity_jigsaw
 };
 const mat_block_t mat_block_jukebox_d = { 
     .resistance = 6,
@@ -3323,7 +3366,8 @@ const mat_block_t mat_block_jukebox_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_jukebox
 };
 const mat_block_t mat_block_jungle_button_d = { 
     .resistance = 0.5,
@@ -3439,7 +3483,8 @@ const mat_block_t mat_block_jungle_sign_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_jungle_slab_d = { 
     .resistance = 3,
@@ -3565,7 +3610,8 @@ const mat_block_t mat_block_lectern_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_lectern
 };
 const mat_block_t mat_block_lever_d = { 
     .resistance = 0.5,
@@ -3590,14 +3636,16 @@ const mat_block_t mat_block_light_blue_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_light_blue_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_light_blue_candle_d = { 
     .resistance = 0.1,
@@ -3648,7 +3696,8 @@ const mat_block_t mat_block_light_blue_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_light_blue_stained_glass_d = { 
     .resistance = 0.3,
@@ -3694,14 +3743,16 @@ const mat_block_t mat_block_light_gray_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_light_gray_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_light_gray_candle_d = { 
     .resistance = 0.1,
@@ -3752,7 +3803,8 @@ const mat_block_t mat_block_light_gray_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_light_gray_stained_glass_d = { 
     .resistance = 0.3,
@@ -3845,14 +3897,16 @@ const mat_block_t mat_block_lime_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_lime_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_lime_candle_d = { 
     .resistance = 0.1,
@@ -3903,7 +3957,8 @@ const mat_block_t mat_block_lime_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_lime_stained_glass_d = { 
     .resistance = 0.3,
@@ -3968,14 +4023,16 @@ const mat_block_t mat_block_magenta_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_magenta_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_magenta_candle_d = { 
     .resistance = 0.1,
@@ -4026,7 +4083,8 @@ const mat_block_t mat_block_magenta_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_magenta_stained_glass_d = { 
     .resistance = 0.3,
@@ -4438,7 +4496,8 @@ const mat_block_t mat_block_oak_sign_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_oak_slab_d = { 
     .resistance = 3,
@@ -4515,7 +4574,8 @@ const mat_block_t mat_block_ominous_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_orange_banner_d = { 
     .resistance = 1,
@@ -4526,14 +4586,16 @@ const mat_block_t mat_block_orange_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_orange_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_orange_candle_d = { 
     .resistance = 0.1,
@@ -4584,7 +4646,8 @@ const mat_block_t mat_block_orange_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_orange_stained_glass_d = { 
     .resistance = 0.3,
@@ -4714,14 +4777,16 @@ const mat_block_t mat_block_pink_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_pink_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_pink_candle_d = { 
     .resistance = 0.1,
@@ -4772,7 +4837,8 @@ const mat_block_t mat_block_pink_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_pink_stained_glass_d = { 
     .resistance = 0.3,
@@ -4831,7 +4897,8 @@ const mat_block_t mat_block_player_head_d = {
     .hardness = 1,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_head
 };
 const mat_block_t mat_block_podzol_d = { 
     .resistance = 0.5,
@@ -5135,10 +5202,6 @@ const mat_block_t mat_block_prismarine_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    },
-    .best_tool = {
-        .tier = mat_equipment_tier_wood,
-        .type = mat_equipment_type_pickaxe
     }
 };
 const mat_block_t mat_block_prismarine_brick_slab_d = { 
@@ -5228,14 +5291,16 @@ const mat_block_t mat_block_purple_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_purple_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_purple_candle_d = { 
     .resistance = 0.1,
@@ -5286,7 +5351,8 @@ const mat_block_t mat_block_purple_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_purple_stained_glass_d = { 
     .resistance = 0.3,
@@ -5419,14 +5485,16 @@ const mat_block_t mat_block_red_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_red_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_red_candle_d = { 
     .resistance = 0.1,
@@ -5585,7 +5653,8 @@ const mat_block_t mat_block_red_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_red_stained_glass_d = { 
     .resistance = 0.3,
@@ -5636,7 +5705,8 @@ const mat_block_t mat_block_redstone_comparator_d = {
     .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_comparator
 };
 const mat_block_t mat_block_redstone_lamp_d = { 
     .resistance = 0.3,
@@ -5674,7 +5744,8 @@ const mat_block_t mat_block_redstone_wire_d = {
 };
 const mat_block_t mat_block_repeating_command_block_d = { 
     .resistance = 3600000,
-    .hardness = -1
+    .hardness = -1,
+    .entity = mat_block_entity_command
 };
 const mat_block_t mat_block_respawn_anchor_d = { 
     .resistance = 1200,
@@ -5805,7 +5876,8 @@ const mat_block_t mat_block_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_skeleton_skull_d = { 
     .resistance = 1,
@@ -5854,7 +5926,8 @@ const mat_block_t mat_block_smoker_d = {
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_furnace
 };
 const mat_block_t mat_block_smooth_basalt_d = { 
     .resistance = 4.2,
@@ -6002,7 +6075,8 @@ const mat_block_t mat_block_soul_campfire_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_container
 };
 const mat_block_t mat_block_soul_fire_d = { 
     .resistance = 0,
@@ -6188,7 +6262,8 @@ const mat_block_t mat_block_spruce_sign_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_spruce_slab_d = { 
     .resistance = 3,
@@ -6534,7 +6609,8 @@ const mat_block_t mat_block_stripped_warped_stem_d = {
 };
 const mat_block_t mat_block_structure_block_d = { 
     .resistance = 3600000,
-    .hardness = -1
+    .hardness = -1,
+    .entity = mat_block_entity_structure
 };
 const mat_block_t mat_block_structure_void_d = { 
     .resistance = 0,
@@ -6632,7 +6708,8 @@ const mat_block_t mat_block_trapped_chest_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_tripwire_d = {
     .resistance = 0,
@@ -6803,7 +6880,8 @@ const mat_block_t mat_block_warped_sign_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_sign
 };
 const mat_block_t mat_block_warped_slab_d = { 
     .resistance = 3,
@@ -7082,14 +7160,16 @@ const mat_block_t mat_block_white_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_white_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_white_candle_d = { 
     .resistance = 0.1,
@@ -7140,7 +7220,8 @@ const mat_block_t mat_block_white_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_white_stained_glass_d = { 
     .resistance = 0.3,
@@ -7211,14 +7292,16 @@ const mat_block_t mat_block_yellow_banner_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_axe
-    }
+    },
+    .entity = mat_block_entity_banner
 };
 const mat_block_t mat_block_yellow_bed_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
     .tags = {
         utl_arraybit(mat_block_tag_catches_fire_from_lava) | utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_bed
 };
 const mat_block_t mat_block_yellow_candle_d = { 
     .resistance = 0.1,
@@ -7269,7 +7352,8 @@ const mat_block_t mat_block_yellow_shulker_box_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_locational_container
 };
 const mat_block_t mat_block_yellow_stained_glass_d = { 
     .resistance = 0.3,
@@ -7319,7 +7403,8 @@ const mat_block_t mat_block_end_portal_d = {
     .luminance = 15,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
-    }
+    },
+    .entity = mat_block_entity_end_particles
 };
 const mat_block_t mat_block_frosted_ice_d = {
     .resistance = 0.5,
@@ -7338,7 +7423,8 @@ const mat_block_t mat_block_piston_head_d = {
     .best_tool = {
         .tier = mat_equipment_tier_any,
         .type = mat_equipment_type_pickaxe
-    }
+    },
+    .entity = mat_block_entity_piston_extension
 };
 const mat_block_t mat_block_nether_portal_d = {
     .resistance = 0,
@@ -7354,7 +7440,8 @@ const mat_block_t mat_block_end_gateway_d = {
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
     },
-    .luminance = 15
+    .luminance = 15,
+    .entity = mat_block_entity_gateway
 };
 const mat_block_t mat_block_big_dripleaf_stem_d = {
     .resistance = 0.1,

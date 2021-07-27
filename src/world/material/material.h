@@ -40,10 +40,116 @@ static inline const mat_hitbox_t* mat_getHitboxById(mat_hitbox_id_t hitbox) {
 typedef enum {
 
 	mat_state_modifier_facing_cardinal,
+		// north
+		// south
+		// east
+		// west
+	mat_state_modifier_facing,
+		// down
+		// east
+		// north
+		// south
+		// up
+		// west
+	mat_state_modifier_rotation,
+		// 0 - 15
+	mat_state_modifier_open,
+		// boolean
+	mat_state_modifier_attachment,
+		// floor
+		// seiling
+		// double_wall
+		// single_wall
+	mat_state_modifier_powered,
+		// boolean
+	mat_state_modifier_lit,
+		// boolean
+	mat_state_modifier_axis,
+		// x
+		// y
+		// z
+	mat_state_modifier_face,
+		// ceiling
+		// floor
+		// wall
+	mat_state_modifier_waterlogged,
+		// boolean
+	mat_state_modifier_down,
+		// boolean
+	mat_state_modifier_east,
+		// boolean
+	mat_state_modifier_north,
+		// boolean
+	mat_state_modifier_south,
+		// boolean
+	mat_state_modifier_up,
+		// boolean
+	mat_state_modifier_west,
+		// boolean
+	mat_state_modifier_power,
+		// 0 - 15
+	mat_state_modifier_triggered,
+		// boolean
+	
 	mat_state_modifier_bamboo_age,
+		// 0 or 1
 	mat_state_modifier_bamboo_leaves,
-	mat_state_modifier_bamboo_state
-	// TODO automatically generate this
+		// large
+		// none
+		// small
+	mat_state_modifier_bamboo_stage,
+		// 0 or 1
+	mat_state_modifier_bed_occupied,
+		// boolean
+	mat_state_modifier_bed_part,
+		// foot
+		// head
+	mat_state_modifier_hive_honey_level,
+		// 0 - 5
+	mat_state_modifier_beetroot_age,
+		// 0 - 3
+	mat_state_modifier_brewing_stand_has_bottle_0,
+		// boolean
+	mat_state_modifier_brewing_stand_has_bottle_1,
+		// boolean
+	mat_state_modifier_brewing_stand_has_bottle_2,
+		// boolean
+	mat_state_modifier_bubble_column_drag,
+		// boolean
+	mat_state_modifier_cactus_age,
+		// 0 - 15
+	mat_state_modifier_campfire_signal,
+		// boolean
+	mat_state_modifier_cake_bites,
+		// 0 - 6
+	mat_state_modifier_carrot_age,
+		// 0 - 7
+	mat_state_modifier_cauldron_level,
+		// 0 - 3
+	mat_state_modifier_chest_type,
+		// left
+		// right
+		// single
+	mat_state_modifier_chorus_flower_age,
+		// 0 - 5
+	mat_state_modifier_cocoa_age,
+		// 0 - 2
+	mat_state_modifier_command_block_conditional,
+		// boolean
+	mat_state_modifier_composter_level,
+		// 0 - 8
+	mat_state_modifier_daylight_detector_inverted,
+		// boolean
+	mat_state_modifier_door_half,
+		// lower or upper
+	mat_state_modifier_door_hinge,
+		// left or right
+	mat_state_modifier_door_open,
+		// boolean
+	mat_state_modifier_end_portal_frame_eye,
+		// boolean
+	mat_state_modifier_farmland_moisture,
+		// 0 - 7
 
 } mat_state_modifier_type_t;
 
@@ -127,27 +233,33 @@ typedef enum {
 typedef enum {
 
 	mat_block_entity_none = 0,
-	mat_block_entity_type_sign,
-	mat_block_entity_type_banner,
-	mat_block_entity_type_storage,
-	mat_block_entity_type_furnace,
-	mat_block_entity_type_brewing_stand,
-	mat_block_entity_type_hopper,
-	mat_block_entity_type_chest,
-	mat_block_entity_type_beacon,
-	mat_block_entity_type_monster_spawner,
-	mat_block_entity_type_note_block,
-	mat_block_entity_type_piston,
-	mat_block_entity_type_jukebox,
-	mat_block_entity_type_enchantment_table,
-	mat_block_entity_type_particle,
-	mat_block_entity_type_mob_head,
-	mat_block_entity_type_command_block,
-	mat_block_entity_type_end_gateway,
-	mat_block_entity_type_structure_block,
-	mat_block_entity_type_daylight_sensor,
-	mat_block_entity_type_flower_pot,
-	mat_block_entity_type_redstone_comparator
+	mat_block_entity_bees, // store bees in a block
+	mat_block_entity_sign, // store sign text
+	mat_block_entity_banner, // store patterns
+
+	mat_block_entity_container, // store inventory slots
+		mat_block_entity_furnace, // store time until current item is smelted and time until fuel is exhausted
+		mat_block_entity_brewing, // store brewing time
+		mat_block_entity_hopper, // store time until next transfer
+		mat_block_entity_locational_container, // store location for opening and closing
+		mat_block_entity_lectern, // store current page
+
+	mat_block_entity_beacon, // store pyramid leve, active effects, contents, and beacon beam position
+	mat_block_entity_spawner, // store spawner information
+	mat_block_entity_piston_extension, // store the blocks they are moving
+	mat_block_entity_jukebox, // store music disks
+	mat_block_entity_enchanting_table, // to store the floating book
+	mat_block_entity_end_particles, // to store particles for end chests and portalls
+	mat_block_entity_head, // store the head type
+	mat_block_entity_command, // store command text
+	mat_block_entity_gateway, // store teleport location
+	mat_block_entity_structure, // to store structure info
+	mat_block_entity_jigsaw, // to store structure pool
+	mat_block_entity_daylight, // to force output signal
+	mat_block_entity_comparator, // to store output strength
+	mat_block_entity_bed, // for rendering
+	mat_block_entity_conduit, // to check activation
+	mat_block_entity_bell // to render bell sway
 
 } mat_block_entity_type_t;
 

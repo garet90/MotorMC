@@ -13,12 +13,6 @@ env:
 jobs:
   build-windows:
     
-    strategy:
-      matrix:
-        include:
-            - COMPILER: gcc
-            - COMPILER: clang
-    
     runs-on: windows-latest
 
     defaults:
@@ -30,14 +24,14 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         update: true
+        msystem: mingw64
         install: >-
           make
           cmake
           automake
           autoconf
           libtool
-          mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-clang
+          mingw-w64-x86_64-toolchain
           git
 
     - name: Set Workspace
@@ -84,33 +78,27 @@ jobs:
         cp libdeflate.h /usr/local/include/
 
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: |
-        cmake -B $workspace/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER=${{ matrix.COMPILER }} -DWIN32=true
+        cd $workspace
+        cmake . -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DWIN32=true
 
     - name: Build
-      # Build your program with the given configuration
       run: |
-        cmake --build $workspace/build --config ${{env.BUILD_TYPE}}
+        cd $workspace
+        make
 
     - uses: actions/upload-artifact@v2
       with:
-        name: MotorMC-Windows-${{ matrix.COMPILER }}
-        path: ${{github.workspace}}/build/MotorMC.exe
+        name: MotorMC-Windows
+        path: ${{github.workspace}}/MotorMC.exe
 
     - name: Test
-      working-directory: ${{github.workspace}}/build
+      working-directory: ${{github.workspace}}
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
   build-osx:
-    
-    strategy:
-      matrix:
-        include:
-          - COMPILER: clang
     
     runs-on: macos-latest
 
@@ -145,18 +133,16 @@ jobs:
         sudo mv libdeflate.h /usr/local/include/
       
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER=${{ matrix.COMPILER }}
+      run: |
+        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
-      # Build your program with the given configuration
       run: |
         cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - uses: actions/upload-artifact@v2
       with:
-        name: MotorMC-MacOS-${{matrix.COMPILER}}
+        name: MotorMC-MacOS
         path: ${{github.workspace}}/build/MotorMC
 
     - name: Test
@@ -166,12 +152,6 @@ jobs:
       run: ctest -C ${{env.BUILD_TYPE}}
 
   build-ubuntu:
-
-    strategy:
-      matrix:
-        include:
-          - COMPILER: gcc
-          - COMPILER: clang
     
     runs-on: ubuntu-latest
 
@@ -211,18 +191,16 @@ jobs:
         sudo mv libdeflate.h /usr/local/include/
       
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER=${{ matrix.COMPILER }}
+      run: |
+        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
-      # Build your program with the given configuration
       run: |
         cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - uses: actions/upload-artifact@v2
       with:
-        name: MotorMC-Ubuntu-${{ matrix.COMPILER }}
+        name: MotorMC-Ubuntu
         path: ${{github.workspace}}/build/MotorMC
 
     - name: Test

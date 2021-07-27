@@ -9,5 +9,3 @@ In vanilla Minecraft, everything resource-intensive runs on a single thread. But
 MotorMC is designed with plugin compatibility in mind. There is already a very experimental API that allows for the same drag-and-drop plugin experience found on Spigot and Paper. A wiki outlining the API and its use will be made eventually.
 ## Downloading
 Currently, this project utilizes GitHub Actions to build binaries. These binaries should work out-of-the-box with Windows, Ubuntu, and MacOS. To download a binary, navigate to the "Actions" tab, click on the most recent successful build (the ones with green checkmarks next to them), scroll down to "Artifacts", and download the one that is compatible with your system. *Note: you WILL need a Github account to download MotorMC*
-### GCC vs Clang
-Binaries for Windows and Ubuntu are built with two different compilers: GCC and Clang. Server hosts should test each binary to see which one works better for their individual system but both should be compatible.
