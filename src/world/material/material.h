@@ -55,11 +55,6 @@ typedef enum {
 		// 0 - 15
 	mat_state_modifier_open,
 		// boolean
-	mat_state_modifier_attachment,
-		// floor
-		// seiling
-		// double_wall
-		// single_wall
 	mat_state_modifier_powered,
 		// boolean
 	mat_state_modifier_lit,
@@ -67,6 +62,9 @@ typedef enum {
 	mat_state_modifier_axis,
 		// x
 		// y
+		// z
+	mat_state_modifier_cardinal_axis,
+		// x
 		// z
 	mat_state_modifier_face,
 		// ceiling
@@ -90,6 +88,17 @@ typedef enum {
 		// 0 - 15
 	mat_state_modifier_triggered,
 		// boolean
+	mat_state_modifier_crop_age,
+		// 0 - 7
+	mat_state_modifier_distance,
+		// 0 - 7
+	mat_state_modifier_stock_age,
+		// 0 - 15
+	mat_state_modifier_liquid_level,
+		// 0 - 15
+	mat_state_modifier_plant_half,
+		// lower
+		// upper
 	
 	mat_state_modifier_bamboo_age,
 		// 0 or 1
@@ -116,14 +125,10 @@ typedef enum {
 		// boolean
 	mat_state_modifier_bubble_column_drag,
 		// boolean
-	mat_state_modifier_cactus_age,
-		// 0 - 15
 	mat_state_modifier_campfire_signal,
 		// boolean
 	mat_state_modifier_cake_bites,
 		// 0 - 6
-	mat_state_modifier_carrot_age,
-		// 0 - 7
 	mat_state_modifier_cauldron_level,
 		// 0 - 3
 	mat_state_modifier_chest_type,
@@ -150,6 +155,179 @@ typedef enum {
 		// boolean
 	mat_state_modifier_farmland_moisture,
 		// 0 - 7
+	mat_state_modifier_fencegate_in_wall,
+		// boolean
+	mat_state_modifier_fire_age,
+		// 0 - 15
+	mat_state_modifier_frosted_ice_age,
+		// 0 - 3
+	mat_state_modifier_grass_snowy,
+		// boolean
+	mat_state_modifier_hopper_enabled,
+		// boolean
+	mat_state_modifier_jigsaw_facing,
+		// down_east
+		// down_north
+		// down_south
+		// down_west
+		// east_up
+		// north_up
+		// south_up
+		// up_east
+		// up_north
+		// up_south
+		// up_west
+		// west_up
+	mat_state_modifier_jukebox_has_record,
+		// boolean
+	mat_state_modifier_kelp_age,
+		// 0 - 25
+	mat_state_modifier_lantern_hanging,
+		// 0 - 1
+	mat_state_modifier_leaves_persistant,
+		// boolean
+	mat_state_modifier_lectern_has_book,
+		// boolean
+	mat_state_modifier_nether_wart_age,
+		// 0 - 3
+	mat_state_modifier_note_block_instrument,
+		// banjo
+		// basedrum
+		// base
+		// bell
+		// bit
+		// chime
+		// cow_bell
+		// didgeridoo
+		// flute
+		// guitar
+		// harp
+		// hat
+		// iron_xylophone
+		// pling
+		// snare
+		// xylophone
+	mat_state_modifier_note_block_note,
+		// 0 - 24
+	mat_state_modifier_piston_extended,
+		// boolean
+	mat_state_modifier_piston_type,
+		// normal or sticky
+	mat_state_modifier_piston_short,
+		// boolean
+	mat_state_modifier_rail_shape,
+		// east_west
+		// north_east
+		// north_south
+		// north_west
+		// south_east
+		// south_west
+		// ascending_east
+		// ascending_north
+		// ascending_south
+		// ascending_west
+	mat_state_modifier_special_rail_shape,
+		// east_west
+		// north_south
+		// ascending_east
+		// ascending_north
+		// ascending_south
+		// ascending_west
+	mat_state_modifier_comparator_mode,
+		// compare
+		// subtract
+	mat_state_modifier_redstone_east,
+		// none
+		// side
+		// up
+	mat_state_modifier_redstone_north,
+		// none
+		// side
+		// up
+	mat_state_modifier_redstone_south,
+		// none
+		// side
+		// up
+	mat_state_modifier_redstone_west,
+		// none
+		// side
+		// up
+	mat_state_modifier_repeater_delay,
+		// 1 - 4
+	mat_state_modifier_repeater_locked,
+		// boolean
+	mat_state_modifier_respawn_anchor_charges,
+		// 0 - 4
+	mat_state_modifier_sapling_state,
+		// 0 - 1
+	mat_state_modifier_scaffolding_bottom,
+		// boolean
+	mat_state_modifier_sea_pickle_pickles,
+		// 1 - 4
+	mat_state_modifier_slab_type,
+		// bottom
+		// top
+		// double
+	mat_state_modifier_snow_layers,
+		// 1 - 8
+	mat_state_modifier_stairs_half,
+		// bottom
+		// top
+	mat_state_modifier_stairs_shape,
+		// inner_left
+		// inner_right
+		// outer_left
+		// outer_right
+		// straight
+	mat_state_modifier_structure_block_mode,
+		// corner
+		// data
+		// load
+		// save
+	mat_state_modifier_sweet_berry_bush_age,
+		// 0 - 3
+	mat_state_modifier_tnt_unstable,
+		// boolean
+	mat_state_modifier_trapdoor_half,
+		// bottom
+		// top
+	mat_state_modifier_trapdoor_open,
+		// boolean
+	mat_state_modifier_tripwire_attached,
+		// boolean
+	mat_state_modifier_tripwire_disarmed,
+		// boolean
+	mat_state_modifier_turtle_egg_eggs,
+		// 1 - 4
+	mat_state_modifier_turtle_egg_hatch,
+		// 0 - 2
+	mat_state_modifier_wall_east,
+		// low
+		// none
+		// tall
+	mat_state_modifier_wall_north,
+		// low
+		// none
+		// tall
+	mat_state_modifier_wall_south,
+		// low
+		// none
+		// tall
+	mat_state_modifier_wall_west,
+		// low
+		// none
+		// tall
+	mat_state_modifier_bell_attachment,
+		// floor
+		// seiling
+		// double_wall
+		// single_wall
+	mat_state_modifier_hopper_facing,
+		// down
+		// east
+		// north
+		// south
+		// west
 
 } mat_state_modifier_type_t;
 
@@ -1096,19 +1274,15 @@ typedef struct {
 
 	struct {
 		
-		mat_equipment_type_t type;
-		mat_equipment_tier_t tier;
+		uint8_t type;
+		uint8_t tier;
 
 	} best_tool;
 
-	mat_block_entity_type_t entity;
+	uint8_t entity;
 
-	struct {
-
-		size_t count;
-		mat_state_modifier_type_t modifier[];
-
-	} modifiers;
+	uint8_t modifiers_count;
+	uint8_t modifiers[];
 
 } mat_block_t;
 
