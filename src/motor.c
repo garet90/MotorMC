@@ -14,6 +14,7 @@
 #include "io/filesystem/filesystem.h"
 #include "world/world.h"
 #include "world/material/material.h"
+#include "test/tests.h"
 
 sky_main_t sky_main = {
 		.protocol = __MC_PRO__,
@@ -293,8 +294,8 @@ int main(int argCount, char* args[]) {
 	
 	if (argCount != 0) {
 		for (int i = 0; i < argCount; ++i) {
-			if (args[i][0] == '-') {
-				// TODO flags
+			if (utl_hash(args[i]) == 0x7c9e6865) {
+				return test_runAll();
 			}
 		}
 	}

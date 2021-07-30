@@ -162,7 +162,8 @@ typedef enum {
 	mat_state_modifier_frosted_ice_age,
 		// 0 - 3
 	mat_state_modifier_grass_snowy,
-		// boolean
+		// true
+		// false
 	mat_state_modifier_hopper_enabled,
 		// boolean
 	mat_state_modifier_jigsaw_facing,
@@ -180,7 +181,7 @@ typedef enum {
 		// west_up
 	mat_state_modifier_jukebox_has_record,
 		// boolean
-	mat_state_modifier_kelp_age,
+	mat_state_modifier_vine_age,
 		// 0 - 25
 	mat_state_modifier_lantern_hanging,
 		// 0 - 1
@@ -258,8 +259,9 @@ typedef enum {
 		// boolean
 	mat_state_modifier_respawn_anchor_charges,
 		// 0 - 4
-	mat_state_modifier_sapling_state,
-		// 0 - 1
+	mat_state_modifier_sapling_stage,
+		// 0
+		// 1
 	mat_state_modifier_scaffolding_bottom,
 		// boolean
 	mat_state_modifier_sea_pickle_pickles,
@@ -328,12 +330,38 @@ typedef enum {
 		// north
 		// south
 		// west
+	mat_state_modifier_light_level,
+		// 0 - 15
+	mat_state_modifier_scaffolding_distance,
+		// 0 - 7
+	mat_state_modifier_candle_candles,
+		// 1 - 4
+	mat_state_modifier_sculk_sensor_phase,
+		// inactive
+		// active
+		// cooldown
+	mat_state_modifier_dripstone_thickness,
+		// tip_merge
+		// tip
+		// frustum
+		// middle
+		// base
+	mat_state_modifier_dripstone_direction,
+		// up
+		// down
+	mat_state_modifier_cave_vines_berries,
+		// boolean
+	mat_state_modifier_dripleaf_tilt,
+		// none
+		// unstable
+		// partial
+		// full
 
 } mat_state_modifier_type_t;
 
 typedef struct {
 
-	size_t count;
+	uint8_t count;
 
 	struct {
 
@@ -343,10 +371,10 @@ typedef struct {
 
 } mat_state_modifier_t;
 
-extern const mat_state_modifier_t mat_modifiers[];
+extern const mat_state_modifier_t* mat_modifiers[];
 
 static inline const mat_state_modifier_t* mat_getStateModifierByType(mat_state_modifier_type_t type) {
-	return mat_modifiers + type;
+	return mat_modifiers[type];
 }
 
 /*
@@ -448,6 +476,7 @@ typedef enum {
 
 typedef enum {
 
+	mat_block_air,
 	mat_block_acacia_button,
 	mat_block_acacia_door,
 	mat_block_acacia_fence,
@@ -475,7 +504,7 @@ typedef enum {
 	mat_block_azalea_leaves,
 	mat_block_azure_bluet,
 	mat_block_bamboo,
-	mat_block_bamboo_shoot,
+	mat_block_bamboo_sapling,
 	mat_block_beetroots,
 	mat_block_barrel,
 	mat_block_barrier,
@@ -517,20 +546,20 @@ typedef enum {
 	mat_block_blackstone_stairs,
 	mat_block_blackstone_wall,
 	mat_block_blast_furnace,
-	mat_block_block_of_amethyst,
-	mat_block_block_of_coal,
-	mat_block_block_of_copper,
-	mat_block_block_of_diamond,
-	mat_block_block_of_emerald,
-	mat_block_block_of_gold,
-	mat_block_block_of_iron,
-	mat_block_block_of_lapis_lazuli,
-	mat_block_block_of_netherite,
-	mat_block_block_of_quartz,
-	mat_block_block_of_raw_copper,
-	mat_block_block_of_raw_gold,
-	mat_block_block_of_raw_iron,
-	mat_block_block_of_redstone,
+	mat_block_amethyst_block,
+	mat_block_coal_block,
+	mat_block_copper_block,
+	mat_block_diamond_block,
+	mat_block_emerald_block,
+	mat_block_gold_block,
+	mat_block_iron_block,
+	mat_block_lapis_block,
+	mat_block_netherite_block,
+	mat_block_quartz_block,
+	mat_block_raw_copper_block,
+	mat_block_raw_gold_block,
+	mat_block_raw_iron_block,
+	mat_block_redstone_block,
 	mat_block_blue_banner,
 	mat_block_blue_bed,
 	mat_block_blue_candle,
@@ -703,7 +732,7 @@ typedef enum {
 	mat_block_deepslate_emerald_ore,
 	mat_block_deepslate_gold_ore,
 	mat_block_deepslate_iron_ore,
-	mat_block_deepslate_lapis_lazuli_ore,
+	mat_block_deepslate_lapis_ore,
 	mat_block_deepslate_redstone_ore,
 	mat_block_deepslate_tiles,
 	mat_block_deepslate_tile_slab,
@@ -720,7 +749,7 @@ typedef enum {
 	mat_block_dispenser,
 	mat_block_dragon_egg,
 	mat_block_dragon_head,
-	mat_block_dried_kelp_block,
+	mat_block_kelp,
 	mat_block_dripstone_block,
 	mat_block_dropper,
 	mat_block_emerald_ore,
@@ -787,7 +816,7 @@ typedef enum {
 	mat_block_green_wool,
 	mat_block_grindstone,
 	mat_block_hanging_roots,
-	mat_block_hay_bale,
+	mat_block_hay_block,
 	mat_block_heavy_weighted_pressure_plate,
 	mat_block_honey_block,
 	mat_block_honeycomb_block,
@@ -808,7 +837,7 @@ typedef enum {
 	mat_block_iron_ore,
 	mat_block_iron_trapdoor,
 	mat_block_jack_o_lantern,
-	mat_block_jigsaw_block,
+	mat_block_jigsaw,
 	mat_block_jukebox,
 	mat_block_jungle_button,
 	mat_block_jungle_door,
@@ -824,16 +853,16 @@ typedef enum {
 	mat_block_jungle_stairs,
 	mat_block_jungle_trapdoor,
 	mat_block_jungle_wood,
-	mat_block_kelp,
+	mat_block_kelp_plant,
 	mat_block_ladder,
 	mat_block_lantern,
-	mat_block_lapis_lazuli_ore,
+	mat_block_lapis_ore,
 	mat_block_large_amethyst_bud,
 	mat_block_large_fern,
 	mat_block_lava,
 	mat_block_lectern,
 	mat_block_lever,
-	mat_block_light_block,
+	mat_block_light,
 	mat_block_light_blue_banner,
 	mat_block_light_blue_bed,
 	mat_block_light_blue_candle,
@@ -1054,10 +1083,10 @@ typedef enum {
 	mat_block_red_terracotta,
 	mat_block_red_tulip,
 	mat_block_red_wool,
-	mat_block_redstone_comparator,
+	mat_block_comparator,
 	mat_block_redstone_lamp,
 	mat_block_redstone_ore,
-	mat_block_redstone_repeater,
+	mat_block_repeater,
 	mat_block_redstone_torch,
 	mat_block_redstone_wire,
 	mat_block_repeating_command_block,
@@ -1083,7 +1112,7 @@ typedef enum {
 	mat_block_smithing_table,
 	mat_block_smoker,
 	mat_block_smooth_basalt,
-	mat_block_smooth_quartz_block,
+	mat_block_smooth_quartz,
 	mat_block_smooth_quartz_slab,
 	mat_block_smooth_quartz_stairs,
 	mat_block_smooth_red_sandstone,
@@ -1167,7 +1196,7 @@ typedef enum {
 	mat_block_tuff,
 	mat_block_turtle_egg,
 	mat_block_twisting_vines,
-	mat_block_vines,
+	mat_block_vine,
 	mat_block_warped_button,
 	mat_block_warped_door,
 	mat_block_warped_fence,
@@ -1185,7 +1214,7 @@ typedef enum {
 	mat_block_warped_trapdoor,
 	mat_block_warped_wart_block,
 	mat_block_water,
-	mat_block_waxed_block_of_copper,
+	mat_block_waxed_copper_block,
 	mat_block_waxed_cut_copper,
 	mat_block_waxed_cut_copper_slab,
 	mat_block_waxed_cut_copper_stairs,
@@ -1207,7 +1236,7 @@ typedef enum {
 	mat_block_weathered_cut_copper_stairs,
 	mat_block_weeping_vines,
 	mat_block_wet_sponge,
-	mat_block_wheat_crops,
+	mat_block_wheat,
 	mat_block_white_banner,
 	mat_block_white_bed,
 	mat_block_white_candle,
@@ -1243,7 +1272,110 @@ typedef enum {
 	mat_block_end_gateway,
 	mat_block_big_dripleaf_stem,
 	mat_block_bubble_column,
-	mat_block_glow_berries
+	mat_block_glow_berries,
+	mat_block_moving_piston,
+	mat_block_wall_torch,
+	mat_block_oak_wall_sign,
+	mat_block_spruce_wall_sign,
+	mat_block_birch_wall_sign,
+	mat_block_acacia_wall_sign,
+	mat_block_jungle_wall_sign,
+	mat_block_dark_oak_wall_sign,
+	mat_block_redstone_wall_torch,
+	mat_block_soul_wall_torch,
+	mat_block_attached_pumpkin_stem,
+	mat_block_attached_melon_stem,
+	mat_block_water_cauldron,
+	mat_block_lava_cauldron,
+	mat_block_powder_snow_cauldron,
+	mat_block_potted_oak_sapling,
+	mat_block_potted_spruce_sapling,
+	mat_block_potted_birch_sapling,
+	mat_block_potted_jungle_sapling,
+	mat_block_potted_acacia_sapling,
+	mat_block_potted_dark_oak_sapling,
+	mat_block_potted_fern,
+	mat_block_potted_dandelion,
+	mat_block_potted_poppy,
+	mat_block_potted_blue_orchid,
+	mat_block_potted_allium,
+	mat_block_potted_azure_bluet,
+	mat_block_potted_red_tulip,
+	mat_block_potted_orange_tulip,
+	mat_block_potted_white_tulip,
+	mat_block_potted_pink_tulip,
+	mat_block_potted_oxeye_daisy,
+	mat_block_potted_cornflower,
+	mat_block_potted_lily_of_the_valley,
+	mat_block_potted_wither_rose,
+	mat_block_potted_red_mushroom,
+	mat_block_potted_brown_mushroom,
+	mat_block_potted_dead_bush,
+	mat_block_potted_cactus,
+	mat_block_skeleton_wall_skull,
+	mat_block_wither_skeleton_wall_skull,
+	mat_block_zombie_wall_head,
+	mat_block_player_wall_head,
+	mat_block_creeper_wall_head,
+	mat_block_dragon_wall_head,
+	mat_block_white_wall_banner,
+	mat_block_orange_wall_banner,
+	mat_block_magenta_wall_banner,
+	mat_block_light_blue_wall_banner,
+	mat_block_yellow_wall_banner,
+	mat_block_lime_wall_banner,
+	mat_block_pink_wall_banner,
+	mat_block_gray_wall_banner,
+	mat_block_light_gray_wall_banner,
+	mat_block_cyan_wall_banner,
+	mat_block_purple_wall_banner,
+	mat_block_blue_wall_banner,
+	mat_block_brown_wall_banner,
+	mat_block_green_wall_banner,
+	mat_block_red_wall_banner,
+	mat_block_black_wall_banner,
+	mat_block_dead_tube_coral_wall_fan,
+	mat_block_dead_brain_coral_wall_fan,
+	mat_block_dead_bubble_coral_wall_fan,
+	mat_block_dead_fire_coral_wall_fan,
+	mat_block_dead_horn_coral_wall_fan,
+	mat_block_tube_coral_wall_fan,
+	mat_block_brain_coral_wall_fan,
+	mat_block_bubble_coral_wall_fan,
+	mat_block_fire_coral_wall_fan,
+	mat_block_horn_coral_wall_fan,
+	mat_block_potted_bamboo,
+	mat_block_void_air,
+	mat_block_cave_air,
+	mat_block_weeping_vines_plant,
+	mat_block_twisting_vines_plant,
+	mat_block_crimson_wall_sign,
+	mat_block_warped_wall_sign,
+	mat_block_potted_crimson_fungus,
+	mat_block_potted_warped_fungus,
+	mat_block_potted_crimson_roots,
+	mat_block_potted_warped_roots,
+	mat_block_candle_cake,
+	mat_block_white_candle_cake,
+	mat_block_orange_candle_cake,
+	mat_block_magenta_candle_cake,
+	mat_block_light_blue_candle_cake,
+	mat_block_yellow_candle_cake,
+	mat_block_lime_candle_cake,
+	mat_block_pink_candle_cake,
+	mat_block_gray_candle_cake,
+	mat_block_light_gray_candle_cake,
+	mat_block_cyan_candle_cake,
+	mat_block_purple_candle_cake,
+	mat_block_blue_candle_cake,
+	mat_block_brown_candle_cake,
+	mat_block_green_candle_cake,
+	mat_block_red_candle_cake,
+	mat_block_black_candle_cake,
+	mat_block_cave_vines_plant,
+	mat_block_potted_azalea_bush,
+	mat_block_potted_flowering_azalea_bush,
+	mat_block_dried_kelp_block,
 
 } mat_block_id_t;
 
@@ -1287,10 +1419,14 @@ typedef struct {
 } mat_block_t;
 
 extern const mat_block_t* mat_blocks[];
-extern const mat_block_id_t mat_blocks_protocol[];
+extern const uint16_t mat_blocks_protocol[];
 
 static inline const mat_block_t* mat_getBlockById(mat_block_id_t id) {
 	return mat_blocks[id];
+}
+
+static inline mat_block_id_t mat_getIdByProtocol(uint16_t protocol) {
+	return mat_blocks_protocol[protocol];
 }
 
 static inline uint8_t mat_getLuminance(const mat_block_t* block) {
@@ -1690,7 +1826,7 @@ typedef enum {
 	mat_item_azalea_leaves,
 	mat_item_azure_bluet,
 	mat_item_bamboo,
-	mat_item_bamboo_shoot,
+	mat_item_bamboo_sapling,
 	mat_item_beetroots,
 	mat_item_barrel,
 	mat_item_barrier,
@@ -1736,13 +1872,13 @@ typedef enum {
 	mat_item_block_of_coal,
 	mat_item_block_of_copper,
 	mat_item_block_of_diamond,
-	mat_item_block_of_emerald,
-	mat_item_block_of_gold,
-	mat_item_block_of_iron,
+	mat_item_emerald_block,
+	mat_item_gold_block,
+	mat_item_iron_block,
 	mat_item_block_of_lapis_lazuli,
 	mat_item_block_of_netherite,
 	mat_item_block_of_quartz,
-	mat_item_block_of_raw_copper,
+	mat_item_raw_copper_block,
 	mat_item_block_of_raw_gold,
 	mat_item_block_of_raw_iron,
 	mat_item_block_of_redstone,
@@ -2268,10 +2404,10 @@ typedef enum {
 	mat_item_red_terracotta,
 	mat_item_red_tulip,
 	mat_item_red_wool,
-	mat_item_redstone_comparator,
+	mat_item_comparator,
 	mat_item_redstone_lamp,
 	mat_item_redstone_ore,
-	mat_item_redstone_repeater,
+	mat_item_repeater,
 	mat_item_redstone_torch,
 	mat_item_redstone_wire,
 	mat_item_repeating_command_block,
