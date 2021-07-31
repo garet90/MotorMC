@@ -37,136 +37,212 @@ static inline const mat_hitbox_t* mat_getHitboxById(mat_hitbox_id_t hitbox) {
 	State modifiers are used to determine the state
 */
 
-typedef enum {
+enum mat_state_modifier {
 
-	mat_state_modifier_facing_cardinal,
 		// north
 		// south
 		// east
 		// west
-	mat_state_modifier_facing,
+	mat_state_modifier_facing_cardinal,
+		
 		// down
 		// east
 		// north
 		// south
 		// up
 		// west
-	mat_state_modifier_rotation,
+	mat_state_modifier_facing,
+		
 		// 0 - 15
+	mat_state_modifier_rotation,
+		
+		// true
+		// false
 	mat_state_modifier_open,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_powered,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_lit,
-		// boolean
-	mat_state_modifier_axis,
+		
 		// x
 		// y
 		// z
-	mat_state_modifier_cardinal_axis,
+	mat_state_modifier_axis,
+		
 		// x
 		// z
-	mat_state_modifier_face,
+	mat_state_modifier_cardinal_axis,
+		
 		// ceiling
 		// floor
 		// wall
+	mat_state_modifier_face,
+		
+		// true
+		// false
 	mat_state_modifier_waterlogged,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_down,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_east,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_north,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_south,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_up,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_west,
-		// boolean
-	mat_state_modifier_power,
+		
 		// 0 - 15
+	mat_state_modifier_power,
+		
+		// true
+		// false
 	mat_state_modifier_triggered,
-		// boolean
+		
+		// 0 - 7
 	mat_state_modifier_crop_age,
+		
 		// 0 - 7
 	mat_state_modifier_distance,
-		// 0 - 7
+		
+		// 0 - 15
 	mat_state_modifier_stock_age,
+		
 		// 0 - 15
 	mat_state_modifier_liquid_level,
-		// 0 - 15
-	mat_state_modifier_plant_half,
+		
 		// lower
 		// upper
+	mat_state_modifier_plant_half,
 	
-	mat_state_modifier_bamboo_age,
 		// 0 or 1
-	mat_state_modifier_bamboo_leaves,
+	mat_state_modifier_bamboo_age,
+		
 		// large
 		// none
 		// small
-	mat_state_modifier_bamboo_stage,
+	mat_state_modifier_bamboo_leaves,
+		
 		// 0 or 1
+	mat_state_modifier_bamboo_stage,
+		
+		// true
+		// false
 	mat_state_modifier_bed_occupied,
-		// boolean
-	mat_state_modifier_bed_part,
+		
 		// foot
 		// head
-	mat_state_modifier_hive_honey_level,
+	mat_state_modifier_bed_part,
+		
 		// 0 - 5
+	mat_state_modifier_hive_honey_level,
+		
+		// 0 - 3
 	mat_state_modifier_beetroot_age,
-		// 0 - 3
+		
+		// true
+		// false
 	mat_state_modifier_brewing_stand_has_bottle_0,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_brewing_stand_has_bottle_1,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_brewing_stand_has_bottle_2,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_bubble_column_drag,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_campfire_signal,
-		// boolean
-	mat_state_modifier_cake_bites,
+		
 		// 0 - 6
-	mat_state_modifier_cauldron_level,
+	mat_state_modifier_cake_bites,
+		
 		// 0 - 3
-	mat_state_modifier_chest_type,
+	mat_state_modifier_cauldron_level,
+		
 		// left
 		// right
 		// single
-	mat_state_modifier_chorus_flower_age,
+	mat_state_modifier_chest_type,
+		
 		// 0 - 5
-	mat_state_modifier_cocoa_age,
+	mat_state_modifier_chorus_flower_age,
+		
 		// 0 - 2
+	mat_state_modifier_cocoa_age,
+		
+		// true
+		// false
 	mat_state_modifier_command_block_conditional,
-		// boolean
-	mat_state_modifier_composter_level,
+		
 		// 0 - 8
+	mat_state_modifier_composter_level,
+
+		// true
+		// false
 	mat_state_modifier_daylight_detector_inverted,
-		// boolean
+		
+		// lower
+		// upper
 	mat_state_modifier_door_half,
-		// lower or upper
+		
+		// left
+		// right
 	mat_state_modifier_door_hinge,
-		// left or right
+		
+		// true
+		// false
 	mat_state_modifier_door_open,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_end_portal_frame_eye,
-		// boolean
-	mat_state_modifier_farmland_moisture,
+		
 		// 0 - 7
+	mat_state_modifier_farmland_moisture,
+		
+		// true
+		// false
 	mat_state_modifier_fencegate_in_wall,
-		// boolean
-	mat_state_modifier_fire_age,
+		
 		// 0 - 15
-	mat_state_modifier_frosted_ice_age,
+	mat_state_modifier_fire_age,
+		
 		// 0 - 3
+	mat_state_modifier_frosted_ice_age,
+		
+		// true
+		// false
 	mat_state_modifier_grass_snowy,
+		
 		// true
 		// false
 	mat_state_modifier_hopper_enabled,
-		// boolean
-	mat_state_modifier_jigsaw_facing,
+		
 		// down_east
 		// down_north
 		// down_south
@@ -179,19 +255,29 @@ typedef enum {
 		// up_south
 		// up_west
 		// west_up
+	mat_state_modifier_jigsaw_facing,
+		
+		// true
+		// false
 	mat_state_modifier_jukebox_has_record,
-		// boolean
-	mat_state_modifier_vine_age,
+
 		// 0 - 25
-	mat_state_modifier_lantern_hanging,
+	mat_state_modifier_vine_age,
+		
 		// 0 - 1
+	mat_state_modifier_lantern_hanging,
+		
+		// true
+		// false
 	mat_state_modifier_leaves_persistant,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_lectern_has_book,
-		// boolean
-	mat_state_modifier_nether_wart_age,
+		
 		// 0 - 3
-	mat_state_modifier_note_block_instrument,
+	mat_state_modifier_nether_wart_age,
+		
 		// banjo
 		// basedrum
 		// base
@@ -208,15 +294,22 @@ typedef enum {
 		// pling
 		// snare
 		// xylophone
-	mat_state_modifier_note_block_note,
+	mat_state_modifier_note_block_instrument,
+		
 		// 0 - 24
+	mat_state_modifier_note_block_note,
+		
+		// true
+		// false
 	mat_state_modifier_piston_extended,
-		// boolean
-	mat_state_modifier_piston_type,
+
 		// normal or sticky
+	mat_state_modifier_piston_type,
+		
+		// true
+		// false
 	mat_state_modifier_piston_short,
-		// boolean
-	mat_state_modifier_rail_shape,
+		
 		// east_west
 		// north_east
 		// north_south
@@ -227,137 +320,186 @@ typedef enum {
 		// ascending_north
 		// ascending_south
 		// ascending_west
-	mat_state_modifier_special_rail_shape,
+	mat_state_modifier_rail_shape,
+		
 		// east_west
 		// north_south
 		// ascending_east
 		// ascending_north
 		// ascending_south
 		// ascending_west
-	mat_state_modifier_comparator_mode,
+	mat_state_modifier_special_rail_shape,
+		
 		// compare
 		// subtract
+	mat_state_modifier_comparator_mode,
+		
+		// none
+		// side
+		// up
 	mat_state_modifier_redstone_east,
+		
 		// none
 		// side
 		// up
 	mat_state_modifier_redstone_north,
+		
 		// none
 		// side
 		// up
 	mat_state_modifier_redstone_south,
+		
 		// none
 		// side
 		// up
 	mat_state_modifier_redstone_west,
-		// none
-		// side
-		// up
-	mat_state_modifier_repeater_delay,
+		
 		// 1 - 4
+	mat_state_modifier_repeater_delay,
+		
+		// true
+		// false
 	mat_state_modifier_repeater_locked,
-		// boolean
-	mat_state_modifier_respawn_anchor_charges,
+		
 		// 0 - 4
-	mat_state_modifier_sapling_stage,
+	mat_state_modifier_respawn_anchor_charges,
+		
 		// 0
 		// 1
+	mat_state_modifier_sapling_stage,
+		
+		// true
+		// false
 	mat_state_modifier_scaffolding_bottom,
-		// boolean
-	mat_state_modifier_sea_pickle_pickles,
+		
 		// 1 - 4
-	mat_state_modifier_slab_type,
+	mat_state_modifier_sea_pickle_pickles,
+		
 		// bottom
 		// top
 		// double
-	mat_state_modifier_snow_layers,
+	mat_state_modifier_slab_type,
+		
 		// 1 - 8
-	mat_state_modifier_stairs_half,
+	mat_state_modifier_snow_layers,
+		
 		// bottom
 		// top
-	mat_state_modifier_stairs_shape,
+	mat_state_modifier_stairs_half,
+		
 		// inner_left
 		// inner_right
 		// outer_left
 		// outer_right
 		// straight
-	mat_state_modifier_structure_block_mode,
+	mat_state_modifier_stairs_shape,
+		
 		// corner
 		// data
 		// load
 		// save
-	mat_state_modifier_sweet_berry_bush_age,
+	mat_state_modifier_structure_block_mode,
+
 		// 0 - 3
+	mat_state_modifier_sweet_berry_bush_age,
+
+		// true
+		// false
 	mat_state_modifier_tnt_unstable,
-		// boolean
-	mat_state_modifier_trapdoor_half,
+
 		// bottom
 		// top
+	mat_state_modifier_trapdoor_half,
+		
+		// true
+		// false
 	mat_state_modifier_trapdoor_open,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_tripwire_attached,
-		// boolean
+		
+		// true
+		// false
 	mat_state_modifier_tripwire_disarmed,
-		// boolean
-	mat_state_modifier_turtle_egg_eggs,
+
 		// 1 - 4
-	mat_state_modifier_turtle_egg_hatch,
+	mat_state_modifier_turtle_egg_eggs,
+
 		// 0 - 2
+	mat_state_modifier_turtle_egg_hatch,
+
+		// low
+		// none
+		// tall
 	mat_state_modifier_wall_east,
+
 		// low
 		// none
 		// tall
 	mat_state_modifier_wall_north,
+
 		// low
 		// none
 		// tall
 	mat_state_modifier_wall_south,
+
 		// low
 		// none
 		// tall
 	mat_state_modifier_wall_west,
-		// low
-		// none
-		// tall
-	mat_state_modifier_bell_attachment,
+
 		// floor
 		// seiling
 		// double_wall
 		// single_wall
-	mat_state_modifier_hopper_facing,
+	mat_state_modifier_bell_attachment,
+
 		// down
 		// east
 		// north
 		// south
 		// west
-	mat_state_modifier_light_level,
+	mat_state_modifier_hopper_facing,
+
 		// 0 - 15
-	mat_state_modifier_scaffolding_distance,
+	mat_state_modifier_light_level,
+
 		// 0 - 7
-	mat_state_modifier_candle_candles,
+	mat_state_modifier_scaffolding_distance,
+
 		// 1 - 4
-	mat_state_modifier_sculk_sensor_phase,
+	mat_state_modifier_candle_candles,
+
 		// inactive
 		// active
 		// cooldown
-	mat_state_modifier_dripstone_thickness,
+	mat_state_modifier_sculk_sensor_phase,
+
 		// tip_merge
 		// tip
 		// frustum
 		// middle
 		// base
-	mat_state_modifier_dripstone_direction,
+	mat_state_modifier_dripstone_thickness,
+
 		// up
 		// down
+	mat_state_modifier_dripstone_direction,
+
+		// true
+		// false
 	mat_state_modifier_cave_vines_berries,
-		// boolean
-	mat_state_modifier_dripleaf_tilt,
+
 		// none
 		// unstable
 		// partial
 		// full
+	mat_state_modifier_dripleaf_tilt,
 
-} mat_state_modifier_type_t;
+};
+
+typedef uint8_t mat_state_modifier_type_t;
 
 typedef struct {
 
@@ -474,7 +616,7 @@ typedef enum {
 	Blocks are the basic building blocks of the world
 */
 
-typedef enum {
+enum mat_block {
 
 	mat_block_air,
 	mat_block_acacia_button,
@@ -962,7 +1104,6 @@ typedef enum {
 	mat_block_oak_wood,
 	mat_block_observer,
 	mat_block_obsidian,
-	mat_block_ominous_banner,
 	mat_block_orange_banner,
 	mat_block_orange_bed,
 	mat_block_orange_candle,
@@ -1272,7 +1413,6 @@ typedef enum {
 	mat_block_end_gateway,
 	mat_block_big_dripleaf_stem,
 	mat_block_bubble_column,
-	mat_block_glow_berries,
 	mat_block_moving_piston,
 	mat_block_wall_torch,
 	mat_block_oak_wall_sign,
@@ -1377,7 +1517,12 @@ typedef enum {
 	mat_block_potted_flowering_azalea_bush,
 	mat_block_dried_kelp_block,
 
-} mat_block_id_t;
+	mat_block_count
+
+};
+
+typedef uint16_t mat_block_id_t;
+typedef uint16_t mat_protocol_id_t;
 
 typedef enum {
 
@@ -1414,19 +1559,85 @@ typedef struct {
 	uint8_t entity;
 
 	uint8_t modifiers_count;
-	uint8_t modifiers[];
+	mat_state_modifier_type_t modifiers[];
 
 } mat_block_t;
 
 extern const mat_block_t* mat_blocks[];
-extern const uint16_t mat_blocks_protocol[];
+extern const mat_protocol_id_t mat_blocks_protocol[];
+extern const mat_protocol_id_t mat_blocks_base_protocol[];
 
 static inline const mat_block_t* mat_getBlockById(mat_block_id_t id) {
 	return mat_blocks[id];
 }
 
-static inline mat_block_id_t mat_getIdByProtocol(uint16_t protocol) {
+static inline mat_block_id_t mat_getIdByProtocol(mat_protocol_id_t protocol) {
 	return mat_blocks_protocol[protocol];
+}
+
+static inline mat_protocol_id_t mat_getBaseProtocolById(mat_protocol_id_t id) {
+	return mat_blocks_base_protocol[id];
+}
+
+/*
+Read the value of a state field of a block with certain protocol
+*/
+static inline uint8_t mat_getStateValue(mat_protocol_id_t block_protocol, mat_state_modifier_type_t field) {
+
+	mat_block_id_t block_id = mat_getIdByProtocol(block_protocol);
+	mat_protocol_id_t block_state = block_protocol - mat_getBaseProtocolById(block_id);
+	const mat_block_t* block_data = mat_getBlockById(block_id);
+
+	for (int32_t i = block_data->modifiers_count; i >= 0; --i) {
+
+		if (block_data->modifiers[i] != field) {
+
+			block_state /= mat_getStateModifierByType(block_data->modifiers[i])->count;
+
+		} else {
+
+			return block_state % mat_getStateModifierByType(field)->count;
+
+		}
+
+	}
+
+	return 0;
+
+}
+
+/*
+Set a state field for a particular block
+*/
+static inline mat_protocol_id_t mat_setStateValue(mat_protocol_id_t block_protocol, mat_state_modifier_type_t field, uint8_t value) {
+
+	mat_block_id_t block_id = mat_getIdByProtocol(block_protocol);
+	mat_protocol_id_t block_state = block_protocol - mat_getBaseProtocolById(block_id);
+	int32_t state_add = 1;
+	const mat_block_t* block_data = mat_getBlockById(block_id);
+
+	for (int32_t i = block_data->modifiers_count; i >= 0; --i) {
+
+		const mat_state_modifier_t* modifier = mat_getStateModifierByType(block_data->modifiers[i]);
+
+		if (block_data->modifiers[i] != field) {
+
+			block_state /= modifier->count;
+			state_add *= modifier->count;
+
+		} else {
+
+			block_state %= modifier->count;
+			state_add *= (int32_t) value - block_state;
+
+			return block_protocol + state_add;
+
+		}
+
+	}
+
+	return block_protocol;
+
 }
 
 static inline uint8_t mat_getLuminance(const mat_block_t* block) {

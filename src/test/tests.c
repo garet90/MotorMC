@@ -5,11 +5,12 @@
 
 bool_t test_materials() {
 
+    // test that protocol map is correct
     uint16_t protocolID = 0;
     uint16_t protocolJump;
     // test to make sure the number
     // of states is equal to state map
-    for (uint16_t i = 0; i < 898; ++i, protocolID += protocolJump) {
+    for (uint16_t i = 0; i < mat_block_count; ++i, protocolID += protocolJump) {
 
         mat_block_id_t id = mat_getIdByProtocol(protocolID);
         const mat_block_t* block = mat_getBlockById(id);
@@ -36,6 +37,41 @@ bool_t test_materials() {
 
     }
 
+    // test that base protocol is correct
+    for (uint16_t i = 0; i < mat_block_count; ++i) {
+
+        uint16_t protocol = mat_getBaseProtocolById(i);
+
+        if (mat_getIdByProtocol(protocol) != i) {
+            log_error("Base protocol is incorrect!");
+            log_error("\tBlock ID %d", i);
+            log_error("\tProtocol ID %d", protocol);
+            return false;
+        }
+
+        if (protocol > 0) {
+            if (mat_getIdByProtocol(protocol - 1) == i) {
+                log_error("Base protocol is incorrect!");
+                log_error("\tBase protocol offset incorrect!");
+                log_error("\tBlock ID %d", i);
+                return false;
+            }
+        }
+
+    }
+
+    // test material
+    mat_block_id_t block_id = mat_block_chest;
+    mat_protocol_id_t protocol_id = mat_getBaseProtocolById(block_id);
+    
+    protocol_id = mat_setStateValue(protocol_id, mat_state_modifier_waterlogged, 1);
+    protocol_id = mat_setStateValue(protocol_id, mat_state_modifier_chest_type, 2);
+
+    if (mat_getStateValue(protocol_id, mat_state_modifier_chest_type) != 2 || mat_getStateValue(protocol_id, mat_state_modifier_waterlogged) != 1) {
+        log_error("Setting or getting states failed!");
+        return false;
+    }
+
     return true;
 
 }
@@ -46,8 +82,10 @@ bool_t test_runAll() {
     if (test_materials()) {
         log_info("Material test passed.");
     } else {
-        return false;
+        return true;
     }
+
+    log_info("All tests passed.");
 
     return false;
 

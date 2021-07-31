@@ -3,6 +3,7 @@
 #include "../util/vector.h"
 #include "../util/tree.h"
 #include "../util/bitset.h"
+#include "material/material.h"
 
 typedef struct wld_world wld_world_t;
 typedef struct wld_region wld_region_t;
@@ -33,7 +34,7 @@ struct wld_chunk {
 		// block map
 		struct {
 
-			uint16_t state;
+			mat_protocol_id_t state;
 			uint16_t entity;
 
 		} blocks[16 * 16 * 16];
@@ -53,7 +54,7 @@ struct wld_region {
 	int32_t y;
 
 	// bit array determining which chunks are active
-	uint64_t chunk_active[16];
+	utl_bitset(32 * 32, chunk_active);
 	// chunks
 	wld_chunk_t* chunks[32 * 32];
 
