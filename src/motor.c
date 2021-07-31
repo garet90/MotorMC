@@ -310,7 +310,7 @@ int main(int argCount, char* args[]) {
 		utl_vectorPush(&sky_main.worlds, &world);
 	} else {
 		log_info("Generating world %s...", sky_main.world.name);
-		wld_world_t* world = wld_new(sky_main.world.name, (sky_main.world.seed == 0 ? time(NULL) : sky_main.world.seed), WLD_NORMAL);
+		wld_world_t* world = wld_new(sky_main.world.name, (sky_main.world.seed == 0 ? time(NULL) : sky_main.world.seed), mat_dimension_overworld);
 		utl_vectorPush(&sky_main.worlds, &world);
 	}
 

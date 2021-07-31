@@ -34,13 +34,13 @@ struct wld_chunk {
 		// block map
 		struct {
 
-			mat_protocol_id_t state;
+			mat_block_protocol_id_t state;
 			uint16_t entity;
 
 		} blocks[16 * 16 * 16];
 
 		// biome map
-		uint16_t biome[4 * 4 * 4];
+		mat_biome_type_t biome[4 * 4 * 4];
 
 	} sections[]; // y = section index * 16, count of sections = World.height / 16
 
@@ -68,15 +68,6 @@ struct wld_region {
 
 };
 
-typedef enum {
-
-	WLD_NORMAL = 0,
-	WLD_NETHER = 1,
-	WLD_THE_END = 2,
-	WLD_CUSTOM = 3
-
-} wld_environment_t;
-
 struct wld_world {
 
 	int64_t seed;
@@ -86,14 +77,14 @@ struct wld_world {
 	// regions
 	utl_tree_t regions;
 
-	wld_environment_t environment;
+	mat_dimension_type_t environment;
 	
 	bool_t debug;
 	bool_t flat;
 
 };
 
-extern wld_world_t* wld_new(const char* name, int64_t seed, wld_environment_t environment);
+extern wld_world_t* wld_new(const char* name, int64_t seed, mat_dimension_type_t environment);
 
 extern wld_world_t* wld_load(const char* name);
 

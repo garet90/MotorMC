@@ -7,8 +7,8 @@
 #define __WINDOWS__
 #endif
 
-#define __MC_VER__ "1.17"
-#define __MC_PRO__ 755
+#define __MC_VER__ "1.17.1"
+#define __MC_PRO__ 756
 //755
 
 #define __MOTOR_VER__ "MotorMC InDev 0.0.1"

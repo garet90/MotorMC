@@ -3,33 +3,201 @@
 #include "../../util/bitset.h"
 
 /*
-	HITBOX
-	Hitboxes are used for physics to determine collisions
+	DIMENSIONS
 */
+
+enum mat_dimension_type {
+
+	mat_dimension_overworld,
+	mat_dimension_nether,
+	mat_dimension_end
+
+};
+
+typedef uint8_t mat_dimension_type_t;
 
 typedef enum {
 
-	mat_hitbox_none = -1,
-	mat_hitbox_full
+	mat_dimension_piglin_safe,
+	mat_dimension_natural,
+	mat_dimension_fixed_time,
+	mat_dimension_respawn_anchor_works,
+	mat_dimension_has_skylight,
+	mat_dimension_bed_works,
+	mat_dimension_has_raids,
+	mat_dimension_ultrawarm,
+	mat_dimension_has_ceiling,
 
-} mat_hitbox_id_t;
+	mat_dimension_properties_count
+
+} mat_dimension_properties_t;
 
 typedef struct {
 
-	size_t count;
+	const char* name;
+	const char* effects;
+	float32_t ambient_light;
+	float32_t coordinate_scale;
+	uint16_t fixed_time;
+	uint16_t min_y;
+	uint16_t height;
+	uint16_t logical_height;
+	utl_bitset(mat_dimension_properties_count, properties);
 
+} mat_dimension_t;
+
+extern const mat_dimension_t* mat_dimensions[];
+
+static inline const mat_dimension_t* mat_getDimensionByType(mat_dimension_type_t type) {
+	return mat_dimensions[type];
+}
+
+/*
+	BIOMES
+*/
+
+enum mat_biome_type {
+
+	mat_biome_badlands,
+	mat_biome_badlands_plateau,
+	mat_biome_bamboo_jungle,
+	mat_biome_bamboo_jungle_hills,
+	mat_biome_basalt_deltas,
+	mat_biome_beach,
+	mat_biome_birch_forest,
+	mat_biome_birch_forest_hills,
+	mat_biome_cold_ocean,
+	mat_biome_crimson_forest,
+	mat_biome_dark_forest,
+	mat_biome_dark_forest_hills,
+	mat_biome_deep_cold_ocean,
+	mat_biome_deep_frozen_ocean,
+	mat_biome_deep_lukewarm_ocean,
+	mat_biome_deep_ocean,
+	mat_biome_deep_warm_ocean,
+	mat_biome_desert,
+	mat_biome_desert_hills,
+	mat_biome_desert_lakes,
+	mat_biome_dripstone_caves,
+	mat_biome_end_barrens,
+	mat_biome_end_highlands,
+	mat_biome_end_midlands,
+	mat_biome_eroded_badlands,
+	mat_biome_flower_forest,
+	mat_biome_forest,
+	mat_biome_frozen_ocean,
+	mat_biome_frozen_river,
+	mat_biome_giant_spruce_taiga,
+	mat_biome_giant_spruce_taiga_hills,
+	mat_biome_giant_tree_taiga,
+	mat_biome_giant_tree_taiga_hills,
+	mat_biome_gravelly_mountains,
+	mat_biome_ice_spikes,
+	mat_biome_jungle,
+	mat_biome_jungle_edge,
+	mat_biome_jungle_hills,
+	mat_biome_lukewarm_ocean,
+	mat_biome_lush_caves,
+	mat_biome_modified_badlands_plateau,
+	mat_biome_modified_gravelly_mountains,
+	mat_biome_modified_jungle,
+	mat_biome_modified_jungle_edge,
+	mat_biome_modified_wooded_badlands_plateau,
+	mat_biome_mountain_edge,
+	mat_biome_mountains,
+	mat_biome_mushroom_field_shore,
+	mat_biome_mushroom_fields,
+	mat_biome_nether_wastes,
+	mat_biome_ocean,
+	mat_biome_plains,
+	mat_biome_river,
+	mat_biome_savanna,
+	mat_biome_savanna_plateau,
+	mat_biome_shattered_savanna,
+	mat_biome_shattered_savanna_plateau,
+	mat_biome_small_end_islands,
+	mat_biome_snowy_beach,
+	mat_biome_snowy_mountains,
+	mat_biome_snowy_taiga,
+	mat_biome_snowy_taiga_hills,
+	mat_biome_snowy_taiga_mountains,
+	mat_biome_snowy_tundra,
+	mat_biome_soul_sand_valley,
+	mat_biome_stone_shore,
+	mat_biome_sunflower_plains,
+	mat_biome_swamp,
+	mat_biome_swamp_hills,
+	mat_biome_taiga,
+	mat_biome_taiga_hills,
+	mat_biome_taiga_mountains,
+	mat_biome_tall_birch_forest,
+	mat_biome_tall_birch_hills,
+	mat_biome_the_end,
+	mat_biome_the_void,
+	mat_biome_warm_ocean,
+	mat_biome_warped_forest,
+	mat_biome_wooded_badlands_plateau,
+	mat_biome_wooded_hills,
+	mat_biome_wooded_mountains
+
+};
+
+typedef uint8_t mat_biome_type_t;
+
+typedef struct {
+
+	const char* name;
+	const char* precipitation; // TODO change for enum
+	float32_t depth;
+	float32_t temperature;
+	float32_t scale;
+	float32_t downfall;
+	const char* category; // TODO change for enum
+	const char* temperature_modifier; // TODO change for enum
+	uint32_t sky_color;
+	uint32_t water_fog_color;
+	uint32_t fog_color;
+	uint32_t water_color;
+	uint32_t foliage_color;
+	uint32_t grass_color_modifier;
 	struct {
-
-		float32_t x, y, z, width, height, depth;
 	
-	} hitbox[];
+		bool_t replace_current_music;
+		const char* sound;
+		uint32_t max_delay;
+		uint32_t min_delay;
+	
+	} music;
+	const char* ambient_sound;
+	struct {
+	
+		const char* sound;
+		float64_t tick_chance;
+	
+	} additions_sound;
+	struct {
+	
+		const char* sound;
+		uint32_t tick_delay;
+		float64_t offset;
+		uint32_t block_search_extent;
+	
+	} mood_sound;
+	struct {
+		
+		float32_t probability;
+		struct {
+			const char* type;
+		} options;
 
-} mat_hitbox_t;
+	} partical;
 
-extern const mat_hitbox_t* mat_hitboxes[];
+} mat_biome_t;
 
-static inline const mat_hitbox_t* mat_getHitboxById(mat_hitbox_id_t hitbox) {
-	return mat_hitboxes[hitbox];
+extern const mat_biome_t* mat_biomes[];
+
+static inline const mat_biome_t* mat_getBiomeByType(mat_biome_type_t type) {
+	return mat_biomes[type];
 }
 
 /*
@@ -37,7 +205,7 @@ static inline const mat_hitbox_t* mat_getHitboxById(mat_hitbox_id_t hitbox) {
 	State modifiers are used to determine the state
 */
 
-enum mat_state_modifier {
+enum mat_state_modifier_type {
 
 		// north
 		// south
@@ -505,12 +673,6 @@ typedef struct {
 
 	uint8_t count;
 
-	struct {
-
-		mat_hitbox_id_t hitbox;
-
-	} state[];
-
 } mat_state_modifier_t;
 
 extern const mat_state_modifier_t* mat_modifiers[];
@@ -616,7 +778,7 @@ typedef enum {
 	Blocks are the basic building blocks of the world
 */
 
-enum mat_block {
+enum mat_block_type {
 
 	mat_block_air,
 	mat_block_acacia_button,
@@ -1521,8 +1683,8 @@ enum mat_block {
 
 };
 
-typedef uint16_t mat_block_id_t;
-typedef uint16_t mat_protocol_id_t;
+typedef uint16_t mat_block_type_t;
+typedef uint16_t mat_block_protocol_id_t;
 
 typedef enum {
 
@@ -1564,28 +1726,28 @@ typedef struct {
 } mat_block_t;
 
 extern const mat_block_t* mat_blocks[];
-extern const mat_protocol_id_t mat_blocks_protocol[];
-extern const mat_protocol_id_t mat_blocks_base_protocol[];
+extern const mat_block_protocol_id_t mat_blocks_protocol[];
+extern const mat_block_protocol_id_t mat_blocks_base_protocol[];
 
-static inline const mat_block_t* mat_getBlockById(mat_block_id_t id) {
+static inline const mat_block_t* mat_getBlockById(mat_block_type_t id) {
 	return mat_blocks[id];
 }
 
-static inline mat_block_id_t mat_getIdByProtocol(mat_protocol_id_t protocol) {
+static inline mat_block_type_t mat_getIdByProtocolId(mat_block_protocol_id_t protocol) {
 	return mat_blocks_protocol[protocol];
 }
 
-static inline mat_protocol_id_t mat_getBaseProtocolById(mat_protocol_id_t id) {
+static inline mat_block_protocol_id_t mat_getBaseProtocolIdById(mat_block_protocol_id_t id) {
 	return mat_blocks_base_protocol[id];
 }
 
 /*
 Read the value of a state field of a block with certain protocol
 */
-static inline uint8_t mat_getStateValue(mat_protocol_id_t block_protocol, mat_state_modifier_type_t field) {
+static inline uint8_t mat_getBlockStateValue(mat_block_protocol_id_t block_protocol, mat_state_modifier_type_t field) {
 
-	mat_block_id_t block_id = mat_getIdByProtocol(block_protocol);
-	mat_protocol_id_t block_state = block_protocol - mat_getBaseProtocolById(block_id);
+	mat_block_type_t block_id = mat_getIdByProtocolId(block_protocol);
+	mat_block_protocol_id_t block_state = block_protocol - mat_getBaseProtocolIdById(block_id);
 	const mat_block_t* block_data = mat_getBlockById(block_id);
 
 	for (int32_t i = block_data->modifiers_count; i >= 0; --i) {
@@ -1609,10 +1771,10 @@ static inline uint8_t mat_getStateValue(mat_protocol_id_t block_protocol, mat_st
 /*
 Set a state field for a particular block
 */
-static inline mat_protocol_id_t mat_setStateValue(mat_protocol_id_t block_protocol, mat_state_modifier_type_t field, uint8_t value) {
+static inline mat_block_protocol_id_t mat_setBlockStateValue(mat_block_protocol_id_t block_protocol, mat_state_modifier_type_t field, uint8_t value) {
 
-	mat_block_id_t block_id = mat_getIdByProtocol(block_protocol);
-	mat_protocol_id_t block_state = block_protocol - mat_getBaseProtocolById(block_id);
+	mat_block_type_t block_id = mat_getIdByProtocolId(block_protocol);
+	mat_block_protocol_id_t block_state = block_protocol - mat_getBaseProtocolIdById(block_id);
 	int32_t state_add = 1;
 	const mat_block_t* block_data = mat_getBlockById(block_id);
 
@@ -2852,7 +3014,7 @@ typedef struct {
 
 		} armor;
 
-		mat_block_id_t block;
+		mat_block_type_t block;
 
 		struct {
 
@@ -2938,7 +3100,7 @@ static inline bool_t mat_isBlock(const mat_item_t* item) {
 	return utl_testBit(item->tags_set, mat_item_tag_block);
 }
 
-static inline mat_block_id_t mat_getBlockId(const mat_item_t* item) {
+static inline mat_block_type_t mat_getBlockId(const mat_item_t* item) {
 	return item->tags[0].block;
 }
 
