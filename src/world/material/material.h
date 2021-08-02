@@ -20,7 +20,6 @@ typedef enum {
 
 	mat_dimension_piglin_safe,
 	mat_dimension_natural,
-	mat_dimension_fixed_time,
 	mat_dimension_respawn_anchor_works,
 	mat_dimension_has_skylight,
 	mat_dimension_bed_works,
@@ -38,7 +37,7 @@ typedef struct {
 	const char* effects;
 	float32_t ambient_light;
 	float32_t coordinate_scale;
-	uint16_t fixed_time;
+	uint16_t fixed_time; // 0xFFFF = no fixed time
 	uint16_t min_y;
 	uint16_t height;
 	uint16_t logical_height;
@@ -144,45 +143,152 @@ enum mat_biome_type {
 
 typedef uint8_t mat_biome_type_t;
 
+typedef enum {
+
+	mat_precipitation_rain,
+	mat_precipitation_snow,
+	mat_precipitation_none
+
+} mat_precipitation_type_t;
+
+static inline const char* mat_precipitationTypeAsString(mat_precipitation_type_t type) {
+
+	const char* types[] = {
+		"rain",
+		"snow",
+		"none"
+	};
+
+	return types[type];
+
+}
+
+typedef enum {
+
+	mat_biome_category_none,
+	mat_biome_category_ocean,
+	mat_biome_category_plains,
+	mat_biome_category_desert,
+	mat_biome_category_forest,
+	mat_biome_category_extreme_hills,
+	mat_biome_category_taiga,
+	mat_biome_category_swamp,
+	mat_biome_category_river,
+	mat_biome_category_nether,
+	mat_biome_category_the_end,
+	mat_biome_category_icy,
+	mat_biome_category_mushroom,
+	mat_biome_category_beach,
+	mat_biome_category_jungle,
+	mat_biome_category_mesa,
+	mat_biome_category_savanna,
+	mat_biome_category_underground,
+
+} mat_biome_category_t;
+
+static inline const char* mat_biomeCategoryAsString(mat_biome_category_t category) {
+
+	const char* categories[] = {
+		"none",
+		"ocean",
+		"plains",
+		"desert",
+		"forest",
+		"extreme_hills",
+		"taiga",
+		"swamp",
+		"river",
+		"nether",
+		"the_end",
+		"icy",
+		"mushroom",
+		"beach",
+		"jungle",
+		"mesa",
+		"savanna",
+		"underground",
+	};
+
+	return categories[category];
+
+}
+
+typedef enum {
+
+	mat_grass_color_modifier_none,
+	mat_grass_color_modifier_swamp,
+	mat_grass_color_modifier_dark_forest
+
+} mat_grass_color_modifier_t;
+
+static inline const char* mat_grassColorModifierAsString(mat_grass_color_modifier_t modifier) {
+
+	const char* modifiers[] = {
+		"none",
+		"swamp",
+		"dark_forest"
+	};
+
+	return modifiers[modifier];
+
+}
+
+typedef enum {
+
+	mat_temperature_modifier_none,
+	mat_temperature_modifier_frozen
+	
+} mat_temperature_modifier_t;
+
 typedef struct {
 
 	const char* name;
-	const char* precipitation; // TODO change for enum
+	mat_precipitation_type_t precipitation;
 	float32_t depth;
 	float32_t temperature;
+	mat_temperature_modifier_t temperature_modifier;
 	float32_t scale;
 	float32_t downfall;
-	const char* category; // TODO change for enum
-	const char* temperature_modifier; // TODO change for enum
-	uint32_t sky_color;
-	uint32_t water_fog_color;
-	uint32_t fog_color;
-	uint32_t water_color;
-	uint32_t foliage_color;
-	uint32_t grass_color_modifier;
+	mat_biome_category_t category;
+
 	struct {
-	
-		bool_t replace_current_music;
-		const char* sound;
-		uint32_t max_delay;
-		uint32_t min_delay;
-	
-	} music;
-	const char* ambient_sound;
-	struct {
-	
-		const char* sound;
-		float64_t tick_chance;
-	
-	} additions_sound;
-	struct {
-	
-		const char* sound;
-		uint32_t tick_delay;
-		float64_t offset;
-		uint32_t block_search_extent;
-	
-	} mood_sound;
+
+		uint32_t sky_color;
+		uint32_t water_fog_color;
+		uint32_t fog_color;
+		uint32_t water_color;
+		uint32_t foliage_color; // 0 if no foliage color
+		uint32_t grass_color; // 0 if no grass color
+		mat_grass_color_modifier_t grass_color_modifier;
+
+		struct {
+
+			const char* sound;
+			uint32_t max_delay;
+			uint32_t min_delay;
+		
+		} music;
+
+		const char* ambient_sound;
+
+		struct {
+		
+			const char* sound;
+			float64_t tick_chance;
+		
+		} additions_sound;
+
+		struct {
+		
+			const char* sound;
+			float64_t offset;
+			uint32_t tick_delay;
+			uint32_t block_search_extent;
+		
+		} mood_sound;
+
+	} effects;
+
 	struct {
 		
 		float32_t probability;
@@ -190,7 +296,7 @@ typedef struct {
 			const char* type;
 		} options;
 
-	} partical;
+	} particle;
 
 } mat_biome_t;
 
