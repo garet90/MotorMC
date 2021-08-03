@@ -4,7 +4,6 @@ const mat_block_t mat_block_air_d = {
     .resistance = 0,
     .hardness = 0
 };
-
 const mat_block_t mat_block_acacia_button_d = { 
     .resistance = 0.5,
     .hardness = 0.5,
@@ -307,7 +306,7 @@ const mat_block_t mat_block_andesite_d = {
 };
 const mat_block_t mat_block_andesite_slab_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -323,7 +322,7 @@ const mat_block_t mat_block_andesite_slab_d = {
 };
 const mat_block_t mat_block_andesite_stairs_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -341,7 +340,7 @@ const mat_block_t mat_block_andesite_stairs_d = {
 };
 const mat_block_t mat_block_andesite_wall_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -466,7 +465,7 @@ const mat_block_t mat_block_barrel_d = {
 };
 const mat_block_t mat_block_barrier_d = {
     .resistance = 3600000.8,
-    .hardness = -1,
+    .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     }
@@ -493,8 +492,8 @@ const mat_block_t mat_block_beacon_d = {
     .entity = mat_block_entity_beacon
 };
 const mat_block_t mat_block_bedrock_d = {
-    .resistance = 18000000,
-    .hardness = -1
+    .resistance = 3600000,
+    .hardness = 0
 };
 const mat_block_t mat_block_beehive_d = { 
     .resistance = 0.6,
@@ -892,7 +891,7 @@ const mat_block_t mat_block_black_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_black_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -951,7 +950,7 @@ const mat_block_t mat_block_black_wool_d = {
     }
 };
 const mat_block_t mat_block_blackstone_d = {
-    .resistance = 5,
+    .resistance = 6,
     .hardness = 1.5,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
@@ -1110,7 +1109,7 @@ const mat_block_t mat_block_quartz_block_d = {
 };
 const mat_block_t mat_block_raw_copper_block_d = { 
     .resistance = 6,
-    .hardness = 3,
+    .hardness = 5,
     .best_tool = {
         .tier = mat_equipment_tier_stone,
         .type = mat_equipment_type_pickaxe
@@ -1118,7 +1117,7 @@ const mat_block_t mat_block_raw_copper_block_d = {
 };
 const mat_block_t mat_block_raw_gold_block_d = { 
     .resistance = 6,
-    .hardness = 3,
+    .hardness = 5,
     .best_tool = {
         .tier = mat_equipment_tier_iron,
         .type = mat_equipment_type_pickaxe
@@ -1238,7 +1237,7 @@ const mat_block_t mat_block_blue_orchid_d = {
     }
 };
 const mat_block_t mat_block_blue_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -1541,7 +1540,7 @@ const mat_block_t mat_block_brown_mushroom_block_d = {
     }
 };
 const mat_block_t mat_block_brown_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -1746,7 +1745,7 @@ const mat_block_t mat_block_cauldron_d = {
     }
 };
 const mat_block_t mat_block_cave_vines_d = { 
-    .resistance = 0.2,
+    .resistance = 0,
     .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -1775,7 +1774,7 @@ const mat_block_t mat_block_chain_d = {
 };
 const mat_block_t mat_block_chain_command_block_d = { 
     .resistance = 3600000,
-    .hardness = -1,
+    .hardness = 0,
     .entity = mat_block_entity_command,
     .modifiers_count = 2,
     .modifiers = {
@@ -1834,7 +1833,7 @@ const mat_block_t mat_block_chiseled_nether_bricks_d = {
 };
 const mat_block_t mat_block_chiseled_polished_blackstone_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
@@ -2084,7 +2083,7 @@ const mat_block_t mat_block_cocoa_d = {
 };
 const mat_block_t mat_block_command_block_d = {
     .resistance = 3600000,
-    .hardness = -1,
+    .hardness = 0,
     .entity = mat_block_entity_command,
     .modifiers_count = 2,
     .modifiers = {
@@ -2169,7 +2168,7 @@ const mat_block_t mat_block_cracked_nether_bricks_d = {
 };
 const mat_block_t mat_block_cracked_polished_blackstone_bricks_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
@@ -2298,7 +2297,7 @@ const mat_block_t mat_block_crimson_hyphae_d = {
     }
 };
 const mat_block_t mat_block_crimson_nylium_d = { 
-    .resistance = 1,
+    .resistance = 0.4,
     .hardness = 0.4,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
@@ -2476,8 +2475,8 @@ const mat_block_t mat_block_cut_red_sandstone_d = {
     }
 };
 const mat_block_t mat_block_cut_red_sandstone_slab_d = { 
-    .resistance = 0.8,
-    .hardness = 0.8,
+    .resistance = 6,
+    .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -2500,8 +2499,8 @@ const mat_block_t mat_block_cut_sandstone_d = {
     }
 };
 const mat_block_t mat_block_cut_sandstone_slab_d = { 
-    .resistance = 0.8,
-    .hardness = 0.8,
+    .resistance = 6,
+    .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -2596,7 +2595,7 @@ const mat_block_t mat_block_cyan_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_cyan_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -3479,8 +3478,8 @@ const mat_block_t mat_block_dragon_head_d = {
     }
 };
 const mat_block_t mat_block_kelp_d = { 
-    .resistance = 2.5,
-    .hardness = 0.5,
+    .resistance = 0,
+    .hardness = 0,
     .encouragement = 30,
     .flammability = 60,
     .best_tool = {
@@ -3536,7 +3535,7 @@ const mat_block_t mat_block_enchanting_table_d = {
 };
 const mat_block_t mat_block_end_portal_frame_d = { 
     .resistance = 3600000,
-    .hardness = -1,
+    .hardness = 0,
     .luminance = 1,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -3854,7 +3853,7 @@ const mat_block_t mat_block_glass_pane_d = {
 const mat_block_t mat_block_glow_lichen_d = { 
     .resistance = 0.2,
     .hardness = 0.2,
-    .luminance = 7,
+    .luminance = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -4060,7 +4059,7 @@ const mat_block_t mat_block_gray_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_gray_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -4199,7 +4198,7 @@ const mat_block_t mat_block_green_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_green_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -4274,8 +4273,8 @@ const mat_block_t mat_block_grindstone_d = {
     }
 };
 const mat_block_t mat_block_hanging_roots_d = { 
-    .resistance = 0.1,
-    .hardness = 0.1,
+    .resistance = 0,
+    .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -4384,19 +4383,19 @@ const mat_block_t mat_block_ice_d = {
 };
 const mat_block_t mat_block_infested_chiseled_stone_bricks_d = { 
     .resistance = 0.75,
-    .hardness = 0
+    .hardness = 0.75
 };
 const mat_block_t mat_block_infested_cobblestone_d = { 
     .resistance = 0.75,
-    .hardness = 0
+    .hardness = 1
 };
 const mat_block_t mat_block_infested_cracked_stone_bricks_d = { 
     .resistance = 0.75,
-    .hardness = 0
+    .hardness = 0.75
 };
 const mat_block_t mat_block_infested_deepslate_d = { 
     .resistance = 0.75,
-    .hardness = 0,
+    .hardness = 1.5,
     .modifiers_count = 1,
     .modifiers = {
         mat_state_modifier_axis
@@ -4404,15 +4403,15 @@ const mat_block_t mat_block_infested_deepslate_d = {
 };
 const mat_block_t mat_block_infested_mossy_stone_bricks_d = { 
     .resistance = 0.75,
-    .hardness = 0
+    .hardness = 0.75
 };
 const mat_block_t mat_block_infested_stone_d = { 
     .resistance = 0.75,
-    .hardness = 0
+    .hardness = 0.75
 };
 const mat_block_t mat_block_infested_stone_bricks_d = { 
     .resistance = 0.75,
-    .hardness = 0
+    .hardness = 0.75
 };
 const mat_block_t mat_block_iron_bars_d = { 
     .resistance = 6,
@@ -4497,7 +4496,7 @@ const mat_block_t mat_block_jack_o_lantern_d = {
 };
 const mat_block_t mat_block_jigsaw_d = { 
     .resistance = 3600000,
-    .hardness = -1,
+    .hardness = 0,
     .entity = mat_block_entity_jigsaw,
     .modifiers_count = 1,
     .modifiers = {
@@ -4883,7 +4882,7 @@ const mat_block_t mat_block_lever_d = {
 };
 const mat_block_t mat_block_light_d = { 
     .resistance = 3600000.8,
-    .hardness = -1,
+    .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -4974,7 +4973,7 @@ const mat_block_t mat_block_light_blue_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_light_blue_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -5113,7 +5112,7 @@ const mat_block_t mat_block_light_gray_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_light_gray_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -5313,7 +5312,7 @@ const mat_block_t mat_block_lime_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_lime_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -5475,7 +5474,7 @@ const mat_block_t mat_block_magenta_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_magenta_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -5738,7 +5737,7 @@ const mat_block_t mat_block_mushroom_stem_d = {
     }
 };
 const mat_block_t mat_block_mycelium_d = { 
-    .resistance = 0.5,
+    .resistance = 0.6,
     .hardness = 0.6,
     .best_tool = {
         .tier = mat_equipment_tier_any,
@@ -6140,8 +6139,8 @@ const mat_block_t mat_block_oak_wood_d = {
     }
 };
 const mat_block_t mat_block_observer_d = { 
-    .resistance = 3.5,
-    .hardness = 3.5,
+    .resistance = 3,
+    .hardness = 3,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
@@ -6241,7 +6240,7 @@ const mat_block_t mat_block_orange_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_orange_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -6389,7 +6388,7 @@ const mat_block_t mat_block_peony_d = {
     }
 };
 const mat_block_t mat_block_petrified_oak_slab_d = { 
-    .resistance = 3,
+    .resistance = 6,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -6485,7 +6484,7 @@ const mat_block_t mat_block_pink_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_pink_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -6553,7 +6552,7 @@ const mat_block_t mat_block_pink_wool_d = {
     }
 };
 const mat_block_t mat_block_piston_d = { 
-    .resistance = 0.5,
+    .resistance = 1.5,
     .hardness = 1.5,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
@@ -6608,7 +6607,7 @@ const mat_block_t mat_block_pointed_dripstone_d = {
 };
 const mat_block_t mat_block_polished_andesite_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
@@ -6616,7 +6615,7 @@ const mat_block_t mat_block_polished_andesite_d = {
 };
 const mat_block_t mat_block_polished_andesite_slab_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -6632,7 +6631,7 @@ const mat_block_t mat_block_polished_andesite_slab_d = {
 };
 const mat_block_t mat_block_polished_andesite_stairs_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -6686,7 +6685,7 @@ const mat_block_t mat_block_polished_blackstone_brick_slab_d = {
 };
 const mat_block_t mat_block_polished_blackstone_brick_stairs_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -6704,7 +6703,7 @@ const mat_block_t mat_block_polished_blackstone_brick_stairs_d = {
 };
 const mat_block_t mat_block_polished_blackstone_brick_wall_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -6724,7 +6723,7 @@ const mat_block_t mat_block_polished_blackstone_brick_wall_d = {
 };
 const mat_block_t mat_block_polished_blackstone_bricks_d = { 
     .resistance = 6,
-    .hardness = 2,
+    .hardness = 1.5,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
@@ -6983,7 +6982,7 @@ const mat_block_t mat_block_potatoes_d = {
     }
 };
 const mat_block_t mat_block_powder_snow_d = { 
-    .resistance = 0.1,
+    .resistance = 0.25,
     .hardness = 0.25,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -7210,7 +7209,7 @@ const mat_block_t mat_block_purple_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_purple_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -7579,7 +7578,7 @@ const mat_block_t mat_block_red_sandstone_d = {
 };
 const mat_block_t mat_block_red_sandstone_slab_d = { 
     .resistance = 6,
-    .hardness = 6,
+    .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -7632,7 +7631,7 @@ const mat_block_t mat_block_red_sandstone_wall_d = {
     }
 };
 const mat_block_t mat_block_red_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -7776,7 +7775,7 @@ const mat_block_t mat_block_redstone_wire_d = {
 };
 const mat_block_t mat_block_repeating_command_block_d = { 
     .resistance = 3600000,
-    .hardness = -1,
+    .hardness = 0,
     .entity = mat_block_entity_command,
     .modifiers_count = 2,
     .modifiers = {
@@ -7797,7 +7796,7 @@ const mat_block_t mat_block_respawn_anchor_d = {
     }
 };
 const mat_block_t mat_block_rooted_dirt_d = { 
-    .resistance = 0.1,
+    .resistance = 0.5,
     .hardness = 0.5
 };
 const mat_block_t mat_block_rose_bush_d = { 
@@ -7831,7 +7830,7 @@ const mat_block_t mat_block_sandstone_d = {
 };
 const mat_block_t mat_block_sandstone_slab_d = { 
     .resistance = 6,
-    .hardness = 6,
+    .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -7951,7 +7950,7 @@ const mat_block_t mat_block_shroomlight_d = {
     }
 };
 const mat_block_t mat_block_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -7999,8 +7998,8 @@ const mat_block_t mat_block_small_amethyst_bud_d = {
     }
 };
 const mat_block_t mat_block_small_dripleaf_d = { 
-    .resistance = 0.1,
-    .hardness = 0.1,
+    .resistance = 0,
+    .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -8088,7 +8087,7 @@ const mat_block_t mat_block_smooth_quartz_stairs_d = {
 };
 const mat_block_t mat_block_smooth_red_sandstone_d = { 
     .resistance = 6,
-    .hardness = 6,
+    .hardness = 2,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
@@ -8096,7 +8095,7 @@ const mat_block_t mat_block_smooth_red_sandstone_d = {
 };
 const mat_block_t mat_block_smooth_red_sandstone_slab_d = { 
     .resistance = 6,
-    .hardness = 6,
+    .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -8112,7 +8111,7 @@ const mat_block_t mat_block_smooth_red_sandstone_slab_d = {
 };
 const mat_block_t mat_block_smooth_red_sandstone_stairs_d = { 
     .resistance = 6,
-    .hardness = 6,
+    .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -8130,7 +8129,7 @@ const mat_block_t mat_block_smooth_red_sandstone_stairs_d = {
 };
 const mat_block_t mat_block_smooth_sandstone_d = { 
     .resistance = 6,
-    .hardness = 6,
+    .hardness = 2,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
         .type = mat_equipment_type_pickaxe
@@ -8138,7 +8137,7 @@ const mat_block_t mat_block_smooth_sandstone_d = {
 };
 const mat_block_t mat_block_smooth_sandstone_slab_d = { 
     .resistance = 6,
-    .hardness = 6,
+    .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -8154,7 +8153,7 @@ const mat_block_t mat_block_smooth_sandstone_slab_d = {
 };
 const mat_block_t mat_block_smooth_sandstone_stairs_d = { 
     .resistance = 6,
-    .hardness = 6,
+    .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -8555,7 +8554,7 @@ const mat_block_t mat_block_spruce_wood_d = {
     }
 };
 const mat_block_t mat_block_sticky_piston_d = { 
-    .resistance = 0.5,
+    .resistance = 1.5,
     .hardness = 1.5,
     .best_tool = {
         .tier = mat_equipment_tier_any,
@@ -8701,7 +8700,7 @@ const mat_block_t mat_block_stone_stairs_d = {
 };
 const mat_block_t mat_block_stonecutter_d = { 
     .resistance = 3.5,
-    .hardness = 1.5,
+    .hardness = 3.5,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -8968,7 +8967,7 @@ const mat_block_t mat_block_stripped_warped_stem_d = {
 };
 const mat_block_t mat_block_structure_block_d = { 
     .resistance = 3600000,
-    .hardness = -1,
+    .hardness = 0,
     .entity = mat_block_entity_structure,
     .modifiers_count = 1,
     .modifiers = {
@@ -9309,7 +9308,7 @@ const mat_block_t mat_block_warped_hyphae_d = {
     }
 };
 const mat_block_t mat_block_warped_nylium_d = { 
-    .resistance = 1,
+    .resistance = 0.4,
     .hardness = 0.4,
     .best_tool = {
         .tier = mat_equipment_tier_wood,
@@ -9698,7 +9697,7 @@ const mat_block_t mat_block_weathered_cut_copper_stairs_d = {
     }
 };
 const mat_block_t mat_block_weeping_vines_d = { 
-    .resistance = 0.2,
+    .resistance = 0,
     .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -9808,7 +9807,7 @@ const mat_block_t mat_block_white_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_white_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -9976,7 +9975,7 @@ const mat_block_t mat_block_yellow_glazed_terracotta_d = {
     }
 };
 const mat_block_t mat_block_yellow_shulker_box_d = { 
-    .resistance = 6,
+    .resistance = 2,
     .hardness = 2,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -10047,7 +10046,7 @@ const mat_block_t mat_block_zombie_head_d = {
 };
 const mat_block_t mat_block_end_portal_d = {
     .resistance = 3600000,
-    .hardness = -1,
+    .hardness = 0,
     .luminance = 15,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -10070,7 +10069,7 @@ const mat_block_t mat_block_frosted_ice_d = {
     }
 };
 const mat_block_t mat_block_piston_head_d = {
-    .resistance = 0.5,
+    .resistance = 1.5,
     .hardness = 1.5,
     .best_tool = {
         .tier = mat_equipment_tier_any,
@@ -10085,7 +10084,7 @@ const mat_block_t mat_block_piston_head_d = {
 };
 const mat_block_t mat_block_nether_portal_d = {
     .resistance = 0,
-    .hardness = -1,
+    .hardness = 0,
     .luminance = 11,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -10097,7 +10096,7 @@ const mat_block_t mat_block_nether_portal_d = {
 };
 const mat_block_t mat_block_end_gateway_d = {
     .resistance = 3600000,
-    .hardness = -1,
+    .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
     },
@@ -10121,7 +10120,7 @@ const mat_block_t mat_block_big_dripleaf_stem_d = {
     }
 };
 const mat_block_t mat_block_bubble_column_d = {
-    .resistance = 100,
+    .resistance = 0,
     .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
@@ -10133,7 +10132,7 @@ const mat_block_t mat_block_bubble_column_d = {
 };
 const mat_block_t mat_block_moving_piston_d = { 
     .resistance = 0,
-    .hardness = -1,
+    .hardness = 0,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },

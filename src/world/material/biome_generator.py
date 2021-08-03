@@ -8,13 +8,16 @@ if len(sys.argv) == 1:
 
 biomes = []
 
+print("#include \"material.h\"")
+print("")
+
 for f in listdir(sys.argv[1]):
     file = open(sys.argv[1] + "/" + f)
     data = json.load(file)
     name = f.split('.')[0]
     biomes.append("mat_biome_" + name + "_d")
     print("const mat_biome_t mat_biome_" + name + "_d = {")
-    print("\t.name = \"" + name + "\",")
+    print("\t.name = \"minecraft:" + name + "\",")
     print("\t.precipitation = mat_precipitation_" + data["precipitation"] + ",")
     print("\t.depth = " + str(data["depth"]) + ",")
     print("\t.temperature = " + str(data["temperature"]) + ",")

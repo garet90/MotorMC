@@ -1,7 +1,7 @@
 #include "material.h"
 
 const mat_biome_t mat_biome_badlands_d = {
-	.name = "badlands",
+	.name = "minecraft:badlands",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -23,7 +23,7 @@ const mat_biome_t mat_biome_badlands_d = {
 	},
 };
 const mat_biome_t mat_biome_badlands_plateau_d = {
-	.name = "badlands_plateau",
+	.name = "minecraft:badlands_plateau",
 	.precipitation = mat_precipitation_none,
 	.depth = 1.5,
 	.temperature = 2.0,
@@ -45,7 +45,7 @@ const mat_biome_t mat_biome_badlands_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_bamboo_jungle_d = {
-	.name = "bamboo_jungle",
+	.name = "minecraft:bamboo_jungle",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.95,
@@ -65,7 +65,7 @@ const mat_biome_t mat_biome_bamboo_jungle_d = {
 	},
 };
 const mat_biome_t mat_biome_bamboo_jungle_hills_d = {
-	.name = "bamboo_jungle_hills",
+	.name = "minecraft:bamboo_jungle_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.95,
@@ -85,7 +85,7 @@ const mat_biome_t mat_biome_bamboo_jungle_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_basalt_deltas_d = {
-	.name = "basalt_deltas",
+	.name = "minecraft:basalt_deltas",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -121,7 +121,7 @@ const mat_biome_t mat_biome_basalt_deltas_d = {
 	},
 };
 const mat_biome_t mat_biome_beach_d = {
-	.name = "beach",
+	.name = "minecraft:beach",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.0,
 	.temperature = 0.8,
@@ -141,7 +141,7 @@ const mat_biome_t mat_biome_beach_d = {
 	},
 };
 const mat_biome_t mat_biome_birch_forest_d = {
-	.name = "birch_forest",
+	.name = "minecraft:birch_forest",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.6,
@@ -161,7 +161,7 @@ const mat_biome_t mat_biome_birch_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_birch_forest_hills_d = {
-	.name = "birch_forest_hills",
+	.name = "minecraft:birch_forest_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.6,
@@ -181,7 +181,7 @@ const mat_biome_t mat_biome_birch_forest_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_cold_ocean_d = {
-	.name = "cold_ocean",
+	.name = "minecraft:cold_ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.0,
 	.temperature = 0.5,
@@ -201,7 +201,7 @@ const mat_biome_t mat_biome_cold_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_crimson_forest_d = {
-	.name = "crimson_forest",
+	.name = "minecraft:crimson_forest",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -237,7 +237,7 @@ const mat_biome_t mat_biome_crimson_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_dark_forest_d = {
-	.name = "dark_forest",
+	.name = "minecraft:dark_forest",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.7,
@@ -258,7 +258,7 @@ const mat_biome_t mat_biome_dark_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_dark_forest_hills_d = {
-	.name = "dark_forest_hills",
+	.name = "minecraft:dark_forest_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.7,
@@ -279,7 +279,7 @@ const mat_biome_t mat_biome_dark_forest_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_cold_ocean_d = {
-	.name = "deep_cold_ocean",
+	.name = "minecraft:deep_cold_ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -299,7 +299,7 @@ const mat_biome_t mat_biome_deep_cold_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_frozen_ocean_d = {
-	.name = "deep_frozen_ocean",
+	.name = "minecraft:deep_frozen_ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -320,7 +320,7 @@ const mat_biome_t mat_biome_deep_frozen_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_lukewarm_ocean_d = {
-	.name = "deep_lukewarm_ocean",
+	.name = "minecraft:deep_lukewarm_ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -340,7 +340,7 @@ const mat_biome_t mat_biome_deep_lukewarm_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_ocean_d = {
-	.name = "deep_ocean",
+	.name = "minecraft:deep_ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -360,7 +360,7 @@ const mat_biome_t mat_biome_deep_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_warm_ocean_d = {
-	.name = "deep_warm_ocean",
+	.name = "minecraft:deep_warm_ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -380,7 +380,7 @@ const mat_biome_t mat_biome_deep_warm_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_desert_d = {
-	.name = "desert",
+	.name = "minecraft:desert",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.125,
 	.temperature = 2.0,
@@ -400,7 +400,7 @@ const mat_biome_t mat_biome_desert_d = {
 	},
 };
 const mat_biome_t mat_biome_desert_hills_d = {
-	.name = "desert_hills",
+	.name = "minecraft:desert_hills",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.45,
 	.temperature = 2.0,
@@ -420,7 +420,7 @@ const mat_biome_t mat_biome_desert_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_desert_lakes_d = {
-	.name = "desert_lakes",
+	.name = "minecraft:desert_lakes",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.225,
 	.temperature = 2.0,
@@ -440,7 +440,7 @@ const mat_biome_t mat_biome_desert_lakes_d = {
 	},
 };
 const mat_biome_t mat_biome_dripstone_caves_d = {
-	.name = "dripstone_caves",
+	.name = "minecraft:dripstone_caves",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.125,
 	.temperature = 0.8,
@@ -460,7 +460,7 @@ const mat_biome_t mat_biome_dripstone_caves_d = {
 	},
 };
 const mat_biome_t mat_biome_end_barrens_d = {
-	.name = "end_barrens",
+	.name = "minecraft:end_barrens",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -480,7 +480,7 @@ const mat_biome_t mat_biome_end_barrens_d = {
 	},
 };
 const mat_biome_t mat_biome_end_highlands_d = {
-	.name = "end_highlands",
+	.name = "minecraft:end_highlands",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -500,7 +500,7 @@ const mat_biome_t mat_biome_end_highlands_d = {
 	},
 };
 const mat_biome_t mat_biome_end_midlands_d = {
-	.name = "end_midlands",
+	.name = "minecraft:end_midlands",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -520,7 +520,7 @@ const mat_biome_t mat_biome_end_midlands_d = {
 	},
 };
 const mat_biome_t mat_biome_eroded_badlands_d = {
-	.name = "eroded_badlands",
+	.name = "minecraft:eroded_badlands",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -542,7 +542,7 @@ const mat_biome_t mat_biome_eroded_badlands_d = {
 	},
 };
 const mat_biome_t mat_biome_flower_forest_d = {
-	.name = "flower_forest",
+	.name = "minecraft:flower_forest",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.7,
@@ -562,7 +562,7 @@ const mat_biome_t mat_biome_flower_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_forest_d = {
-	.name = "forest",
+	.name = "minecraft:forest",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.7,
@@ -582,7 +582,7 @@ const mat_biome_t mat_biome_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_frozen_ocean_d = {
-	.name = "frozen_ocean",
+	.name = "minecraft:frozen_ocean",
 	.precipitation = mat_precipitation_snow,
 	.depth = -1.0,
 	.temperature = 0.0,
@@ -603,7 +603,7 @@ const mat_biome_t mat_biome_frozen_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_frozen_river_d = {
-	.name = "frozen_river",
+	.name = "minecraft:frozen_river",
 	.precipitation = mat_precipitation_snow,
 	.depth = -0.5,
 	.temperature = 0.0,
@@ -623,7 +623,7 @@ const mat_biome_t mat_biome_frozen_river_d = {
 	},
 };
 const mat_biome_t mat_biome_giant_spruce_taiga_d = {
-	.name = "giant_spruce_taiga",
+	.name = "minecraft:giant_spruce_taiga",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.25,
@@ -643,7 +643,7 @@ const mat_biome_t mat_biome_giant_spruce_taiga_d = {
 	},
 };
 const mat_biome_t mat_biome_giant_spruce_taiga_hills_d = {
-	.name = "giant_spruce_taiga_hills",
+	.name = "minecraft:giant_spruce_taiga_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.25,
@@ -663,7 +663,7 @@ const mat_biome_t mat_biome_giant_spruce_taiga_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_giant_tree_taiga_d = {
-	.name = "giant_tree_taiga",
+	.name = "minecraft:giant_tree_taiga",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.3,
@@ -683,7 +683,7 @@ const mat_biome_t mat_biome_giant_tree_taiga_d = {
 	},
 };
 const mat_biome_t mat_biome_giant_tree_taiga_hills_d = {
-	.name = "giant_tree_taiga_hills",
+	.name = "minecraft:giant_tree_taiga_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.3,
@@ -703,7 +703,7 @@ const mat_biome_t mat_biome_giant_tree_taiga_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_gravelly_mountains_d = {
-	.name = "gravelly_mountains",
+	.name = "minecraft:gravelly_mountains",
 	.precipitation = mat_precipitation_rain,
 	.depth = 1.0,
 	.temperature = 0.2,
@@ -723,7 +723,7 @@ const mat_biome_t mat_biome_gravelly_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_ice_spikes_d = {
-	.name = "ice_spikes",
+	.name = "minecraft:ice_spikes",
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.425,
 	.temperature = 0.0,
@@ -743,7 +743,7 @@ const mat_biome_t mat_biome_ice_spikes_d = {
 	},
 };
 const mat_biome_t mat_biome_jungle_d = {
-	.name = "jungle",
+	.name = "minecraft:jungle",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.95,
@@ -763,7 +763,7 @@ const mat_biome_t mat_biome_jungle_d = {
 	},
 };
 const mat_biome_t mat_biome_jungle_edge_d = {
-	.name = "jungle_edge",
+	.name = "minecraft:jungle_edge",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.95,
@@ -783,7 +783,7 @@ const mat_biome_t mat_biome_jungle_edge_d = {
 	},
 };
 const mat_biome_t mat_biome_jungle_hills_d = {
-	.name = "jungle_hills",
+	.name = "minecraft:jungle_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.95,
@@ -803,7 +803,7 @@ const mat_biome_t mat_biome_jungle_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_lukewarm_ocean_d = {
-	.name = "lukewarm_ocean",
+	.name = "minecraft:lukewarm_ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.0,
 	.temperature = 0.5,
@@ -823,7 +823,7 @@ const mat_biome_t mat_biome_lukewarm_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_lush_caves_d = {
-	.name = "lush_caves",
+	.name = "minecraft:lush_caves",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -837,7 +837,7 @@ const mat_biome_t mat_biome_lush_caves_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_badlands_plateau_d = {
-	.name = "modified_badlands_plateau",
+	.name = "minecraft:modified_badlands_plateau",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.45,
 	.temperature = 2.0,
@@ -859,7 +859,7 @@ const mat_biome_t mat_biome_modified_badlands_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_gravelly_mountains_d = {
-	.name = "modified_gravelly_mountains",
+	.name = "minecraft:modified_gravelly_mountains",
 	.precipitation = mat_precipitation_rain,
 	.depth = 1.0,
 	.temperature = 0.2,
@@ -879,7 +879,7 @@ const mat_biome_t mat_biome_modified_gravelly_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_jungle_d = {
-	.name = "modified_jungle",
+	.name = "minecraft:modified_jungle",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.95,
@@ -899,7 +899,7 @@ const mat_biome_t mat_biome_modified_jungle_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_jungle_edge_d = {
-	.name = "modified_jungle_edge",
+	.name = "minecraft:modified_jungle_edge",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.95,
@@ -919,7 +919,7 @@ const mat_biome_t mat_biome_modified_jungle_edge_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_wooded_badlands_plateau_d = {
-	.name = "modified_wooded_badlands_plateau",
+	.name = "minecraft:modified_wooded_badlands_plateau",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.45,
 	.temperature = 2.0,
@@ -941,7 +941,7 @@ const mat_biome_t mat_biome_modified_wooded_badlands_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_mountains_d = {
-	.name = "mountains",
+	.name = "minecraft:mountains",
 	.precipitation = mat_precipitation_rain,
 	.depth = 1.0,
 	.temperature = 0.2,
@@ -961,7 +961,7 @@ const mat_biome_t mat_biome_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_mountain_edge_d = {
-	.name = "mountain_edge",
+	.name = "minecraft:mountain_edge",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.8,
 	.temperature = 0.2,
@@ -981,7 +981,7 @@ const mat_biome_t mat_biome_mountain_edge_d = {
 	},
 };
 const mat_biome_t mat_biome_mushroom_fields_d = {
-	.name = "mushroom_fields",
+	.name = "minecraft:mushroom_fields",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.9,
@@ -1001,7 +1001,7 @@ const mat_biome_t mat_biome_mushroom_fields_d = {
 	},
 };
 const mat_biome_t mat_biome_mushroom_field_shore_d = {
-	.name = "mushroom_field_shore",
+	.name = "minecraft:mushroom_field_shore",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.0,
 	.temperature = 0.9,
@@ -1021,7 +1021,7 @@ const mat_biome_t mat_biome_mushroom_field_shore_d = {
 	},
 };
 const mat_biome_t mat_biome_nether_wastes_d = {
-	.name = "nether_wastes",
+	.name = "minecraft:nether_wastes",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -1051,7 +1051,7 @@ const mat_biome_t mat_biome_nether_wastes_d = {
 	},
 };
 const mat_biome_t mat_biome_ocean_d = {
-	.name = "ocean",
+	.name = "minecraft:ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.0,
 	.temperature = 0.5,
@@ -1071,7 +1071,7 @@ const mat_biome_t mat_biome_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_plains_d = {
-	.name = "plains",
+	.name = "minecraft:plains",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.125,
 	.temperature = 0.8,
@@ -1091,7 +1091,7 @@ const mat_biome_t mat_biome_plains_d = {
 	},
 };
 const mat_biome_t mat_biome_river_d = {
-	.name = "river",
+	.name = "minecraft:river",
 	.precipitation = mat_precipitation_rain,
 	.depth = -0.5,
 	.temperature = 0.5,
@@ -1111,7 +1111,7 @@ const mat_biome_t mat_biome_river_d = {
 	},
 };
 const mat_biome_t mat_biome_savanna_d = {
-	.name = "savanna",
+	.name = "minecraft:savanna",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.125,
 	.temperature = 1.2,
@@ -1131,7 +1131,7 @@ const mat_biome_t mat_biome_savanna_d = {
 	},
 };
 const mat_biome_t mat_biome_savanna_plateau_d = {
-	.name = "savanna_plateau",
+	.name = "minecraft:savanna_plateau",
 	.precipitation = mat_precipitation_none,
 	.depth = 1.5,
 	.temperature = 1.0,
@@ -1151,7 +1151,7 @@ const mat_biome_t mat_biome_savanna_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_shattered_savanna_d = {
-	.name = "shattered_savanna",
+	.name = "minecraft:shattered_savanna",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.3625,
 	.temperature = 1.1,
@@ -1171,7 +1171,7 @@ const mat_biome_t mat_biome_shattered_savanna_d = {
 	},
 };
 const mat_biome_t mat_biome_shattered_savanna_plateau_d = {
-	.name = "shattered_savanna_plateau",
+	.name = "minecraft:shattered_savanna_plateau",
 	.precipitation = mat_precipitation_none,
 	.depth = 1.05,
 	.temperature = 1.0,
@@ -1191,7 +1191,7 @@ const mat_biome_t mat_biome_shattered_savanna_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_small_end_islands_d = {
-	.name = "small_end_islands",
+	.name = "minecraft:small_end_islands",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -1211,7 +1211,7 @@ const mat_biome_t mat_biome_small_end_islands_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_beach_d = {
-	.name = "snowy_beach",
+	.name = "minecraft:snowy_beach",
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.0,
 	.temperature = 0.05,
@@ -1231,7 +1231,7 @@ const mat_biome_t mat_biome_snowy_beach_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_mountains_d = {
-	.name = "snowy_mountains",
+	.name = "minecraft:snowy_mountains",
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.45,
 	.temperature = 0.0,
@@ -1251,7 +1251,7 @@ const mat_biome_t mat_biome_snowy_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_taiga_d = {
-	.name = "snowy_taiga",
+	.name = "minecraft:snowy_taiga",
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.2,
 	.temperature = -0.5,
@@ -1271,7 +1271,7 @@ const mat_biome_t mat_biome_snowy_taiga_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_taiga_hills_d = {
-	.name = "snowy_taiga_hills",
+	.name = "minecraft:snowy_taiga_hills",
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.45,
 	.temperature = -0.5,
@@ -1291,7 +1291,7 @@ const mat_biome_t mat_biome_snowy_taiga_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_taiga_mountains_d = {
-	.name = "snowy_taiga_mountains",
+	.name = "minecraft:snowy_taiga_mountains",
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.3,
 	.temperature = -0.5,
@@ -1311,7 +1311,7 @@ const mat_biome_t mat_biome_snowy_taiga_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_tundra_d = {
-	.name = "snowy_tundra",
+	.name = "minecraft:snowy_tundra",
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.125,
 	.temperature = 0.0,
@@ -1331,7 +1331,7 @@ const mat_biome_t mat_biome_snowy_tundra_d = {
 	},
 };
 const mat_biome_t mat_biome_soul_sand_valley_d = {
-	.name = "soul_sand_valley",
+	.name = "minecraft:soul_sand_valley",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -1367,7 +1367,7 @@ const mat_biome_t mat_biome_soul_sand_valley_d = {
 	},
 };
 const mat_biome_t mat_biome_stone_shore_d = {
-	.name = "stone_shore",
+	.name = "minecraft:stone_shore",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.2,
@@ -1387,7 +1387,7 @@ const mat_biome_t mat_biome_stone_shore_d = {
 	},
 };
 const mat_biome_t mat_biome_sunflower_plains_d = {
-	.name = "sunflower_plains",
+	.name = "minecraft:sunflower_plains",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.125,
 	.temperature = 0.8,
@@ -1407,7 +1407,7 @@ const mat_biome_t mat_biome_sunflower_plains_d = {
 	},
 };
 const mat_biome_t mat_biome_swamp_d = {
-	.name = "swamp",
+	.name = "minecraft:swamp",
 	.precipitation = mat_precipitation_rain,
 	.depth = -0.2,
 	.temperature = 0.8,
@@ -1429,7 +1429,7 @@ const mat_biome_t mat_biome_swamp_d = {
 	},
 };
 const mat_biome_t mat_biome_swamp_hills_d = {
-	.name = "swamp_hills",
+	.name = "minecraft:swamp_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = -0.1,
 	.temperature = 0.8,
@@ -1451,7 +1451,7 @@ const mat_biome_t mat_biome_swamp_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_taiga_d = {
-	.name = "taiga",
+	.name = "minecraft:taiga",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.25,
@@ -1471,7 +1471,7 @@ const mat_biome_t mat_biome_taiga_d = {
 	},
 };
 const mat_biome_t mat_biome_taiga_hills_d = {
-	.name = "taiga_hills",
+	.name = "minecraft:taiga_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.25,
@@ -1491,7 +1491,7 @@ const mat_biome_t mat_biome_taiga_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_taiga_mountains_d = {
-	.name = "taiga_mountains",
+	.name = "minecraft:taiga_mountains",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.3,
 	.temperature = 0.25,
@@ -1511,7 +1511,7 @@ const mat_biome_t mat_biome_taiga_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_tall_birch_forest_d = {
-	.name = "tall_birch_forest",
+	.name = "minecraft:tall_birch_forest",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.6,
@@ -1531,7 +1531,7 @@ const mat_biome_t mat_biome_tall_birch_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_tall_birch_hills_d = {
-	.name = "tall_birch_hills",
+	.name = "minecraft:tall_birch_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.55,
 	.temperature = 0.6,
@@ -1551,7 +1551,7 @@ const mat_biome_t mat_biome_tall_birch_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_the_end_d = {
-	.name = "the_end",
+	.name = "minecraft:the_end",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -1571,7 +1571,7 @@ const mat_biome_t mat_biome_the_end_d = {
 	},
 };
 const mat_biome_t mat_biome_the_void_d = {
-	.name = "the_void",
+	.name = "minecraft:the_void",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -1591,7 +1591,7 @@ const mat_biome_t mat_biome_the_void_d = {
 	},
 };
 const mat_biome_t mat_biome_warm_ocean_d = {
-	.name = "warm_ocean",
+	.name = "minecraft:warm_ocean",
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.0,
 	.temperature = 0.5,
@@ -1611,7 +1611,7 @@ const mat_biome_t mat_biome_warm_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_warped_forest_d = {
-	.name = "warped_forest",
+	.name = "minecraft:warped_forest",
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -1647,7 +1647,7 @@ const mat_biome_t mat_biome_warped_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_wooded_badlands_plateau_d = {
-	.name = "wooded_badlands_plateau",
+	.name = "minecraft:wooded_badlands_plateau",
 	.precipitation = mat_precipitation_none,
 	.depth = 1.5,
 	.temperature = 2.0,
@@ -1669,7 +1669,7 @@ const mat_biome_t mat_biome_wooded_badlands_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_wooded_hills_d = {
-	.name = "wooded_hills",
+	.name = "minecraft:wooded_hills",
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.7,
@@ -1689,7 +1689,7 @@ const mat_biome_t mat_biome_wooded_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_wooded_mountains_d = {
-	.name = "wooded_mountains",
+	.name = "minecraft:wooded_mountains",
 	.precipitation = mat_precipitation_rain,
 	.depth = 1.0,
 	.temperature = 0.2,
@@ -1707,4 +1707,87 @@ const mat_biome_t mat_biome_wooded_mountains_d = {
 			.block_search_extent = 8,
 		},
 	},
+};
+const mat_biome_t* mat_biomes[] = {
+	&mat_biome_badlands_d,
+	&mat_biome_badlands_plateau_d,
+	&mat_biome_bamboo_jungle_d,
+	&mat_biome_bamboo_jungle_hills_d,
+	&mat_biome_basalt_deltas_d,
+	&mat_biome_beach_d,
+	&mat_biome_birch_forest_d,
+	&mat_biome_birch_forest_hills_d,
+	&mat_biome_cold_ocean_d,
+	&mat_biome_crimson_forest_d,
+	&mat_biome_dark_forest_d,
+	&mat_biome_dark_forest_hills_d,
+	&mat_biome_deep_cold_ocean_d,
+	&mat_biome_deep_frozen_ocean_d,
+	&mat_biome_deep_lukewarm_ocean_d,
+	&mat_biome_deep_ocean_d,
+	&mat_biome_deep_warm_ocean_d,
+	&mat_biome_desert_d,
+	&mat_biome_desert_hills_d,
+	&mat_biome_desert_lakes_d,
+	&mat_biome_dripstone_caves_d,
+	&mat_biome_end_barrens_d,
+	&mat_biome_end_highlands_d,
+	&mat_biome_end_midlands_d,
+	&mat_biome_eroded_badlands_d,
+	&mat_biome_flower_forest_d,
+	&mat_biome_forest_d,
+	&mat_biome_frozen_ocean_d,
+	&mat_biome_frozen_river_d,
+	&mat_biome_giant_spruce_taiga_d,
+	&mat_biome_giant_spruce_taiga_hills_d,
+	&mat_biome_giant_tree_taiga_d,
+	&mat_biome_giant_tree_taiga_hills_d,
+	&mat_biome_gravelly_mountains_d,
+	&mat_biome_ice_spikes_d,
+	&mat_biome_jungle_d,
+	&mat_biome_jungle_edge_d,
+	&mat_biome_jungle_hills_d,
+	&mat_biome_lukewarm_ocean_d,
+	&mat_biome_lush_caves_d,
+	&mat_biome_modified_badlands_plateau_d,
+	&mat_biome_modified_gravelly_mountains_d,
+	&mat_biome_modified_jungle_d,
+	&mat_biome_modified_jungle_edge_d,
+	&mat_biome_modified_wooded_badlands_plateau_d,
+	&mat_biome_mountains_d,
+	&mat_biome_mountain_edge_d,
+	&mat_biome_mushroom_fields_d,
+	&mat_biome_mushroom_field_shore_d,
+	&mat_biome_nether_wastes_d,
+	&mat_biome_ocean_d,
+	&mat_biome_plains_d,
+	&mat_biome_river_d,
+	&mat_biome_savanna_d,
+	&mat_biome_savanna_plateau_d,
+	&mat_biome_shattered_savanna_d,
+	&mat_biome_shattered_savanna_plateau_d,
+	&mat_biome_small_end_islands_d,
+	&mat_biome_snowy_beach_d,
+	&mat_biome_snowy_mountains_d,
+	&mat_biome_snowy_taiga_d,
+	&mat_biome_snowy_taiga_hills_d,
+	&mat_biome_snowy_taiga_mountains_d,
+	&mat_biome_snowy_tundra_d,
+	&mat_biome_soul_sand_valley_d,
+	&mat_biome_stone_shore_d,
+	&mat_biome_sunflower_plains_d,
+	&mat_biome_swamp_d,
+	&mat_biome_swamp_hills_d,
+	&mat_biome_taiga_d,
+	&mat_biome_taiga_hills_d,
+	&mat_biome_taiga_mountains_d,
+	&mat_biome_tall_birch_forest_d,
+	&mat_biome_tall_birch_hills_d,
+	&mat_biome_the_end_d,
+	&mat_biome_the_void_d,
+	&mat_biome_warm_ocean_d,
+	&mat_biome_warped_forest_d,
+	&mat_biome_wooded_badlands_plateau_d,
+	&mat_biome_wooded_hills_d,
+	&mat_biome_wooded_mountains_d,
 };
