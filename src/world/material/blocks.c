@@ -465,7 +465,7 @@ const mat_block_t mat_block_barrel_d = {
 };
 const mat_block_t mat_block_barrier_d = {
     .resistance = 3600000.8,
-    .hardness = 0,
+    .hardness = -1,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     }
@@ -493,7 +493,7 @@ const mat_block_t mat_block_beacon_d = {
 };
 const mat_block_t mat_block_bedrock_d = {
     .resistance = 3600000,
-    .hardness = 0
+    .hardness = -1
 };
 const mat_block_t mat_block_beehive_d = { 
     .resistance = 0.6,
@@ -1774,7 +1774,7 @@ const mat_block_t mat_block_chain_d = {
 };
 const mat_block_t mat_block_chain_command_block_d = { 
     .resistance = 3600000,
-    .hardness = 0,
+    .hardness = -1,
     .entity = mat_block_entity_command,
     .modifiers_count = 2,
     .modifiers = {
@@ -2083,7 +2083,7 @@ const mat_block_t mat_block_cocoa_d = {
 };
 const mat_block_t mat_block_command_block_d = {
     .resistance = 3600000,
-    .hardness = 0,
+    .hardness = -1,
     .entity = mat_block_entity_command,
     .modifiers_count = 2,
     .modifiers = {
@@ -3535,7 +3535,7 @@ const mat_block_t mat_block_enchanting_table_d = {
 };
 const mat_block_t mat_block_end_portal_frame_d = { 
     .resistance = 3600000,
-    .hardness = 0,
+    .hardness = -1,
     .luminance = 1,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -4496,7 +4496,7 @@ const mat_block_t mat_block_jack_o_lantern_d = {
 };
 const mat_block_t mat_block_jigsaw_d = { 
     .resistance = 3600000,
-    .hardness = 0,
+    .hardness = -1,
     .entity = mat_block_entity_jigsaw,
     .modifiers_count = 1,
     .modifiers = {
@@ -4882,7 +4882,7 @@ const mat_block_t mat_block_lever_d = {
 };
 const mat_block_t mat_block_light_d = { 
     .resistance = 3600000.8,
-    .hardness = 0,
+    .hardness = -1,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },
@@ -7775,7 +7775,7 @@ const mat_block_t mat_block_redstone_wire_d = {
 };
 const mat_block_t mat_block_repeating_command_block_d = { 
     .resistance = 3600000,
-    .hardness = 0,
+    .hardness = -1,
     .entity = mat_block_entity_command,
     .modifiers_count = 2,
     .modifiers = {
@@ -8967,7 +8967,7 @@ const mat_block_t mat_block_stripped_warped_stem_d = {
 };
 const mat_block_t mat_block_structure_block_d = { 
     .resistance = 3600000,
-    .hardness = 0,
+    .hardness = -1,
     .entity = mat_block_entity_structure,
     .modifiers_count = 1,
     .modifiers = {
@@ -10046,7 +10046,7 @@ const mat_block_t mat_block_zombie_head_d = {
 };
 const mat_block_t mat_block_end_portal_d = {
     .resistance = 3600000,
-    .hardness = 0,
+    .hardness = -1,
     .luminance = 15,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -10084,7 +10084,7 @@ const mat_block_t mat_block_piston_head_d = {
 };
 const mat_block_t mat_block_nether_portal_d = {
     .resistance = 0,
-    .hardness = 0,
+    .hardness = -1,
     .luminance = 11,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
@@ -10096,7 +10096,7 @@ const mat_block_t mat_block_nether_portal_d = {
 };
 const mat_block_t mat_block_end_gateway_d = {
     .resistance = 3600000,
-    .hardness = 0,
+    .hardness = -1,
     .tags = {
         utl_arraybit(mat_block_tag_light_filtering) | utl_arraybit(mat_block_tag_transparent)
     },
@@ -10132,7 +10132,7 @@ const mat_block_t mat_block_bubble_column_d = {
 };
 const mat_block_t mat_block_moving_piston_d = { 
     .resistance = 0,
-    .hardness = 0,
+    .hardness = -1,
     .tags = {
         utl_arraybit(mat_block_tag_transparent)
     },

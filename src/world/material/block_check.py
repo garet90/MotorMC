@@ -38,6 +38,8 @@ for line in lines:
     if data_line:
         if line.startswith("    .resistance = "):
             resistance = float(line.replace("    .resistance = ", "").replace(",\n", ""))
+            if test_block["diggable"] == False:
+                test_block["hardness"] = -1
             if test_block["resistance"] != resistance:
                 print("Resistance for", data_name, "differs!", test_block["resistance"], "vs", resistance)
                 exit()

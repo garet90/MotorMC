@@ -73,6 +73,7 @@ struct wld_world {
 	int64_t seed;
 	uint64_t time;
 	const char* name;
+	size_t name_length;
 
 	// regions
 	utl_tree_t regions;

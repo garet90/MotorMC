@@ -10,7 +10,9 @@ enum mat_dimension_type {
 
 	mat_dimension_overworld,
 	mat_dimension_nether,
-	mat_dimension_end
+	mat_dimension_end,
+
+	mat_dimension_count
 
 };
 
@@ -41,6 +43,8 @@ typedef struct {
 	uint16_t min_y;
 	uint16_t height;
 	uint16_t logical_height;
+	uint16_t name_length;
+	uint16_t effects_length;
 	utl_bitset(mat_dimension_properties_count, properties);
 
 } mat_dimension_t;
@@ -49,6 +53,46 @@ extern const mat_dimension_t* mat_dimensions[];
 
 static inline const mat_dimension_t* mat_getDimensionByType(mat_dimension_type_t type) {
 	return mat_dimensions[type];
+}
+
+static inline bool_t mat_dimension_isPiglinSafe(mat_dimension_type_t dimension) {
+	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_piglin_safe);
+}
+
+static inline bool_t mat_dimension_isNatural(mat_dimension_type_t dimension) {
+	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_natural);
+}
+
+static inline bool_t mat_dimension_respawnAnchorWorks(mat_dimension_type_t dimension) {
+	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_respawn_anchor_works);
+}
+
+static inline bool_t mat_dimension_hasSkylight(mat_dimension_type_t dimension) {
+	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_has_skylight);
+}
+
+static inline bool_t mat_dimension_bedWorks(mat_dimension_type_t dimension) {
+	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_bed_works);
+}
+
+static inline bool_t mat_dimension_hasRaids(mat_dimension_type_t dimension) {
+	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_has_raids);
+}
+
+static inline bool_t mat_dimension_isUltrawarm(mat_dimension_type_t dimension) {
+	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_ultrawarm);
+}
+
+static inline bool_t mat_dimension_hasCeiling(mat_dimension_type_t dimension) {
+	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_has_ceiling);
+}
+
+static inline bool_t mat_dimension_hasFixedTime(mat_dimension_type_t dimension) {
+	return mat_getDimensionByType(dimension)->fixed_time == 0xFFFF ? false : true;
+}
+
+static inline uint16_t mat_dimension_getFixedTime(mat_dimension_type_t dimension) {
+	return mat_getDimensionByType(dimension)->fixed_time;
 }
 
 /*
@@ -137,7 +181,9 @@ enum mat_biome_type {
 	mat_biome_warped_forest,
 	mat_biome_wooded_badlands_plateau,
 	mat_biome_wooded_hills,
-	mat_biome_wooded_mountains
+	mat_biome_wooded_mountains,
+
+	mat_biome_count
 
 };
 
@@ -157,6 +203,18 @@ static inline const char* mat_precipitationTypeAsString(mat_precipitation_type_t
 		"rain",
 		"snow",
 		"none"
+	};
+
+	return types[type];
+
+}
+
+static inline uint16_t mat_precipitationTypeLength(mat_precipitation_type_t type) {
+
+	const uint16_t types[] = {
+		4,
+		4,
+		4
 	};
 
 	return types[type];
@@ -213,6 +271,33 @@ static inline const char* mat_biomeCategoryAsString(mat_biome_category_t categor
 
 }
 
+static inline uint16_t mat_biomeCategoryLength(mat_biome_category_t category) {
+
+	const uint16_t categories[] = {
+		4,
+		5,
+		6,
+		6,
+		6,
+		13,
+		5,
+		5,
+		5,
+		6,
+		7,
+		3,
+		8,
+		5,
+		6,
+		4,
+		7,
+		11
+	};
+
+	return categories[category];
+
+}
+
 typedef enum {
 
 	mat_grass_color_modifier_none,
@@ -224,11 +309,23 @@ typedef enum {
 static inline const char* mat_grassColorModifierAsString(mat_grass_color_modifier_t modifier) {
 
 	const char* modifiers[] = {
-		"none",
+		NULL,
 		"swamp",
 		"dark_forest"
 	};
 
+	return modifiers[modifier];
+
+}
+
+static inline uint16_t mat_grassColorModifierLength(mat_grass_color_modifier_t modifier) {
+
+	const uint16_t modifiers[] = {
+		0,
+		5,
+		11
+	};
+	
 	return modifiers[modifier];
 
 }
@@ -240,9 +337,32 @@ typedef enum {
 	
 } mat_temperature_modifier_t;
 
+static inline const char* mat_temperatureModifierAsString(mat_temperature_modifier_t modifier) {
+
+	const char* modifiers[] = {
+		NULL,
+		"frozen"
+	};
+
+	return modifiers[modifier];
+
+}
+
+static inline uint16_t mat_temperatureModifierLength(mat_temperature_modifier_t modifier) {
+	
+	const uint16_t modifiers[] = {
+		0,
+		6
+	};
+
+	return modifiers[modifier];
+
+}
+
 typedef struct {
 
 	const char* name;
+	uint32_t name_length;
 	mat_precipitation_type_t precipitation;
 	float32_t depth;
 	float32_t temperature;
@@ -257,22 +377,26 @@ typedef struct {
 		uint32_t water_fog_color;
 		uint32_t fog_color;
 		uint32_t water_color;
-		uint32_t foliage_color; // 0 if no foliage color
-		uint32_t grass_color; // 0 if no grass color
+		uint32_t foliage_color; // 0xFFFFFFFF if no foliage color
+		uint32_t grass_color; // 0xFFFFFFFF if no grass color
 		mat_grass_color_modifier_t grass_color_modifier;
 
 		struct {
 
+			uint32_t sound_length;
 			const char* sound;
 			uint32_t max_delay;
 			uint32_t min_delay;
+			bool_t replace_current_music;
 		
 		} music;
 
 		const char* ambient_sound;
+		uint32_t ambient_sound_length;
 
 		struct {
 		
+			uint32_t sound_length;
 			const char* sound;
 			float64_t tick_chance;
 		
@@ -284,6 +408,7 @@ typedef struct {
 			float64_t offset;
 			uint32_t tick_delay;
 			uint32_t block_search_extent;
+			uint32_t sound_length;
 		
 		} mood_sound;
 
@@ -293,6 +418,7 @@ typedef struct {
 		
 		float32_t probability;
 		struct {
+			uint32_t type_length;
 			const char* type;
 		} options;
 
@@ -304,6 +430,14 @@ extern const mat_biome_t* mat_biomes[];
 
 static inline const mat_biome_t* mat_getBiomeByType(mat_biome_type_t type) {
 	return mat_biomes[type];
+}
+
+static inline bool_t mat_biome_hasFoliageColor(mat_biome_type_t type) {
+	return mat_getBiomeByType(type)->effects.foliage_color == 0xFFFFFFFF ? false : true;
+}
+
+static inline bool_t mat_biome_hasGrassColor(mat_biome_type_t type) {
+	return mat_getBiomeByType(type)->effects.grass_color == 0xFFFFFFFF ? false : true;
 }
 
 /*
@@ -1914,25 +2048,25 @@ static inline uint8_t mat_getLuminance(const mat_block_t* block) {
 
 }
 
-static inline bool_t utl_catchesFireFromLava(const mat_block_t* block) {
+static inline bool_t mat_catchesFireFromLava(const mat_block_t* block) {
 
 	return (block->encouragement & 0x80) ? true : false;
 
 }
 
-static inline bool_t utl_canBurnAway(const mat_block_t* block) {
+static inline bool_t mat_canBurnAway(const mat_block_t* block) {
 
 	return (block->flammability & 0x80) ? true : false;
 
 }
 
-static inline uint8_t utl_getEncouragement(const mat_block_t* block) {
+static inline uint8_t mat_getEncouragement(const mat_block_t* block) {
 
 	return block->encouragement & 0x7F;
 
 }
 
-static inline uint8_t utl_getFlammability(const mat_block_t* block) {
+static inline uint8_t mat_getFlammability(const mat_block_t* block) {
 
 	return block->flammability & 0x7F;
 

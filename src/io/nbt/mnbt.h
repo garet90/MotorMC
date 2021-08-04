@@ -65,6 +65,7 @@ union mnbt_val {
     } String;
     struct {
         uint32_t size;
+        uint32_t cap;
         mnbt_type type;
         mnbt_val* list;
     } List;
@@ -407,12 +408,19 @@ static inline mnbt_val mnbt_val_list(mnbt_type type) {
     mnbt_val val = {
         .List = {
             .size = 0,
+            .cap = 0,
             .type = type,
             .list = NULL
         }
     };
     
     return val;
+}
+
+void mnbt_val_list_push(mnbt_val* list, mnbt_val val);
+
+static inline void mnbt_list_push(mnbt_tag* tag, mnbt_val val) {
+    mnbt_val_list_push(&tag->value, val);
 }
 
 void mnbt_free(mnbt_doc* document);

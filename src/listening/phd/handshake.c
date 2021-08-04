@@ -6,10 +6,8 @@ bool_t phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
 
 	// legacy server list ping
 	if (packet->bytes[0] == 0xFE) {
-		// TODO handle legacy SLP
-		return false;
-		//packet->cursor++;
-		//return phd_handleLegacySLP(client, packet);
+		packet->cursor++;
+		return phd_handleLegacySLP(client, packet);
 	}
 
 	pck_readVarInt(packet); // packet length
@@ -46,6 +44,8 @@ bool_t phd_handleLegacySLP(ltg_client_t* client, pck_packet_t* packet) {
 }
 
 void phd_sendLegacySLP(ltg_client_t* client) {
+
+	// this no worky TODO fix it
 	
 	const uint8_t MC_PING_HOST[] = {
 		0x00, 0x0b,

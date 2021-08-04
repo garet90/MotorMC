@@ -164,7 +164,14 @@ static inline int32_t io_readVarInt(const byte_t* buffer, size_t* length) {
         } while ((read & 0x80) != 0);
 
     } else {
-        // TODO big endian
+
+        do {
+            read = io_readInt8(buffer + *length);
+            result |= ((read & 0x7F) << (32 - (7 * *length)));
+
+            *length += 1;
+        } while ((read & 0x80) != 0);
+
     }
 
     return result;
@@ -187,7 +194,14 @@ static inline int64_t io_readVarLong(const byte_t* buffer, size_t* length) {
         } while ((read & 0x80) != 0);
 
     } else {
-        // TODO big endian
+
+        do {
+            read = io_readInt8(buffer + *length);
+            result |= ((read & 0x7F) << (64 - (7 * *length)));
+
+            *length += 1;
+        } while ((read & 0x80) != 0);
+
     }
 
     return result;

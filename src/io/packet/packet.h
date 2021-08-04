@@ -124,7 +124,7 @@ static inline void pck_writeVarLong(pck_packet_t* packet, int64_t value) {
 
 extern void pck_writeBytes(pck_packet_t*, const byte_t*, int32_t);
 
-static inline void pck_writeString(pck_packet_t* packet, char* string, size_t length) {
+static inline void pck_writeString(pck_packet_t* packet, const char* string, size_t length) {
 
 	pck_writeVarInt(packet, length);
 	pck_writeBytes(packet, (byte_t*) string, length);
