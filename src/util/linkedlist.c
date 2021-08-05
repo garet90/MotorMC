@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include "linkedlist.h"
 
-utl_linked_list_t* utl_createList() {
+utl_linked_list_t* utl_create_list() {
 	utl_linked_list_t* list = malloc(sizeof(utl_linked_list_t));
-	utl_initList(list);
+	utl_init_list(list);
 	return list;
 }
 
-utl_linked_node_t* utl_createNode() {
+utl_linked_node_t* utl_create_node() {
 
 	utl_linked_node_t* node = malloc(sizeof(utl_linked_node_t));
 	node->element = NULL;
@@ -16,9 +16,9 @@ utl_linked_node_t* utl_createNode() {
 
 }
 
-void utl_listPush(utl_linked_list_t* list, void* element) {
+void utl_list_push(utl_linked_list_t* list, void* element) {
 
-	utl_linked_node_t* node = utl_createNode();
+	utl_linked_node_t* node = utl_create_node();
 	node->element = element;
 
 	if (list->first == NULL) {
@@ -33,7 +33,7 @@ void utl_listPush(utl_linked_list_t* list, void* element) {
 
 }
 
-void* utl_listShift(utl_linked_list_t* list) {
+void* utl_list_shift(utl_linked_list_t* list) {
 
 	if (list->first == NULL) return NULL;
 

@@ -3,7 +3,7 @@
 #include "../io/logger/logger.h"
 #include "random.h"
 
-void cry_genRSAKeyPair(cry_RSAkeypair_t* keypair) {
+void cry_rsa_gen_key_pair(cry_rsa_keypair_t* keypair) {
 
 	// e for generating d
 	const byte_t e_val[] = {
@@ -16,8 +16,8 @@ void cry_genRSAKeyPair(cry_RSAkeypair_t* keypair) {
 
 	// generate two 64 byte primes: p and q
 	fp_int p, q;
-	cry_genPrime(&p, 64);
-	cry_genPrime(&q, 64);
+	cry_gen_prime(&p, 64);
+	cry_gen_prime(&q, 64);
 
 #ifdef CRY_DEBUG
 	char str[512];
@@ -81,14 +81,14 @@ void cry_genRSAKeyPair(cry_RSAkeypair_t* keypair) {
 
 }
 
-void cry_genPrime(fp_int* prime, size_t size) {
+void cry_gen_prime(fp_int* prime, size_t size) {
 	
 	const byte_t two_val[] = { 0x02 };
 	fp_int two;
 	fp_read_unsigned_bin(&two, two_val, sizeof(two_val));
 
 	byte_t bytes[size];
-	cry_randomBytes(bytes, size);
+	cry_random_bytes(bytes, size);
 	bytes[size - 1] |= 0x1; // make sure it's even
 	bytes[0] |= 0xC0; // make sure top two bits are 1 (so the product is the correct bit length)
 
@@ -101,7 +101,7 @@ void cry_genPrime(fp_int* prime, size_t size) {
 	}
 
 }
-void cry_decryptRSA(byte_t* out, const byte_t* message, size_t size, cry_RSAkeypair_t* keypair) {
+void cry_rsa_decript(byte_t* out, const byte_t* message, size_t size, cry_rsa_keypair_t* keypair) {
 
 	fp_int c;
 	fp_read_unsigned_bin(&c, message, size);
@@ -112,6 +112,6 @@ void cry_decryptRSA(byte_t* out, const byte_t* message, size_t size, cry_RSAkeyp
 	uint8_t m_arr[m_size];
 	fp_to_unsigned_bin(&c, m_arr);
 
-	utl_reverseBytes(m_arr, out, m_size);
+	utl_reverse_bytes(m_arr, out, m_size);
 
 }

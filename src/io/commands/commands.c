@@ -19,22 +19,22 @@ utl_vector_t cmd_list = {
 	.size = sizeof(cmd_defaults) / sizeof(cmd_defaults[0])
 };
 
-void cmd_addDefaults() {
+void cmd_add_defaults() {
 
 	for (size_t i = 0; i < cmd_list.size; ++i) {
 
-		cmd_command_t* command = utl_vectorGetAs(cmd_command_t*, &cmd_list, i);
+		cmd_command_t* command = UTL_VECTOR_GET_AS(cmd_command_t*, &cmd_list, i);
 
-		if (utl_treeGet(&cmd_handlers, cmd_hash(command->label)) == NULL) {
-			utl_treePut(&cmd_handlers, cmd_hash(command->label), command);
+		if (utl_tree_get(&cmd_handlers, cmd_hash(command->label)) == NULL) {
+			utl_tree_put(&cmd_handlers, cmd_hash(command->label), command);
 		} else {
 			log_warn("Command already exists and was not added: /%s", command->label);
 			continue;
 		}
 
 		for (size_t j = 0; j < command->alias_count; ++j) {
-			if (utl_treeGet(&cmd_handlers, cmd_hash(command->aliases[j])) == NULL) {
-				utl_treePut(&cmd_handlers, cmd_hash(command->aliases[j]), command);
+			if (utl_tree_get(&cmd_handlers, cmd_hash(command->aliases[j])) == NULL) {
+				utl_tree_put(&cmd_handlers, cmd_hash(command->aliases[j]), command);
 			}
 		}
 
@@ -42,23 +42,23 @@ void cmd_addDefaults() {
 
 }
 
-void cmd_addCommand(const cmd_command_t* command) {
+void cmd_add_command(const cmd_command_t* command) {
 
 	if (cmd_list.size != 0 && cmd_handlers.object == NULL) {
-		cmd_addDefaults();
+		cmd_add_defaults();
 	}
 
-	if (utl_treeGet(&cmd_handlers, cmd_hash(command->label)) == NULL) {
-		utl_treePut(&cmd_handlers, cmd_hash(command->label), (cmd_command_t*) command);
-		utl_vectorPush(&cmd_list, &command);
+	if (utl_tree_get(&cmd_handlers, cmd_hash(command->label)) == NULL) {
+		utl_tree_put(&cmd_handlers, cmd_hash(command->label), (cmd_command_t*) command);
+		utl_vector_push(&cmd_list, &command);
 	} else {
 		log_warn("Command already exists and was not added: /%s", command->label);
 		return;
 	}
 
 	for (uint32_t i = 0; i < command->alias_count; ++i) {
-		if (utl_treeGet(&cmd_handlers, cmd_hash(command->aliases[i])) == NULL) {
-			utl_treePut(&cmd_handlers, cmd_hash(command->aliases[i]), (cmd_command_t*) command);
+		if (utl_tree_get(&cmd_handlers, cmd_hash(command->aliases[i])) == NULL) {
+			utl_tree_put(&cmd_handlers, cmd_hash(command->aliases[i]), (cmd_command_t*) command);
 		}
 	}
 
@@ -67,16 +67,16 @@ void cmd_addCommand(const cmd_command_t* command) {
 void cmd_handle(char* cmd, cmd_sender_t* sender) {
 
 	if (cmd_list.size != 0 && cmd_handlers.object == NULL) {
-		cmd_addDefaults();
+		cmd_add_defaults();
 	}
 
 	uint32_t hash;
-	cmd = cmd_hashArg(cmd, &hash);
+	cmd = cmd_hash_arg(cmd, &hash);
 
-	const cmd_command_t* command = utl_treeGet(&cmd_handlers, hash);
+	const cmd_command_t* command = utl_tree_get(&cmd_handlers, hash);
 
 	if (command != NULL) {
-		if (cmd_hasPermission(command, sender)) {
+		if (cmd_has_permission(command, sender)) {
 			if (!command->handler(cmd, sender)) {
 				if (command->usage != NULL) {
 
@@ -94,7 +94,7 @@ void cmd_handle(char* cmd, cmd_sender_t* sender) {
 					cht_component_t usage = cht_new;
 					usage.text = (char*) command->usage;
 
-					cht_addExtra(&component, &usage);
+					cht_add_extra(&component, &usage);
 
 					cmd_message(sender, &component);
 
@@ -103,10 +103,10 @@ void cmd_handle(char* cmd, cmd_sender_t* sender) {
 				}
 			}
 		} else {
-			if (command->permissionMessage != NULL) {
+			if (command->permission_message != NULL) {
 
 				cht_component_t component = cht_new;
-				component.text = (char*) command->permissionMessage;
+				component.text = (char*) command->permission_message;
 
 				cmd_message(sender, &component);
 
@@ -124,13 +124,13 @@ void cmd_handle(char* cmd, cmd_sender_t* sender) {
 
 }
 
-bool_t cmd_hasPermission(const cmd_command_t* command, const cmd_sender_t* sender) {
+bool_t cmd_has_permission(const cmd_command_t* command, const cmd_sender_t* sender) {
 
 	if (sender->op) return true;
 	if (command->permission == NULL) return true;
 
 	for (uint32_t i = 0; i < sender->permissions.size; ++i) {
-		if (strcmp(utl_vectorGetAs(char*, &sender->permissions, 1), command->permission)) {
+		if (strcmp(UTL_VECTOR_GET_AS(char*, &sender->permissions, 1), command->permission)) {
 			return true;
 		}
 	}
@@ -164,7 +164,7 @@ uint32_t cmd_hash(const char* string) {
 
 }
 
-char* cmd_hashArg(char* string, uint32_t* hash) {
+char* cmd_hash_arg(char* string, uint32_t* hash) {
 
 	*hash = 5381;
 
@@ -225,7 +225,7 @@ bool_t cmd_help(char* args, cmd_sender_t* sender) {
 	msg.text = line;
 
 	for (uint32_t i = 0; i < cmd_list.size; ++i) {
-		cmd_command_t* command = utl_vectorGetAs(cmd_command_t*, &cmd_list, i);
+		cmd_command_t* command = UTL_VECTOR_GET_AS(cmd_command_t*, &cmd_list, i);
 		sprintf(line, "- %s: %s", command->label, command->description);
 		cmd_message(sender, &msg);
 	}

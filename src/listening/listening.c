@@ -16,7 +16,7 @@ void ltg_init() {
 	log_info("Starting listener...");
 
 	// generate RSA keypair
-	cry_genRSAKeyPair(&sky_main.listener.keypair);
+	cry_rsa_gen_key_pair(&sky_main.listener.keypair);
 
 	// start listening thread
 	pthread_create(&sky_main.listener.thread, NULL, t_ltg_run, NULL);
@@ -87,22 +87,22 @@ void ltg_accept(ltg_client_t* client) {
 	// lock clients
 	pthread_mutex_lock(&sky_main.listener.clients.lock);
 
-	if (sky_main.listener.clients.nextID.size > 0) {
+	if (sky_main.listener.clients.next_id.size > 0) {
 
 		// allocate to next client id
 
-		client->id = utl_vectorGetAs(uint32_t, &sky_main.listener.clients.nextID, 0);
+		client->id = UTL_VECTOR_GET_AS(uint32_t, &sky_main.listener.clients.next_id, 0);
 
 		// replace first with last and decrement size
-		if (sky_main.listener.clients.nextID.size > 1) {
-			uint32_t lastCLID = utl_vectorGetAs(uint32_t, &sky_main.listener.clients.nextID, sky_main.listener.clients.nextID.size - 1);
-			utl_vectorSet(&sky_main.listener.clients.nextID, 0, &lastCLID);
+		if (sky_main.listener.clients.next_id.size > 1) {
+			uint32_t lastCLID = UTL_VECTOR_GET_AS(uint32_t, &sky_main.listener.clients.next_id, sky_main.listener.clients.next_id.size - 1);
+			utl_vector_set(&sky_main.listener.clients.next_id, 0, &lastCLID);
 		}
 
-		sky_main.listener.clients.nextID.size -= 1;
+		sky_main.listener.clients.next_id.size -= 1;
 
 		// set the client to the id
-		utl_vectorSet(&sky_main.listener.clients.vector, client->id, &client);
+		utl_vector_set(&sky_main.listener.clients.vector, client->id, &client);
 
 	} else {
 
@@ -110,7 +110,7 @@ void ltg_accept(ltg_client_t* client) {
 
 		client->id = sky_main.listener.clients.vector.size;
 
-		utl_vectorPush(&sky_main.listener.clients.vector, &client);
+		utl_vector_push(&sky_main.listener.clients.vector, &client);
 
 	}
 
@@ -126,7 +126,7 @@ void* t_ltg_client(void* args) {
 	ltg_client_t* client = args;
 
 	// create receive packet (on stack)
-	pck_inline(recvd, LTG_MAX_RECIEVE, IO_BIG_ENDIAN);
+	PCK_INLINE(recvd, LTG_MAX_RECIEVE, IO_BIG_ENDIAN);
 	int32_t recvl = 0;
 
 	for (;;) {
@@ -146,7 +146,7 @@ void* t_ltg_client(void* args) {
 				cfb8_decrypt(recvd->bytes, recvd->bytes, recvl, &client->encryption.key);
 			}
 
-			if (!ltg_handlePacket(client, recvd)) {
+			if (!ltg_handle_packet(client, recvd)) {
 				break;
 			}
 
@@ -162,7 +162,7 @@ void* t_ltg_client(void* args) {
  * Handle packets
  * If return is false, disconnect the client
  */
-bool_t ltg_handlePacket(ltg_client_t* client, pck_packet_t* packet) {
+bool_t ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 
 	do {
 		switch (client->state) {
@@ -200,9 +200,9 @@ bool_t ltg_handlePacket(ltg_client_t* client, pck_packet_t* packet) {
 void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 	size_t length = packet->cursor;
-	size_t length_length = io_varIntLength(length);
+	size_t length_length = io_var_int_length(length);
 	byte_t* bytes = packet->bytes - length_length;
-	io_writeVarInt(bytes, length);
+	io_write_var_int(bytes, length);
 	length += length_length;
 
 	if (client->encryption.enabled) {
@@ -230,8 +230,8 @@ void ltg_disconnect(ltg_client_t* client) {
 	void* null = NULL;
 
 	// push id to next id stack and set last client to NULL
-	utl_vectorPush(&sky_main.listener.clients.nextID, &client->id);
-	utl_vectorSet(&sky_main.listener.clients.vector, client->id, &null);
+	utl_vector_push(&sky_main.listener.clients.next_id, &client->id);
+	utl_vector_set(&sky_main.listener.clients.vector, client->id, &null);
 
 	pthread_mutex_unlock(&sky_main.listener.clients.lock);
 
@@ -262,7 +262,7 @@ void ltg_term() {
 
 	// disconnect all clients
 	for (uint32_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
-		ltg_client_t* client = utl_vectorGetAs(ltg_client_t*, &sky_main.listener.clients.vector, i);
+		ltg_client_t* client = UTL_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 		if (client != NULL) {
 			sck_close(client->socket);
 			pthread_cancel(client->thread);

@@ -15,7 +15,7 @@ pck_packet_t* pck_create(size_t length, io_endianness_t endianness) {
 
 }
 
-pck_packet_t* pck_fromBytes(byte_t* bytes, size_t length, io_endianness_t endianness) {
+pck_packet_t* pck_from_bytes(byte_t* bytes, size_t length, io_endianness_t endianness) {
 
 	pck_packet_t* packet = malloc(sizeof(pck_packet_t) + length);
 
@@ -28,7 +28,7 @@ pck_packet_t* pck_fromBytes(byte_t* bytes, size_t length, io_endianness_t endian
 
 }
 
-void pck_initFromBytes(pck_packet_t* packet, byte_t* bytes, size_t length, io_endianness_t endianness) {
+void pck_init_from_bytes(pck_packet_t* packet, byte_t* bytes, size_t length, io_endianness_t endianness) {
 
 	packet->endianness = endianness;
 	packet->length = length;
@@ -37,14 +37,14 @@ void pck_initFromBytes(pck_packet_t* packet, byte_t* bytes, size_t length, io_en
 
 }
 
-void pck_readBytes(pck_packet_t* packet, byte_t* bytes, int32_t length) {
+void pck_read_bytes(pck_packet_t* packet, byte_t* bytes, int32_t length) {
 
 	memcpy(bytes, packet->bytes + packet->cursor, length);
 	packet->cursor += length;
 
 }
 
-void pck_writeBytes(pck_packet_t* packet, const byte_t* bytes, int32_t length) {
+void pck_write_bytes(pck_packet_t* packet, const byte_t* bytes, int32_t length) {
 
 	memcpy(packet->bytes + packet->cursor, bytes, length);
 	packet->cursor += length;

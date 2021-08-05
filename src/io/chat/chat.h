@@ -6,22 +6,22 @@
 
 typedef enum {
 
-	CHT_BLACK = 0x0,
-	CHT_DARK_BLUE = 0x1,
-	CHT_DARK_GREEN = 0x2,
-	CHT_DARK_CYAN = 0x3,
-	CHT_DARK_RED = 0x4,
-	CHT_PURPLE = 0x5,
-	CHT_GOLD = 0x6,
-	CHT_GRAY = 0x7,
-	CHT_DARK_GRAY = 0x8,
-	CHT_BLUE = 0x9,
-	CHT_BRIGHT_GREEN = 0xA,
-	CHT_CYAN = 0xB,
-	CHT_RED = 0xC,
-	CHT_PINK = 0xD,
-	CHT_YELLOW = 0xE,
-	CHT_WHITE = 0xF,
+	cht_black = 0x0,
+	cht_dark_blue = 0x1,
+	cht_dark_green = 0x2,
+	cht_dark_cyan = 0x3,
+	cht_dark_red = 0x4,
+	cht_purple = 0x5,
+	cht_gold = 0x6,
+	cht_gray = 0x7,
+	cht_dark_gray = 0x8,
+	cht_blue = 0x9,
+	cht_bright_green = 0xA,
+	cht_cyan = 0xB,
+	cht_red = 0xC,
+	cht_pink = 0xD,
+	cht_yellow = 0xE,
+	cht_white = 0xF,
 
 	CHT_NOCOLOR = -0x01
 
@@ -88,14 +88,14 @@ static /*in-plugin*/ const cht_component_t cht_new = {
 };
 
 extern cht_component_t* cht_alloc();
-extern cht_component_t* cht_fromJson(yyjson_val*);
-extern cht_component_t* cht_fromString(const char*, size_t);
+extern cht_component_t* cht_from_json(yyjson_val*);
+extern cht_component_t* cht_from_string(const char*, size_t);
 
-extern void cht_addExtra(cht_component_t*, const cht_component_t*);
+extern void cht_add_extra(cht_component_t*, const cht_component_t*);
 
 extern void cht_jsonify(yyjson_mut_doc*, yyjson_mut_val*, const cht_component_t*);
 extern size_t cht_write(const cht_component_t*, char*);
 
 extern void cht_free(cht_component_t*);
 
-extern size_t cht_serverListPing(char*);
+extern size_t cht_server_list_ping(char*);

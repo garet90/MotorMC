@@ -4,15 +4,15 @@
 #define UTL_MIN(a, b) ((a) < (b) ? a : b)
 #define UTL_MAX(a, b) ((a) > (b) ? a : b)
 
-extern size_t utl_toMinecraftHex(char*, const uint8_t*, size_t);
+extern size_t utl_to_minecraft_hex(char*, const uint8_t*, size_t);
 
-extern void utl_writeByteHex(char*, uint8_t);
+extern void utl_write_byte_hex(char*, uint8_t);
 
-extern void utl_readHexBytes(byte_t*, const char*, size_t);
+extern void utl_read_hex_bytes(byte_t*, const char*, size_t);
 
-static inline void utl_reverseBytes(const byte_t* in, byte_t* out, size_t count) {
+static inline void utl_reverse_bytes(const byte_t* in, byte_t* out, size_t count) {
 
-    for (size_t i = 0, j = count - 1; i < j; ++i, --j) {
+	for (size_t i = 0, j = count - 1; i < j; ++i, --j) {
 		byte_t temp = in[i];
 		out[i] = in[j];
 		out[j] = temp;
@@ -41,16 +41,16 @@ extern char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
 
 static inline uint32_t utl_hash(const char* string) {
 
-    uint32_t hash = 5381;
-    
-    for (;;) {
-        switch (*string) {
-            case '\0':
-                return hash;
-            default:
-                hash = ((hash << 5) + hash) + *string;
-                ++string;
-        }
-    }
+	uint32_t hash = 5381;
+	
+	for (;;) {
+		switch (*string) {
+			case '\0':
+				return hash;
+			default:
+				hash = ((hash << 5) + hash) + *string;
+				++string;
+		}
+	}
 
 }

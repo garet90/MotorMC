@@ -16,8 +16,8 @@
 
 typedef enum bool {
 
-    false = 0x00,
-    true = 0x01
+	false = 0x00,
+	true = 0x01
 
 } bool_t;
 

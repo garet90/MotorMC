@@ -6,18 +6,18 @@
 
 bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
-	pck_readVarInt(packet); // packet length
-	int32_t id = pck_readVarInt(packet);
+	pck_read_var_int(packet); // packet length
+	int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
 	case 0x00: // teleport confirm
-		return phd_handleTeleportConfirm(client, packet);
+		return phd_handle_teleport_confirm(client, packet);
 	case 0x04:
-		return phd_handleClientStatus(client, packet);
+		return phd_handle_client_status(client, packet);
 	case 0x05: // client settings
-		return phd_handleClientSettings(client, packet);
+		return phd_handle_client_settings(client, packet);
 	case 0x12:
-		return phd_handlePlayerPositionAndLook(client, packet);
+		return phd_handle_player_position_and_look(client, packet);
 	default:
 		log_warn("Unknown packet %x received in play state!", id);
 		return false;
@@ -25,7 +25,7 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handleTeleportConfirm(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 
 	assert(client != NULL);
 	assert(packet != NULL);
@@ -34,7 +34,7 @@ bool_t phd_handleTeleportConfirm(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handleClientStatus(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_client_status(ltg_client_t* client, pck_packet_t* packet) {
 
 	assert(client != NULL);
 	assert(packet != NULL);
@@ -43,7 +43,7 @@ bool_t phd_handleClientStatus(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handleClientSettings(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 	assert(client != NULL);
 	assert(packet != NULL);
@@ -52,7 +52,7 @@ bool_t phd_handleClientSettings(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handlePlayerPositionAndLook(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet) {
 
 	assert(client != NULL);
 	assert(packet != NULL);
@@ -61,20 +61,20 @@ bool_t phd_handlePlayerPositionAndLook(ltg_client_t* client, pck_packet_t* packe
 
 }
 
-void phd_sendJoinGame(ltg_client_t* client) {
+void phd_send_join_game(ltg_client_t* client) {
 
-	pck_inline(packet, 81920, IO_BIG_ENDIAN);
+	PCK_INLINE(packet, 81920, IO_BIG_ENDIAN);
 
-	pck_writeInt32(packet, 0); // entity ID
-	pck_writeInt8(packet, sky_main.hardcore);
-	pck_writeInt8(packet, sky_main.gamemode);
-	pck_writeInt8(packet, -1); // previous game mode
+	pck_write_int32(packet, 0); // entity ID
+	pck_write_int8(packet, sky_main.hardcore);
+	pck_write_int8(packet, sky_main.gamemode);
+	pck_write_int8(packet, -1); // previous game mode
 
 	// worlds
-	pck_writeVarInt(packet, sky_main.worlds.size);
+	pck_write_var_int(packet, sky_main.worlds.size);
 	for (size_t i = 0; i < sky_main.worlds.size; ++i) {
-		wld_world_t* world = utl_vectorGetAs(wld_world_t*, &sky_main.worlds, i);
-		pck_writeString(packet, world->name, world->name_length);
+		wld_world_t* world = UTL_VECTOR_GET_AS(wld_world_t*, &sky_main.worlds, i);
+		pck_write_string(packet, world->name, world->name_length);
 	}
 
 	// dimension codec
@@ -87,29 +87,29 @@ void phd_sendJoinGame(ltg_client_t* client) {
 	mnbt_push_tag(dimension_type, mnbt_new_tag(doc, "type", 4, MNBT_STRING, mnbt_val_string("minecraft:dimension_type", 24)));
 	mnbt_tag* dimension_list = mnbt_new_tag(doc, "value", 5, MNBT_LIST, mnbt_val_list(MNBT_COMPOUND));
 	for (mat_dimension_type_t i = 0; i < mat_dimension_count; ++i) {
-		const mat_dimension_t* dimension = mat_getDimensionByType(i);
+		const mat_dimension_t* dimension = mat_get_dimension_by_type(i);
 		mnbt_val compound = mnbt_val_compound();
 		mnbt_val_push_tag(&compound, mnbt_new_tag(doc, "name", 4, MNBT_STRING, mnbt_val_string(dimension->name, dimension->name_length)));
 		mnbt_val_push_tag(&compound, mnbt_new_tag(doc, "id", 2, MNBT_INT, mnbt_val_int(i)));
 		mnbt_tag* element = mnbt_new_tag(doc, "element", 7, MNBT_COMPOUND, mnbt_val_compound());
-		mnbt_push_tag(element, mnbt_new_tag(doc, "piglin_safe", 11, MNBT_BYTE, mnbt_val_byte(mat_dimension_isPiglinSafe(i))));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "natural", 7, MNBT_BYTE, mnbt_val_byte(mat_dimension_isNatural(i))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "piglin_safe", 11, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_piglin_safe(i))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "natural", 7, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_natural(i))));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "ambient_light", 13, MNBT_FLOAT, mnbt_val_float(dimension->ambient_light)));
-		if (mat_dimension_hasFixedTime(i)) {
-			mnbt_push_tag(element, mnbt_new_tag(doc, "fixed_time", 10, MNBT_LONG, mnbt_val_long(mat_dimension_getFixedTime(i))));
+		if (mat_dimension_has_fixed_time(i)) {
+			mnbt_push_tag(element, mnbt_new_tag(doc, "fixed_time", 10, MNBT_LONG, mnbt_val_long(mat_dimension_get_fixed_time(i))));
 		}
 		mnbt_push_tag(element, mnbt_new_tag(doc, "infiniburn", 10, MNBT_STRING, mnbt_val_string("", 0)));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "respawn_anchor_works", 20, MNBT_BYTE, mnbt_val_byte(mat_dimension_respawnAnchorWorks(i))));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "has_skylight", 12, MNBT_BYTE, mnbt_val_byte(mat_dimension_hasSkylight(i))));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "bed_works", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_bedWorks(i))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "respawn_anchor_works", 20, MNBT_BYTE, mnbt_val_byte(mat_dimension_respawn_anchor_works(i))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "has_skylight", 12, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_skylight(i))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "bed_works", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_bed_works(i))));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "effects", 7, MNBT_STRING, mnbt_val_string(dimension->effects, dimension->effects_length)));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "has_raids", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_hasRaids(i))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "has_raids", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_raids(i))));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "min_y", 5, MNBT_INT, mnbt_val_int(dimension->min_y)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "height", 6, MNBT_INT, mnbt_val_int(dimension->height)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "logical_height", 14, MNBT_INT, mnbt_val_int(dimension->logical_height)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "coordinate_scale", 16, MNBT_FLOAT, mnbt_val_float(dimension->coordinate_scale)));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "ultrawarm", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_isUltrawarm(i))));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "has_ceiling", 11, MNBT_BYTE, mnbt_val_byte(mat_dimension_hasCeiling(i))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "ultrawarm", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_ultrawarm(i))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "has_ceiling", 11, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_ceiling(i))));
 		mnbt_val_push_tag(&compound, element);
 		mnbt_list_push(dimension_list, compound);
 	}
@@ -120,32 +120,32 @@ void phd_sendJoinGame(ltg_client_t* client) {
 	mnbt_push_tag(biomes, mnbt_new_tag(doc, "type", 4, MNBT_STRING, mnbt_val_string("minecraft:worldgen/biome", 24)));
 	mnbt_tag* biomes_list = mnbt_new_tag(doc, "value", 5, MNBT_LIST, mnbt_val_list(MNBT_COMPOUND));
 	for (mat_biome_type_t i = 0; i < mat_biome_count; ++i) {
-		const mat_biome_t* biome = mat_getBiomeByType(i);
+		const mat_biome_t* biome = mat_get_biome_by_type(i);
 		mnbt_val compound = mnbt_val_compound();
 		mnbt_val_push_tag(&compound, mnbt_new_tag(doc, "name", 4, MNBT_STRING, mnbt_val_string(biome->name, biome->name_length)));
 		mnbt_val_push_tag(&compound, mnbt_new_tag(doc, "id", 2, MNBT_INT, mnbt_val_int(i)));
 		mnbt_tag* element = mnbt_new_tag(doc, "element", 7, MNBT_COMPOUND, mnbt_val_compound());
-		mnbt_push_tag(element, mnbt_new_tag(doc, "precipitation", 13, MNBT_STRING, mnbt_val_string(mat_precipitationTypeAsString(biome->precipitation), mat_precipitationTypeLength(biome->precipitation))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "precipitation", 13, MNBT_STRING, mnbt_val_string(mat_precipitation_type_string(biome->precipitation), mat_precipitation_type_length(biome->precipitation))));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "depth", 5, MNBT_FLOAT, mnbt_val_float(biome->depth)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "temperature", 11, MNBT_FLOAT, mnbt_val_float(biome->temperature)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "scale", 5, MNBT_FLOAT, mnbt_val_float(biome->scale)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "downfall", 8, MNBT_FLOAT, mnbt_val_float(biome->downfall)));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "category", 8, MNBT_STRING, mnbt_val_string(mat_biomeCategoryAsString(biome->category), mat_biomeCategoryLength(biome->category))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "category", 8, MNBT_STRING, mnbt_val_string(mat_biome_category_string(biome->category), mat_biome_category_length(biome->category))));
 		if (biome->temperature_modifier != mat_temperature_modifier_none) {
-			mnbt_push_tag(element, mnbt_new_tag(doc, "temperature_modifier", 20, MNBT_STRING, mnbt_val_string(mat_temperatureModifierAsString(biome->temperature_modifier), mat_temperatureModifierLength(biome->temperature_modifier))));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "temperature_modifier", 20, MNBT_STRING, mnbt_val_string(mat_temperature_modifier_string(biome->temperature_modifier), mat_temperature_modifier_length(biome->temperature_modifier))));
 		}
 		mnbt_tag* effects = mnbt_new_tag(doc, "effects", 7, MNBT_COMPOUND, mnbt_val_compound());
 		mnbt_push_tag(effects, mnbt_new_tag(doc, "sky_color", 9, MNBT_INT, mnbt_val_int(biome->effects.sky_color)));
 		mnbt_push_tag(effects, mnbt_new_tag(doc, "water_fog_color", 15, MNBT_INT, mnbt_val_int(biome->effects.water_fog_color)));
 		mnbt_push_tag(effects, mnbt_new_tag(doc, "fog_color", 9, MNBT_INT, mnbt_val_int(biome->effects.fog_color)));
-		if (mat_biome_hasFoliageColor(i)) {
+		if (mat_biome_has_foliage_color(i)) {
 			mnbt_push_tag(effects, mnbt_new_tag(doc, "foliage_color", 13, MNBT_INT, mnbt_val_int(biome->effects.foliage_color)));
 		}
-		if (mat_biome_hasGrassColor(i)) {
+		if (mat_biome_has_grass_color(i)) {
 			mnbt_push_tag(effects, mnbt_new_tag(doc, "grass_color", 11, MNBT_INT, mnbt_val_int(biome->effects.grass_color)));
 		}
 		if (biome->effects.grass_color_modifier != mat_grass_color_modifier_none) {
-			mnbt_push_tag(effects, mnbt_new_tag(doc, "grass_color_modifier", 20, MNBT_STRING, mnbt_val_string(mat_grassColorModifierAsString(biome->effects.grass_color_modifier), mat_grassColorModifierLength(biome->effects.grass_color_modifier))));
+			mnbt_push_tag(effects, mnbt_new_tag(doc, "grass_color_modifier", 20, MNBT_STRING, mnbt_val_string(mat_grass_color_modifier_string(biome->effects.grass_color_modifier), mat_grass_color_modifier_length(biome->effects.grass_color_modifier))));
 		}
 		if (biome->effects.music.sound != NULL) {
 			mnbt_tag* music = mnbt_new_tag(doc, "music", 5, MNBT_COMPOUND, mnbt_val_compound());

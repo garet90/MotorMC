@@ -23,5 +23,5 @@
 #define UTL_CONSOLE_BRIGHT_CYAN     "\033[36;1m"
 #define UTL_CONSOLE_BRIGHT_WHITE    "\033[37;1m"
 
-extern void utl_setupConsole();
-extern void utl_restoreConsole();
+extern void utl_setup_console();
+extern void utl_restore_console();

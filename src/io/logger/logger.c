@@ -35,7 +35,7 @@ void log_command(cmd_sender_t* sender, const cht_component_t* chat) {
 
 	char message[512];
 
-	message[log_toString(message, chat)] = '\0';
+	message[log_to_string(message, chat)] = '\0';
 	log_info("%s", message);
 
 }
@@ -115,58 +115,58 @@ void log_error(const char* format, ...) {
 
 }
 
-uint32_t log_toString(char* message, const cht_component_t* chat) {
+uint32_t log_to_string(char* message, const cht_component_t* chat) {
 
 	uint32_t offset = 0;
 
 	if (chat->color <= 0xF) {
 		switch (chat->color) {
-		case CHT_BLACK:
+		case cht_black:
 			offset += sprintf(message + offset, UTL_CONSOLE_BLACK);
 			break;
-		case CHT_DARK_BLUE:
+		case cht_dark_blue:
 			offset += sprintf(message + offset, UTL_CONSOLE_BLUE);
 			break;
-		case CHT_DARK_GREEN:
+		case cht_dark_green:
 			offset += sprintf(message + offset, UTL_CONSOLE_GREEN);
 			break;
-		case CHT_DARK_CYAN:
+		case cht_dark_cyan:
 			offset += sprintf(message + offset, UTL_CONSOLE_CYAN);
 			break;
-		case CHT_DARK_RED:
+		case cht_dark_red:
 			offset += sprintf(message + offset, UTL_CONSOLE_RED);
 			break;
-		case CHT_PURPLE:
+		case cht_purple:
 			offset += sprintf(message + offset, UTL_CONSOLE_MAGENTA);
 			break;
-		case CHT_GOLD:
+		case cht_gold:
 			offset += sprintf(message + offset, UTL_CONSOLE_YELLOW);
 			break;
-		case CHT_GRAY:
+		case cht_gray:
 			offset += sprintf(message + offset, UTL_CONSOLE_WHITE);
 			break;
-		case CHT_DARK_GRAY:
+		case cht_dark_gray:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_BLACK);
 			break;
-		case CHT_BLUE:
+		case cht_blue:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_BLUE);
 			break;
-		case CHT_BRIGHT_GREEN:
+		case cht_bright_green:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_GREEN);
 			break;
-		case CHT_CYAN:
+		case cht_cyan:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_CYAN);
 			break;
-		case CHT_RED:
+		case cht_red:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_RED);
 			break;
-		case CHT_PINK:
+		case cht_pink:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_MAGENTA);
 			break;
-		case CHT_YELLOW:
+		case cht_yellow:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_YELLOW);
 			break;
-		case CHT_WHITE:
+		case cht_white:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_WHITE);
 			break;
 		case CHT_NOCOLOR:
@@ -179,7 +179,7 @@ uint32_t log_toString(char* message, const cht_component_t* chat) {
 	if (chat->extra != NULL) {
 
 		for (uint32_t i = 0; i < chat->extra->size; ++i) {
-			offset += log_toString(message + offset, utl_vectorGetAs(cht_component_t*, chat->extra, i));
+			offset += log_to_string(message + offset, UTL_VECTOR_GET_AS(cht_component_t*, chat->extra, i));
 		}
 
 	}

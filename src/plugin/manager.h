@@ -20,13 +20,13 @@ static const plg_interface_t plg_interface = {
 	},
 
 	.commands = {
-		.add = cmd_addCommand,
+		.add = cmd_add_command,
 		.message = cmd_message
 	},
 
 	.chat = {
 		.alloc = cht_alloc,
-		.addExtra = cht_addExtra,
+		.addExtra = cht_add_extra,
 		.free = cht_free
 	}
 
@@ -34,9 +34,9 @@ static const plg_interface_t plg_interface = {
 
 typedef struct plg_link plg_link_t;
 
-typedef const plg_plugin_t* (*plg_getPlugin_t) (const plg_interface_t*);
-typedef void (*plg_onEnable_t) (void);
-typedef void (*plg_onDisable_t) (void);
+typedef const plg_plugin_t* (*plg_get_plugin_t) (const plg_interface_t*);
+typedef void (*plg_on_enable_t) (void);
+typedef void (*plg_on_disable_t) (void);
 
 #ifdef __WINDOWS__
 
@@ -58,9 +58,9 @@ struct plg_link {
 
 #endif
 
-extern void plg_registerPlugin(const char*);
-extern void plg_registerPlugins();
+extern void plg_register_plugin(const char*);
+extern void plg_register_plugins();
 
-extern void plg_onStartup();
-extern void plg_onPostworld();
-extern void plg_onDisable();
+extern void plg_on_startup();
+extern void plg_on_postworld();
+extern void plg_on_disable();

@@ -1,17 +1,17 @@
 #include <stdlib.h>
 #include "tree.h"
 
-utl_tree_t* utl_createBranch(int64_t key, void* object) {
+utl_tree_t* utl_create_branch(int64_t key, void* object) {
 
 	utl_tree_t* branch = malloc(sizeof(utl_tree_t));
 
-	utl_initBranch(branch, key, object);
+	utl_init_branch(branch, key, object);
 
 	return branch;
 
 }
 
-void utl_treePut(utl_tree_t* tree, int64_t key, void* object) {
+void utl_tree_put(utl_tree_t* tree, int64_t key, void* object) {
 
 	if (tree->object == NULL) {
 		tree->object = object;
@@ -23,11 +23,11 @@ void utl_treePut(utl_tree_t* tree, int64_t key, void* object) {
 
 		if (tree->left == NULL) {
 
-			tree->left = utl_createBranch(key, object);
+			tree->left = utl_create_branch(key, object);
 
 		} else {
 
-			utl_treePut(tree->left, key, object);
+			utl_tree_put(tree->left, key, object);
 
 		}
 
@@ -35,11 +35,11 @@ void utl_treePut(utl_tree_t* tree, int64_t key, void* object) {
 
 		if (tree->right == NULL) {
 
-			tree->right = utl_createBranch(key, object);
+			tree->right = utl_create_branch(key, object);
 
 		} else {
 
-			utl_treePut(tree->right, key, object);
+			utl_tree_put(tree->right, key, object);
 
 		}
 
@@ -47,7 +47,7 @@ void utl_treePut(utl_tree_t* tree, int64_t key, void* object) {
 
 }
 
-void* utl_treeGet(const utl_tree_t* tree, int64_t key) {
+void* utl_tree_get(const utl_tree_t* tree, int64_t key) {
 
 	if (tree == NULL) return NULL;
 
@@ -59,7 +59,7 @@ void* utl_treeGet(const utl_tree_t* tree, int64_t key) {
 
 		if (tree->left != NULL) {
 
-			return utl_treeGet(tree->left, key);
+			return utl_tree_get(tree->left, key);
 
 		} else {
 
@@ -71,7 +71,7 @@ void* utl_treeGet(const utl_tree_t* tree, int64_t key) {
 
 		if (tree->right != NULL) {
 
-			return utl_treeGet(tree->right, key);
+			return utl_tree_get(tree->right, key);
 
 		} else {
 
@@ -85,7 +85,7 @@ void* utl_treeGet(const utl_tree_t* tree, int64_t key) {
 
 }
 
-void utl_treeRemove(utl_tree_t* tree, int64_t key) {
+void utl_tree_remove(utl_tree_t* tree, int64_t key) {
 
 	if (tree->key == key) {
 
@@ -116,7 +116,7 @@ void utl_treeRemove(utl_tree_t* tree, int64_t key) {
 			int64_t nkey = successor->key;
 			void* nobject = successor->object;
 
-			utl_treeRemove(tree, nkey);
+			utl_tree_remove(tree, nkey);
 
 			tree->key = nkey;
 			tree->object = nobject;
@@ -147,43 +147,43 @@ void utl_treeRemove(utl_tree_t* tree, int64_t key) {
 
 	} else if (tree->key < key) {
 
-		utl_treeRemove(tree->left, key);
+		utl_tree_remove(tree->left, key);
 
 	} else if (tree->key > key) {
 
-		utl_treeRemove(tree->right, key);
+		utl_tree_remove(tree->right, key);
 
 	}
 
 }
 
-void utl_treeTerm(utl_tree_t* tree) {
+void utl_tree_term(utl_tree_t* tree) {
 
 	if (tree->left != NULL) {
 
-		utl_treeDestroy(tree->left);
+		utl_tree_destroy(tree->left);
 
 	}
 
 	if (tree->right != NULL) {
 
-		utl_treeDestroy(tree->right);
+		utl_tree_destroy(tree->right);
 
 	}
 
 }
 
-void utl_treeDestroy(utl_tree_t* tree) {
+void utl_tree_destroy(utl_tree_t* tree) {
 
 	if (tree->left != NULL) {
 
-		utl_treeDestroy(tree->left);
+		utl_tree_destroy(tree->left);
 
 	}
 
 	if (tree->right != NULL) {
 
-		utl_treeDestroy(tree->right);
+		utl_tree_destroy(tree->right);
 
 	}
 
@@ -204,14 +204,14 @@ void* utl_treeShiftL1(utl_tree_t* tree, utl_tree_t* branch) {
 	} else {
 
 		void* object = branch->object;
-		utl_treeRemove(tree, branch->key);
+		utl_tree_remove(tree, branch->key);
 		return object;
 
 	}
 
 }
 
-void* utl_treeShift(utl_tree_t* tree) {
+void* utl_tree_shift(utl_tree_t* tree) {
 
 	if (tree->left != NULL) {
 

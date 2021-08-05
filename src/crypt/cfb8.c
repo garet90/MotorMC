@@ -19,12 +19,12 @@ int cfb8_start(int cipher, const byte_t* IV, const byte_t* key, int keylen, int 
 		cfb8->IV[x] = IV[x];
 	}
 
-    /* init the cipher */
+	/* init the cipher */
 	if ((err = cipher_descriptor[cipher].setup(key, keylen, num_rounds, &cfb8->key)) != CRYPT_OK) {
-    	return err;
-    }
+		return err;
+	}
 
-    //return cipher_descriptor[cfb8->cipher].ecb_encrypt(cfb8->IV, cfb8->IV, &cfb8->key);
+	//return cipher_descriptor[cfb8->cipher].ecb_encrypt(cfb8->IV, cfb8->IV, &cfb8->key);
 
 	return CRYPT_OK;
 

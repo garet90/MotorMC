@@ -18,7 +18,7 @@ typedef enum {
 
 #define LTG_AES_KEY_LENGTH 16
 
-typedef byte_t ltg_UUID_t[16];
+typedef byte_t ltg_uuid_t[16];
 
 typedef struct {
 
@@ -39,7 +39,7 @@ typedef struct {
 		char* value;
 	} username;
 
-	ltg_UUID_t uuid;
+	ltg_uuid_t uuid;
 
 	uint32_t protocol;
 	uint32_t verify;
@@ -72,7 +72,7 @@ typedef struct {
 	struct {
 		pthread_mutex_t lock;
 		utl_vector_t vector;
-		utl_vector_t nextID;
+		utl_vector_t next_id;
 	} clients;
 
 	struct {
@@ -84,7 +84,7 @@ typedef struct {
 	bool_t online_mode;
 	bool_t prevent_proxy_connections;
 
-	cry_RSAkeypair_t keypair;
+	cry_rsa_keypair_t keypair;
 
 } ltg_main_t;
 
@@ -93,7 +93,7 @@ extern void* t_ltg_run(void*);
 extern void ltg_accept(ltg_client_t*);
 extern void* t_ltg_client(void*);
 
-extern bool_t ltg_handlePacket(ltg_client_t* client, pck_packet_t* packet);
+extern bool_t ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet);
 
 extern void ltg_send(ltg_client_t*, pck_packet_t*);
 

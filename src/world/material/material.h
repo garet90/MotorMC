@@ -22,12 +22,12 @@ typedef enum {
 
 	mat_dimension_piglin_safe,
 	mat_dimension_natural,
-	mat_dimension_respawn_anchor_works,
-	mat_dimension_has_skylight,
-	mat_dimension_bed_works,
-	mat_dimension_has_raids,
+	mat_dimension_respawn_anchor,
+	mat_dimension_skylight,
+	mat_dimension_bed,
+	mat_dimension_raids,
 	mat_dimension_ultrawarm,
-	mat_dimension_has_ceiling,
+	mat_dimension_ceiling,
 
 	mat_dimension_properties_count
 
@@ -51,48 +51,48 @@ typedef struct {
 
 extern const mat_dimension_t* mat_dimensions[];
 
-static inline const mat_dimension_t* mat_getDimensionByType(mat_dimension_type_t type) {
+static inline const mat_dimension_t* mat_get_dimension_by_type(mat_dimension_type_t type) {
 	return mat_dimensions[type];
 }
 
-static inline bool_t mat_dimension_isPiglinSafe(mat_dimension_type_t dimension) {
-	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_piglin_safe);
+static inline bool_t mat_dimension_is_piglin_safe(mat_dimension_type_t dimension) {
+	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_piglin_safe);
 }
 
-static inline bool_t mat_dimension_isNatural(mat_dimension_type_t dimension) {
-	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_natural);
+static inline bool_t mat_dimension_is_natural(mat_dimension_type_t dimension) {
+	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_natural);
 }
 
-static inline bool_t mat_dimension_respawnAnchorWorks(mat_dimension_type_t dimension) {
-	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_respawn_anchor_works);
+static inline bool_t mat_dimension_respawn_anchor_works(mat_dimension_type_t dimension) {
+	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_respawn_anchor);
 }
 
-static inline bool_t mat_dimension_hasSkylight(mat_dimension_type_t dimension) {
-	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_has_skylight);
+static inline bool_t mat_dimension_has_skylight(mat_dimension_type_t dimension) {
+	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_skylight);
 }
 
-static inline bool_t mat_dimension_bedWorks(mat_dimension_type_t dimension) {
-	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_bed_works);
+static inline bool_t mat_dimension_bed_works(mat_dimension_type_t dimension) {
+	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_bed);
 }
 
-static inline bool_t mat_dimension_hasRaids(mat_dimension_type_t dimension) {
-	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_has_raids);
+static inline bool_t mat_dimension_has_raids(mat_dimension_type_t dimension) {
+	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_raids);
 }
 
-static inline bool_t mat_dimension_isUltrawarm(mat_dimension_type_t dimension) {
-	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_ultrawarm);
+static inline bool_t mat_dimension_is_ultrawarm(mat_dimension_type_t dimension) {
+	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_ultrawarm);
 }
 
-static inline bool_t mat_dimension_hasCeiling(mat_dimension_type_t dimension) {
-	return utl_testBit(mat_getDimensionByType(dimension)->properties, mat_dimension_has_ceiling);
+static inline bool_t mat_dimension_has_ceiling(mat_dimension_type_t dimension) {
+	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_ceiling);
 }
 
-static inline bool_t mat_dimension_hasFixedTime(mat_dimension_type_t dimension) {
-	return mat_getDimensionByType(dimension)->fixed_time == 0xFFFF ? false : true;
+static inline bool_t mat_dimension_has_fixed_time(mat_dimension_type_t dimension) {
+	return mat_get_dimension_by_type(dimension)->fixed_time == 0xFFFF ? false : true;
 }
 
-static inline uint16_t mat_dimension_getFixedTime(mat_dimension_type_t dimension) {
-	return mat_getDimensionByType(dimension)->fixed_time;
+static inline uint16_t mat_dimension_get_fixed_time(mat_dimension_type_t dimension) {
+	return mat_get_dimension_by_type(dimension)->fixed_time;
 }
 
 /*
@@ -197,7 +197,7 @@ typedef enum {
 
 } mat_precipitation_type_t;
 
-static inline const char* mat_precipitationTypeAsString(mat_precipitation_type_t type) {
+static inline const char* mat_precipitation_type_string(mat_precipitation_type_t type) {
 
 	const char* types[] = {
 		"rain",
@@ -209,7 +209,7 @@ static inline const char* mat_precipitationTypeAsString(mat_precipitation_type_t
 
 }
 
-static inline uint16_t mat_precipitationTypeLength(mat_precipitation_type_t type) {
+static inline uint16_t mat_precipitation_type_length(mat_precipitation_type_t type) {
 
 	const uint16_t types[] = {
 		4,
@@ -244,7 +244,7 @@ typedef enum {
 
 } mat_biome_category_t;
 
-static inline const char* mat_biomeCategoryAsString(mat_biome_category_t category) {
+static inline const char* mat_biome_category_string(mat_biome_category_t category) {
 
 	const char* categories[] = {
 		"none",
@@ -271,7 +271,7 @@ static inline const char* mat_biomeCategoryAsString(mat_biome_category_t categor
 
 }
 
-static inline uint16_t mat_biomeCategoryLength(mat_biome_category_t category) {
+static inline uint16_t mat_biome_category_length(mat_biome_category_t category) {
 
 	const uint16_t categories[] = {
 		4,
@@ -306,7 +306,7 @@ typedef enum {
 
 } mat_grass_color_modifier_t;
 
-static inline const char* mat_grassColorModifierAsString(mat_grass_color_modifier_t modifier) {
+static inline const char* mat_grass_color_modifier_string(mat_grass_color_modifier_t modifier) {
 
 	const char* modifiers[] = {
 		NULL,
@@ -318,7 +318,7 @@ static inline const char* mat_grassColorModifierAsString(mat_grass_color_modifie
 
 }
 
-static inline uint16_t mat_grassColorModifierLength(mat_grass_color_modifier_t modifier) {
+static inline uint16_t mat_grass_color_modifier_length(mat_grass_color_modifier_t modifier) {
 
 	const uint16_t modifiers[] = {
 		0,
@@ -337,7 +337,7 @@ typedef enum {
 	
 } mat_temperature_modifier_t;
 
-static inline const char* mat_temperatureModifierAsString(mat_temperature_modifier_t modifier) {
+static inline const char* mat_temperature_modifier_string(mat_temperature_modifier_t modifier) {
 
 	const char* modifiers[] = {
 		NULL,
@@ -348,7 +348,7 @@ static inline const char* mat_temperatureModifierAsString(mat_temperature_modifi
 
 }
 
-static inline uint16_t mat_temperatureModifierLength(mat_temperature_modifier_t modifier) {
+static inline uint16_t mat_temperature_modifier_length(mat_temperature_modifier_t modifier) {
 	
 	const uint16_t modifiers[] = {
 		0,
@@ -428,16 +428,16 @@ typedef struct {
 
 extern const mat_biome_t* mat_biomes[];
 
-static inline const mat_biome_t* mat_getBiomeByType(mat_biome_type_t type) {
+static inline const mat_biome_t* mat_get_biome_by_type(mat_biome_type_t type) {
 	return mat_biomes[type];
 }
 
-static inline bool_t mat_biome_hasFoliageColor(mat_biome_type_t type) {
-	return mat_getBiomeByType(type)->effects.foliage_color == 0xFFFFFFFF ? false : true;
+static inline bool_t mat_biome_has_foliage_color(mat_biome_type_t type) {
+	return mat_get_biome_by_type(type)->effects.foliage_color == 0xFFFFFFFF ? false : true;
 }
 
-static inline bool_t mat_biome_hasGrassColor(mat_biome_type_t type) {
-	return mat_getBiomeByType(type)->effects.grass_color == 0xFFFFFFFF ? false : true;
+static inline bool_t mat_biome_has_grass_color(mat_biome_type_t type) {
+	return mat_get_biome_by_type(type)->effects.grass_color == 0xFFFFFFFF ? false : true;
 }
 
 /*
@@ -917,7 +917,7 @@ typedef struct {
 
 extern const mat_state_modifier_t* mat_modifiers[];
 
-static inline const mat_state_modifier_t* mat_getStateModifierByType(mat_state_modifier_type_t type) {
+static inline const mat_state_modifier_t* mat_get_state_modifier_by_type(mat_state_modifier_type_t type) {
 	return mat_modifiers[type];
 }
 
@@ -1969,36 +1969,36 @@ extern const mat_block_t* mat_blocks[];
 extern const mat_block_protocol_id_t mat_blocks_protocol[];
 extern const mat_block_protocol_id_t mat_blocks_base_protocol[];
 
-static inline const mat_block_t* mat_getBlockById(mat_block_type_t id) {
+static inline const mat_block_t* mat_get_block_by_id(mat_block_type_t id) {
 	return mat_blocks[id];
 }
 
-static inline mat_block_type_t mat_getIdByProtocolId(mat_block_protocol_id_t protocol) {
+static inline mat_block_type_t mat_get_block_id_by_protocol_id(mat_block_protocol_id_t protocol) {
 	return mat_blocks_protocol[protocol];
 }
 
-static inline mat_block_protocol_id_t mat_getBaseProtocolIdById(mat_block_protocol_id_t id) {
+static inline mat_block_protocol_id_t mat_get_block_base_protocol_id_by_id(mat_block_protocol_id_t id) {
 	return mat_blocks_base_protocol[id];
 }
 
 /*
 Read the value of a state field of a block with certain protocol
 */
-static inline uint8_t mat_getBlockStateValue(mat_block_protocol_id_t block_protocol, mat_state_modifier_type_t field) {
+static inline uint8_t mat_get_block_state_value(mat_block_protocol_id_t block_protocol, mat_state_modifier_type_t field) {
 
-	mat_block_type_t block_id = mat_getIdByProtocolId(block_protocol);
-	mat_block_protocol_id_t block_state = block_protocol - mat_getBaseProtocolIdById(block_id);
-	const mat_block_t* block_data = mat_getBlockById(block_id);
+	mat_block_type_t block_id = mat_get_block_id_by_protocol_id(block_protocol);
+	mat_block_protocol_id_t block_state = block_protocol - mat_get_block_base_protocol_id_by_id(block_id);
+	const mat_block_t* block_data = mat_get_block_by_id(block_id);
 
 	for (int32_t i = block_data->modifiers_count; i >= 0; --i) {
 
 		if (block_data->modifiers[i] != field) {
 
-			block_state /= mat_getStateModifierByType(block_data->modifiers[i])->count;
+			block_state /= mat_get_state_modifier_by_type(block_data->modifiers[i])->count;
 
 		} else {
 
-			return block_state % mat_getStateModifierByType(field)->count;
+			return block_state % mat_get_state_modifier_by_type(field)->count;
 
 		}
 
@@ -2011,16 +2011,16 @@ static inline uint8_t mat_getBlockStateValue(mat_block_protocol_id_t block_proto
 /*
 Set a state field for a particular block
 */
-static inline mat_block_protocol_id_t mat_setBlockStateValue(mat_block_protocol_id_t block_protocol, mat_state_modifier_type_t field, uint8_t value) {
+static inline mat_block_protocol_id_t mat_set_block_state_value(mat_block_protocol_id_t block_protocol, mat_state_modifier_type_t field, uint8_t value) {
 
-	mat_block_type_t block_id = mat_getIdByProtocolId(block_protocol);
-	mat_block_protocol_id_t block_state = block_protocol - mat_getBaseProtocolIdById(block_id);
+	mat_block_type_t block_id = mat_get_block_id_by_protocol_id(block_protocol);
+	mat_block_protocol_id_t block_state = block_protocol - mat_get_block_base_protocol_id_by_id(block_id);
 	int32_t state_add = 1;
-	const mat_block_t* block_data = mat_getBlockById(block_id);
+	const mat_block_t* block_data = mat_get_block_by_id(block_id);
 
 	for (int32_t i = block_data->modifiers_count; i >= 0; --i) {
 
-		const mat_state_modifier_t* modifier = mat_getStateModifierByType(block_data->modifiers[i]);
+		const mat_state_modifier_t* modifier = mat_get_state_modifier_by_type(block_data->modifiers[i]);
 
 		if (block_data->modifiers[i] != field) {
 
@@ -2042,33 +2042,15 @@ static inline mat_block_protocol_id_t mat_setBlockStateValue(mat_block_protocol_
 
 }
 
-static inline uint8_t mat_getLuminance(const mat_block_t* block) {
+static inline bool_t mat_catches_fire_from_lava(const mat_block_t* block) {
 
-	return block->luminance;
-
-}
-
-static inline bool_t mat_catchesFireFromLava(const mat_block_t* block) {
-
-	return (block->encouragement & 0x80) ? true : false;
+	return utl_test_bit(block->tags, mat_block_tag_catches_fire_from_lava);
 
 }
 
-static inline bool_t mat_canBurnAway(const mat_block_t* block) {
+static inline bool_t mat_can_burn_away(const mat_block_t* block) {
 
-	return (block->flammability & 0x80) ? true : false;
-
-}
-
-static inline uint8_t mat_getEncouragement(const mat_block_t* block) {
-
-	return block->encouragement & 0x7F;
-
-}
-
-static inline uint8_t mat_getFlammability(const mat_block_t* block) {
-
-	return block->flammability & 0x7F;
+	return block->flammability > 0 ? true : false;
 
 }
 
@@ -3276,102 +3258,102 @@ typedef struct {
 extern const mat_item_t* mat_items[];
 extern const mat_item_id_t mat_items_protocol[];
 
-static inline const mat_item_t* mat_getItemById(mat_item_id_t id) {
+static inline const mat_item_t* mat_get_item_by_id(mat_item_id_t id) {
 	return mat_items[id];
 }
 
-static inline bool_t mat_isEquipment(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_equipment);
+static inline bool_t mat_is_equipment(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_equipment);
 }
 
-static inline mat_equipment_type_t mat_getEquipmentType(const mat_item_t* item) {
+static inline mat_equipment_type_t mat_get_equipment_type(const mat_item_t* item) {
 	return item->tags[0].equipment.type;
 }
 
-static inline uint32_t mat_getMaxDurability(const mat_item_t* item) {
+static inline uint32_t mat_get_max_durability(const mat_item_t* item) {
 	return item->tags[0].equipment.max_durability;
 }
 
-static inline bool_t mat_isWeapon(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_weapon);
+static inline bool_t mat_is_weapon(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_weapon);
 }
 
-static inline float32_t mat_getAttackSpeed(const mat_item_t* item) {
+static inline float32_t mat_get_attack_speed(const mat_item_t* item) {
 	return item->tags[1].weapon.attack_speed;
 }
 
-static inline float32_t mat_getDamage(const mat_item_t* item) {
+static inline float32_t mat_get_damage(const mat_item_t* item) {
 	return item->tags[1].weapon.damage;
 }
 
-static inline bool_t mat_isTiered(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_tier);
+static inline bool_t mat_is_tiered(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_tier);
 }
 
-static inline mat_equipment_tier_t mat_getTier(const mat_item_t* item) {
+static inline mat_equipment_tier_t mat_get_tier(const mat_item_t* item) {
 	return item->tags[2].tier;
 }
 
-static inline bool_t mat_isArmor(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_armor);
+static inline bool_t mat_is_armor(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_armor);
 }
 
-static inline uint8_t mat_getDefense(const mat_item_t* item) {
+static inline uint8_t mat_get_defense(const mat_item_t* item) {
 	return item->tags[1].armor.defense;
 }
 
-static inline uint8_t mat_getToughness(const mat_item_t* item) {
+static inline uint8_t mat_get_toughness(const mat_item_t* item) {
 	return item->tags[1].armor.toughness;
 }
 
-static inline uint8_t mat_getKnockbackResistance(const mat_item_t* item) {
+static inline uint8_t mat_get_knockback_resistance(const mat_item_t* item) {
 	return item->tags[1].armor.knockback_resistance;
 }
 
-static inline bool_t mat_itemStacks(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_stacks);
+static inline bool_t mat_item_stacks(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_stacks);
 }
 
-static inline bool_t mat_itemStacksTo16(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_stacks_16);
+static inline bool_t mat_item_stacks_16(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_stacks_16);
 }
 
-static inline bool_t mat_isBlock(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_block);
+static inline bool_t mat_is_block(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_block);
 }
 
-static inline mat_block_type_t mat_getBlockId(const mat_item_t* item) {
+static inline mat_block_type_t mat_get_block_id(const mat_item_t* item) {
 	return item->tags[0].block;
 }
 
-static inline bool_t mat_isFood(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_food);
+static inline bool_t mat_is_food(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_food);
 }
 
-static inline float32_t mat_getSaturation(const mat_item_t* item) {
+static inline float32_t mat_get_saturation(const mat_item_t* item) {
 	return item->tags[0].food.saturation;
 }
 
-static inline uint8_t mat_getFood(const mat_item_t* item) {
+static inline uint8_t mat_get_food(const mat_item_t* item) {
 	return item->tags[0].food.food;
 }
 
-static inline uint8_t mat_getConsumeSpeed(const mat_item_t* item) {
+static inline uint8_t mat_get_consume_speed(const mat_item_t* item) {
 	return item->tags[0].food.speed;
 }
 
-static inline bool_t mat_isEntity(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_entity);
+static inline bool_t mat_is_entity(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_entity);
 }
 
-static inline uint32_t mat_getEntity(const mat_item_t* item) {
+static inline uint32_t mat_get_entity(const mat_item_t* item) {
 	return item->tags[0].entity;
 }
 
-static inline bool_t mat_isPlacedEntity(const mat_item_t* item) {
-	return utl_testBit(item->tags_set, mat_item_tag_entity_place);
+static inline bool_t mat_is_placed_entity(const mat_item_t* item) {
+	return utl_test_bit(item->tags_set, mat_item_tag_entity_place);
 }
 
-static inline float32_t mat_getThrowSpeed(const mat_item_t* item) {
+static inline float32_t mat_get_throw_speed(const mat_item_t* item) {
 	return item->tags[0].throw_speed;
 }

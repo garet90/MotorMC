@@ -3,4 +3,4 @@
 
 extern bool_t test_materials();
 
-extern bool_t test_runAll();
+extern int test_run_all();

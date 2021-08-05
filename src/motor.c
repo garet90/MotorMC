@@ -46,7 +46,7 @@ sky_main_t sky_main = {
 		.vector = {
 			.bytes_per_element = sizeof(void*)
 		},
-		.nextID = {
+		.next_id = {
 			.bytes_per_element = sizeof(uint32_t)
 		}
 	},
@@ -72,7 +72,7 @@ sky_main_t sky_main = {
 			.vector = {
 				.bytes_per_element = sizeof(ltg_client_t*)
 			},
-			.nextID = {
+			.next_id = {
 				.bytes_per_element = sizeof(ltg_client_t*)
 			}
 		},
@@ -91,7 +91,7 @@ int main(int argCount, char* args[]) {
 	struct timespec start;
 	clock_gettime(CLOCK_REALTIME, &start);
 
-	utl_setupConsole();
+	utl_setup_console();
 
 	log_info("//      //  //////  //////  //////  //////");
 	log_info("////  ////  //  //    //    //  //  //  //");
@@ -111,7 +111,7 @@ int main(int argCount, char* args[]) {
 	// register aes cipher
 	register_cipher(&aes_enc_desc);
 
-	if (fs_fileExists("server.json")) {
+	if (fs_file_exists("server.json")) {
 
 		yyjson_doc* server = yyjson_read_file("server.json", 0, NULL, NULL);
 
@@ -179,7 +179,7 @@ int main(int argCount, char* args[]) {
 					sky_main.listener.online_mode = yyjson_get_bool(server_val);
 					break;
 				case 0x7c9abc59: // "motd"
-					sky_main.motd = cht_fromJson(server_val);
+					sky_main.motd = cht_from_json(server_val);
 					break;
 				default:
 					log_warn("Unknown value '%s' in server.json! (%x)", key, hash);
@@ -295,27 +295,27 @@ int main(int argCount, char* args[]) {
 	if (argCount != 0) {
 		for (int i = 0; i < argCount; ++i) {
 			if (utl_hash(args[i]) == 0x7c9e6865) {
-				return test_runAll();
+				return test_run_all();
 			}
 		}
 	}
 
 	// load startup plugins
-	plg_onStartup();
+	plg_on_startup();
 
 	// TODO load world
-	if (fs_dirExists(sky_main.world.name)) {
+	if (fs_dir_exists(sky_main.world.name)) {
 		log_info("Loading world %s...", sky_main.world.name);
 		wld_world_t* world = wld_load(sky_main.world.name);
-		utl_vectorPush(&sky_main.worlds, &world);
+		utl_vector_push(&sky_main.worlds, &world);
 	} else {
 		log_info("Generating world %s...", sky_main.world.name);
 		wld_world_t* world = wld_new(sky_main.world.name, (sky_main.world.seed == 0 ? time(NULL) : sky_main.world.seed), mat_dimension_overworld);
-		utl_vectorPush(&sky_main.worlds, &world);
+		utl_vector_push(&sky_main.worlds, &world);
 	}
 
 	// load postworld plugins
-	plg_onPostworld();
+	plg_on_postworld();
 
 	// initiate socket
 	ltg_init();
@@ -329,7 +329,7 @@ int main(int argCount, char* args[]) {
 		pthread_mutex_init(&worker->world_lock, NULL);
 		worker->id = i;
 
-		utl_vectorPush(&sky_main.workers.vector, &worker);
+		utl_vector_push(&sky_main.workers.vector, &worker);
 
 		pthread_create(&worker->thread, NULL, t_sky_worker, worker);
 
@@ -368,7 +368,7 @@ void* t_sky_main(void* input) {
 
 		clock_gettime(CLOCK_MONOTONIC, &currentTime);
 
-		if (sky_toNanos(currentTime) < sky_toNanos(nextTick)) {
+		if (sky_to_nanos(currentTime) < sky_to_nanos(nextTick)) {
 			sleepTime.tv_sec = nextTick.tv_sec - currentTime.tv_sec;
 			sleepTime.tv_nsec = nextTick.tv_nsec - currentTime.tv_nsec;
 			if (sleepTime.tv_nsec < 0) {
@@ -378,8 +378,8 @@ void* t_sky_main(void* input) {
 		} else {
 			sleepTime.tv_sec = 0;
 			sleepTime.tv_nsec = 0;
-			if ((sky_toNanos(currentTime) - sky_toNanos(nextTick)) / SKY_NANOS_PER_TICK > SKY_SKIP_TICKS) {
-				log_warn("Can't keep up! Is the server overloaded? Running %dms or %d ticks behind", (sky_toNanos(currentTime) - sky_toNanos(nextTick)) / 1000000, (sky_toNanos(currentTime) - sky_toNanos(nextTick)) / SKY_NANOS_PER_TICK);
+			if ((sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / SKY_NANOS_PER_TICK > SKY_SKIP_TICKS) {
+				log_warn("Can't keep up! Is the server overloaded? Running %dms or %d ticks behind", (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / 1000000, (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / SKY_NANOS_PER_TICK);
 				clock_gettime(CLOCK_MONOTONIC, &nextTick);
 			}
 		}
@@ -394,7 +394,7 @@ void* t_sky_main(void* input) {
 
 		// pause work
 		for (size_t i = 0; i < sky_main.workers.vector.size; ++i) {
-			sky_worker_t* worker = utl_vectorGetAs(sky_worker_t*, &sky_main.workers.vector, i);
+			sky_worker_t* worker = UTL_VECTOR_GET_AS(sky_worker_t*, &sky_main.workers.vector, i);
 			pthread_mutex_lock(&worker->world_lock);
 		}
 
@@ -403,7 +403,7 @@ void* t_sky_main(void* input) {
 
 		// resume works (unlock in reverse order)
 		for (size_t i = sky_main.workers.vector.size - 1; i < sky_main.workers.vector.size; --i) {
-			sky_worker_t* worker = utl_vectorGetAs(sky_worker_t*, &sky_main.workers.vector, i);
+			sky_worker_t* worker = UTL_VECTOR_GET_AS(sky_worker_t*, &sky_main.workers.vector, i);
 			pthread_mutex_unlock(&worker->world_lock);
 		}
 
@@ -445,7 +445,7 @@ void __attribute__ ((noreturn)) sky_term() {
 
 	for (size_t i = 0; i < sky_main.workers.vector.size; ++i) {
 
-		sky_worker_t* worker = utl_vectorGetAs(sky_worker_t*, &sky_main.workers.vector, i);
+		sky_worker_t* worker = UTL_VECTOR_GET_AS(sky_worker_t*, &sky_main.workers.vector, i);
 
 		pthread_join(worker->thread, NULL);
 
@@ -454,13 +454,13 @@ void __attribute__ ((noreturn)) sky_term() {
 	// TODO unload world
 
 	// disable plugins
-	plg_onDisable();
+	plg_on_disable();
 
 	sky_main.status = sky_stopped;
 
 	curl_global_cleanup();
 
-	utl_restoreConsole();
+	utl_restore_console();
 
 	exit(0);
 

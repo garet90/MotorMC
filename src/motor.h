@@ -39,7 +39,7 @@ typedef struct {
 	struct {
 		utl_vector_t vector;
 		/* next entity id */
-		utl_vector_t nextID;
+		utl_vector_t next_id;
 	} entities;
 
 	/* workers */
@@ -98,6 +98,6 @@ extern void* t_sky_worker(void*);
 
 extern void __attribute__ ((noreturn)) sky_term();
 
-static inline uint64_t sky_toNanos(const struct timespec time) {
+static inline uint64_t sky_to_nanos(const struct timespec time) {
 	return (time.tv_sec * SKY_NANOS_PER_SECOND) + time.tv_nsec;
 }

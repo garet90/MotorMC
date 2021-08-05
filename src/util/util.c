@@ -2,7 +2,7 @@
 #include "util.h"
 #include "../io/io.h"
 
-size_t utl_toMinecraftHex(char* str, const byte_t* val, size_t size) {
+size_t utl_to_minecraft_hex(char* str, const byte_t* val, size_t size) {
 
 	const char hexmap[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
@@ -41,7 +41,7 @@ size_t utl_toMinecraftHex(char* str, const byte_t* val, size_t size) {
 
 			if (val[i] & 0xF0) {
 
-				utl_writeByteHex(str + str_size, val[i]);
+				utl_write_byte_hex(str + str_size, val[i]);
 				str_size += 2;
 
 			} else {
@@ -53,7 +53,7 @@ size_t utl_toMinecraftHex(char* str, const byte_t* val, size_t size) {
 			begin = false;
 
 		} else {
-			utl_writeByteHex(str + str_size, val[i]);
+			utl_write_byte_hex(str + str_size, val[i]);
 			str_size += 2;
 		}
 
@@ -64,7 +64,7 @@ size_t utl_toMinecraftHex(char* str, const byte_t* val, size_t size) {
 
 }
 
-void utl_writeByteHex(char* str, uint8_t val) {
+void utl_write_byte_hex(char* str, uint8_t val) {
 
 	const char hexmap[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
@@ -73,7 +73,7 @@ void utl_writeByteHex(char* str, uint8_t val) {
 
 }
 
-void utl_readHexBytes(byte_t* out, const char* str, size_t size) {
+void utl_read_hex_bytes(byte_t* out, const char* str, size_t size) {
 
 	const byte_t ascii_map[] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // ........

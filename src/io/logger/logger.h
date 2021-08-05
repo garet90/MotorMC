@@ -23,4 +23,4 @@ extern void log_info(const char*, ...);
 extern void log_warn(const char*, ...);
 extern void log_error(const char*, ...);
 
-extern uint32_t log_toString(char*, const cht_component_t*);
+extern uint32_t log_to_string(char*, const cht_component_t*);

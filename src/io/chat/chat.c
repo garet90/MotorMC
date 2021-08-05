@@ -8,14 +8,14 @@ cht_component_t* cht_alloc() {
 
 	cht_component_t* alloc = calloc(1, sizeof(cht_component_t));
 
-	utl_setBit(alloc->format, cht_heap);
+	utl_set_bit(alloc->format, cht_heap);
 	alloc->color = CHT_NOCOLOR;
 
 	return alloc;
 
 }
 
-cht_component_t* cht_fromJson(yyjson_val* obj) {
+cht_component_t* cht_from_json(yyjson_val* obj) {
 
 	cht_component_t* component = cht_alloc();
 
@@ -31,82 +31,82 @@ cht_component_t* cht_fromJson(yyjson_val* obj) {
 			break;
 		}
 		case 0x7c94b326: // "bold"
-			utl_setBit(component->format, cht_bold_set);
+			utl_set_bit(component->format, cht_bold_set);
 			if (yyjson_get_bool(obj_val))
-				utl_setBit(component->format, cht_bold);
+				utl_set_bit(component->format, cht_bold);
 			break;
 		case 0x0536d35b: // "italic"
-			utl_setBit(component->format, cht_italic_set);
+			utl_set_bit(component->format, cht_italic_set);
 			if (yyjson_get_bool(obj_val))
-				utl_setBit(component->format, cht_italic);
+				utl_set_bit(component->format, cht_italic);
 			break;
 		case 0xd635c50f: // "underlined"
-			utl_setBit(component->format, cht_underlined_set);
+			utl_set_bit(component->format, cht_underlined_set);
 			if (yyjson_get_bool(obj_val))
-				utl_setBit(component->format, cht_underlined);
+				utl_set_bit(component->format, cht_underlined);
 			break;
 		case 0x10d72f78: // "strikethrough"
-			utl_setBit(component->format, cht_strikethrough_set);
+			utl_set_bit(component->format, cht_strikethrough_set);
 			if (yyjson_get_bool(obj_val))
-				utl_setBit(component->format, cht_strikethrough);
+				utl_set_bit(component->format, cht_strikethrough);
 			break;
 		case 0xf1f68aa5: // "obfuscated"
-			utl_setBit(component->format, cht_obfuscated_set);
+			utl_set_bit(component->format, cht_obfuscated_set);
 			if (yyjson_get_bool(obj_val))
-				utl_setBit(component->format, cht_obfuscated);
+				utl_set_bit(component->format, cht_obfuscated);
 			break;
 		case 0x0f3d3244: // "color"
 			switch (utl_hash(yyjson_get_str(obj_val))) {
 			case 0x0f294442: // "black"
-				component->color = CHT_BLACK;
+				component->color = cht_black;
 				break;
 			case 0x3fa0116e: // "dark_blue"
-				component->color = CHT_DARK_BLUE;
+				component->color = cht_dark_blue;
 				break;
 			case 0x33ffc057: // "dark_green"
-				component->color = CHT_DARK_GREEN;
+				component->color = cht_dark_green;
 				break;
 			case 0x3f9f9a4e: // "dark_aqua"
-				component->color = CHT_DARK_CYAN;
+				component->color = cht_dark_cyan;
 				break;
 			case 0x01edd701: // "dark_red"
-				component->color = CHT_DARK_RED;
+				component->color = cht_dark_red;
 				break;
 			case 0xc933d23e: // "dark_purple"
-				component->color = CHT_PURPLE;
+				component->color = cht_purple;
 				break;
 			case 0x7c97710b: // "gold"
-				component->color = CHT_GOLD;
+				component->color = cht_gold;
 				break;
 			case 0x7c977c78: // "gray"
-				component->color = CHT_GRAY;
+				component->color = cht_gray;
 				break;
 			case 0x3fa2e659: // "dark_gray"
-				component->color = CHT_DARK_GRAY;
+				component->color = cht_dark_gray;
 				break;
 			case 0x7c94a78d: // "blue"
-				component->color = CHT_BLUE;
+				component->color = cht_blue;
 				break;
 			case 0x0f871a56: // "green"
-				component->color = CHT_BRIGHT_GREEN;
+				component->color = cht_bright_green;
 				break;
 			case 0x7c94306d: // "aqua"
-				component->color = CHT_CYAN;
+				component->color = cht_cyan;
 				break;
 			case 0x0b88a540: // "red"
-				component->color = CHT_RED;
+				component->color = cht_red;
 				break;
 			case 0x519b36b4: // "light_purple"
-				component->color = CHT_PINK;
+				component->color = cht_pink;
 				break;
 			case 0x297ff6e1: // "yellow"
-				component->color = CHT_YELLOW;
+				component->color = cht_yellow;
 				break;
 			case 0x10a33986: // "white"
-				component->color = CHT_WHITE;
+				component->color = cht_white;
 				break;
 			default:
-				utl_readHexBytes((byte_t*) &component->color, yyjson_get_str(obj_val), yyjson_get_len(obj_val) >> 1);
+				utl_read_hex_bytes((byte_t*) &component->color, yyjson_get_str(obj_val), yyjson_get_len(obj_val) >> 1);
 				break;
 			}
 			break;
@@ -182,8 +182,8 @@ cht_component_t* cht_fromJson(yyjson_val* obj) {
 			size_t j, j_max;
 			yyjson_val *extra_val;
 			yyjson_arr_foreach(obj_val, j, j_max, extra_val) {
-				cht_component_t* extra = cht_fromJson(extra_val);
-				cht_addExtra(component, extra);
+				cht_component_t* extra = cht_from_json(extra_val);
+				cht_add_extra(component, extra);
 			}
 			break;
 		}
@@ -194,11 +194,11 @@ cht_component_t* cht_fromJson(yyjson_val* obj) {
 
 }
 
-cht_component_t* cht_fromString(const char* str, size_t len) {
+cht_component_t* cht_from_string(const char* str, size_t len) {
 
 	yyjson_doc* doc = yyjson_read(str, len, 0);
 
-	cht_component_t* component = cht_fromJson(yyjson_doc_get_root(doc));
+	cht_component_t* component = cht_from_json(yyjson_doc_get_root(doc));
 
 	yyjson_doc_free(doc);
 
@@ -206,13 +206,13 @@ cht_component_t* cht_fromString(const char* str, size_t len) {
 	
 }
 
-void cht_addExtra(cht_component_t* base, const cht_component_t* extra) {
+void cht_add_extra(cht_component_t* base, const cht_component_t* extra) {
 
 	if (base->extra == NULL) {
-		base->extra = utl_createVector(sizeof(cht_component_t*), 2);
+		base->extra = utl_create_vector(sizeof(cht_component_t*), 2);
 	}
 
-	utl_vectorPush(base->extra, &extra);
+	utl_vector_push(base->extra, &extra);
 
 }
 
@@ -221,70 +221,70 @@ void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t
 	if (component->text != NULL)
 		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "text"), yyjson_mut_str(doc, component->text));
 
-	if (utl_testBit(component->format, cht_bold_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "bold"), utl_testBit(component->format, cht_bold) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (utl_test_bit(component->format, cht_bold_set))
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "bold"), utl_test_bit(component->format, cht_bold) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
-	if (utl_testBit(component->format, cht_italic_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "italic"), utl_testBit(component->format, cht_italic) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (utl_test_bit(component->format, cht_italic_set))
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "italic"), utl_test_bit(component->format, cht_italic) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
-	if (utl_testBit(component->format, cht_underlined_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "underlined"), utl_testBit(component->format, cht_underlined) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (utl_test_bit(component->format, cht_underlined_set))
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "underlined"), utl_test_bit(component->format, cht_underlined) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
-	if (utl_testBit(component->format, cht_strikethrough_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "strikethrough"), utl_testBit(component->format, cht_strikethrough) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (utl_test_bit(component->format, cht_strikethrough_set))
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "strikethrough"), utl_test_bit(component->format, cht_strikethrough) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 		
-	if (utl_testBit(component->format, cht_obfuscated_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "obfuscated"), utl_testBit(component->format, cht_obfuscated) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (utl_test_bit(component->format, cht_obfuscated_set))
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "obfuscated"), utl_test_bit(component->format, cht_obfuscated) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
 	if (component->color != CHT_NOCOLOR) {
 		if (component->color <= 0xF) {
 			switch (component->color) {
-			case CHT_BLACK:
+			case cht_black:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "black"));
 				break;
-			case CHT_DARK_BLUE:
+			case cht_dark_blue:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_blue"));
 				break;
-			case CHT_DARK_GREEN:
+			case cht_dark_green:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_green"));
 				break;
-			case CHT_DARK_CYAN:
+			case cht_dark_cyan:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_aqua"));
 				break;
-			case CHT_DARK_RED:
+			case cht_dark_red:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_red"));
 				break;
-			case CHT_PURPLE:
+			case cht_purple:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_purple"));
 				break;
-			case CHT_GOLD:
+			case cht_gold:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "gold"));
 				break;
-			case CHT_GRAY:
+			case cht_gray:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "gray"));
 				break;
-			case CHT_DARK_GRAY:
+			case cht_dark_gray:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_gray"));
 				break;
-			case CHT_BLUE:
+			case cht_blue:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "blue"));
 				break;
-			case CHT_BRIGHT_GREEN:
+			case cht_bright_green:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "green"));
 				break;
-			case CHT_CYAN:
+			case cht_cyan:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "aqua"));
 				break;
-			case CHT_RED:
+			case cht_red:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "red"));
 				break;
-			case CHT_PINK:
+			case cht_pink:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "light_purple"));
 				break;
-			case CHT_YELLOW:
+			case cht_yellow:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "yellow"));
 				break;
-			case CHT_WHITE:
+			case cht_white:
 				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "white"));
 				break;
 			default:
@@ -362,7 +362,7 @@ void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t
 
 			yyjson_mut_val* extra_obj = yyjson_mut_obj(doc);
 
-			cht_jsonify(doc, extra_obj, utl_vectorGetAs(cht_component_t*, component->extra, i));
+			cht_jsonify(doc, extra_obj, UTL_VECTOR_GET_AS(cht_component_t*, component->extra, i));
 
 			yyjson_mut_arr_append(extra, extra_obj);
 
@@ -398,13 +398,13 @@ void cht_free(cht_component_t* component) {
 
 	if (component->extra != NULL) {
 		for (uint32_t i = 0; i < component->extra->size; ++i) {
-			cht_component_t* extra = utl_vectorGetAs(cht_component_t*, component->extra, i);
+			cht_component_t* extra = UTL_VECTOR_GET_AS(cht_component_t*, component->extra, i);
 			cht_free(extra);
 		}
-		utl_vectorDestroy(component->extra);
+		utl_vector_destroy(component->extra);
 	}
 
-	if (utl_testBit(component->format, cht_heap)) {
+	if (utl_test_bit(component->format, cht_heap)) {
 		
 		if (component->text != NULL) {
 			free(component->text);
@@ -421,13 +421,13 @@ void cht_free(cht_component_t* component) {
 		free(component);
 	}
 
-	if (utl_testBit(component->format, cht_heap)) {
+	if (utl_test_bit(component->format, cht_heap)) {
 		free(component);
 	}
 
 }
 
-size_t cht_serverListPing(char* message) {
+size_t cht_server_list_ping(char* message) {
 
 	yyjson_mut_doc* doc = yyjson_mut_doc_new(NULL);
 	yyjson_mut_val* obj = yyjson_mut_obj(doc);

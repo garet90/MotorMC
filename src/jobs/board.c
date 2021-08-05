@@ -26,31 +26,31 @@ struct {
 	}
 };
 
-job_work_t* job_createWork(uint32_t job) {
+job_work_t* job_create_work(uint32_t job) {
 
 	job_work_t* work = malloc(sizeof(job_work_t));
-	job_initWork(work, job);
+	job_init_work(work, job);
 
 	return work;
 
 }
 
-void job_initWork(job_work_t* job, uint32_t id) {
+void job_init_work(job_work_t* job, uint32_t id) {
 
 	job->type = id;
 	job->header = JOB_NORMAL;
 
 }
 
-void job_addHandler(uint32_t job, job_handler_t handler) {
+void job_add_handler(uint32_t job, job_handler_t handler) {
 
 	while (job_handlers.size <= job) {
-		utl_vector_t* handlers = utl_createVector(sizeof(job_handler_t), 2);
-		utl_vectorPush(&job_handlers, &handlers);
+		utl_vector_t* handlers = utl_create_vector(sizeof(job_handler_t), 2);
+		utl_vector_push(&job_handlers, &handlers);
 	}
 
-	utl_vector_t* handlers = utl_vectorGetAs(utl_vector_t*, &job_handlers, job);
-	utl_vectorPush(handlers, &handler);
+	utl_vector_t* handlers = UTL_VECTOR_GET_AS(utl_vector_t*, &job_handlers, job);
+	utl_vector_push(handlers, &handler);
 
 }
 
@@ -58,13 +58,13 @@ void job_handle(sky_worker_t* worker, job_work_t* work) {
 
 	if (work == NULL) return;
 
-	utl_vector_t* handlers = utl_vectorGetAs(utl_vector_t*, &job_handlers, work->type);
+	utl_vector_t* handlers = UTL_VECTOR_GET_AS(utl_vector_t*, &job_handlers, work->type);
 
 	if (handlers != NULL) {
 
 		for (uint32_t i = 0; i < handlers->size; ++i) {
 
-			job_handler_t handler = utl_vectorGetAs(job_handler_t, handlers, i);
+			job_handler_t handler = UTL_VECTOR_GET_AS(job_handler_t, handlers, i);
 			if (!handler(worker, work)) {
 				break;
 			}
@@ -84,7 +84,7 @@ void job_add(job_work_t* work) {
 	if (work != NULL) {
 		pthread_mutex_lock(&job_board.lock);
 
-		utl_listPush(&job_board.list, work);
+		utl_list_push(&job_board.list, work);
 
 		pthread_mutex_unlock(&job_board.lock);
 		
@@ -129,7 +129,7 @@ job_work_t* job_get() {
 		pthread_mutex_lock(&job_board.lock);
 	}
 
-	job_work_t* job = utl_listShift(&job_board.list);
+	job_work_t* job = utl_list_shift(&job_board.list);
 	pthread_mutex_unlock(&job_board.lock);
 
 	return job;

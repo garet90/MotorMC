@@ -8,10 +8,10 @@ utl_vector_t plg_links = {
 	.bytes_per_element = sizeof(plg_link_t)
 };
 
-void plg_registerPlugin(const char* file) {
+void plg_register_plugin(const char* file) {
 
 	plg_link_t link;
-	plg_getPlugin_t getPlugin = NULL;
+	plg_get_plugin_t get_plugin = NULL;
 
 #ifdef __WINDOWS__
 	char libraryPath[1024];
@@ -23,9 +23,9 @@ void plg_registerPlugin(const char* file) {
 		return;
 	}
 
-	getPlugin = (void*) GetProcAddress(link.lib, "getPlugin");
+	get_plugin = (void*) GetProcAddress(link.lib, "get_plugin");
 
-	if (getPlugin == NULL) {
+	if (get_plugin == NULL) {
 		log_error("Failed to load plugin %s", file);
 		FreeLibrary(link.lib);
 		return;
@@ -40,7 +40,7 @@ void plg_registerPlugin(const char* file) {
 		return;
 	}
 
-	getPlugin = dlsym(link.lib, "getPlugin");
+	get_plugin = dlsym(link.lib, "get_plugin");
 	if (dlerror() != NULL) {
 		log_error("Failed to load plugin %s", file);
 		dlclose(link.lib);
@@ -48,7 +48,7 @@ void plg_registerPlugin(const char* file) {
 	}
 #endif
 
-	link.meta = getPlugin(&plg_interface);
+	link.meta = get_plugin(&plg_interface);
 
 	if (link.meta == NULL) {
 		log_error("Plugin is out of date and was not loaded: %s", file);
@@ -60,41 +60,41 @@ void plg_registerPlugin(const char* file) {
 		return;
 	}
 
-	utl_vectorPush(&plg_links, &link);
+	utl_vector_push(&plg_links, &link);
 
 }
 
-void plg_registerPlugins() {
+void plg_register_plugins() {
 
-	if (fs_dirExists("plugins")) {
+	if (fs_dir_exists("plugins")) {
 #ifdef __WINDOWS__
-		fs_getDirContents("plugins", "dll", plg_registerPlugin);
+		fs_get_dir_contents("plugins", "dll", plg_register_plugin);
 #elif __APPLE__
-		fs_getDirContents("plugins", "bundle", plg_registerPlugin);
+		fs_get_dir_contents("plugins", "bundle", plg_register_plugin);
 #else
-		fs_getDirContents("plugins", "so", plg_registerPlugin);
+		fs_get_dir_contents("plugins", "so", plg_register_plugin);
 #endif
 	} else {
-		if (!fs_makeDir("plugins")) {
+		if (!fs_mkdir("plugins")) {
 			log_error("Error creating plugin directory!");
 		}
 	}
 
 }
 
-void plg_onStartup() {
+void plg_on_startup() {
 
-	plg_registerPlugins();
+	plg_register_plugins();
 
 	for (uint32_t i = 0; i < plg_links.size; ++i) {
 
-		plg_link_t plugin = utl_vectorGetAs(plg_link_t, &plg_links, i);
+		plg_link_t plugin = UTL_VECTOR_GET_AS(plg_link_t, &plg_links, i);
 
 		if (plugin.meta->load == plg_startup) {
 
 			log_info("Enabling %s version %s...", plugin.meta->name, plugin.meta->version);
 
-			plg_onEnable_t onEnable = NULL;
+			plg_on_enable_t onEnable = NULL;
 
 #ifdef __WINDOWS__
 
@@ -117,17 +117,17 @@ void plg_onStartup() {
 
 }
 
-void plg_onPostworld() {
+void plg_on_postworld() {
 
 	for (uint32_t i = 0; i < plg_links.size; ++i) {
 
-		plg_link_t plugin = utl_vectorGetAs(plg_link_t, &plg_links, i);
+		plg_link_t plugin = UTL_VECTOR_GET_AS(plg_link_t, &plg_links, i);
 
 		if (plugin.meta->load == plg_postworld) {
 
 			log_info("Enabling %s version %s...", plugin.meta->name, plugin.meta->version);
 
-			plg_onEnable_t onEnable = NULL;
+			plg_on_enable_t onEnable = NULL;
 
 #ifdef __WINDOWS__
 
@@ -150,15 +150,15 @@ void plg_onPostworld() {
 
 }
 
-void plg_onDisable() {
+void plg_on_disable() {
 
 	for (uint32_t i = 0; i < plg_links.size; ++i) {
 
-		plg_link_t plugin = utl_vectorGetAs(plg_link_t, &plg_links, i);
+		plg_link_t plugin = UTL_VECTOR_GET_AS(plg_link_t, &plg_links, i);
 
 		log_info("Disabling %s...", plugin.meta->name);
 
-		plg_onDisable_t onDisable = NULL;
+		plg_on_disable_t onDisable = NULL;
 
 #ifdef __WINDOWS__
 

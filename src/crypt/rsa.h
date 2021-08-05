@@ -14,10 +14,10 @@ typedef struct {
 		byte_t bytes[256];
 	} ASN1;
 
-} cry_RSAkeypair_t;
+} cry_rsa_keypair_t;
 
-extern void cry_genRSAKeyPair(cry_RSAkeypair_t*);
+extern void cry_rsa_gen_key_pair(cry_rsa_keypair_t*);
 
-extern void cry_genPrime(fp_int*, size_t);
+extern void cry_gen_prime(fp_int*, size_t);
 
-extern void cry_decryptRSA(byte_t*, const byte_t*, size_t, cry_RSAkeypair_t*);
+extern void cry_rsa_decript(byte_t*, const byte_t*, size_t, cry_rsa_keypair_t*);

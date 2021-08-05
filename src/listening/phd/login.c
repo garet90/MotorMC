@@ -18,7 +18,7 @@ struct {
 	.lock = PTHREAD_MUTEX_INITIALIZER
 };
 
-size_t phd_authResponseWrite(void* ptr, size_t size, size_t nmemb, phd_authResponse_t* r) {
+size_t phd_auth_response_write(void* ptr, size_t size, size_t nmemb, phd_auth_response_t* r) {
 	
 	size_t new_len = r->len + size * nmemb;
 	r->ptr = realloc(r->ptr, new_len + 1);
@@ -33,16 +33,16 @@ size_t phd_authResponseWrite(void* ptr, size_t size, size_t nmemb, phd_authRespo
 
 bool_t phd_login(ltg_client_t* client, pck_packet_t* packet) {
 
-	pck_readVarInt(packet); // packet length
-	int32_t id = pck_readVarInt(packet);
+	pck_read_var_int(packet); // packet length
+	int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
 	case 0x00:
-		return phd_handleLoginStart(client, packet);
+		return phd_handle_login_start(client, packet);
 	case 0x01:
-		return phd_handleEncryptionResponse(client, packet);
+		return phd_handle_encryption_response(client, packet);
 	case 0x02:
-		return phd_handleLoginPluginResponse(client, packet);
+		return phd_handle_login_plugin_response(client, packet);
 	default:
 		log_warn("Received unknown packet %x in login state!", id);
 		return false;
@@ -50,9 +50,9 @@ bool_t phd_login(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handleLoginStart(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 
-	pck_allocString(username, packet);
+	PCK_ALLOC_STRING(username, packet);
 	client->username.length = username_length;
 	client->username.value = username;
 
@@ -63,27 +63,27 @@ bool_t phd_handleLoginStart(ltg_client_t* client, pck_packet_t* packet) {
 			cht_component_t msg = cht_new;
 			msg.text = "Outdated client! Please use " __MC_VER__;
 
-			phd_sendDisconnectLogin(client, msg);
+			phd_send_disconnect_login(client, msg);
 
 		} else {
 
 			cht_component_t msg = cht_new;
 			msg.text = "Outdated server! I'm still on " __MC_VER__;
 
-			phd_sendDisconnectLogin(client, msg);
+			phd_send_disconnect_login(client, msg);
 
 		}
 
 		return false;
 	}
 
-	phd_sendEncryptionRequest(client);
+	phd_send_encryption_request(client);
 
 	return true;
 
 }
 
-bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) {
 
 	struct {
 		int32_t length;
@@ -91,12 +91,12 @@ bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) 
 	} secret;
 
 	// get shared secret
-	secret.length = pck_readVarInt(packet);
-	pck_readBytes(packet, secret.bytes, secret.length);
+	secret.length = pck_read_var_int(packet);
+	pck_read_bytes(packet, secret.bytes, secret.length);
 
 	// decrypt shared secret
-	cry_decryptRSA(secret.bytes, secret.bytes, secret.length, &sky_main.listener.keypair);
-	utl_reverseBytes(secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH);
+	cry_rsa_decript(secret.bytes, secret.bytes, secret.length, &sky_main.listener.keypair);
+	utl_reverse_bytes(secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH);
 	
 	// start encryption cypher
 	int cres = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.key);
@@ -115,17 +115,17 @@ bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) 
 	} verify;
 
 	// get verify
-	verify.length = pck_readVarInt(packet);
-	pck_readBytes(packet, verify.bytes, verify.length);
+	verify.length = pck_read_var_int(packet);
+	pck_read_bytes(packet, verify.bytes, verify.length);
 
 	// decrypt and check verify
-	cry_decryptRSA(verify.bytes, verify.bytes, verify.length, &sky_main.listener.keypair);
+	cry_rsa_decript(verify.bytes, verify.bytes, verify.length, &sky_main.listener.keypair);
 	if (verify.key != client->verify) {
 
 		cht_component_t msg = cht_new;
 		msg.text = "Failed RSA Challenge";
 
-		phd_sendDisconnectLogin(client, msg);
+		phd_send_disconnect_login(client, msg);
 		return false;
 
 	}
@@ -139,7 +139,7 @@ bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) 
 			phd_authRequest.curl = curl_easy_init();
 			curl_easy_setopt(phd_authRequest.curl, CURLOPT_TCP_FASTOPEN, 1);
 			curl_easy_setopt(phd_authRequest.curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-			curl_easy_setopt(phd_authRequest.curl, CURLOPT_WRITEFUNCTION, phd_authResponseWrite);
+			curl_easy_setopt(phd_authRequest.curl, CURLOPT_WRITEFUNCTION, phd_auth_response_write);
 		}
 		CURLcode res;
 
@@ -160,14 +160,14 @@ bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) 
 
 		// create server_id string
 		char server_id[(sha1_desc.hashsize << 1) + 2];
-		utl_toMinecraftHex(server_id, server_id_hash, sha1_desc.hashsize);
+		utl_to_minecraft_hex(server_id, server_id_hash, sha1_desc.hashsize);
 
 		char request[157];
 		sprintf(request, "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", client->username.value, server_id);
 		curl_easy_setopt(phd_authRequest.curl, CURLOPT_URL, request);
 
 		// prepare response string
-		phd_authResponse_t response;
+		phd_auth_response_t response;
 		response.len = 0;
 		response.ptr = malloc(1);
 		response.ptr[0] = '\0';
@@ -201,7 +201,7 @@ bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) 
 			cht_component_t msg = cht_new;
 			msg.text = "Authentication failed";
 
-			phd_sendDisconnectLogin(client, msg);
+			phd_send_disconnect_login(client, msg);
 			return false;
 
 		}
@@ -214,7 +214,7 @@ bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) 
 		yyjson_obj_foreach(auth_obj, i, i_max, auth_key, auth_val) {
 			switch (i) {
 				case 0: { // id
-					utl_readHexBytes(client->uuid, yyjson_get_str(auth_val), 16);
+					utl_read_hex_bytes(client->uuid, yyjson_get_str(auth_val), 16);
 					break;
 				}
 				case 1: { // username
@@ -301,23 +301,23 @@ bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) 
 	}
 
 	// send login success packet
-	phd_sendLoginSuccess(client);
+	phd_send_login_success(client);
 
 	// switch to play state and join game
 	client->state = ltg_play;
-	phd_sendJoinGame(client);
+	phd_send_join_game(client);
 
 	return true;
 
 }
 
-bool_t phd_handleLoginPluginResponse(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_login_plugin_response(ltg_client_t* client, pck_packet_t* packet) {
 
-	if ((uint32_t) pck_readVarInt(packet) != client->verify) {
+	if ((uint32_t) pck_read_var_int(packet) != client->verify) {
 		return false;
 	}
 
-	if (pck_readInt8(packet)) {
+	if (pck_read_int8(packet)) {
 		// successful
 	} else {
 		// unsuccessful
@@ -327,79 +327,79 @@ bool_t phd_handleLoginPluginResponse(ltg_client_t* client, pck_packet_t* packet)
 
 }
 
-void phd_sendDisconnectLogin(ltg_client_t* client, cht_component_t component) {
+void phd_send_disconnect_login(ltg_client_t* client, cht_component_t component) {
 
-	pck_inline(packet, 512, IO_BIG_ENDIAN);
+	PCK_INLINE(packet, 512, IO_BIG_ENDIAN);
 
-	pck_writeVarInt(packet, 0x00);
+	pck_write_var_int(packet, 0x00);
 
 	char chat[512];
 	uint32_t chat_length = cht_write(&component, chat);
-	pck_writeString(packet, chat, chat_length);
+	pck_write_string(packet, chat, chat_length);
 
 	ltg_send(client, packet);
 
 }
 
-void phd_sendEncryptionRequest(ltg_client_t* client) {
+void phd_send_encryption_request(ltg_client_t* client) {
 
-	pck_inline(response, 256, IO_BIG_ENDIAN);
+	PCK_INLINE(response, 256, IO_BIG_ENDIAN);
 
 	// packet type 0x01
-	pck_writeVarInt(response, 0x01);
+	pck_write_var_int(response, 0x01);
 
 	// server id
 	if (sky_main.listener.online_mode) {
-		pck_writeString(response, "", 0);
+		pck_write_string(response, "", 0);
 	} else {
-		pck_writeString(response, "-", 1);
+		pck_write_string(response, "-", 1);
 	}
 
 	// the public auth_key
-	pck_writeVarInt(response, sky_main.listener.keypair.ASN1.length);
-	pck_writeBytes(response, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
+	pck_write_var_int(response, sky_main.listener.keypair.ASN1.length);
+	pck_write_bytes(response, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
 
 	// our verify token
-	cry_randomBytes((uint8_t*) &client->verify, 4);
-	pck_writeVarInt(response, 4);
-	pck_writeInt32(response, client->verify);
+	cry_random_bytes((uint8_t*) &client->verify, 4);
+	pck_write_var_int(response, 4);
+	pck_write_int32(response, client->verify);
 
 	ltg_send(client, response);
 
 }
 
-void phd_sendLoginSuccess(ltg_client_t* client) {
+void phd_send_login_success(ltg_client_t* client) {
 
-	pck_inline(response, 32, IO_BIG_ENDIAN);
+	PCK_INLINE(response, 32, IO_BIG_ENDIAN);
 
-	pck_writeVarInt(response, 0x02);
-	pck_writeBytes(response, client->uuid, 16);
-	pck_writeString(response, client->username.value, client->username.length);
+	pck_write_var_int(response, 0x02);
+	pck_write_bytes(response, client->uuid, 16);
+	pck_write_string(response, client->username.value, client->username.length);
 
 	ltg_send(client, response);
 
 }
 
-void phd_sendSetCompression(ltg_client_t* client) {
+void phd_send_set_compression(ltg_client_t* client) {
 
-	pck_inline(packet, 15, IO_BIG_ENDIAN);
+	PCK_INLINE(packet, 15, IO_BIG_ENDIAN);
 
-	pck_writeVarInt(packet, 0x03);
-	pck_writeVarInt(packet, sky_main.listener.network_compression_threshold);
+	pck_write_var_int(packet, 0x03);
+	pck_write_var_int(packet, sky_main.listener.network_compression_threshold);
 
 	ltg_send(client, packet);
 
 }
 
-void phd_sendLoginPluginRequest(ltg_client_t* client, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length) {
+void phd_send_login_plugin_request(ltg_client_t* client, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length) {
 
-	pck_inline(packet, identifier_length + data_length + 20, IO_BIG_ENDIAN);
+	PCK_INLINE(packet, identifier_length + data_length + 20, IO_BIG_ENDIAN);
 
-	pck_writeVarInt(packet, 0x04);
-	pck_writeVarInt(packet, client->verify);
-	pck_writeString(packet, identifier, identifier_length);
+	pck_write_var_int(packet, 0x04);
+	pck_write_var_int(packet, client->verify);
+	pck_write_string(packet, identifier, identifier_length);
 
-	pck_writeBytes(packet, data, data_length);
+	pck_write_bytes(packet, data, data_length);
 
 	ltg_send(client, packet);
 

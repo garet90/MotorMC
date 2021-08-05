@@ -63,7 +63,7 @@ typedef struct {
 
 } plg_plugin_t;
 
-#define registerPlugin(plugin) EXPORT const plg_plugin_t* getPlugin(const plg_interface_t* interface) {\
+#define registerPlugin(plugin) EXPORT const plg_plugin_t* get_plugin(const plg_interface_t* interface) {\
 			if (interface->interface_version != PLG_CURRENT_INTERFACE) {\
 				return NULL;\
 			}\

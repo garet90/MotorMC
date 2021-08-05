@@ -7,7 +7,7 @@
 #include <stdio.h>
 #endif
 
-extern void cry_randomBytes(byte_t* bytes, size_t count) {
+extern void cry_random_bytes(byte_t* bytes, size_t count) {
 
 #ifdef __WINDOWS__
 	HCRYPTPROV hCryptProv;
@@ -19,11 +19,11 @@ extern void cry_randomBytes(byte_t* bytes, size_t count) {
 			CRYPT_VERIFYCONTEXT)) {
 		if (GetLastError() == (uint32_t) NTE_BAD_KEYSET) {
 			if(!CryptAcquireContext(
-                &hCryptProv,
-                NULL,
-                NULL,
-                PROV_RSA_FULL,
-                CRYPT_NEWKEYSET)) {
+				&hCryptProv,
+				NULL,
+				NULL,
+				PROV_RSA_FULL,
+				CRYPT_NEWKEYSET)) {
 				log_error("Error in CryptAcquireContext");
 				return;
 			}

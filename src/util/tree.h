@@ -14,9 +14,9 @@ struct utl_tree {
 
 };
 
-extern utl_tree_t* utl_createBranch(int64_t, void*);
+extern utl_tree_t* utl_create_branch(int64_t, void*);
 
-static inline void utl_initBranch(utl_tree_t* branch, int64_t key, void* object) {
+static inline void utl_init_branch(utl_tree_t* branch, int64_t key, void* object) {
 	branch->object = object;
 	branch->key = key;
 	branch->parent = NULL;
@@ -24,11 +24,11 @@ static inline void utl_initBranch(utl_tree_t* branch, int64_t key, void* object)
 	branch->right = NULL;
 }
 
-extern void utl_treePut(utl_tree_t*, int64_t, void*);
-extern void* utl_treeGet(const utl_tree_t*, int64_t);
-extern void utl_treeRemove(utl_tree_t*, int64_t);
+extern void utl_tree_put(utl_tree_t*, int64_t, void*);
+extern void* utl_tree_get(const utl_tree_t*, int64_t);
+extern void utl_tree_remove(utl_tree_t*, int64_t);
 
-extern void utl_treeTerm(utl_tree_t*);
-extern void utl_treeDestroy(utl_tree_t*);
+extern void utl_tree_term(utl_tree_t*);
+extern void utl_tree_destroy(utl_tree_t*);
 
-extern void* utl_treeShift(utl_tree_t*);
+extern void* utl_tree_shift(utl_tree_t*);

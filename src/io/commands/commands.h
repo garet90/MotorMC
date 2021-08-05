@@ -28,22 +28,22 @@ typedef struct {
 	const char* description;
 	const char* usage;
 	const char* permission;
-	const char* permissionMessage;
+	const char* permission_message;
 	bool_t (*const handler) (char*, cmd_sender_t*);
 	const size_t alias_count;
 	const char* aliases[];
 
 } cmd_command_t;
 
-extern void cmd_addDefaults();
+extern void cmd_add_defaults();
 
-extern void cmd_addCommand(const cmd_command_t*);
+extern void cmd_add_command(const cmd_command_t*);
 extern void cmd_handle(char*, cmd_sender_t*);
 
-extern bool_t cmd_hasPermission(const cmd_command_t*, const cmd_sender_t*);
+extern bool_t cmd_has_permission(const cmd_command_t*, const cmd_sender_t*);
 
 extern uint32_t cmd_hash(const char*);
-extern char* cmd_hashArg(char*, uint32_t*);
+extern char* cmd_hash_arg(char*, uint32_t*);
 
 extern void cmd_message(cmd_sender_t*, const cht_component_t*);
 
@@ -78,7 +78,7 @@ static const cmd_command_t cmd_plugins_h = {
 /* CONSTANT MESSAGES */
 static const cht_component_t cmd_no_permission = {
 	.text = "You don't have permission to use this command!",
-	.color = CHT_RED
+	.color = cht_red
 };
 
 static const cht_component_t cmd_not_found = {

@@ -21,7 +21,7 @@ char utl_stdoutBuffer[UTL_CONSOLE_BUFFER_SIZE];
 static HANDLE utl_stdoutHandle;
 static DWORD utl_outModeInit;
 
-void utl_setupConsole(void) {
+void utl_setup_console(void) {
 	setvbuf(stdout, utl_stdoutBuffer, _IOLBF, UTL_CONSOLE_BUFFER_SIZE);
 
 	DWORD outMode = 0;
@@ -37,7 +37,7 @@ void utl_setupConsole(void) {
 
 	utl_outModeInit = outMode;
 
-    // Enable ANSI escape codes
+	// Enable ANSI escape codes
 	outMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
 	if(!SetConsoleMode(utl_stdoutHandle, outMode)) {
@@ -45,24 +45,24 @@ void utl_setupConsole(void) {
 	}
 }
 
-void utl_restoreConsole(void) {
-    // Reset colors
-    printf("\x1b[0m\r  \r\n");
-    fflush(stdout);
+void utl_restore_console(void) {
+	// Reset colors
+	printf("\x1b[0m\r  \r\n");
+	fflush(stdout);
 
-    // Reset console mode
+	// Reset console mode
 	if(!SetConsoleMode(utl_stdoutHandle, utl_outModeInit)) {
 		exit(GetLastError());
 	}
 }
 #else
-void utl_setupConsole(void) {
+void utl_setup_console(void) {
 	setvbuf(stdout, utl_stdoutBuffer, _IOLBF, UTL_CONSOLE_BUFFER_SIZE);
 }
 
-void utl_restoreConsole(void) {
-    // Reset colors
-    printf("\x1b[0m\r  \r\n");
-    fflush(stdout);
+void utl_restore_console(void) {
+	// Reset colors
+	printf("\x1b[0m\r  \r\n");
+	fflush(stdout);
 }
 #endif

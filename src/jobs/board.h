@@ -16,10 +16,10 @@ typedef struct {
 
 typedef bool_t (*job_handler_t) (sky_worker_t*, job_work_t*);
 
-job_work_t* job_createWork(uint32_t);
-void job_initWork(job_work_t*, uint32_t);
+job_work_t* job_create_work(uint32_t);
+void job_init_work(job_work_t*, uint32_t);
 
-void job_addHandler(uint32_t, job_handler_t);
+void job_add_handler(uint32_t, job_handler_t);
 void job_handle(sky_worker_t*, job_work_t*);
 void job_add(job_work_t*);
 

@@ -2,4 +2,4 @@
 #include "../main.h"
 #include "../io/logger/logger.h"
 
-extern void cry_randomBytes(byte_t*, size_t);
+extern void cry_random_bytes(byte_t*, size_t);

@@ -11,22 +11,22 @@ void sch_push(sch_scheduled_t* scheduled, uint32_t delay) {
 
 	void* null = NULL;
 	while (sch_board.size < delay) {
-		utl_vectorPush(&sch_board, &null);
+		utl_vector_push(&sch_board, &null);
 	}
 
 	if (sch_board.size == delay) {
-		utl_linked_list_t* list = utl_createList();
-		utl_vectorPush(&sch_board, &list);
+		utl_linked_list_t* list = utl_create_list();
+		utl_vector_push(&sch_board, &list);
 	}
 
-	utl_linked_list_t* list = utl_vectorGetAs(utl_linked_list_t*, &sch_board, delay);
+	utl_linked_list_t* list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board, delay);
 
 	if (list == NULL) {
-		list = utl_createList();
-		utl_vectorSet(&sch_board, delay, &list);
+		list = utl_create_list();
+		utl_vector_set(&sch_board, delay, &list);
 	}
 
-	utl_listPush(list, scheduled);
+	utl_list_push(list, scheduled);
 
 }
 
@@ -43,7 +43,7 @@ sch_scheduled_t* sch_schedule(job_work_t* job, uint32_t delay) {
 
 }
 
-sch_scheduled_t* sch_scheduleRepeating(job_work_t* job, uint32_t delay, uint32_t interval) {
+sch_scheduled_t* sch_schedule_repeating(job_work_t* job, uint32_t delay, uint32_t interval) {
 
 	job->header |= JOB_REPEATING;
 
@@ -63,8 +63,8 @@ void sch_tick() {
 	// get schedule
 	if (sch_board.size == 0) return;
 
-	utl_linked_list_t* list = utl_vectorGetAs(utl_linked_list_t*, &sch_board, 0);
-	utl_vectorShift(&sch_board);
+	utl_linked_list_t* list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board, 0);
+	utl_vector_shift(&sch_board);
 
 	if (list == NULL) {
 		return;
@@ -72,7 +72,7 @@ void sch_tick() {
 
 	for (uint32_t i = 0; i < list->length; ++i) {
 
-		sch_scheduled_t* scheduled = utl_listShift(list);
+		sch_scheduled_t* scheduled = utl_list_shift(list);
 
 		if (!scheduled->cancel) {
 
