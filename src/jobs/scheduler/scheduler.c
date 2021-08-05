@@ -4,7 +4,7 @@
 #include "../../util/linkedlist.h"
 
 utl_vector_t sch_board = {
-		.bytes_per_element = sizeof(utl_linked_list_t*)
+	.bytes_per_element = sizeof(utl_linked_list_t*)
 };
 
 void sch_push(sch_scheduled_t* scheduled, uint32_t delay) {

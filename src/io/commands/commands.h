@@ -53,45 +53,45 @@ extern bool_t cmd_help(char*, cmd_sender_t*);
 extern bool_t cmd_plugins(char*, cmd_sender_t*);
 
 static const cmd_command_t cmd_stop_h = {
-		.label = "stop",
-		.description = "Stops the server",
-		.permission = "server.stop",
-		.handler = cmd_stop
+	.label = "stop",
+	.description = "Stops the server",
+	.permission = "server.stop",
+	.handler = cmd_stop
 };
 
 static const cmd_command_t cmd_help_h = {
-		.label = "help",
-		.alias_count = 1,
-		.aliases = { "?" },
-		.description = "Show a list of commands",
-		.handler = cmd_help
+	.label = "help",
+	.alias_count = 1,
+	.aliases = { "?" },
+	.description = "Show a list of commands",
+	.handler = cmd_help
 };
 
 static const cmd_command_t cmd_plugins_h = {
-		.label = "plugins",
-		.alias_count = 1,
-		.aliases = { "pl" },
-		.description = "List active plugins",
-		.handler = cmd_plugins
+	.label = "plugins",
+	.alias_count = 1,
+	.aliases = { "pl" },
+	.description = "List active plugins",
+	.handler = cmd_plugins
 };
 
 /* CONSTANT MESSAGES */
 static const cht_component_t cmd_no_permission = {
-		.text = "You don't have permission to use this command!",
-		.color = CHT_RED
+	.text = "You don't have permission to use this command!",
+	.color = CHT_RED
 };
 
 static const cht_component_t cmd_not_found = {
-		.text = "Unknown command. Type 'help' for a list of commands.",
-		.color = CHT_NOCOLOR
+	.text = "Unknown command. Type 'help' for a list of commands.",
+	.color = CHT_NOCOLOR
 };
 
 static const cht_component_t cmd_stopping_server = {
-		.text = "Stopping the server...",
-		.color = CHT_NOCOLOR
+	.text = "Stopping the server...",
+	.color = CHT_NOCOLOR
 };
 
 static const cht_component_t cmd_help_header = {
-		.text = "------------Help: Commands------------",
-		.color = CHT_NOCOLOR
+	.text = "------------Help: Commands------------",
+	.color = CHT_NOCOLOR
 };

@@ -11,24 +11,24 @@
 
 static const plg_interface_t plg_interface = {
 
-		.interface_version = PLG_CURRENT_INTERFACE,
+	.interface_version = PLG_CURRENT_INTERFACE,
 
-		.logger = {
-				.info = log_info,
-				.warn = log_warn,
-				.error = log_error
-		},
+	.logger = {
+		.info = log_info,
+		.warn = log_warn,
+		.error = log_error
+	},
 
-		.commands = {
-				.add = cmd_addCommand,
-				.message = cmd_message
-		},
+	.commands = {
+		.add = cmd_addCommand,
+		.message = cmd_message
+	},
 
-		.chat = {
-				.alloc = cht_alloc,
-				.addExtra = cht_addExtra,
-				.free = cht_free
-		}
+	.chat = {
+		.alloc = cht_alloc,
+		.addExtra = cht_addExtra,
+		.free = cht_free
+	}
 
 };
 

@@ -63,8 +63,7 @@ bool_t phd_handlePlayerPositionAndLook(ltg_client_t* client, pck_packet_t* packe
 
 void phd_sendJoinGame(ltg_client_t* client) {
 
-	pck_inline(packet, 4096, IO_BIG_ENDIAN);
-	pck_padLength(packet);
+	pck_inline(packet, 81920, IO_BIG_ENDIAN);
 
 	pck_writeInt32(packet, 0); // entity ID
 	pck_writeInt8(packet, sky_main.hardcore);
@@ -188,13 +187,10 @@ void phd_sendJoinGame(ltg_client_t* client) {
 	mnbt_push_tag(biomes, biomes_list);
 	mnbt_push_tag(root, biomes);
 
-	mnbt_write_file(doc, "test.nbt", MNBT_NONE);
-	mnbt_write_file(doc, "test.gzip.nbt", MNBT_GZIP);
-	mnbt_write_file(doc, "test.zlib.nbt", MNBT_ZLIB);
+	packet->cursor += mnbt_write(doc, pck_cursor(packet), MNBT_NONE);
 
 	mnbt_free(doc);
 
-	pck_writeLength(packet);
 	ltg_send(client, packet);
 
 }

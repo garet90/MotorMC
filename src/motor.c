@@ -17,72 +17,72 @@
 #include "test/tests.h"
 
 sky_main_t sky_main = {
-		.protocol = __MC_PRO__,
-		.version = __MOTOR_VER__,
-		.mcver = __MC_VER__,
-		.console = {
-				.name = "SERVER",
-				.op = cmd_op_4,
-				.permissions = {
-						.bytes_per_element = sizeof(char*)
-				}
-		},
-		.workers = {
-				.count = 4,
-				.vector = {
-						.bytes_per_element = sizeof(sky_worker_t*)
-				}
-		},
-		.status = sky_starting,
-
-		.instructions = {
-				.lock = PTHREAD_MUTEX_INITIALIZER,
-				.vector = {
-						.bytes_per_element = sizeof(sky_instruction_t)
-				}
-		},
-
-		.entities = {
-				.vector = {
-						.bytes_per_element = sizeof(void*)
-				},
-				.nextID = {
-						.bytes_per_element = sizeof(uint32_t)
-				}
-		},
-
-		.worlds = {
-			.bytes_per_element = sizeof(wld_world_t*)
-		},
-		
-		.world = {
-			.name = "world",
-			.seed = 0
-		},
-
-		.render_distance = 10,
-
-		// listener
-		.listener = {
-				.address = {
-					.port = 25565
-				},
-				.clients = {
-					.lock = PTHREAD_MUTEX_INITIALIZER,
-					.vector = {
-						.bytes_per_element = sizeof(ltg_client_t*)
-					},
-					.nextID = {
-						.bytes_per_element = sizeof(ltg_client_t*)
-					}
-				},
-				.online = {
-					.max = 20
-				},
-				.network_compression_threshold = 256,
-				.online_mode = true,
-				.prevent_proxy_connections = false
+	.protocol = __MC_PRO__,
+	.version = __MOTOR_VER__,
+	.mcver = __MC_VER__,
+	.console = {
+		.name = "SERVER",
+		.op = cmd_op_4,
+		.permissions = {
+			.bytes_per_element = sizeof(char*)
 		}
+	},
+	.workers = {
+		.count = 4,
+		.vector = {
+			.bytes_per_element = sizeof(sky_worker_t*)
+		}
+	},
+	.status = sky_starting,
+
+	.instructions = {
+		.lock = PTHREAD_MUTEX_INITIALIZER,
+		.vector = {
+			.bytes_per_element = sizeof(sky_instruction_t)
+		}
+	},
+
+	.entities = {
+		.vector = {
+			.bytes_per_element = sizeof(void*)
+		},
+		.nextID = {
+			.bytes_per_element = sizeof(uint32_t)
+		}
+	},
+
+	.worlds = {
+		.bytes_per_element = sizeof(wld_world_t*)
+	},
+	
+	.world = {
+		.name = "world",
+		.seed = 0
+	},
+
+	.render_distance = 10,
+
+	// listener
+	.listener = {
+		.address = {
+			.port = 25565
+		},
+		.clients = {
+			.lock = PTHREAD_MUTEX_INITIALIZER,
+			.vector = {
+				.bytes_per_element = sizeof(ltg_client_t*)
+			},
+			.nextID = {
+				.bytes_per_element = sizeof(ltg_client_t*)
+			}
+		},
+		.online = {
+			.max = 20
+		},
+		.network_compression_threshold = 256,
+		.online_mode = true,
+		.prevent_proxy_connections = false
+	}
 
 };
 

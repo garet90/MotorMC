@@ -84,7 +84,7 @@ typedef struct {
 } cht_component_t;
 
 static /*in-plugin*/ const cht_component_t cht_new = {
-		.color = CHT_NOCOLOR
+	.color = CHT_NOCOLOR
 };
 
 extern cht_component_t* cht_alloc();

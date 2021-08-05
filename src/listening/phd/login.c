@@ -313,11 +313,17 @@ bool_t phd_handleEncryptionResponse(ltg_client_t* client, pck_packet_t* packet) 
 
 bool_t phd_handleLoginPluginResponse(ltg_client_t* client, pck_packet_t* packet) {
 
-	assert(client != NULL);
-	assert(packet != NULL);
+	if ((uint32_t) pck_readVarInt(packet) != client->verify) {
+		return false;
+	}
 
-	//TODO
-	return false;
+	if (pck_readInt8(packet)) {
+		// successful
+	} else {
+		// unsuccessful
+	}
+
+	return true;
 
 }
 
@@ -325,15 +331,11 @@ void phd_sendDisconnectLogin(ltg_client_t* client, cht_component_t component) {
 
 	pck_inline(packet, 512, IO_BIG_ENDIAN);
 
-	pck_padLength(packet);
-
 	pck_writeVarInt(packet, 0x00);
 
 	char chat[512];
 	uint32_t chat_length = cht_write(&component, chat);
 	pck_writeString(packet, chat, chat_length);
-
-	pck_writeLength(packet);
 
 	ltg_send(client, packet);
 
@@ -342,9 +344,6 @@ void phd_sendDisconnectLogin(ltg_client_t* client, cht_component_t component) {
 void phd_sendEncryptionRequest(ltg_client_t* client) {
 
 	pck_inline(response, 256, IO_BIG_ENDIAN);
-
-	// gaps for length later
-	pck_padLength(response);
 
 	// packet type 0x01
 	pck_writeVarInt(response, 0x01);
@@ -365,8 +364,6 @@ void phd_sendEncryptionRequest(ltg_client_t* client) {
 	pck_writeVarInt(response, 4);
 	pck_writeInt32(response, client->verify);
 
-	pck_writeLength(response);
-
 	ltg_send(client, response);
 
 }
@@ -375,14 +372,9 @@ void phd_sendLoginSuccess(ltg_client_t* client) {
 
 	pck_inline(response, 32, IO_BIG_ENDIAN);
 
-	// gaps for length later
-	pck_padLength(response);
-
 	pck_writeVarInt(response, 0x02);
 	pck_writeBytes(response, client->uuid, 16);
 	pck_writeString(response, client->username.value, client->username.length);
-
-	pck_writeLength(response);
 
 	ltg_send(client, response);
 
@@ -390,12 +382,25 @@ void phd_sendLoginSuccess(ltg_client_t* client) {
 
 void phd_sendSetCompression(ltg_client_t* client) {
 
-	assert(client != NULL);
+	pck_inline(packet, 15, IO_BIG_ENDIAN);
+
+	pck_writeVarInt(packet, 0x03);
+	pck_writeVarInt(packet, sky_main.listener.network_compression_threshold);
+
+	ltg_send(client, packet);
 
 }
 
-void phd_sendLoginPluginRequest(ltg_client_t* client) {
+void phd_sendLoginPluginRequest(ltg_client_t* client, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length) {
 
-	assert(client != NULL);
+	pck_inline(packet, identifier_length + data_length + 20, IO_BIG_ENDIAN);
+
+	pck_writeVarInt(packet, 0x04);
+	pck_writeVarInt(packet, client->verify);
+	pck_writeString(packet, identifier, identifier_length);
+
+	pck_writeBytes(packet, data, data_length);
+
+	ltg_send(client, packet);
 
 }

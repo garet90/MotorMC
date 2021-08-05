@@ -200,12 +200,10 @@ bool_t ltg_handlePacket(ltg_client_t* client, pck_packet_t* packet) {
 void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 	size_t length = packet->cursor;
-	byte_t* bytes = packet->bytes;
-	// get first non zero byte of packet
-	while (*bytes == 0 && (int64_t) length >= 0) {
-		length--;
-		bytes++;
-	}
+	size_t length_length = io_varIntLength(length);
+	byte_t* bytes = packet->bytes - length_length;
+	io_writeVarInt(bytes, length);
+	length += length_length;
 
 	if (client->encryption.enabled) {
 

@@ -25,4 +25,4 @@ extern void phd_sendDisconnectLogin(ltg_client_t*, cht_component_t);
 extern void phd_sendEncryptionRequest(ltg_client_t*);
 extern void phd_sendLoginSuccess(ltg_client_t*);
 extern void phd_sendSetCompression(ltg_client_t*);
-extern void phd_sendLoginPluginRequest(ltg_client_t*);
+extern void phd_sendLoginPluginRequest(ltg_client_t*, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length);

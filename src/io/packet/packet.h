@@ -8,6 +8,8 @@ typedef struct {
 	size_t length;
 	
 	io_endianness_t endianness;
+	
+	byte_t length_prefix[5]; // the length of the packet
 	byte_t bytes[];
 
 } pck_packet_t;
@@ -135,6 +137,7 @@ static inline byte_t* pck_cursor(pck_packet_t* packet) {
 	return packet->bytes + packet->cursor;
 }
 
+/*
 static inline void pck_padLength(pck_packet_t* packet) {
 	packet->cursor = 0;
 	pck_writeInt32(packet, 0);
@@ -149,3 +152,4 @@ static inline void pck_writeLength(pck_packet_t* packet) {
 	packet->cursor = packet_length;
 
 }
+*/

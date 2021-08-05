@@ -5,7 +5,7 @@
 #include "../io/filesystem/filesystem.h"
 
 utl_vector_t plg_links = {
-		.bytes_per_element = sizeof(plg_link_t)
+	.bytes_per_element = sizeof(plg_link_t)
 };
 
 void plg_registerPlugin(const char* file) {

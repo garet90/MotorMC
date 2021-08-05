@@ -49,13 +49,8 @@ void phd_sendResponse(ltg_client_t* client) {
 
 	pck_inline(response, 2048, IO_BIG_ENDIAN);
 
-	// length padding
-	pck_padLength(response);
-
 	pck_writeVarInt(response, 0x00);
 	pck_writeString(response, slp, slp_length);
-
-	pck_writeLength(response);
 
 	ltg_send(client, response);
 
@@ -65,7 +60,6 @@ void phd_sendPong(ltg_client_t* client, int64_t random) {
 
 	pck_inline(response, 9, IO_BIG_ENDIAN);
 
-	pck_writeVarInt(response, 9);
 	pck_writeVarInt(response, 0x01);
 	pck_writeInt64(response, random);
 

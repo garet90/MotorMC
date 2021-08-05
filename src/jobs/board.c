@@ -5,7 +5,7 @@
 
 // vector of vectors that point to job handlers, the index is the job
 utl_vector_t job_handlers = {
-		.bytes_per_element = sizeof(utl_vector_t*)
+	.bytes_per_element = sizeof(utl_vector_t*)
 };
 
 struct {

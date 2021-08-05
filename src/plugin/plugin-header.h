@@ -1,11 +1,11 @@
 #pragma once
 #include <stdint.h>
 #include <stddef.h>
-#if defined(__MINGW32__) || defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
+#if defined(__MINGW32__) || defined(__MINGW64__) || defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
 #define __WINDOWS__
 #endif
-#define __MC_VER__ "1.17"
-#define __MC_PRO__ 755
+#define __MC_VER__ "1.17.1"
+#define __MC_PRO__ 756
 #define __MOTOR_VER__ "MotorMC InDev 0.0.1"
 #define __MOTOR_UNSAFE__ 1
 typedef enum bool {
@@ -15,7 +15,8 @@ typedef enum bool {
 typedef float float32_t;
 typedef double float64_t;
 typedef uint8_t byte_t;
-#define utl_bitset(n, l) byte_t l [((n) >> 3) + 1]
+#define utl_bitset(length, name) byte_t name [((length) >> 3) + 1]
+#define utl_arraybit(x) (1 << (x & 7))
 typedef struct {
 	byte_t* array;
 	size_t size;
@@ -87,7 +88,7 @@ typedef struct {
 	utl_vector_t* extra;
 } cht_component_t;
 static /*in-plugin*/ const cht_component_t cht_new = {
-		.color = CHT_NOCOLOR
+	.color = CHT_NOCOLOR
 };
 typedef enum {
 	cmd_not_op = 0,

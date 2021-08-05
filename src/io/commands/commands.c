@@ -5,7 +5,7 @@
 #include "../logger/logger.h"
 
 utl_tree_t cmd_handlers = {
-		.object = NULL
+	.object = NULL
 };
 
 const cmd_command_t* cmd_defaults[] = {
@@ -14,9 +14,9 @@ const cmd_command_t* cmd_defaults[] = {
 	&cmd_plugins_h
 };
 utl_vector_t cmd_list = {
-		.bytes_per_element = sizeof(cmd_command_t*),
-		.array = (byte_t*) cmd_defaults,
-		.size = sizeof(cmd_defaults) / sizeof(cmd_defaults[0])
+	.bytes_per_element = sizeof(cmd_command_t*),
+	.array = (byte_t*) cmd_defaults,
+	.size = sizeof(cmd_defaults) / sizeof(cmd_defaults[0])
 };
 
 void cmd_addDefaults() {

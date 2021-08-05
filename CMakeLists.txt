@@ -10,7 +10,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 set(CMAKE_C_FLAGS "-O3 -Wall -Wextra")
-set(CMAKE_C_FLAGS_DEBUG "-g -Wall -Wextra")
+set(CMAKE_C_FLAGS_DEBUG "-g3 -Wall -Wextra")
 
 file(GLOB_RECURSE src
      "src/*.c"
