@@ -52,9 +52,8 @@ bool_t phd_login(ltg_client_t* client, pck_packet_t* packet) {
 
 bool_t phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 
-	PCK_ALLOC_STRING(username, packet);
-	client->username.length = username_length;
-	client->username.value = username;
+	client->username.length = pck_read_var_int(packet);
+	pck_read_bytes(packet, (byte_t*) client->username.value, client->username.length);
 
 	if (client->protocol != sky_main.protocol) {
 
@@ -99,9 +98,14 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 	utl_reverse_bytes(secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH);
 	
 	// start encryption cypher
-	int cres = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.key);
+	int cres = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.encrypt);
 	if (cres != CRYPT_OK) {
 		log_error("Could not start encryption cipher! Error code: %d", cres);
+		return false;
+	}
+	cres = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.decrypt);
+	if (cres != CRYPT_OK) {
+		log_error("Could not start decryption cipher! Error code: %d", cres);
 		return false;
 	}
 	client->encryption.enabled = true;
@@ -225,7 +229,6 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 						// copy new username
 						client->username.length = yyjson_get_len(auth_val);
-						client->username.value = malloc(client->username.length);
 						memcpy(client->username.value, auth_username, client->username.length);
 					}
 					break;

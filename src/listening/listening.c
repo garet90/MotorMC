@@ -143,7 +143,7 @@ void* t_ltg_client(void* args) {
 			recvd->cursor = 0;
 
 			if (client->encryption.enabled) {
-				cfb8_decrypt(recvd->bytes, recvd->bytes, recvl, &client->encryption.key);
+				cfb8_decrypt(recvd->bytes, recvd->bytes, recvl, &client->encryption.decrypt);
 			}
 
 			if (!ltg_handle_packet(client, recvd)) {
@@ -210,7 +210,7 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 		// encrypt packet
 		byte_t encrypted[length];
 
-		cfb8_encrypt(bytes, encrypted, length, &client->encryption.key);
+		cfb8_encrypt(bytes, encrypted, length, &client->encryption.encrypt);
 
 		sck_send(client->socket, (char*) encrypted, length);
 
@@ -234,11 +234,6 @@ void ltg_disconnect(ltg_client_t* client) {
 	utl_vector_set(&sky_main.listener.clients.vector, client->id, &null);
 
 	pthread_mutex_unlock(&sky_main.listener.clients.lock);
-
-	// free the username
-	if (client->username.value != NULL) {
-		free(client->username.value);
-	}
 	
 	// free skin
 	if (client->textures.value != NULL) {
@@ -246,6 +241,11 @@ void ltg_disconnect(ltg_client_t* client) {
 	}
 	if (client->textures.signature != NULL) {
 		free(client->textures.signature);
+	}
+
+	// free encryption key
+	if (client->encryption.enabled) {
+		cfb8_done(&client->encryption.encrypt);
 	}
 
 	free(client);

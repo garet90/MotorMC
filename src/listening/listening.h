@@ -36,8 +36,13 @@ typedef struct {
 
 	struct {
 		size_t length;
-		char* value;
+		char value[16];
 	} username;
+
+	struct {
+		size_t length;
+		char value[16];
+	} locale;
 
 	ltg_uuid_t uuid;
 
@@ -45,7 +50,8 @@ typedef struct {
 	uint32_t verify;
 
 	struct {
-		symmetric_CFB8 key;
+		symmetric_CFB8 encrypt;
+		symmetric_CFB8 decrypt;
 		bool_t enabled;
 	} encryption;
 

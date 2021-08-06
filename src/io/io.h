@@ -161,6 +161,10 @@ static inline int32_t io_read_var_int(const byte_t* buffer, size_t* length) {
 			result |= ((read & 0x7F) << (7 * *length));
 
 			*length += 1;
+			
+			if (*length > 5) {
+				return -1;
+			}
 		} while ((read & 0x80) != 0);
 
 	} else {
@@ -170,6 +174,10 @@ static inline int32_t io_read_var_int(const byte_t* buffer, size_t* length) {
 			result |= ((read & 0x7F) << (32 - (7 * *length)));
 
 			*length += 1;
+
+			if (*length > 5) {
+				return -1;
+			}
 		} while ((read & 0x80) != 0);
 
 	}
@@ -191,6 +199,10 @@ static inline int64_t io_read_var_long(const byte_t* buffer, size_t* length) {
 			result |= ((read & 0x7F) << (7 * *length));
 
 			*length += 1;
+
+			if (*length > 10) {
+				return -1;
+			}
 		} while ((read & 0x80) != 0);
 
 	} else {
@@ -200,6 +212,10 @@ static inline int64_t io_read_var_long(const byte_t* buffer, size_t* length) {
 			result |= ((read & 0x7F) << (64 - (7 * *length)));
 
 			*length += 1;
+			
+			if (*length > 10) {
+				return -1;
+			}
 		} while ((read & 0x80) != 0);
 
 	}

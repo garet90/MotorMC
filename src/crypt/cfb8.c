@@ -110,6 +110,11 @@ int cfb8_encrypt(const byte_t* pt, byte_t* ct, unsigned long len, symmetric_CFB8
 
 }
 
+/**
+ * I0 = IV
+ * Ii = ((Ii-1 << s) + Ci) mod 2^b
+ * Pi = MSBs(Ek(Ii-1)) xor Ci
+*/
 int cfb8_decrypt(const byte_t* ct, byte_t* pt, unsigned long len, symmetric_CFB8* cfb8) {
 
 	int err;
@@ -136,7 +141,6 @@ int cfb8_decrypt(const byte_t* ct, byte_t* pt, unsigned long len, symmetric_CFB8
 
 		memmove(cfb8->IV, cfb8->IV + 1, cfb8->blocklen - 1);
 		cfb8->IV[cfb8->blocklen - 1] = *ct;
-
 		*pt = cipher_out[0] ^ *ct;
 
 		pt++;

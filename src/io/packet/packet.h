@@ -56,6 +56,22 @@ static inline int64_t pck_read_int64(pck_packet_t* packet) {
 
 }
 
+static inline float32_t pck_read_float32(pck_packet_t* packet) {
+
+	packet->cursor += 4;
+
+	return io_read_float32(packet->bytes + packet->cursor - 4, packet->endianness);
+
+}
+
+static inline float64_t pck_read_float64(pck_packet_t* packet) {
+
+	packet->cursor += 8;
+
+	return io_read_float64(packet->bytes + packet->cursor - 8, packet->endianness);
+
+}
+
 static inline int32_t pck_read_var_int(pck_packet_t* packet) {
 
 	size_t size = 0;
@@ -107,6 +123,22 @@ static inline void pck_write_int32(pck_packet_t* packet, int32_t value) {
 static inline void pck_write_int64(pck_packet_t* packet, int64_t value) {
 
 	io_write_int64(packet->bytes + packet->cursor, value, packet->endianness);
+
+	packet->cursor += 8;
+
+}
+
+static inline void pck_write_float32(pck_packet_t* packet, float32_t value) {
+
+	io_write_float32(packet->bytes + packet->cursor, value, packet->endianness);
+
+	packet->cursor += 4;
+
+}
+
+static inline void pck_write_float64(pck_packet_t* packet, float64_t value) {
+
+	io_write_float64(packet->bytes + packet->cursor, value, packet->endianness);
 
 	packet->cursor += 8;
 

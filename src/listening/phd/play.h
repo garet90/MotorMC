@@ -8,6 +8,8 @@ extern bool_t phd_play(ltg_client_t*, pck_packet_t*);
 extern bool_t phd_handle_teleport_confirm(ltg_client_t*, pck_packet_t*);
 extern bool_t phd_handle_client_status(ltg_client_t*, pck_packet_t*);
 extern bool_t phd_handle_client_settings(ltg_client_t*, pck_packet_t*);
+extern bool_t phd_handle_plugin_message(ltg_client_t*, pck_packet_t*, int32_t);
+extern bool_t phd_handle_player_position(ltg_client_t*, pck_packet_t*);
 extern bool_t phd_handle_player_position_and_look(ltg_client_t*, pck_packet_t*);
 
 extern void phd_send_join_game(ltg_client_t*);
