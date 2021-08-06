@@ -69,6 +69,7 @@ mat_codec_t* mat_get_codec() {
             }
             mnbt_tag* effects = mnbt_new_tag(doc, "effects", 7, MNBT_COMPOUND, mnbt_val_compound());
             mnbt_push_tag(effects, mnbt_new_tag(doc, "sky_color", 9, MNBT_INT, mnbt_val_int(biome->effects.sky_color)));
+            mnbt_push_tag(effects, mnbt_new_tag(doc, "water_color", 11, MNBT_INT, mnbt_val_int(biome->effects.water_color)));
             mnbt_push_tag(effects, mnbt_new_tag(doc, "water_fog_color", 15, MNBT_INT, mnbt_val_int(biome->effects.water_fog_color)));
             mnbt_push_tag(effects, mnbt_new_tag(doc, "fog_color", 9, MNBT_INT, mnbt_val_int(biome->effects.fog_color)));
             if (mat_biome_has_foliage_color(i)) {
@@ -125,7 +126,7 @@ mat_codec_t* mat_get_codec() {
 
 	    mnbt_free(doc);
 
-        mat_codec = realloc(mat_codec, sizeof(sizeof(mat_codec_t) + mat_codec->size));
+        mat_codec = realloc(mat_codec, sizeof(sizeof(mat_codec_t)) + mat_codec->size);
 
     }
 
