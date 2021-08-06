@@ -441,6 +441,21 @@ static inline bool_t mat_biome_has_grass_color(mat_biome_type_t type) {
 }
 
 /*
+	CODEC
+*/
+
+typedef struct {
+
+	size_t size;
+	byte_t bytes[];
+
+} mat_codec_t;
+
+extern mat_codec_t* mat_get_codec();
+
+extern mat_codec_t* mat_get_dimension_codec(mat_dimension_type_t dimension);
+
+/*
 	STATE MODIFIERS
 	State modifiers are used to determine the state
 */

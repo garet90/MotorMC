@@ -98,11 +98,11 @@ void plg_on_startup() {
 
 #ifdef __WINDOWS__
 
-			onEnable = (void*) GetProcAddress(plugin.lib, "onEnable");
+			onEnable = (void*) GetProcAddress(plugin.lib, "on_enable");
 
 #else
 
-			onEnable = dlsym(plugin.lib, "onEnable");
+			onEnable = dlsym(plugin.lib, "on_enable");
 
 #endif
 			if (onEnable == NULL) {
@@ -131,11 +131,11 @@ void plg_on_postworld() {
 
 #ifdef __WINDOWS__
 
-			onEnable = (void*) GetProcAddress(plugin.lib, "onEnable");
+			onEnable = (void*) GetProcAddress(plugin.lib, "on_enable");
 
 #else
 
-			onEnable = dlsym(plugin.lib, "onEnable");
+			onEnable = dlsym(plugin.lib, "on_enable");
 
 #endif
 			if (onEnable == NULL) {
@@ -162,11 +162,11 @@ void plg_on_disable() {
 
 #ifdef __WINDOWS__
 
-		onDisable = (void*) GetProcAddress(plugin.lib, "onDisable");
+		onDisable = (void*) GetProcAddress(plugin.lib, "on_disable");
 
 #else
 
-		onDisable = dlsym(plugin.lib, "onDisable");
+		onDisable = dlsym(plugin.lib, "on_disable");
 
 #endif
 

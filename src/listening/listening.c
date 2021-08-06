@@ -196,7 +196,7 @@ bool_t ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-// sends from first non zero byte to cursor of packet
+// sends the packet to the client specified
 void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 	size_t length = packet->cursor;
