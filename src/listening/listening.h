@@ -60,6 +60,8 @@ typedef struct {
 		int size;
 	} address;
 
+	int32_t keep_alive;
+
 	ltg_state_t state;
 
 } ltg_client_t;

@@ -1,6 +1,7 @@
 #include "listening.h"
 #include "../motor.h"
 #include "../jobs/board.h"
+#include "../jobs/scheduler/scheduler.h"
 #include "../util/util.h"
 #include "../io/logger/logger.h"
 #include "../io/io.h"
@@ -71,6 +72,7 @@ void* t_ltg_run(void* input) {
 			client->address.addr = address;
 			client->address.size = addressSize;
 			client->state = ltg_handshake;
+			client->keep_alive = -1;
 
 			// accept the client
 			ltg_accept(client);
@@ -222,6 +224,9 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 void ltg_disconnect(ltg_client_t* client) {
 
+	// cancel keep alive
+	sch_cancel(client->keep_alive);
+
 	sck_close(client->socket);
 
 	// lock clients
@@ -246,6 +251,7 @@ void ltg_disconnect(ltg_client_t* client) {
 	// free encryption key
 	if (client->encryption.enabled) {
 		cfb8_done(&client->encryption.encrypt);
+		cfb8_done(&client->encryption.decrypt);
 	}
 
 	free(client);

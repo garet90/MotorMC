@@ -2,6 +2,8 @@
 #include "../../io/logger/logger.h"
 #include "../../motor.h"
 #include "../../world/world.h"
+#include "../../jobs/board.h"
+#include "../../jobs/scheduler/scheduler.h"
 
 bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
@@ -15,6 +17,8 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		return phd_handle_client_settings(client, packet);
 	case 0x0a:
 		return phd_handle_plugin_message(client, packet, length);
+	case 0x0f:
+		return phd_handle_keep_alive(client, packet);
 	case 0x11:
 		return phd_handle_player_position(client, packet);
 	case 0x12:
@@ -68,6 +72,14 @@ bool_t phd_handle_plugin_message(ltg_client_t* client, pck_packet_t* packet, int
 
 }
 
+bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
+
+	pck_read_int64(packet); // keep alive id
+
+	return true;
+
+}
+
 bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 	log_info("X: %f", pck_read_float64(packet));
@@ -92,7 +104,34 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 
 }
 
+void phd_send_plugin_message(ltg_client_t* client, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length) {
+
+	PCK_INLINE(packet, 6 + identifier_length + data_length, IO_BIG_ENDIAN);
+	
+	pck_write_var_int(packet, 0x18);
+	pck_write_string(packet, identifier, identifier_length);
+	pck_write_bytes(packet, data, data_length);
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
+
+	PCK_INLINE(packet, 9, IO_BIG_ENDIAN);
+
+	pck_write_var_int(packet, 0x21);
+	pck_write_int64(packet, id);
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_join_game(ltg_client_t* client) {
+	
+	JOB_CREATE_WORK(keep_alive, job_keep_alive);
+	keep_alive->client = client;
+	client->keep_alive = sch_schedule_repeating(&keep_alive->header, 200, 200);
 
 	mat_codec_t* codec = mat_get_codec();
 	mat_codec_t* dimension_codec = mat_get_dimension_codec(mat_dimension_overworld);
@@ -125,6 +164,8 @@ void phd_send_join_game(ltg_client_t* client) {
 	pck_write_int8(packet, 0); // is flat
 
 	ltg_send(client, packet);
+
+	phd_send_plugin_message(client, "minecraft:brand", 15, (const byte_t*) "\x07MotorMC", 8);
 
 }
 

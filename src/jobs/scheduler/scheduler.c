@@ -2,69 +2,152 @@
 #include "../../motor.h"
 #include "../../util/vector.h"
 #include "../../util/linkedlist.h"
+#include <pthread.h>
 
-utl_vector_t sch_board = {
-	.bytes_per_element = sizeof(utl_linked_list_t*)
+typedef struct {
+
+	job_work_t* job;
+	int32_t repeat;
+	bool_t cancel;
+
+} sch_scheduled_t;
+
+struct {
+	utl_vector_t elements;
+	pthread_mutex_t lock;
+} sch_board = {
+	.elements = {
+		.bytes_per_element = sizeof(utl_linked_list_t*)
+	},
+	.lock = PTHREAD_MUTEX_INITIALIZER
+};
+
+struct {
+	utl_vector_t elements;
+	utl_vector_t next_id;
+	pthread_mutex_t lock;
+} sch_scheduled = {
+	.elements = {
+		.bytes_per_element = sizeof(sch_scheduled_t*)
+	},
+	.next_id = {
+		.bytes_per_element = sizeof(int32_t)
+	},
+	.lock = PTHREAD_MUTEX_INITIALIZER
 };
 
 void sch_push(sch_scheduled_t* scheduled, uint32_t delay) {
 
+	pthread_mutex_lock(&sch_board.lock);
+
 	void* null = NULL;
-	while (sch_board.size < delay) {
-		utl_vector_push(&sch_board, &null);
+	while (sch_board.elements.size < delay) {
+		utl_vector_push(&sch_board.elements, &null);
 	}
 
-	if (sch_board.size == delay) {
+	if (sch_board.elements.size == delay) {
 		utl_linked_list_t* list = utl_create_list();
-		utl_vector_push(&sch_board, &list);
+		utl_vector_push(&sch_board.elements, &list);
 	}
 
-	utl_linked_list_t* list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board, delay);
+	utl_linked_list_t* list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board.elements, delay);
 
 	if (list == NULL) {
 		list = utl_create_list();
-		utl_vector_set(&sch_board, delay, &list);
+		utl_vector_set(&sch_board.elements, delay, &list);
 	}
 
 	utl_list_push(list, scheduled);
 
+	pthread_mutex_unlock(&sch_board.lock);
+
 }
 
-sch_scheduled_t* sch_schedule(job_work_t* job, uint32_t delay) {
+sch_scheduled_t* sch_new(int32_t* id) {
 
 	sch_scheduled_t* scheduled = malloc(sizeof(sch_scheduled_t));
+
+	pthread_mutex_lock(&sch_scheduled.lock);
+
+	if (sch_scheduled.next_id.size > 0) {
+
+		*id = UTL_VECTOR_GET_AS(int32_t, &sch_scheduled.next_id, 0);
+		utl_vector_set(&sch_scheduled.elements, *id, &scheduled);
+		utl_vector_set(&sch_scheduled.next_id, 0, utl_vector_get(&sch_scheduled.next_id, 0));
+		sch_scheduled.next_id.size -= 1;
+
+	} else {
+
+		*id = sch_scheduled.elements.size;
+		utl_vector_push(&sch_scheduled.elements, &scheduled);
+
+	}
+
+	pthread_mutex_unlock(&sch_scheduled.lock);
+
+	return scheduled;
+
+}
+
+int32_t sch_schedule(job_work_t* job, uint32_t delay) {
+
+	int32_t id;
+	sch_scheduled_t* scheduled = sch_new(&id);
 	scheduled->job = job;
 	scheduled->repeat = -1;
 	scheduled->cancel = false;
 
 	sch_push(scheduled, delay);
 
-	return scheduled;
+	return id;
 
 }
 
-sch_scheduled_t* sch_schedule_repeating(job_work_t* job, uint32_t delay, uint32_t interval) {
+int32_t sch_schedule_repeating(job_work_t* job, uint32_t delay, uint32_t interval) {
 
-	job->header |= JOB_REPEATING;
+	utl_set_bit(job->flags, job_flag_repeating);
 
-	sch_scheduled_t* scheduled = malloc(sizeof(sch_scheduled_t));
+	int32_t id;
+	sch_scheduled_t* scheduled = sch_new(&id);
 	scheduled->job = job;
 	scheduled->repeat = interval;
 	scheduled->cancel = false;
 
 	sch_push(scheduled, delay);
 
-	return scheduled;
+	return id;
+
+}
+
+void sch_cancel(int32_t id) {
+
+	if (id < 0) return;
+
+	pthread_mutex_lock(&sch_scheduled.lock);
+
+	sch_scheduled_t* scheduled = UTL_VECTOR_GET_AS(sch_scheduled_t*, &sch_scheduled.elements, id);
+	scheduled->cancel = true;
+
+	utl_vector_push(&sch_scheduled.next_id, &id);
+
+	pthread_mutex_unlock(&sch_scheduled.lock);
 
 }
 
 void sch_tick() {
 
-	// get schedule
-	if (sch_board.size == 0) return;
+	pthread_mutex_lock(&sch_board.lock);
 
-	utl_linked_list_t* list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board, 0);
-	utl_vector_shift(&sch_board);
+	// get schedule
+	if (sch_board.elements.size == 0) {
+		pthread_mutex_unlock(&sch_board.lock);	
+		return;
+	}
+
+	utl_linked_list_t* list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board.elements, 0);
+	utl_vector_shift(&sch_board.elements);
+
+	pthread_mutex_unlock(&sch_board.lock);
 
 	if (list == NULL) {
 		return;

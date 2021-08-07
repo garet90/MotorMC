@@ -1,11 +1,22 @@
 #include "board.h"
 #include "../util/linkedlist.h"
 #include "../util/vector.h"
+#include "handlers.h"
 #include <pthread.h>
 
 // vector of vectors that point to job handlers, the index is the job
-utl_vector_t job_handlers = {
-	.bytes_per_element = sizeof(utl_vector_t*)
+job_handler_t job_keep_alive_handlers[] = {
+	(job_handler_t) job_handle_keep_alive
+};
+
+utl_vector_t job_keep_alive_handlers_vector = {
+	.bytes_per_element = sizeof(job_handler_t),
+	.size = sizeof(job_keep_alive_handlers) / sizeof(job_handler_t),
+	.array = (byte_t*) job_keep_alive_handlers
+};
+
+utl_vector_t* job_handlers[job_count] = {
+	&job_keep_alive_handlers_vector
 };
 
 struct {
@@ -26,31 +37,22 @@ struct {
 	}
 };
 
-job_work_t* job_create_work(uint32_t job) {
-
-	job_work_t* work = malloc(sizeof(job_work_t));
-	job_init_work(work, job);
-
-	return work;
-
-}
-
 void job_init_work(job_work_t* job, uint32_t id) {
 
 	job->type = id;
-	job->header = JOB_NORMAL;
+	for (size_t i = 0; i < sizeof(job->flags); ++i) {
+		job->flags[i] = 0;
+	}
 
 }
 
-void job_add_handler(uint32_t job, job_handler_t handler) {
-
-	while (job_handlers.size <= job) {
-		utl_vector_t* handlers = utl_create_vector(sizeof(job_handler_t), 2);
-		utl_vector_push(&job_handlers, &handlers);
+void job_add_handler(job_type_t job, job_handler_t handler) {
+	
+	if (job_handlers[job] == NULL) {
+		job_handlers[job] = utl_create_vector(sizeof(job_handler_t), 2);
 	}
 
-	utl_vector_t* handlers = UTL_VECTOR_GET_AS(utl_vector_t*, &job_handlers, job);
-	utl_vector_push(handlers, &handler);
+	utl_vector_push(job_handlers[job], &handler);
 
 }
 
@@ -58,13 +60,11 @@ void job_handle(sky_worker_t* worker, job_work_t* work) {
 
 	if (work == NULL) return;
 
-	utl_vector_t* handlers = UTL_VECTOR_GET_AS(utl_vector_t*, &job_handlers, work->type);
+	if (job_handlers[work->type] != NULL) {
 
-	if (handlers != NULL) {
+		for (uint32_t i = 0; i < job_handlers[work->type]->size; ++i) {
 
-		for (uint32_t i = 0; i < handlers->size; ++i) {
-
-			job_handler_t handler = UTL_VECTOR_GET_AS(job_handler_t, handlers, i);
+			job_handler_t handler = UTL_VECTOR_GET_AS(job_handler_t, job_handlers[work->type], i);
 			if (!handler(worker, work)) {
 				break;
 			}
@@ -73,7 +73,7 @@ void job_handle(sky_worker_t* worker, job_work_t* work) {
 
 	}
 
-	if (!(work->header & JOB_REPEATING)) {
+	if (!utl_test_bit(work->flags, job_flag_repeating)) {
 		free(work);
 	}
 
