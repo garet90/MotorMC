@@ -3,6 +3,7 @@
 #include "../../motor.h"
 #include "../../world/world.h"
 #include "../../jobs/board.h"
+#include "../../jobs/jobs.h"
 #include "../../jobs/scheduler/scheduler.h"
 
 bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
@@ -13,6 +14,8 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 	switch (id) {
 	case 0x00:
 		return phd_handle_teleport_confirm(client, packet);
+	case 0x03:
+		return phd_handle_chat_message(client, packet);
 	case 0x05:
 		return phd_handle_client_settings(client, packet);
 	case 0x0a:
@@ -33,6 +36,21 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 
 	log_info("Teleport confirm: %d", pck_read_var_int(packet));
+
+	return true;
+
+}
+
+bool_t phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
+
+	JOB_CREATE_WORK(job, job_global_chat_message);
+
+	job->sender = client;
+	job->message.length = pck_read_var_int(packet);
+	pck_read_bytes(packet, (byte_t*) job->message.value, job->message.length);
+	job->message.value[job->message.length] = '\0';
+
+	job_add(&job->header);
 
 	return true;
 
@@ -101,6 +119,19 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 	log_info("On Ground: %d", pck_read_int8(packet));
 
 	return true;
+
+}
+
+void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_len, byte_t position, ltg_uuid_t uuid) {
+
+	PCK_INLINE(packet, 23 + message_len, IO_BIG_ENDIAN);
+
+	pck_write_var_int(packet, 0x0F);
+	pck_write_string(packet, message, message_len);
+	pck_write_int8(packet, position);
+	pck_write_bytes(packet, uuid, 16);
+
+	ltg_send(client, packet);
 
 }
 

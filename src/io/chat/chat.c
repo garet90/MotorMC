@@ -206,16 +206,6 @@ cht_component_t* cht_from_string(const char* str, size_t len) {
 	
 }
 
-void cht_add_extra(cht_component_t* base, const cht_component_t* extra) {
-
-	if (base->extra == NULL) {
-		base->extra = utl_create_vector(sizeof(cht_component_t*), 2);
-	}
-
-	utl_vector_push(base->extra, &extra);
-
-}
-
 void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t* component) {
 
 	if (component->text != NULL)
@@ -238,59 +228,26 @@ void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t
 
 	if (component->color != CHT_NOCOLOR) {
 		if (component->color <= 0xF) {
-			switch (component->color) {
-			case cht_black:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "black"));
-				break;
-			case cht_dark_blue:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_blue"));
-				break;
-			case cht_dark_green:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_green"));
-				break;
-			case cht_dark_cyan:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_aqua"));
-				break;
-			case cht_dark_red:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_red"));
-				break;
-			case cht_purple:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_purple"));
-				break;
-			case cht_gold:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "gold"));
-				break;
-			case cht_gray:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "gray"));
-				break;
-			case cht_dark_gray:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "dark_gray"));
-				break;
-			case cht_blue:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "blue"));
-				break;
-			case cht_bright_green:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "green"));
-				break;
-			case cht_cyan:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "aqua"));
-				break;
-			case cht_red:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "red"));
-				break;
-			case cht_pink:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "light_purple"));
-				break;
-			case cht_yellow:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "yellow"));
-				break;
-			case cht_white:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "white"));
-				break;
-			default:
-				yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, "black"));
-				break;
-			}
+			const char* colors[] = {
+				"black",
+				"dark_blue",
+				"dark_green",
+				"dark_aqua",
+				"dark_red",
+				"dark_purple",
+				"gold",
+				"gray",
+				"dark_gray",
+				"blue",
+				"green",
+				"aqua",
+				"red",
+				"light_purple",
+				"yellow",
+				"white"
+			};
+
+			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, colors[component->color]));
 		} else {
 			char color[9];
 			sprintf(color, "%x", component->color);
@@ -299,30 +256,18 @@ void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t
 	}
 
 	if (component->click_event.value != NULL) {
-		
+
+		const char* click_events[] = {
+			"open_url",
+			"run_command",
+			"suggest_command",
+			"change_page",
+			"copy_to_clipboard"
+		};
+
 		yyjson_mut_val* click_event = yyjson_mut_obj(doc);
 
-		switch (component->click_event.action) {
-		case cht_open_url:
-			yyjson_mut_obj_add(click_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "open_url"));
-			break;
-		case cht_run_command:
-			yyjson_mut_obj_add(click_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "run_command"));
-			break;
-		case cht_suggest_command:
-			yyjson_mut_obj_add(click_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "suggest_command"));
-			break;
-		case cht_change_page:
-			yyjson_mut_obj_add(click_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "change_page"));
-			break;
-		case cht_copy_to_clipboard:
-			yyjson_mut_obj_add(click_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "copy_to_clipboard"));
-			break;
-		default:
-			yyjson_mut_obj_add(click_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "null"));
-			break;
-		}
-
+		yyjson_mut_obj_add(click_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, click_events[component->click_event.action]));
 		yyjson_mut_obj_add(click_event, yyjson_mut_str(doc, "value"), yyjson_mut_str(doc, component->click_event.value));
 
 		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "clickEvent"), click_event);
@@ -331,38 +276,30 @@ void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t
 
 	if (component->hover_event.value != NULL) {
 
+		const char* hover_events[] = {
+			"show_text",
+			"show_item",
+			"show_entity"
+		};
+
 		yyjson_mut_val* hover_event = yyjson_mut_obj(doc);
 
-		switch (component->hover_event.action) {
-		case cht_show_text:
-			yyjson_mut_obj_add(hover_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "show_text"));
-			break;
-		case cht_show_item:
-			yyjson_mut_obj_add(hover_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "show_item"));
-			break;
-		case cht_show_entity:
-			yyjson_mut_obj_add(hover_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "show_entity"));
-			break;
-		default:
-			yyjson_mut_obj_add(hover_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, "null"));
-			break;
-		}
-		
+		yyjson_mut_obj_add(hover_event, yyjson_mut_str(doc, "action"), yyjson_mut_str(doc, hover_events[component->hover_event.action]));
 		yyjson_mut_obj_add(hover_event, yyjson_mut_str(doc, "value"), yyjson_mut_str(doc, component->hover_event.value));
 		
 		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "hoverEvent"), hover_event);
 
 	}
 
-	if (component->extra != NULL) {
+	if (component->extra.size != 0) {
 
 		yyjson_mut_val* extra = yyjson_mut_arr(doc);
 
-		for (size_t i = 0; i < component->extra->size; ++i) {
+		for (size_t i = 0; i < component->extra.size; ++i) {
 
 			yyjson_mut_val* extra_obj = yyjson_mut_obj(doc);
 
-			cht_jsonify(doc, extra_obj, UTL_VECTOR_GET_AS(cht_component_t*, component->extra, i));
+			cht_jsonify(doc, extra_obj, UTL_VECTOR_GET_AS(cht_component_t*, &component->extra, i));
 
 			yyjson_mut_arr_append(extra, extra_obj);
 
@@ -382,26 +319,26 @@ size_t cht_write(const cht_component_t* component, char* message) {
 
 	cht_jsonify(doc, obj, component);
 
-	char* str = yyjson_mut_write(doc, YYJSON_WRITE_NOFLAG, NULL);
-	log_info(str);
-	size_t size = sprintf(message, "%s", str);
+	size_t str_len;
+	char* str = yyjson_mut_write(doc, YYJSON_WRITE_NOFLAG, &str_len);
+	memcpy(message, str, str_len);
 
 	free(str);
 
 	yyjson_mut_doc_free(doc);
 
-	return size;
+	return str_len;
 
 }
 
 void cht_free(cht_component_t* component) {
 
-	if (component->extra != NULL) {
-		for (uint32_t i = 0; i < component->extra->size; ++i) {
-			cht_component_t* extra = UTL_VECTOR_GET_AS(cht_component_t*, component->extra, i);
+	if (component->extra.size != 0) {
+		for (uint32_t i = 0; i < component->extra.size; ++i) {
+			cht_component_t* extra = UTL_VECTOR_GET_AS(cht_component_t*, &component->extra, i);
 			cht_free(extra);
 		}
-		utl_vector_destroy(component->extra);
+		utl_vector_term(&component->extra);
 	}
 
 	if (utl_test_bit(component->format, cht_heap)) {
@@ -419,10 +356,7 @@ void cht_free(cht_component_t* component) {
 		}
 
 		free(component);
-	}
 
-	if (utl_test_bit(component->format, cht_heap)) {
-		free(component);
 	}
 
 }

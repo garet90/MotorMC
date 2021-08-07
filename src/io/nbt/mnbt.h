@@ -139,7 +139,7 @@ size_t mnbt_write(mnbt_doc* document, uint8_t* bytes, mnbt_compression compressi
 Write the document to the file, starting at the root tag and working inward
 Returns the length of the resulting file or 0 on error
 */
-size_t mnbt_write_file(mnbt_doc* document, const char* file, mnbt_compression compression);
+size_t mnbt_write_file(mnbt_doc* document, const char* file, size_t max_file_length, mnbt_compression compression);
 
 /*
 Create new tag with label and value

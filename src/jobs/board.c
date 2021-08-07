@@ -8,15 +8,24 @@
 job_handler_t job_keep_alive_handlers[] = {
 	(job_handler_t) job_handle_keep_alive
 };
-
 utl_vector_t job_keep_alive_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
-	.size = sizeof(job_keep_alive_handlers) / sizeof(job_handler_t),
+	.size = 1,
 	.array = (byte_t*) job_keep_alive_handlers
 };
 
+job_handler_t job_global_chat_message_handlers[] = {
+	(job_handler_t) job_handle_global_chat_message
+};
+utl_vector_t job_global_chat_message_handlers_vector = {
+	.bytes_per_element = sizeof(job_handler_t),
+	.size = 1,
+	.array = (byte_t*) job_global_chat_message_handlers
+};
+
 utl_vector_t* job_handlers[job_count] = {
-	&job_keep_alive_handlers_vector
+	&job_keep_alive_handlers_vector,
+	&job_global_chat_message_handlers_vector
 };
 
 struct {

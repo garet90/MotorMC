@@ -173,11 +173,11 @@ size_t _mnbt_read_val(mnbt_doc* document, mnbt_type type, mnbt_val* value, const
 			return 8;
 		}
 		case MNBT_FLOAT: {
-			value->Float = *((float*) bytes);
+			value->Float = _mnbt_reverse_float(*((float*) bytes));
 			return 4;
 		}
 		case MNBT_DOUBLE: {
-			value->Double = *((double*) bytes);
+			value->Double = _mnbt_reverse_double(*((double*) bytes));
 			return 8;
 		}
 		case MNBT_BYTE_ARRAY: {
@@ -309,9 +309,9 @@ size_t mnbt_write(mnbt_doc* document, uint8_t* bytes, mnbt_compression compressi
 
 }
 
-size_t mnbt_write_file(mnbt_doc* document, const char* file, mnbt_compression compression) {
+size_t mnbt_write_file(mnbt_doc* document, const char* file, size_t max_file_length, mnbt_compression compression) {
 
-	uint8_t buffer[document->count * 128 + 2048];
+	uint8_t buffer[max_file_length];
 	size_t size = mnbt_write(document, buffer, compression);
 
 	FILE* f = fopen(file, "wb");

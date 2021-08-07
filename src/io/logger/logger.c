@@ -176,10 +176,10 @@ uint32_t log_to_string(char* message, const cht_component_t* chat) {
 
 	offset += sprintf(message + offset, "%s", chat->text);
 
-	if (chat->extra != NULL) {
+	if (chat->extra.size != 0) {
 
-		for (uint32_t i = 0; i < chat->extra->size; ++i) {
-			offset += log_to_string(message + offset, UTL_VECTOR_GET_AS(cht_component_t*, chat->extra, i));
+		for (uint32_t i = 0; i < chat->extra.size; ++i) {
+			offset += log_to_string(message + offset, UTL_VECTOR_GET_AS(cht_component_t*, &chat->extra, i));
 		}
 
 	}

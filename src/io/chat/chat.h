@@ -79,19 +79,24 @@ typedef struct {
 		char* value;
 	} hover_event;
 
-	utl_vector_t* extra;
+	utl_vector_t extra;
 
 } cht_component_t;
 
 static /*in-plugin*/ const cht_component_t cht_new = {
-	.color = CHT_NOCOLOR
+	.color = CHT_NOCOLOR,
+	.extra = {
+		.bytes_per_element = sizeof(cht_component_t*)
+	}
 };
 
 extern cht_component_t* cht_alloc();
 extern cht_component_t* cht_from_json(yyjson_val*);
 extern cht_component_t* cht_from_string(const char*, size_t);
 
-extern void cht_add_extra(cht_component_t*, const cht_component_t*);
+static inline void cht_add_extra(cht_component_t* base, const cht_component_t* extra) {
+	utl_vector_push(&base->extra, &extra);
+}
 
 extern void cht_jsonify(yyjson_mut_doc*, yyjson_mut_val*, const cht_component_t*);
 extern size_t cht_write(const cht_component_t*, char*);

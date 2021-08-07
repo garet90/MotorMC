@@ -69,7 +69,7 @@ extern void phd_send_block_action(ltg_client_t*);
 extern void phd_send_block_change(ltg_client_t*);
 extern void phd_send_boss_bar(ltg_client_t*);
 extern void phd_send_server_difficulty(ltg_client_t*);
-extern void phd_send_chat_message(ltg_client_t*);
+extern void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_length, byte_t position, ltg_uuid_t uuid);
 extern void phd_send_clear_tiles(ltg_client_t*);
 extern void phd_send_tab_complete(ltg_client_t*);
 extern void phd_send_declare_commands(ltg_client_t*);

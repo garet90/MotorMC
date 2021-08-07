@@ -16,6 +16,7 @@ typedef enum {
 typedef enum {
 
 	job_keep_alive,
+	job_global_chat_message,
 
 	job_count
 
@@ -27,16 +28,6 @@ typedef struct {
 	utl_bitset(job_flag_count, flags);
 
 } job_work_t;
-
-typedef struct {
-
-	job_work_t header;
-
-	ltg_client_t* client;
-
-} job_keep_alive_t;
-
-#define JOB_CREATE_WORK(name, job_type) job_type ##_t* name = malloc(sizeof(job_type ##_t)); name->header.type = job_type; memset(name->header.flags, 0, sizeof(name->header.flags));
 
 typedef bool_t (*job_handler_t) (sky_worker_t*, job_work_t*);
 
