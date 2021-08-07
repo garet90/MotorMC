@@ -73,7 +73,7 @@ sch_scheduled_t* sch_new(int32_t* id) {
 
 		*id = UTL_VECTOR_GET_AS(int32_t, &sch_scheduled.next_id, 0);
 		utl_vector_set(&sch_scheduled.elements, *id, &scheduled);
-		utl_vector_set(&sch_scheduled.next_id, 0, utl_vector_get(&sch_scheduled.next_id, 0));
+		utl_vector_set(&sch_scheduled.next_id, 0, utl_vector_get(&sch_scheduled.next_id, sch_scheduled.next_id.size - 1));
 		sch_scheduled.next_id.size -= 1;
 
 	} else {
