@@ -28,7 +28,9 @@ bool_t job_handle_global_chat_message(sky_worker_t* worker, job_global_chat_mess
     pthread_mutex_lock(&sky_main.listener.clients.lock);
     for (size_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
         ltg_client_t* client = UTL_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
-        phd_send_chat_message(client, out, out_len, 0, work->sender->uuid);
+        if (client->state == ltg_play) {
+            phd_send_chat_message(client, out, out_len, 0, work->sender->uuid);
+        }
     }
     pthread_mutex_unlock(&sky_main.listener.clients.lock);
     return true;
