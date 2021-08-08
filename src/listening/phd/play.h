@@ -107,7 +107,13 @@ extern void phd_send_player_abilities(ltg_client_t*);
 extern void phd_send_end_combat_event(ltg_client_t*);
 extern void phd_send_enter_combat_event(ltg_client_t*);
 extern void phd_send_death_combat_event(ltg_client_t*);
-extern void phd_send_player_info(ltg_client_t*);
+
+extern void phd_send_player_info_add_players(ltg_client_t* client);
+extern void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player);
+extern void phd_send_player_info_update_gamemode(ltg_client_t* client, ltg_client_t* player);
+extern void phd_send_player_info_update_display_name(ltg_client_t* client, ltg_client_t* player);
+extern void phd_send_player_info_remove_player(ltg_client_t* client, ltg_client_t* player);
+
 extern void phd_send_face_player(ltg_client_t*);
 extern void phd_send_player_position_and_look(ltg_client_t*);
 extern void phd_send_unlock_recipes(ltg_client_t*);

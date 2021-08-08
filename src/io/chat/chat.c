@@ -379,7 +379,10 @@ size_t cht_server_list_ping(char* message) {
 	yyjson_mut_val* players = yyjson_mut_obj(doc);
 
 	yyjson_mut_obj_add(players, yyjson_mut_str(doc, "max"), yyjson_mut_uint(doc, sky_main.listener.online.max));
-	yyjson_mut_obj_add(players, yyjson_mut_str(doc, "online"), yyjson_mut_uint(doc, sky_main.listener.online.count));
+	
+    pthread_mutex_lock(&sky_main.listener.online.lock);
+	yyjson_mut_obj_add(players, yyjson_mut_str(doc, "online"), yyjson_mut_uint(doc, sky_main.listener.online.list.length));
+    pthread_mutex_unlock(&sky_main.listener.online.lock);
 
 	yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "players"), players);
 

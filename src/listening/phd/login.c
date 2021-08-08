@@ -210,6 +210,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 		}
 
+		log_info("%s", response.ptr);
 		yyjson_doc* auth = yyjson_read(response.ptr, response.len, 0);
 
 		yyjson_val* auth_obj = yyjson_doc_get_root(auth);
@@ -263,9 +264,9 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 											return false;
 										}
 										case textures: {
-											size_t textures_len = yyjson_get_len(property_val);
-											client->textures.value = malloc(textures_len);
-											memcpy(client->textures.value, yyjson_get_str(property_val), textures_len);
+											client->textures.value.length = yyjson_get_len(property_val);
+											client->textures.value.value = malloc(client->textures.value.length);
+											memcpy(client->textures.value.value, yyjson_get_str(property_val), client->textures.value.length);
 											break;
 										}
 									}
@@ -281,9 +282,9 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 											return false;
 										}
 										case textures: {
-											size_t signature_len = yyjson_get_len(property_val);
-											client->textures.signature = malloc(signature_len);
-											memcpy(client->textures.signature, yyjson_get_str(property_val), signature_len);
+											client->textures.signature.length = yyjson_get_len(property_val);
+											client->textures.signature.value = malloc(client->textures.signature.length);
+											memcpy(client->textures.signature.value, yyjson_get_str(property_val), client->textures.signature.length);
 											break;
 										}
 									}
@@ -332,7 +333,7 @@ bool_t phd_handle_login_plugin_response(ltg_client_t* client, pck_packet_t* pack
 
 void phd_send_disconnect_login(ltg_client_t* client, cht_component_t component) {
 
-	PCK_INLINE(packet, 512, IO_BIG_ENDIAN);
+	PCK_INLINE(packet, 512, io_big_endian);
 
 	pck_write_var_int(packet, 0x00);
 
@@ -346,7 +347,7 @@ void phd_send_disconnect_login(ltg_client_t* client, cht_component_t component) 
 
 void phd_send_encryption_request(ltg_client_t* client) {
 
-	PCK_INLINE(response, 256, IO_BIG_ENDIAN);
+	PCK_INLINE(response, 256, io_big_endian);
 
 	// packet type 0x01
 	pck_write_var_int(response, 0x01);
@@ -373,7 +374,7 @@ void phd_send_encryption_request(ltg_client_t* client) {
 
 void phd_send_login_success(ltg_client_t* client) {
 
-	PCK_INLINE(response, 32, IO_BIG_ENDIAN);
+	PCK_INLINE(response, 32, io_big_endian);
 
 	pck_write_var_int(response, 0x02);
 	pck_write_bytes(response, client->uuid, 16);
@@ -385,7 +386,7 @@ void phd_send_login_success(ltg_client_t* client) {
 
 void phd_send_set_compression(ltg_client_t* client) {
 
-	PCK_INLINE(packet, 15, IO_BIG_ENDIAN);
+	PCK_INLINE(packet, 15, io_big_endian);
 
 	pck_write_var_int(packet, 0x03);
 	pck_write_var_int(packet, sky_main.listener.network_compression_threshold);
@@ -396,7 +397,7 @@ void phd_send_set_compression(ltg_client_t* client) {
 
 void phd_send_login_plugin_request(ltg_client_t* client, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length) {
 
-	PCK_INLINE(packet, identifier_length + data_length + 20, IO_BIG_ENDIAN);
+	PCK_INLINE(packet, identifier_length + data_length + 20, io_big_endian);
 
 	pck_write_var_int(packet, 0x04);
 	pck_write_var_int(packet, client->verify);

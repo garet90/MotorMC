@@ -2,21 +2,18 @@
 #include "linkedlist.h"
 
 utl_linked_list_t* utl_create_list() {
-	utl_linked_list_t* list = malloc(sizeof(utl_linked_list_t));
-	utl_init_list(list);
+	utl_linked_list_t* list = calloc(1, sizeof(utl_linked_list_t));
 	return list;
 }
 
 utl_linked_node_t* utl_create_node() {
 
-	utl_linked_node_t* node = malloc(sizeof(utl_linked_node_t));
-	node->element = NULL;
-	node->next = NULL;
+	utl_linked_node_t* node = calloc(1, sizeof(utl_linked_node_t));
 	return node;
 
 }
 
-void utl_list_push(utl_linked_list_t* list, void* element) {
+utl_linked_node_t* utl_list_push(utl_linked_list_t* list, void* element) {
 
 	utl_linked_node_t* node = utl_create_node();
 	node->element = element;
@@ -31,6 +28,8 @@ void utl_list_push(utl_linked_list_t* list, void* element) {
 
 	list->length += 1;
 
+	return node;
+
 }
 
 void* utl_list_shift(utl_linked_list_t* list) {
@@ -38,7 +37,7 @@ void* utl_list_shift(utl_linked_list_t* list) {
 	if (list->first == NULL) return NULL;
 
 	utl_linked_node_t* node = list->first;
-	list->first = NULL;
+	list->first = node->next;
 
 	if (node->next == NULL) list->last = NULL;
 

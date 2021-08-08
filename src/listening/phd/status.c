@@ -47,7 +47,7 @@ void phd_send_response(ltg_client_t* client) {
 	char slp[2048];
 	int32_t slp_length = cht_server_list_ping(slp);
 
-	PCK_INLINE(response, 2048, IO_BIG_ENDIAN);
+	PCK_INLINE(response, 2048, io_big_endian);
 
 	pck_write_var_int(response, 0x00);
 	pck_write_string(response, slp, slp_length);
@@ -58,7 +58,7 @@ void phd_send_response(ltg_client_t* client) {
 
 void phd_send_pong(ltg_client_t* client, int64_t random) {
 
-	PCK_INLINE(response, 9, IO_BIG_ENDIAN);
+	PCK_INLINE(response, 9, io_big_endian);
 
 	pck_write_var_int(response, 0x01);
 	pck_write_int64(response, random);

@@ -73,10 +73,11 @@ sky_main_t sky_main = {
 				.bytes_per_element = sizeof(ltg_client_t*)
 			},
 			.next_id = {
-				.bytes_per_element = sizeof(ltg_client_t*)
+				.bytes_per_element = sizeof(uint32_t)
 			}
 		},
 		.online = {
+			.lock = PTHREAD_MUTEX_INITIALIZER,
 			.max = 20
 		},
 		.network_compression_threshold = 256,
@@ -100,6 +101,11 @@ int main(int argCount, char* args[]) {
 	log_info("//      //  //////    //    //////  //  MC");
 	log_info("%s", sky_main.version);
 	log_info("");
+
+	/*
+		The MotorMC project was started officially on June 2, 2021
+		by Garet Halliday
+	*/
 
 #ifdef __MOTOR_UNSAFE__
 	log_warn("You are using an unsafe version of MotorMC! This version may have game breaking bugs or experimental features and should not be used for production servers!");

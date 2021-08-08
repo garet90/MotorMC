@@ -25,14 +25,14 @@ bool_t job_handle_global_chat_message(sky_worker_t* worker, job_global_chat_mess
     char out[8096];
     size_t out_len = cht_write_translation(&translation, out);
     // lock client vector
-    pthread_mutex_lock(&sky_main.listener.clients.lock);
-    for (size_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
-        ltg_client_t* client = UTL_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
-        if (client->state == ltg_play) {
-            phd_send_chat_message(client, out, out_len, 0, work->sender->uuid);
-        }
+    pthread_mutex_lock(&sky_main.listener.online.lock);
+    utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
+    while (node != NULL) {
+        ltg_client_t* client = node->element;
+        phd_send_chat_message(client, out, out_len, 0, work->sender->uuid);
+        node = node->next;
     }
-    pthread_mutex_unlock(&sky_main.listener.clients.lock);
+    pthread_mutex_unlock(&sky_main.listener.online.lock);
     return true;
 
 }

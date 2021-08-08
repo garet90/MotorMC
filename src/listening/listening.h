@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include "../main.h"
 #include "../util/vector.h"
+#include "../util/doublylinkedlist.h"
 #include "../io/packet/packet.h"
 #include "../crypt/rsa.h"
 #include "../crypt/cfb8.h"
@@ -23,6 +24,8 @@ typedef byte_t ltg_uuid_t[16];
 typedef struct {
 
 	pthread_t thread;
+	
+	utl_doubly_linked_node_t* online_node;
 
 	uint32_t id;
 
@@ -30,8 +33,14 @@ typedef struct {
 	int32_t socket;
 
 	struct {
-		char* value;
-		char* signature;
+		struct {
+			char* value;
+			size_t length;
+		} value;
+		struct {
+			char* value;
+			size_t length;
+		} signature;
 	} textures;
 
 	struct {
@@ -84,8 +93,9 @@ typedef struct {
 	} clients;
 
 	struct {
-		uint16_t count;
-		uint16_t max;
+		pthread_mutex_t lock;
+		utl_doubly_linked_list_t list;
+		size_t max;
 	} online;
 
 	uint16_t network_compression_threshold;

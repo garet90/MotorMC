@@ -128,7 +128,7 @@ void* t_ltg_client(void* args) {
 	ltg_client_t* client = args;
 
 	// create receive packet (on stack)
-	PCK_INLINE(recvd, LTG_MAX_RECIEVE, IO_BIG_ENDIAN);
+	PCK_INLINE(recvd, LTG_MAX_RECIEVE, io_big_endian);
 	int32_t recvl = 0;
 
 	for (;;) {
@@ -227,6 +227,28 @@ void ltg_disconnect(ltg_client_t* client) {
 	// cancel keep alive
 	sch_cancel(client->keep_alive);
 
+	// if we're on the online players list, remove it
+	if (client->online_node != NULL) {
+		pthread_mutex_lock(&sky_main.listener.online.lock);
+
+		if (client->online_node->previous != NULL) {
+			client->online_node->previous->next = client->online_node->next;
+		} else {
+			sky_main.listener.online.list.first = client->online_node->next;
+		}
+		if (client->online_node->next != NULL) {
+			client->online_node->next->previous = client->online_node->previous;
+		} else {
+			sky_main.listener.online.list.last = client->online_node->previous;
+		}
+
+		sky_main.listener.online.list.length -= 1;
+
+		free(client->online_node);
+
+		pthread_mutex_unlock(&sky_main.listener.online.lock);
+	}
+
 	sck_close(client->socket);
 
 	// lock clients
@@ -241,11 +263,11 @@ void ltg_disconnect(ltg_client_t* client) {
 	pthread_mutex_unlock(&sky_main.listener.clients.lock);
 	
 	// free skin
-	if (client->textures.value != NULL) {
-		free(client->textures.value);
+	if (client->textures.value.value != NULL) {
+		free(client->textures.value.value);
 	}
-	if (client->textures.signature != NULL) {
-		free(client->textures.signature);
+	if (client->textures.signature.value != NULL) {
+		free(client->textures.signature.value);
 	}
 
 	// free encryption key

@@ -3,7 +3,7 @@
 
 typedef enum io_endianness {
 	io_little_endian = 0,
-	IO_BIG_ENDIAN = 1
+	io_big_endian = 1
 } io_endianness_t;
 
 static inline io_endianness_t io_get_endianness() {
@@ -11,7 +11,7 @@ static inline io_endianness_t io_get_endianness() {
 	const uint8_t array[] = { 0xAA, 0xBB };
 
 	if (*((uint16_t*) array) == 0xAABB) {
-		return IO_BIG_ENDIAN;
+		return io_big_endian;
 	} else {
 		return io_little_endian;
 	}
@@ -371,7 +371,7 @@ static inline size_t io_var_int_length(uint32_t value) {
 
 }
 
-static inline size_t io_write_var_int(byte_t* buffer, int32_t value) {
+static inline size_t io_write_var_int(byte_t* buffer, uint32_t value) {
 
 	size_t i = 0;
 	do {
@@ -388,7 +388,7 @@ static inline size_t io_write_var_int(byte_t* buffer, int32_t value) {
 
 }
 
-static inline size_t io_write_var_long(byte_t* buffer, int64_t value) {
+static inline size_t io_write_var_long(byte_t* buffer, uint64_t value) {
 
 	size_t i = 0;
 	do {

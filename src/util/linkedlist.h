@@ -5,7 +5,7 @@ typedef struct utl_linked_node utl_linked_node_t;
 
 struct utl_linked_node {
 
-	utl_linked_node_t* element;
+	void* element;
 	utl_linked_node_t* next;
 
 };
@@ -27,5 +27,5 @@ static inline void utl_init_list(utl_linked_list_t* list) {
 }
 
 extern utl_linked_node_t* utl_create_node();
-extern void utl_list_push(utl_linked_list_t*, void*);
+extern utl_linked_node_t* utl_list_push(utl_linked_list_t*, void*);
 extern void* utl_list_shift(utl_linked_list_t*);
