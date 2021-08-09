@@ -23,7 +23,7 @@ typedef enum {
 	cht_yellow = 0xE,
 	cht_white = 0xF,
 
-	CHT_NOCOLOR = -0x01
+	cht_nocolor = -0x01
 
 } cht_color_t;
 
@@ -84,7 +84,7 @@ typedef struct {
 } cht_component_t;
 
 static /*in-plugin*/ const cht_component_t cht_new = {
-	.color = CHT_NOCOLOR,
+	.color = cht_nocolor,
 	.extra = {
 		.bytes_per_element = sizeof(cht_component_t*)
 	}

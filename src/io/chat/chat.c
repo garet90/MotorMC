@@ -9,7 +9,7 @@ cht_component_t* cht_alloc() {
 	cht_component_t* alloc = calloc(1, sizeof(cht_component_t));
 
 	utl_set_bit(alloc->format, cht_heap);
-	alloc->color = CHT_NOCOLOR;
+	alloc->color = cht_nocolor;
 
 	return alloc;
 
@@ -226,7 +226,7 @@ void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t
 	if (utl_test_bit(component->format, cht_obfuscated_set))
 		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "obfuscated"), utl_test_bit(component->format, cht_obfuscated) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
-	if (component->color != CHT_NOCOLOR) {
+	if (component->color != cht_nocolor) {
 		if (component->color <= 0xF) {
 			const char* colors[] = {
 				"black",

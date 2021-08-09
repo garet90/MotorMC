@@ -23,9 +23,29 @@ utl_vector_t job_global_chat_message_handlers_vector = {
 	.array = (byte_t*) job_global_chat_message_handlers
 };
 
+job_handler_t job_player_join_handlers[] = {
+	(job_handler_t) job_handle_player_join
+};
+utl_vector_t job_player_join_handlers_vector = {
+	.bytes_per_element = sizeof(job_handler_t),
+	.size = 1,
+	.array = (byte_t*) job_player_join_handlers
+};
+
+job_handler_t job_player_leave_handlers[] = {
+	(job_handler_t) job_handle_player_leave
+};
+utl_vector_t job_player_leave_handlers_vector = {
+	.bytes_per_element = sizeof(job_handler_t),
+	.size = 1,
+	.array = (byte_t*) job_player_leave_handlers
+};
+
 utl_vector_t* job_handlers[job_count] = {
 	&job_keep_alive_handlers_vector,
-	&job_global_chat_message_handlers_vector
+	&job_global_chat_message_handlers_vector,
+	&job_player_join_handlers_vector,
+	&job_player_leave_handlers_vector
 };
 
 struct {

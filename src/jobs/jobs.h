@@ -26,3 +26,20 @@ typedef struct {
     } message;
 
 } job_global_chat_message_t;
+
+typedef struct {
+
+    job_work_t header;
+
+    ltg_client_t* player;
+
+} job_player_join_t;
+
+typedef struct {
+
+    job_work_t header;
+
+    ltg_uuid_t uuid;
+    char username[17];
+
+} job_player_leave_t;

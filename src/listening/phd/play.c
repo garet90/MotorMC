@@ -122,15 +122,29 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 
 }
 
-void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_len, byte_t position, ltg_uuid_t uuid) {
+void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_len, ltg_uuid_t uuid) {
 
 	PCK_INLINE(packet, 23 + message_len, io_big_endian);
 
 	pck_write_var_int(packet, 0x0F);
 	pck_write_string(packet, message, message_len);
-	pck_write_int8(packet, position);
+	pck_write_int8(packet, 0); // position
 	pck_write_bytes(packet, uuid, 16);
 
+	ltg_send(client, packet);
+
+}
+
+void phd_send_system_chat_message(ltg_client_t* client, const char* message, size_t message_len) {
+
+	PCK_INLINE(packet, 7 + message_len, io_big_endian);
+
+	pck_write_var_int(packet, 0x0F);
+	pck_write_string(packet, message, message_len);
+	pck_write_int8(packet, 1);
+	pck_write_int64(packet, 0);
+	pck_write_int64(packet, 0);
+	
 	ltg_send(client, packet);
 
 }
@@ -206,6 +220,11 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	pthread_mutex_unlock(&sky_main.listener.online.lock);
 
+	JOB_CREATE_WORK(work, job_player_join);
+	work->player = client;
+
+	job_add(&work->header);
+
 }
 
 void phd_send_player_info_add_players(ltg_client_t* client) {
@@ -255,6 +274,31 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 
 void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player) {
 
+	PCK_INLINE(packet, 2048, io_big_endian);
+	pck_write_var_int(packet, 0x36);
+	pck_write_var_int(packet, 0);
+	pck_write_var_int(packet, 1);
+	pck_write_bytes(packet, player->uuid, 16);
+	pck_write_string(packet, player->username.value, player->username.length);
+	if (player->textures.value.value != NULL) {
+		pck_write_var_int(packet, 1);
+		pck_write_string(packet, "textures", 8);
+		pck_write_string(packet, player->textures.value.value, player->textures.value.length);
+		if (player->textures.signature.value != NULL) {
+			pck_write_int8(packet, 1);
+			pck_write_string(packet, player->textures.signature.value, player->textures.signature.length);
+		} else {
+			pck_write_int8(packet, 0);
+		}
+	} else {
+		pck_write_var_int(packet, 0);
+	}
+	pck_write_var_int(packet, 0); // game mode
+	pck_write_var_int(packet, -1); // ping
+	pck_write_int8(packet, 0); // has display name
+	
+	ltg_send(client, packet);
+
 }
 
 void phd_send_player_info_update_gamemode(ltg_client_t* client, ltg_client_t* player) {
@@ -265,7 +309,15 @@ void phd_send_player_info_update_display_name(ltg_client_t* client, ltg_client_t
 
 }
 
-void phd_send_player_info_remove_player(ltg_client_t* client, ltg_client_t* player) {
+void phd_send_player_info_remove_player(ltg_client_t* client, ltg_uuid_t uuid) {
+
+	PCK_INLINE(packet, 19, io_big_endian);
+	pck_write_var_int(packet, 0x36);
+	pck_write_var_int(packet, 4);
+	pck_write_var_int(packet, 1);
+	pck_write_bytes(packet, uuid, 16);
+
+	ltg_send(client, packet);
 
 }
 

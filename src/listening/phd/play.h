@@ -69,7 +69,10 @@ extern void phd_send_block_action(ltg_client_t*);
 extern void phd_send_block_change(ltg_client_t*);
 extern void phd_send_boss_bar(ltg_client_t*);
 extern void phd_send_server_difficulty(ltg_client_t*);
-extern void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_length, byte_t position, ltg_uuid_t uuid);
+
+extern void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_length, ltg_uuid_t uuid);
+extern void phd_send_system_chat_message(ltg_client_t* client, const char* message, size_t message_length);
+
 extern void phd_send_clear_tiles(ltg_client_t*);
 extern void phd_send_tab_complete(ltg_client_t*);
 extern void phd_send_declare_commands(ltg_client_t*);
@@ -112,7 +115,7 @@ extern void phd_send_player_info_add_players(ltg_client_t* client);
 extern void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player);
 extern void phd_send_player_info_update_gamemode(ltg_client_t* client, ltg_client_t* player);
 extern void phd_send_player_info_update_display_name(ltg_client_t* client, ltg_client_t* player);
-extern void phd_send_player_info_remove_player(ltg_client_t* client, ltg_client_t* player);
+extern void phd_send_player_info_remove_player(ltg_client_t* client, ltg_uuid_t uuid);
 
 extern void phd_send_face_player(ltg_client_t*);
 extern void phd_send_player_position_and_look(ltg_client_t*);

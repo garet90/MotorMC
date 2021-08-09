@@ -4,7 +4,9 @@
 
 typedef enum {
 
-    cht_translation_cht_type_text
+    cht_translation_chat_type_text,
+	cht_translation_multiplayer_player_joined,
+	cht_translation_multiplayer_player_left
 
 } cht_translation_type_t;
 
@@ -12,11 +14,14 @@ typedef struct {
 
     cht_translation_type_t translate;
 
+	cht_color_t color;
+
     utl_vector_t with;
 
 } cht_translation_t;
 
 static /*in-plugin*/ const cht_translation_t cht_translation_new = {
+	.color = cht_nocolor,
 	.with = {
 		.bytes_per_element = sizeof(cht_component_t*)
 	}

@@ -3,10 +3,41 @@
 void cht_jsonify_translation(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_translation_t* translation) {
 
     const char* translations[] = {
-        "chat.type.text"
+        "chat.type.text",
+        "multiplayer.player.joined",
+        "multiplayer.player.left"
     };
 
     yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "translate"), yyjson_mut_str(doc, translations[translation->translate]));
+
+    if (translation->color != cht_nocolor) {
+		if (translation->color <= 0xF) {
+			const char* colors[] = {
+				"black",
+				"dark_blue",
+				"dark_green",
+				"dark_aqua",
+				"dark_red",
+				"dark_purple",
+				"gold",
+				"gray",
+				"dark_gray",
+				"blue",
+				"green",
+				"aqua",
+				"red",
+				"light_purple",
+				"yellow",
+				"white"
+			};
+
+			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, colors[translation->color]));
+		} else {
+			char color[9];
+			sprintf(color, "%x", translation->color);
+			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, color));
+		}
+	}
 
     if (translation->with.size != 0) {
         yyjson_mut_val* with = yyjson_mut_arr(doc);

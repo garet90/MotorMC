@@ -1,6 +1,7 @@
 #include "listening.h"
 #include "../motor.h"
 #include "../jobs/board.h"
+#include "../jobs/jobs.h"
 #include "../jobs/scheduler/scheduler.h"
 #include "../util/util.h"
 #include "../io/logger/logger.h"
@@ -229,6 +230,7 @@ void ltg_disconnect(ltg_client_t* client) {
 
 	// if we're on the online players list, remove it
 	if (client->online_node != NULL) {
+
 		pthread_mutex_lock(&sky_main.listener.online.lock);
 
 		if (client->online_node->previous != NULL) {
@@ -247,6 +249,13 @@ void ltg_disconnect(ltg_client_t* client) {
 		free(client->online_node);
 
 		pthread_mutex_unlock(&sky_main.listener.online.lock);
+
+		JOB_CREATE_WORK(work, job_player_leave);
+		memcpy(work->uuid, client->uuid, 16);
+		memcpy(work->username, client->username.value, client->username.length + 1);
+
+		job_add(&work->header);
+
 	}
 
 	sck_close(client->socket);
