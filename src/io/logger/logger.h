@@ -1,7 +1,6 @@
 #pragma once
 #include "../../main.h"
 #include "../chat/chat.h"
-#include "../commands/commands.h"
 
 #define LOG_P1 "\r\033[2K\033["
 #define LOG_P2 "m[%02u:%02u:%02u "
@@ -17,7 +16,7 @@
 */
 
 extern void log_put(const char*, ...);
-extern void log_command(cmd_sender_t*, const cht_component_t*);
+extern void log_command(const cht_component_t*);
 
 extern void log_info(const char*, ...);
 extern void log_warn(const char*, ...);

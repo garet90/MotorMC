@@ -26,12 +26,7 @@ void log_put(const char* format, ...) {
 
 }
 
-void log_command(cmd_sender_t* sender, const cht_component_t* chat) {
-
-	if (sender != &sky_main.console) {
-		log_error("Trying to send a command message to the console that wasn't intended for the console!");
-		return;
-	}
+void log_command(const cht_component_t* chat) {
 
 	char message[512];
 

@@ -21,11 +21,8 @@ sky_main_t sky_main = {
 	.version = __MOTOR_VER__,
 	.mcver = __MC_VER__,
 	.console = {
-		.name = "SERVER",
-		.op = cmd_op_4,
-		.permissions = {
-			.bytes_per_element = sizeof(char*)
-		}
+		.type = cmd_console,
+		.op = cmd_op_4
 	},
 	.workers = {
 		.count = 4,
@@ -87,7 +84,7 @@ sky_main_t sky_main = {
 
 };
 
-int main(int argCount, char* args[]) {
+int main(int argc, char* argv[]) {
 
 	struct timespec start;
 	clock_gettime(CLOCK_REALTIME, &start);
@@ -298,9 +295,9 @@ int main(int argCount, char* args[]) {
 		sky_main.motd->text = "A Minecraft server";
 	}
 	
-	if (argCount != 0) {
-		for (int i = 0; i < argCount; ++i) {
-			if (utl_hash(args[i]) == 0x7c9e6865) {
+	if (argc != 0) {
+		for (int i = 0; i < argc; ++i) {
+			if (utl_hash(argv[i]) == 0x7c9e6865) {
 				return test_run_all();
 			}
 		}
@@ -350,7 +347,7 @@ int main(int argCount, char* args[]) {
 	for (;;) {
 		if (fgets(in, 256, stdin) != NULL) {
 
-			cmd_handle(in, &sky_main.console);
+			cmd_handle(in, sky_main.console);
 
 		} else {
 
@@ -456,7 +453,9 @@ void __attribute__ ((noreturn)) sky_term() {
 
 		sky_worker_t* worker = UTL_VECTOR_GET_AS(sky_worker_t*, &sky_main.workers.vector, i);
 
-		pthread_join(worker->thread, NULL);
+		if (pthread_self() != worker->thread) {
+			pthread_join(worker->thread, NULL);
+		}
 
 	}
 

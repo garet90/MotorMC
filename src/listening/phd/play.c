@@ -33,7 +33,7 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_teleport_confirm(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
 
 	log_info("Teleport confirm: %d", pck_read_var_int(packet));
 
@@ -43,14 +43,23 @@ bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 
 bool_t phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 
-	JOB_CREATE_WORK(job, job_global_chat_message);
+	PCK_READ_STRING(message, packet);
 
-	job->sender = client;
-	job->message.length = pck_read_var_int(packet);
-	pck_read_bytes(packet, (byte_t*) job->message.value, job->message.length);
-	job->message.value[job->message.length] = '\0';
+	if (message_length > 0 && message[0] == '/') {
+		const cmd_sender_t sender = {
+			.type = cmd_player,
+			.player = client
+		};
+		cmd_handle(message + 1, sender);
+	} else {
+		JOB_CREATE_WORK(job, job_global_chat_message);
 
-	job_add(&job->header);
+		job->sender = client;
+		job->message.length = message_length;
+		memcpy(job->message.value, message, message_length + 1);
+
+		job_add(&job->header);
+	}
 
 	return true;
 
@@ -74,7 +83,7 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_plugin_message(ltg_client_t* client, pck_packet_t* packet, int32_t length) {
+bool_t phd_handle_plugin_message(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet, int32_t length) {
 
 	PCK_READ_STRING(channel, packet);
 	log_info("Plugin message for channel: %s", channel);
@@ -104,7 +113,7 @@ bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_player_position(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
 
 	log_info("X: %f", pck_read_float64(packet));
 	log_info("Feet Y: %f", pck_read_float64(packet));
@@ -115,7 +124,7 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_player_position_and_look(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
 
 	log_info("X: %f", pck_read_float64(packet));
 	log_info("Feet Y: %f", pck_read_float64(packet));
@@ -312,7 +321,7 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 
 }
 
-void phd_send_player_info_update_gamemode(ltg_client_t* client, ltg_client_t* player) {
+void phd_send_player_info_update_gamemode(__attribute__((unused)) ltg_client_t* client, __attribute__((unused)) ltg_client_t* player) {
 
 }
 
@@ -336,7 +345,7 @@ void phd_send_player_info_update_latency(ltg_client_t* client) {
 
 }
 
-void phd_send_player_info_update_display_name(ltg_client_t* client, ltg_client_t* player) {
+void phd_send_player_info_update_display_name(__attribute__((unused)) ltg_client_t* client, __attribute__((unused)) ltg_client_t* player) {
 
 }
 

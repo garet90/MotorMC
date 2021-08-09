@@ -1,5 +1,6 @@
 #pragma once
 #include "../../main.h"
+#include "../../listening/listening.h"
 #include "../chat/chat.h"
 
 typedef enum {
@@ -12,15 +13,24 @@ typedef enum {
 
 } cmd_op_level_t;
 
-typedef struct cmd_sender cmd_sender_t;
+typedef enum {
 
-struct cmd_sender {
+	cmd_console,
+	cmd_player,
+	cmd_command_block
 
-	utl_vector_t permissions;
-	char* name;
+} cmd_sender_type_t;
+
+typedef struct {
+
+	cmd_sender_type_t type;
 	cmd_op_level_t op;
 
-};
+	union {
+		ltg_client_t* player;
+	};
+
+} cmd_sender_t;
 
 typedef struct {
 
@@ -29,7 +39,7 @@ typedef struct {
 	const char* usage;
 	const char* permission;
 	const char* permission_message;
-	bool_t (*const handler) (char*, cmd_sender_t*);
+	bool_t (*const handler) (char*, const cmd_sender_t);
 	const size_t alias_count;
 	const char* aliases[];
 
@@ -38,19 +48,19 @@ typedef struct {
 extern void cmd_add_defaults();
 
 extern void cmd_add_command(const cmd_command_t*);
-extern void cmd_handle(char*, cmd_sender_t*);
+extern void cmd_handle(char*, const cmd_sender_t);
 
-extern bool_t cmd_has_permission(const cmd_command_t*, const cmd_sender_t*);
+extern bool_t cmd_has_permission(const cmd_command_t*, const cmd_sender_t);
 
 extern uint32_t cmd_hash(const char*);
 extern char* cmd_hash_arg(char*, uint32_t*);
 
-extern void cmd_message(cmd_sender_t*, const cht_component_t*);
+extern void cmd_message(cmd_sender_t, const cht_component_t*);
 
 /* COMMANDS */
-extern bool_t cmd_stop(char*, cmd_sender_t*);
-extern bool_t cmd_help(char*, cmd_sender_t*);
-extern bool_t cmd_plugins(char*, cmd_sender_t*);
+extern bool_t cmd_stop(char*, cmd_sender_t);
+extern bool_t cmd_help(char*, cmd_sender_t);
+extern bool_t cmd_plugins(char*, cmd_sender_t);
 
 static const cmd_command_t cmd_stop_h = {
 	.label = "stop",
@@ -88,10 +98,5 @@ static const cht_component_t cmd_not_found = {
 
 static const cht_component_t cmd_stopping_server = {
 	.text = "Stopping the server...",
-	.color = cht_nocolor
-};
-
-static const cht_component_t cmd_help_header = {
-	.text = "------------Help: Commands------------",
 	.color = cht_nocolor
 };

@@ -16,7 +16,7 @@ typedef struct {
 
 #define PCK_INLINE(name, len, end) byte_t name ##_r[sizeof(pck_packet_t) + len]; pck_packet_t* name = (pck_packet_t*) name ##_r; name->cursor = 0; name->length = len; name->endianness = end;
 
-#define PCK_READ_STRING(name, packet) int32_t name ##_length = pck_read_var_int(packet); char name [name ##_length + 1]; pck_read_bytes(packet, (uint8_t*) name, name ##_length); name [name ##_length] = '\0';
+#define PCK_READ_STRING(name, packet) int32_t name ##_length = pck_read_var_int(packet); char name [name ##_length + 1]; pck_read_bytes(packet, (uint8_t*) name, name ##_length); if (name ##_length + 1 != 0) { name [name ##_length] = '\0'; }
 #define PCK_ALLOC_STRING(name, packet) int32_t name ##_length = pck_read_var_int(packet); char* name = malloc(name ##_length + 1); pck_read_bytes(packet, (uint8_t*) name, name ##_length); name[name ##_length] = '\0';
 
 extern pck_packet_t* pck_create(size_t, io_endianness_t);

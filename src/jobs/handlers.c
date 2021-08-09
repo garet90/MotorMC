@@ -4,7 +4,7 @@
 #include "../io/chat/translation.h"
 #include "../motor.h"
 
-bool_t job_handle_keep_alive(sky_worker_t* worker, job_keep_alive_t* work) {
+bool_t job_handle_keep_alive(__attribute__((unused)) sky_worker_t* worker, job_keep_alive_t* work) {
 
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
@@ -20,7 +20,7 @@ bool_t job_handle_keep_alive(sky_worker_t* worker, job_keep_alive_t* work) {
 
 }
 
-bool_t job_handle_global_chat_message(sky_worker_t* worker, job_global_chat_message_t* work) {
+bool_t job_handle_global_chat_message(__attribute__((unused)) sky_worker_t* worker, job_global_chat_message_t* work) {
 
     cht_translation_t translation = cht_translation_new; // todo terminate
     translation.translate = cht_translation_chat_type_text;
@@ -47,7 +47,7 @@ bool_t job_handle_global_chat_message(sky_worker_t* worker, job_global_chat_mess
 
 }
 
-bool_t job_handle_player_join(sky_worker_t* worker, job_player_join_t* work) {
+bool_t job_handle_player_join(__attribute__((unused)) sky_worker_t* worker, job_player_join_t* work) {
 
     // TODO send player join message
     cht_translation_t translation = cht_translation_new;
@@ -76,7 +76,7 @@ bool_t job_handle_player_join(sky_worker_t* worker, job_player_join_t* work) {
 
 }
 
-bool_t job_handle_player_leave(sky_worker_t* worker, job_player_leave_t* work) {
+bool_t job_handle_player_leave(__attribute__((unused)) sky_worker_t* worker, job_player_leave_t* work) {
 
     // TODO send player join message
     cht_translation_t translation = cht_translation_new;
@@ -105,7 +105,7 @@ bool_t job_handle_player_leave(sky_worker_t* worker, job_player_leave_t* work) {
 
 }
 
-bool_t job_handle_send_update_pings(sky_worker_t* worker, job_send_update_pings_t* work) {
+bool_t job_handle_send_update_pings(__attribute__((unused)) sky_worker_t* worker, __attribute__((unused)) job_send_update_pings_t* work) {
 
     pthread_mutex_lock(&sky_main.listener.online.lock);
     utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;

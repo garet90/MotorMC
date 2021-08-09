@@ -31,7 +31,7 @@ typedef struct {
 	struct {
 
 		void (*add) (const cmd_command_t*);
-		void (*message) (cmd_sender_t*, const cht_component_t*);
+		void (*message) (cmd_sender_t, const cht_component_t*);
 
 	} commands;
 
