@@ -86,19 +86,19 @@ int32_t sck_recv(int32_t s, char* message, int32_t maxlen) {
 int32_t sck_shutdown(int32_t s) {
 
 #ifdef __WINDOWS__
-	shutdown(s, SD_BOTH);
+	return shutdown(s, SD_BOTH);
 #else
-	shutdown(s, SHUT_RDWR);
+	return shutdown(s, SHUT_RDWR);
 #endif
 
 }
 
-void sck_close(int32_t s) {
+int32_t sck_close(int32_t s) {
 
 #ifdef __WINDOWS__
-	closesocket(s);
+	return closesocket(s);
 #else
-	close(s);
+	return close(s);
 #endif
 
 }

@@ -116,4 +116,6 @@ bool_t job_handle_send_update_pings(sky_worker_t* worker, job_send_update_pings_
     }
     pthread_mutex_unlock(&sky_main.listener.online.lock);
 
+    return true;
+
 }
