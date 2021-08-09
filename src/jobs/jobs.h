@@ -43,3 +43,9 @@ typedef struct {
     char username[17];
 
 } job_player_leave_t;
+
+typedef struct {
+
+    job_work_t header;
+
+} job_send_update_pings_t;

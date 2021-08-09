@@ -58,6 +58,9 @@ typedef struct {
 	uint32_t protocol;
 	uint32_t verify;
 
+	int64_t last_recv;
+	int64_t ping;
+
 	struct {
 		symmetric_CFB8 encrypt;
 		symmetric_CFB8 decrypt;
@@ -118,3 +121,5 @@ extern void ltg_send(ltg_client_t*, pck_packet_t*);
 extern void ltg_disconnect(ltg_client_t*);
 
 extern void ltg_term();
+
+extern void ltg_uuid_to_string(ltg_uuid_t uuid, char* out);

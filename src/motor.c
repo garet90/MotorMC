@@ -366,6 +366,9 @@ void* t_sky_main(void* input) {
 
 	sky_main.status = sky_running;
 
+	JOB_CREATE_WORK(update_pings, job_send_update_pings);
+	sch_schedule_repeating(&update_pings->header, 200, 200);
+
 	struct timespec nextTick, currentTime, sleepTime;
 
 	clock_gettime(CLOCK_MONOTONIC, &nextTick);

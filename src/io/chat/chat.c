@@ -382,7 +382,24 @@ size_t cht_server_list_ping(char* message) {
 	
     pthread_mutex_lock(&sky_main.listener.online.lock);
 	yyjson_mut_obj_add(players, yyjson_mut_str(doc, "online"), yyjson_mut_uint(doc, sky_main.listener.online.list.length));
-    pthread_mutex_unlock(&sky_main.listener.online.lock);
+    
+	// TODO limit sample to however long it's supposed to be
+	if (sky_main.listener.online.list.length > 0) {
+		yyjson_mut_val* sample = yyjson_mut_arr(doc);
+		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
+    	while (node != NULL) {
+			ltg_client_t* player = node->element;
+			yyjson_mut_val* val = yyjson_mut_obj(doc);
+			yyjson_mut_obj_add(val, yyjson_mut_str(doc, "name"), yyjson_mut_str(doc, player->username.value));
+			char uuid[37];
+			ltg_uuid_to_string(player->uuid, uuid);
+			yyjson_mut_obj_add(val, yyjson_mut_str(doc, "id"), yyjson_mut_strcpy(doc, uuid));
+			yyjson_mut_arr_append(sample, val);
+			node = node->next;
+		}
+		yyjson_mut_obj_add(players, yyjson_mut_str(doc, "sample"), sample);
+	}
+	pthread_mutex_unlock(&sky_main.listener.online.lock);
 
 	yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "players"), players);
 
@@ -392,8 +409,9 @@ size_t cht_server_list_ping(char* message) {
 
 	yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "description"), description);
 
-	char* str = yyjson_mut_write(doc, YYJSON_WRITE_NOFLAG, NULL);
-	size_t size = sprintf(message, "%s", str);
+	size_t size;
+	char* str = yyjson_mut_write(doc, YYJSON_WRITE_NOFLAG, &size);
+	memcpy(message, str, size);
 
 	free(str);
 

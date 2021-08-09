@@ -19,6 +19,7 @@ typedef enum {
 	job_global_chat_message,
 	job_player_join,
 	job_player_leave,
+	job_send_update_pings,
 
 	job_count
 

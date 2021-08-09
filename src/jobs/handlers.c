@@ -1,3 +1,4 @@
+#include <time.h>
 #include "handlers.h"
 #include "../listening/phd/play.h"
 #include "../io/chat/translation.h"
@@ -5,8 +6,17 @@
 
 bool_t job_handle_keep_alive(sky_worker_t* worker, job_keep_alive_t* work) {
 
-    phd_send_keep_alive(work->client, 0); // TODO use another value than 0 here
-    return true;
+	struct timespec time;
+	clock_gettime(CLOCK_REALTIME, &time);
+    int64_t out_ms = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
+
+    if (out_ms - work->client->last_recv >= 30000) {
+        ltg_disconnect(work->client);
+        return false;
+    } else {
+        phd_send_keep_alive(work->client, out_ms);
+        return true;
+    }
 
 }
 
@@ -92,5 +102,18 @@ bool_t job_handle_player_leave(sky_worker_t* worker, job_player_leave_t* work) {
     cht_term_translation(&translation);
 
     return true;
+
+}
+
+bool_t job_handle_send_update_pings(sky_worker_t* worker, job_send_update_pings_t* work) {
+
+    pthread_mutex_lock(&sky_main.listener.online.lock);
+    utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
+    while (node != NULL) {
+        ltg_client_t* client = node->element;
+        phd_send_player_info_update_latency(client);
+        node = node->next;
+    }
+    pthread_mutex_unlock(&sky_main.listener.online.lock);
 
 }

@@ -114,6 +114,8 @@ extern void phd_send_death_combat_event(ltg_client_t*);
 extern void phd_send_player_info_add_players(ltg_client_t* client);
 extern void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player);
 extern void phd_send_player_info_update_gamemode(ltg_client_t* client, ltg_client_t* player);
+// does NOT lock players list, expects it to be locked beforehand
+extern void phd_send_player_info_update_latency(ltg_client_t* client);
 extern void phd_send_player_info_update_display_name(ltg_client_t* client, ltg_client_t* player);
 extern void phd_send_player_info_remove_player(ltg_client_t* client, ltg_uuid_t uuid);
 

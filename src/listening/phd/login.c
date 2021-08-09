@@ -210,7 +210,6 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 		}
 
-		log_info("%s", response.ptr);
 		yyjson_doc* auth = yyjson_read(response.ptr, response.len, 0);
 
 		yyjson_val* auth_obj = yyjson_doc_get_root(auth);

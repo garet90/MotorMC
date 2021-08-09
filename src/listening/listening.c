@@ -225,6 +225,13 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 void ltg_disconnect(ltg_client_t* client) {
 
+	if (pthread_self() != client->thread) {
+		sck_shutdown(client->socket);
+		return;
+	}
+		
+	sck_shutdown(client->socket);
+
 	// cancel keep alive
 	sch_cancel(client->keep_alive);
 
@@ -301,11 +308,54 @@ void ltg_term() {
 	for (uint32_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
 		ltg_client_t* client = UTL_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 		if (client != NULL) {
-			sck_close(client->socket);
-			pthread_cancel(client->thread);
+			ltg_disconnect(client);
 		}
 	}
 
 	sck_term();
+
+}
+
+void ltg_uuid_to_string(ltg_uuid_t uuid, char* out) {
+	
+	const char hexmap[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
+	out[0] = hexmap[uuid[0] >> 4];
+	out[1] = hexmap[uuid[0] & 0xF];
+	out[2] = hexmap[uuid[1] >> 4];
+	out[3] = hexmap[uuid[1] & 0xF];
+	out[4] = hexmap[uuid[2] >> 4];
+	out[5] = hexmap[uuid[2] & 0xF];
+	out[6] = hexmap[uuid[3] >> 4];
+	out[7] = hexmap[uuid[3] & 0xF];
+	out[8] = '-';
+	out[9] = hexmap[uuid[4] >> 4];
+	out[10] = hexmap[uuid[4] & 0xF];
+	out[11] = hexmap[uuid[5] >> 4];
+	out[12] = hexmap[uuid[5] & 0xF];
+	out[13] = '-';
+	out[14] = hexmap[uuid[6] >> 4];
+	out[15] = hexmap[uuid[6] & 0xF];
+	out[16] = hexmap[uuid[7] >> 4];
+	out[17] = hexmap[uuid[7] & 0xF];
+	out[18] = '-';
+	out[19] = hexmap[uuid[8] >> 4];
+	out[20] = hexmap[uuid[8] & 0xF];
+	out[21] = hexmap[uuid[9] >> 4];
+	out[22] = hexmap[uuid[9] & 0xF];
+	out[23] = '-';
+	out[24] = hexmap[uuid[10] >> 4];
+	out[25] = hexmap[uuid[10] & 0xF];
+	out[26] = hexmap[uuid[11] >> 4];
+	out[27] = hexmap[uuid[11] & 0xF];
+	out[28] = hexmap[uuid[12] >> 4];
+	out[29] = hexmap[uuid[12] & 0xF];
+	out[30] = hexmap[uuid[13] >> 4];
+	out[31] = hexmap[uuid[13] & 0xF];
+	out[32] = hexmap[uuid[14] >> 4];
+	out[33] = hexmap[uuid[14] & 0xF];
+	out[34] = hexmap[uuid[15] >> 4];
+	out[35] = hexmap[uuid[15] & 0xF];
+	out[36] = 0;
 
 }

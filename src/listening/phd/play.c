@@ -92,7 +92,13 @@ bool_t phd_handle_plugin_message(ltg_client_t* client, pck_packet_t* packet, int
 
 bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
-	pck_read_int64(packet); // keep alive id
+	int64_t out_ms = pck_read_int64(packet);
+
+	struct timespec time;
+	clock_gettime(CLOCK_REALTIME, &time);
+    client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
+
+	client->ping = client->last_recv - out_ms;
 
 	return true;
 
@@ -173,6 +179,11 @@ void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 }
 
 void phd_send_join_game(ltg_client_t* client) {
+
+	// set last recieve packet to now
+	struct timespec time;
+	clock_gettime(CLOCK_REALTIME, &time);
+    client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
 
 	JOB_CREATE_WORK(keep_alive, job_keep_alive);
 	keep_alive->client = client;
@@ -261,7 +272,7 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 			pck_write_var_int(packet, 0);
 		}
 		pck_write_var_int(packet, 0); // game mode
-		pck_write_var_int(packet, -1); // ping
+		pck_write_var_int(packet, player->ping); // ping
 		pck_write_int8(packet, 0); // has display name
 		node = node->next;
 	}
@@ -294,7 +305,7 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 		pck_write_var_int(packet, 0);
 	}
 	pck_write_var_int(packet, 0); // game mode
-	pck_write_var_int(packet, -1); // ping
+	pck_write_var_int(packet, player->ping); // ping
 	pck_write_int8(packet, 0); // has display name
 	
 	ltg_send(client, packet);
@@ -302,6 +313,26 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 }
 
 void phd_send_player_info_update_gamemode(ltg_client_t* client, ltg_client_t* player) {
+
+}
+
+void phd_send_player_info_update_latency(ltg_client_t* client) {
+
+	// TODO test to make sure this actually works
+	PCK_INLINE(packet, 21 * sky_main.listener.online.list.length + 6, io_big_endian);
+
+	pck_write_var_int(packet, 0x36);
+	pck_write_var_int(packet, 2); // update latency
+	pck_write_var_int(packet, sky_main.listener.online.list.length);
+	utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
+	while (node != NULL) {
+		ltg_client_t* player = node->element;
+		pck_write_bytes(packet, player->uuid, 16);
+		pck_write_var_int(packet, player->ping);
+		node = node->next;
+	}
+
+	ltg_send(client, packet);
 
 }
 
