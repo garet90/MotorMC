@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "translation.h"
 
 void cht_jsonify_translation(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_translation_t* translation) {
