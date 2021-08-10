@@ -31,7 +31,7 @@ bool_t job_handle_global_chat_message(__attribute__((unused)) sky_worker_t* work
     cht_add_with(&translation, &name);
     cht_add_with(&translation, &message);
 
-    char out[512];
+    char out[1536];
     size_t out_len = cht_write_translation(&translation, out);
     // lock client vector
     pthread_mutex_lock(&sky_main.listener.online.lock);

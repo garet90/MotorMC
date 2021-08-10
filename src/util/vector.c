@@ -21,13 +21,16 @@ void utl_init_vector(utl_vector_t* vector, size_t bpe, size_t capacity) {
 
 }
 
-void utl_vector_push(utl_vector_t* vector, const void* element) {
+void* utl_vector_push(utl_vector_t* vector, const void* element) {
 
 	if (vector->size >= vector->capacity) {
 		utl_vector_resize(vector, (vector->size > 0 ? vector->size * 2 : 2));
 	}
 
-	memcpy(vector->array + (vector->bytes_per_element * vector->size++), element, vector->bytes_per_element);
+	void* ptr = vector->array + (vector->bytes_per_element * vector->size++);
+	memcpy(ptr, element, vector->bytes_per_element);
+
+	return ptr;
 
 }
 

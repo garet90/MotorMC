@@ -16,7 +16,7 @@ typedef struct {
 extern utl_vector_t* utl_create_vector(size_t, size_t);
 extern void utl_init_vector(utl_vector_t*, size_t, size_t);
 
-extern void utl_vector_push(utl_vector_t*, const void*);
+extern void* utl_vector_push(utl_vector_t*, const void*);
 static inline void* utl_vector_get(const utl_vector_t* vector, size_t idx) {
 	
 	if (vector == NULL) return NULL;

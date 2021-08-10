@@ -451,9 +451,9 @@ typedef struct {
 
 } mat_codec_t;
 
-extern mat_codec_t* mat_get_codec();
+extern const mat_codec_t* mat_get_codec();
 
-extern mat_codec_t* mat_get_dimension_codec(mat_dimension_type_t dimension);
+extern const mat_codec_t* mat_get_dimension_codec(mat_dimension_type_t dimension);
 
 /*
 	STATE MODIFIERS

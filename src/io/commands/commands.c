@@ -20,6 +20,8 @@ utl_vector_t cmd_list = {
 	.size = sizeof(cmd_defaults) / sizeof(cmd_defaults[0])
 };
 
+pck_packet_t* cmd_graph = NULL;
+
 void cmd_add_defaults() {
 
 	for (size_t i = 0; i < cmd_list.size; ++i) {
@@ -44,6 +46,11 @@ void cmd_add_defaults() {
 }
 
 void cmd_add_command(const cmd_command_t* command) {
+
+	if (cmd_graph != NULL) {
+		free(cmd_graph);
+		cmd_graph = NULL;
+	}
 
 	if (cmd_list.size != 0 && cmd_handlers.object == NULL) {
 		cmd_add_defaults();
@@ -209,6 +216,180 @@ void cmd_message(const cmd_sender_t sender, const cht_component_t* component) {
 		case cmd_command_block:
 			break;
 	}
+
+}
+
+typedef enum {
+	
+	cmd_node_root,
+	cmd_node_literal,
+	cmd_node_argument
+
+} cmd_node_type_t;
+
+typedef struct cmd_node cmd_node_t;
+
+struct cmd_node {
+
+	int32_t idx;
+	cmd_node_type_t type;
+	byte_t flags[1];
+	utl_vector_t children;
+	cmd_node_t* redirect_node;
+
+	union {
+
+		struct {
+
+			struct {
+				const char* value;
+				int32_t length;
+			} name;
+
+		} literal;
+
+		struct {
+
+			struct {
+				const char* value;
+				int32_t length;
+			} name;
+
+			struct {
+				const char* value;
+				int32_t length;
+			} parser;
+
+			struct {
+				const char* value;
+				int32_t length;
+			} properties;
+
+		} argument;
+
+	};
+
+	struct {
+		char* value;
+		int32_t length;
+	} suggestions_type;
+
+};
+
+int32_t cmd_assign_node_idx(cmd_node_t* node, int32_t idx) {
+	
+	for (size_t i = 0; i < node->children.size; ++i) {
+		cmd_node_t* child = utl_vector_get(&node->children, i);
+		child->idx = idx++;
+		idx = cmd_assign_node_idx(child, idx);
+	}
+
+	return idx;
+
+}
+
+void cmd_write_node(pck_packet_t* packet, cmd_node_t* node) {
+
+	pck_write_int8(packet, node->flags[0]);
+	
+	pck_write_var_int(packet, node->children.size);
+	for (size_t i = 0; i < node->children.size; ++i) {
+		cmd_node_t* child = utl_vector_get(&node->children, i);
+		pck_write_var_int(packet, child->idx);
+	}
+
+	if (node->flags[0] & 0x08) {
+		pck_write_var_int(packet, node->redirect_node->idx);
+	}
+
+	switch (node->type) {
+		case cmd_node_root:
+			break;
+		case cmd_node_literal:
+			pck_write_string(packet, node->literal.name.value, node->literal.name.length);
+			break;
+		case cmd_node_argument:
+			pck_write_string(packet, node->argument.name.value, node->argument.name.length);
+			pck_write_string(packet, node->argument.parser.value, node->argument.parser.length);
+			break;
+	}
+
+	if (node->flags[0] & 0x10) {
+		pck_write_string(packet, node->suggestions_type.value, node->suggestions_type.length);
+	}
+
+	for (size_t i = 0; i < node->children.size; ++i) {
+		cmd_node_t* child = utl_vector_get(&node->children, i);
+		cmd_write_node(packet, child);
+	}
+
+}
+
+pck_packet_t* cmd_get_graph() {
+
+	if (cmd_graph == NULL) {
+
+		cmd_node_t root = {
+			.idx = 0,
+			.type = cmd_node_root,
+			.children = {
+				.bytes_per_element = sizeof(cmd_node_t)
+			}
+		};
+
+		for (size_t i = 0; i < cmd_list.size; ++i) {
+			cmd_command_t* command = UTL_VECTOR_GET_AS(cmd_command_t*, &cmd_list, i);
+			cmd_node_t command_node = {
+				.type = cmd_node_literal,
+				.flags = {
+					0x01
+				},
+				.children = {
+					.bytes_per_element = sizeof(cmd_node_t)
+				},
+				.literal = {
+					.name = {
+						.value = command->label,
+						.length = strlen(command->label)
+					}
+				}
+			};
+			cmd_node_t* command_ptr = utl_vector_push(&root.children, &command_node);
+
+			// aliases
+			for (size_t j = 0; j < command->alias_count; ++j) {
+				cmd_node_t command_alias = {
+					.type = cmd_node_literal,
+					.flags = {
+						0x01 | 0x08
+					},
+					.children = {
+						.bytes_per_element = sizeof(cmd_node_t)
+					},
+					.redirect_node = command_ptr,
+					.literal = {
+						.name = {
+							.value = command->aliases[j],
+							.length = strlen(command->aliases[j])
+						}
+					}
+				};
+				utl_vector_push(&root.children, &command_alias);
+			}
+		}
+
+		// assign indexes
+		int32_t node_count = cmd_assign_node_idx(&root, 1);
+
+		cmd_graph = pck_create(11 + (node_count * 128), io_big_endian);
+		pck_write_var_int(cmd_graph, 0x12);
+		pck_write_var_int(cmd_graph, node_count);
+		cmd_write_node(cmd_graph, &root);
+		pck_write_var_int(cmd_graph, 0);
+
+	}
+
+	return cmd_graph;
 
 }
 

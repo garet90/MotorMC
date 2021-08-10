@@ -1,6 +1,7 @@
 #pragma once
 #include "../../main.h"
 #include "../../listening/listening.h"
+#include "../packet/packet.h"
 #include "../chat/chat.h"
 
 typedef enum {
@@ -56,6 +57,8 @@ extern uint32_t cmd_hash(const char*);
 extern char* cmd_hash_arg(char*, uint32_t*);
 
 extern void cmd_message(cmd_sender_t, const cht_component_t*);
+
+extern pck_packet_t* cmd_get_graph();
 
 /* COMMANDS */
 extern bool_t cmd_stop(char*, cmd_sender_t);

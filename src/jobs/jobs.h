@@ -20,7 +20,7 @@ typedef struct {
 
     struct {
         
-        char value[257];
+        char value[1025];
         int32_t length;
 
     } message;

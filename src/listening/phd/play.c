@@ -164,6 +164,12 @@ void phd_send_system_chat_message(ltg_client_t* client, const char* message, siz
 
 }
 
+void phd_send_declare_commands(ltg_client_t* client) {
+
+	ltg_send(client, cmd_get_graph());
+
+}
+
 void phd_send_plugin_message(ltg_client_t* client, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length) {
 
 	PCK_INLINE(packet, 6 + identifier_length + data_length, io_big_endian);
@@ -198,8 +204,8 @@ void phd_send_join_game(ltg_client_t* client) {
 	keep_alive->client = client;
 	client->keep_alive = sch_schedule_repeating(&keep_alive->header, 200, 200);
 
-	mat_codec_t* codec = mat_get_codec();
-	mat_codec_t* dimension_codec = mat_get_dimension_codec(mat_dimension_overworld);
+	const mat_codec_t* codec = mat_get_codec();
+	const mat_codec_t* dimension_codec = mat_get_dimension_codec(mat_dimension_overworld);
 
 	PCK_INLINE(packet, codec->size + dimension_codec->size + 1024, io_big_endian);
 
@@ -231,6 +237,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	ltg_send(client, packet);
 
 	phd_send_plugin_message(client, "minecraft:brand", 15, (const byte_t*) "\x07MotorMC", 8);
+	phd_send_declare_commands(client);
 	phd_send_player_info_add_players(client);
 
 	// add to online players

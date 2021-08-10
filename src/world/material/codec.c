@@ -7,7 +7,7 @@ mat_codec_t* mat_codec = NULL;
 
 mat_codec_t* mat_dimension_codec[mat_dimension_count] = {};
 
-mat_codec_t* mat_get_codec() {
+const mat_codec_t* mat_get_codec() {
     
     if (mat_codec == NULL) {
 
@@ -134,7 +134,7 @@ mat_codec_t* mat_get_codec() {
 
 }
 
-mat_codec_t* mat_get_dimension_codec(mat_dimension_type_t type) {
+const mat_codec_t* mat_get_dimension_codec(mat_dimension_type_t type) {
 
     if (mat_dimension_codec[type] == NULL) {
         const mat_dimension_t* dimension = mat_get_dimension_by_type(type);
