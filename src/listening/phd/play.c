@@ -182,6 +182,17 @@ void phd_send_plugin_message(ltg_client_t* client, const char* identifier, size_
 
 }
 
+void phd_send_disconnect(ltg_client_t* client, const char* message, size_t message_len) {
+
+	PCK_INLINE(packet, 1 + message_len, io_big_endian);
+
+	pck_write_var_int(packet, 0x1a);
+	pck_write_string(packet, message, message_len);
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 	PCK_INLINE(packet, 9, io_big_endian);

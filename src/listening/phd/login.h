@@ -1,7 +1,6 @@
 #pragma once
 #include "../../main.h"
 #include "../../io/packet/packet.h"
-#include "../../io/chat/chat.h"
 #include "../listening.h"
 
 extern bool_t phd_login(ltg_client_t*, pck_packet_t*);
@@ -21,7 +20,7 @@ extern bool_t phd_handle_encryption_response(ltg_client_t*, pck_packet_t*);
 extern bool_t phd_handle_login_plugin_response(ltg_client_t*, pck_packet_t*);
 
 //outbound
-extern void phd_send_disconnect_login(ltg_client_t*, cht_component_t);
+extern void phd_send_disconnect_login(ltg_client_t*, const char*, size_t);
 extern void phd_send_encryption_request(ltg_client_t*);
 extern void phd_send_login_success(ltg_client_t*);
 extern void phd_send_set_compression(ltg_client_t*);

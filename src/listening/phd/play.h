@@ -83,7 +83,7 @@ extern void phd_send_set_slot(ltg_client_t*);
 extern void phd_send_set_cooldown(ltg_client_t*);
 extern void phd_send_plugin_message(ltg_client_t* client, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length);
 extern void phd_send_named_sound_effect(ltg_client_t*);
-extern void phd_send_disconnect(ltg_client_t*);
+extern void phd_send_disconnect(ltg_client_t* client, const char* message, size_t message_len);
 extern void phd_send_entity_status(ltg_client_t*);
 extern void phd_send_explosion(ltg_client_t*);
 extern void phd_send_unload_chunk(ltg_client_t*);

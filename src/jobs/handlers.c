@@ -49,7 +49,6 @@ bool_t job_handle_global_chat_message(__attribute__((unused)) sky_worker_t* work
 
 bool_t job_handle_player_join(__attribute__((unused)) sky_worker_t* worker, job_player_join_t* work) {
 
-    // TODO send player join message
     cht_translation_t translation = cht_translation_new;
     translation.translate = cht_translation_multiplayer_player_joined;
     translation.color = cht_yellow;
@@ -78,7 +77,6 @@ bool_t job_handle_player_join(__attribute__((unused)) sky_worker_t* worker, job_
 
 bool_t job_handle_player_leave(__attribute__((unused)) sky_worker_t* worker, job_player_leave_t* work) {
 
-    // TODO send player join message
     cht_translation_t translation = cht_translation_new;
     translation.translate = cht_translation_multiplayer_player_left;
     translation.color = cht_yellow;

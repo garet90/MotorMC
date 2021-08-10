@@ -250,7 +250,13 @@ void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t
 			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, colors[component->color]));
 		} else {
 			char color[9];
-			sprintf(color, "%x", component->color);
+			// convert int to hex
+			utl_write_byte_hex(color, ((byte_t*) &component->color)[0]);
+			utl_write_byte_hex(color + 2, ((byte_t*) &component->color)[1]);
+			utl_write_byte_hex(color + 4, ((byte_t*) &component->color)[2]);
+			utl_write_byte_hex(color + 6, ((byte_t*) &component->color)[3]);
+			color[8] = '\0';
+
 			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, color));
 		}
 	}
@@ -369,9 +375,7 @@ size_t cht_server_list_ping(char* message) {
 
 	yyjson_mut_val* version = yyjson_mut_obj(doc);
 
-	char version_name[9 + sizeof(__MC_VER__)];
-	sprintf(version_name, "MotorMC %s", sky_main.mcver);
-	yyjson_mut_obj_add(version, yyjson_mut_str(doc, "name"), yyjson_mut_str(doc, version_name));
+	yyjson_mut_obj_add(version, yyjson_mut_str(doc, "name"), yyjson_mut_str(doc, "MotorMC " __MC_VER__));
 	yyjson_mut_obj_add(version, yyjson_mut_str(doc, "protocol"), yyjson_mut_uint(doc, sky_main.protocol));
 
 	yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "version"), version);

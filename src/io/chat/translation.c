@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include "translation.h"
+#include "../../util/util.h"
 
 void cht_jsonify_translation(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_translation_t* translation) {
 
     const char* translations[] = {
         "chat.type.text",
         "multiplayer.player.joined",
-        "multiplayer.player.left"
+        "multiplayer.player.left",
+		"multiplayer.disconnect.outdated_client",
+		"multiplayer.disconnect.outdated_server",
+		"multiplayer.disconnect.server_shutdown"
     };
 
     yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "translate"), yyjson_mut_str(doc, translations[translation->translate]));
@@ -35,7 +39,13 @@ void cht_jsonify_translation(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht
 			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, colors[translation->color]));
 		} else {
 			char color[9];
-			sprintf(color, "%x", translation->color);
+			// convert int to hex
+			utl_write_byte_hex(color, ((byte_t*) &translation->color)[0]);
+			utl_write_byte_hex(color + 2, ((byte_t*) &translation->color)[1]);
+			utl_write_byte_hex(color + 4, ((byte_t*) &translation->color)[2]);
+			utl_write_byte_hex(color + 6, ((byte_t*) &translation->color)[3]);
+			color[8] = '\0';
+
 			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, color));
 		}
 	}

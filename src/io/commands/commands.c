@@ -399,7 +399,8 @@ bool_t cmd_stop(char* args, const cmd_sender_t sender) {
 		return false;
 	}
 
-	cmd_message(sender, &cmd_stopping_server);
+	if (sender.type != cmd_console)
+		cmd_message(sender, &cmd_stopping_server);
 
 	sky_term();
 

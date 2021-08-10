@@ -27,6 +27,7 @@ typedef enum {
 
 typedef struct {
 
+	pthread_t console_thread;
 	pthread_t thread;
 
 	/* instructions */
@@ -96,7 +97,7 @@ int main(int, char*[]);
 extern void* t_sky_main(void*);
 extern void* t_sky_worker(void*);
 
-extern void __attribute__ ((noreturn)) sky_term();
+extern void __attribute__((noreturn)) sky_term();
 
 static inline uint64_t sky_to_nanos(const struct timespec time) {
 	return (time.tv_sec * SKY_NANOS_PER_SECOND) + time.tv_nsec;

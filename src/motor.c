@@ -4,6 +4,7 @@
 #include <time.h>
 #include <curl/curl.h>
 #include "motor.h"
+#include <signal.h>
 #include "jobs/board.h"
 #include "jobs/handlers.h"
 #include "jobs/scheduler/scheduler.h"
@@ -84,7 +85,75 @@ sky_main_t sky_main = {
 
 };
 
+// signal handlers
+void sky_handle_signal_terminate(__attribute__((unused)) int signal) {
+	sky_term();
+}
+
+void sky_handle_signal_crash(int signal) {
+	log_error("!!!!THE SERVER HAS CRASHED FATALLY!!!!");
+	log_error("BEGIN CRASH REPORT");
+	log_error("\tVERSION " __MOTOR_VER__);
+	log_error("\tMCVER " __MC_VER__);
+	log_error("\tCOMPILED " __DATE__ " " __TIME__);
+	log_error("\tCODE 0x%04lx", signal);
+	switch (signal) {
+		case SIGFPE:
+			log_error("\t\tFLOATING POINT EXCEPTION");
+			break;
+		case SIGILL:
+			log_error("\t\tILLEGAL INSTRUCTION");
+			break;
+		case SIGSEGV:
+			log_error("\t\tSEGMENTATION FAULT");
+			break;
+		default:
+			break;
+	}
+	log_error("\tTHREAD #%llx", pthread_self());
+	if (pthread_self() == sky_main.console_thread) {
+		log_error("\t\tCONSOLE THREAD");
+	} else if (pthread_self() == sky_main.thread) {
+		log_error("\t\tMAIN THREAD");
+	} else if (pthread_self() == sky_main.listener.thread) {
+		log_error("\t\tLISTENER THREAD");
+	} else {
+		for (size_t i = 0; i < sky_main.workers.vector.size; ++i) {
+			sky_worker_t* worker = UTL_VECTOR_GET_AS(sky_worker_t*, &sky_main.workers.vector, i);
+			if (pthread_self() == worker->thread) {
+				log_error("\t\tWORKER #%lld", i);
+				goto identified;
+			}
+		}
+
+		for (size_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
+			ltg_client_t* client = UTL_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
+			if (client != NULL && pthread_self() == client->thread) {
+				log_error("\t\tCLIENT #%lld", i);
+				log_error("\tCLIENT STATE %ld", client->state);
+				log_error("\tENCRYPTION ENABLED %d", client->encryption.enabled);
+				goto identified;
+			}
+		}
+
+		log_error("\t\tUNKNOWN THREAD");
+	}
+	identified:
+	log_error("REPORT THIS CRASH TO MOTORMC ALONG WITH THE STEPS TO REPRODUCE IT");
+	exit(signal);
+}
+
 int main(int argc, char* argv[]) {
+
+	// add signal handlers
+	signal(SIGABRT, sky_handle_signal_terminate);
+	signal(SIGFPE, sky_handle_signal_crash);
+	signal(SIGILL, sky_handle_signal_crash);
+	signal(SIGINT, sky_handle_signal_terminate);
+	signal(SIGSEGV, sky_handle_signal_crash);
+	signal(SIGTERM, sky_handle_signal_terminate);
+
+	sky_main.console_thread = pthread_self();
 
 	struct timespec start;
 	clock_gettime(CLOCK_REALTIME, &start);
@@ -323,6 +392,9 @@ int main(int argc, char* argv[]) {
 	// initiate socket
 	ltg_init();
 
+	// we're running now
+	sky_main.status = sky_running;
+
 	// start main thread
 	pthread_create(&sky_main.thread, NULL, t_sky_main, NULL);
 
@@ -349,19 +421,12 @@ int main(int argc, char* argv[]) {
 
 			cmd_handle(in, sky_main.console);
 
-		} else {
-
-			log_error("Could not read input from stdin!");
-			sky_term();
-
 		}
 	}
 
 }
 
 void* t_sky_main(void* input) {
-
-	sky_main.status = sky_running;
 
 	JOB_CREATE_WORK(update_pings, job_send_update_pings);
 	sch_schedule_repeating(&update_pings->header, 200, 200);
@@ -434,9 +499,11 @@ void* t_sky_worker(void* worker_ptr) {
 
 }
 
-void __attribute__ ((noreturn)) sky_term() {
+void __attribute__((noreturn)) sky_term() {
 
 	sky_main.status = sky_stopping;
+
+	log_info("Stopping the server...");
 
 	// stop listening
 	ltg_term();

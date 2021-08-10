@@ -10,22 +10,6 @@
 // The log is locked so multiple messages from different threads don't interfere
 pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 
-void log_put(const char* format, ...) {
-
-	pthread_mutex_lock(&log_lock);
-
-	va_list args;
-	va_start(args, format);
-
-	vfprintf(stdout, format, args);
-	va_end(args);
-
-	fflush(stdout);
-
-	pthread_mutex_unlock(&log_lock);
-
-}
-
 void log_command(const cht_component_t* chat) {
 
 	char message[512];
@@ -54,6 +38,9 @@ void log_info(const char* format, ...) {
 	// suffix
 	fprintf(stdout, LOG_S1);
 
+	if (sky_main.status == sky_running)
+		fprintf(stdout, "> ");
+
 	fflush(stdout);
 
 	pthread_mutex_unlock(&log_lock);
@@ -78,6 +65,9 @@ void log_warn(const char* format, ...) {
 
 	// suffix
 	fprintf(stdout, LOG_S1);
+
+	if (sky_main.status == sky_running)
+		fprintf(stdout, "> ");
 
 	fflush(stdout);
 
@@ -104,17 +94,21 @@ void log_error(const char* format, ...) {
 	// suffix
 	fprintf(stdout, LOG_S1);
 
+	if (sky_main.status == sky_running)
+		fprintf(stdout, "> ");
+
 	fflush(stdout);
 
 	pthread_mutex_unlock(&log_lock);
 
 }
 
-uint32_t log_to_string(char* message, const cht_component_t* chat) {
+size_t log_to_string(char* message, const cht_component_t* chat) {
 
-	uint32_t offset = 0;
+	size_t offset = 0;
 
 	if (chat->color <= 0xF) {
+		// if we change this to an array it doesn't work anymore
 		switch (chat->color) {
 		case cht_black:
 			offset += sprintf(message + offset, UTL_CONSOLE_BLACK);
@@ -173,7 +167,7 @@ uint32_t log_to_string(char* message, const cht_component_t* chat) {
 
 	if (chat->extra.size != 0) {
 
-		for (uint32_t i = 0; i < chat->extra.size; ++i) {
+		for (size_t i = 0; i < chat->extra.size; ++i) {
 			offset += log_to_string(message + offset, UTL_VECTOR_GET_AS(cht_component_t*, &chat->extra, i));
 		}
 

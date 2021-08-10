@@ -47,7 +47,7 @@ void utl_setup_console(void) {
 
 void utl_restore_console(void) {
 	// Reset colors
-	printf("\x1b[0m\r  \r\n");
+	printf("\x1b[0m\n");
 	fflush(stdout);
 
 	// Reset console mode
@@ -62,7 +62,7 @@ void utl_setup_console(void) {
 
 void utl_restore_console(void) {
 	// Reset colors
-	printf("\x1b[0m\r  \r\n");
+	printf("\x1b[0m\n");
 	fflush(stdout);
 }
 #endif

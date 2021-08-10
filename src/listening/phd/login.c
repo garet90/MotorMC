@@ -4,6 +4,8 @@
 #include "../../util/util.h"
 #include "../../motor.h"
 #include "../../io/logger/logger.h"
+#include "../../io/chat/chat.h"
+#include "../../io/chat/translation.h"
 #include "../../crypt/random.h"
 
 #include <yyjson.h>
@@ -59,17 +61,35 @@ bool_t phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 
 		if (client->protocol < sky_main.protocol) {
 
-			cht_component_t msg = cht_new;
-			msg.text = "Outdated client! Please use " __MC_VER__;
+			cht_translation_t translation = cht_translation_new;
+			translation.translate = cht_translation_multiplayer_disconnect_outdated_client;
+			cht_component_t version = cht_new;
+			version.text = __MC_VER__;
+			
+			cht_add_with(&translation, &version);
 
-			phd_send_disconnect_login(client, msg);
+			char message[128];
+			size_t message_len = cht_write_translation(&translation, message);
+
+			phd_send_disconnect_login(client, message, message_len);
+
+			cht_term_translation(&translation);
 
 		} else {
 
-			cht_component_t msg = cht_new;
-			msg.text = "Outdated server! I'm still on " __MC_VER__;
+			cht_translation_t translation = cht_translation_new;
+			translation.translate = cht_translation_multiplayer_disconnect_outdated_server;
+			cht_component_t version = cht_new;
+			version.text = __MC_VER__;
+			
+			cht_add_with(&translation, &version);
 
-			phd_send_disconnect_login(client, msg);
+			char message[128];
+			size_t message_len = cht_write_translation(&translation, message);
+
+			phd_send_disconnect_login(client, message, message_len);
+
+			cht_term_translation(&translation);
 
 		}
 
@@ -126,10 +146,6 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 	cry_rsa_decript(verify.bytes, verify.bytes, verify.length, &sky_main.listener.keypair);
 	if (verify.key != client->verify) {
 
-		cht_component_t msg = cht_new;
-		msg.text = "Failed RSA Challenge";
-
-		phd_send_disconnect_login(client, msg);
 		return false;
 
 	}
@@ -198,14 +214,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 		pthread_mutex_unlock(&phd_authRequest.lock);
 
 		if (http_code != 200) {
-
-			if (response.ptr != NULL)
-				free(response.ptr);
-
-			cht_component_t msg = cht_new;
-			msg.text = "Authentication failed";
-
-			phd_send_disconnect_login(client, msg);
+			
 			return false;
 
 		}
@@ -330,15 +339,13 @@ bool_t phd_handle_login_plugin_response(ltg_client_t* client, pck_packet_t* pack
 
 }
 
-void phd_send_disconnect_login(ltg_client_t* client, cht_component_t component) {
+void phd_send_disconnect_login(ltg_client_t* client, const char* message, size_t message_len) {
 
-	PCK_INLINE(packet, 512, io_big_endian);
+	PCK_INLINE(packet, 1 + message_len, io_big_endian);
 
 	pck_write_var_int(packet, 0x00);
 
-	char chat[512];
-	uint32_t chat_length = cht_write(&component, chat);
-	pck_write_string(packet, chat, chat_length);
+	pck_write_string(packet, message, message_len);
 
 	ltg_send(client, packet);
 

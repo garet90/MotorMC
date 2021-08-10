@@ -14,7 +14,7 @@ void plg_register_plugin(const char* file) {
 	plg_get_plugin_t get_plugin = NULL;
 
 #ifdef __WINDOWS__
-	char libraryPath[1024];
+	char libraryPath[MAX_PATH];
 	sprintf(libraryPath, "plugins\\%s", file);
 	link.lib = LoadLibrary(libraryPath);
 
@@ -31,7 +31,7 @@ void plg_register_plugin(const char* file) {
 		return;
 	}
 #else
-	char libraryPath[1024];
+	char libraryPath[PATH_MAX];
 	sprintf(libraryPath, "plugins/%s", file);
 	link.lib = dlopen(libraryPath, RTLD_LAZY);
 

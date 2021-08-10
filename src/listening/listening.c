@@ -6,6 +6,8 @@
 #include "../util/util.h"
 #include "../io/logger/logger.h"
 #include "../io/io.h"
+#include "../io/chat/chat.h"
+#include "../io/chat/translation.h"
 
 // packet handlers
 #include "phd/handshake.h"
@@ -304,11 +306,24 @@ void ltg_term() {
 
 	pthread_mutex_lock(&sky_main.listener.clients.lock);
 
+	// disconnect message
+	cht_translation_t disconnect_message = cht_translation_new;
+	disconnect_message.translate = cht_translation_multiplayer_disconnect_server_shutdown;
+
+	char message[128];
+	size_t message_length = cht_write_translation(&disconnect_message, message);
+
 	// disconnect all clients
 	for (uint32_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
 		ltg_client_t* client = UTL_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 		if (client != NULL) {
+			pthread_mutex_unlock(&sky_main.listener.clients.lock);
+			phd_send_disconnect(client, message, message_length);
 			ltg_disconnect(client);
+			if (pthread_self() != client->thread) {
+				pthread_join(client->thread, NULL);
+			}
+			pthread_mutex_lock(&sky_main.listener.clients.lock);
 		}
 	}
 
