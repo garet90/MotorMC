@@ -50,8 +50,8 @@ struct wld_region {
 	
 	wld_world_t* world; // typeof wld_world_t*
 
-	int32_t x;
-	int32_t y;
+	int16_t x;
+	int16_t y;
 
 	// bit array determining which chunks are active
 	utl_bitset(32 * 32, chunk_active);

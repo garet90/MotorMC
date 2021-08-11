@@ -33,22 +33,6 @@ sky_main_t sky_main = {
 	},
 	.status = sky_starting,
 
-	.instructions = {
-		.lock = PTHREAD_MUTEX_INITIALIZER,
-		.vector = {
-			.bytes_per_element = sizeof(sky_instruction_t)
-		}
-	},
-
-	.entities = {
-		.vector = {
-			.bytes_per_element = sizeof(void*)
-		},
-		.next_id = {
-			.bytes_per_element = sizeof(uint32_t)
-		}
-	},
-
 	.worlds = {
 		.bytes_per_element = sizeof(wld_world_t*)
 	},
@@ -401,7 +385,6 @@ int main(int argc, char* argv[]) {
 	for (size_t i = 0; i < sky_main.workers.count; ++i) {
 
 		sky_worker_t* worker = malloc(sizeof(sky_worker_t));
-		pthread_mutex_init(&worker->world_lock, NULL);
 		worker->id = i;
 
 		utl_vector_push(&sky_main.workers.vector, &worker);
@@ -463,20 +446,8 @@ void* t_sky_main(void* input) {
 
 		nanosleep(&sleepTime, NULL);
 
-		// pause work
-		for (size_t i = 0; i < sky_main.workers.vector.size; ++i) {
-			sky_worker_t* worker = UTL_VECTOR_GET_AS(sky_worker_t*, &sky_main.workers.vector, i);
-			pthread_mutex_lock(&worker->world_lock);
-		}
-
 		// do tick stuff
 		sch_tick();
-
-		// resume works (unlock in reverse order)
-		for (size_t i = sky_main.workers.vector.size - 1; i < sky_main.workers.vector.size; --i) {
-			sky_worker_t* worker = UTL_VECTOR_GET_AS(sky_worker_t*, &sky_main.workers.vector, i);
-			pthread_mutex_unlock(&worker->world_lock);
-		}
 
 	}
 
@@ -484,18 +455,16 @@ void* t_sky_main(void* input) {
 
 }
 
-void* t_sky_worker(void* worker_ptr) {
-
-	sky_worker_t* worker = worker_ptr;
+void* t_sky_worker(void* args) {
 
 	while (sky_main.status != sky_stopping) {
 
 		// do work
-		job_work(worker);
+		job_work();
 
 	}
 
-	return NULL;
+	return args;
 
 }
 

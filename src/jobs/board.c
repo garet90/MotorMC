@@ -1,4 +1,5 @@
 #include "board.h"
+#include "../motor.h"
 #include "../util/linkedlist.h"
 #include "../util/vector.h"
 #include "handlers.h"
@@ -95,16 +96,18 @@ void job_add_handler(job_type_t job, job_handler_t handler) {
 
 }
 
-void job_handle(sky_worker_t* worker, job_work_t* work) {
+void job_handle(job_work_t* work) {
 
 	if (work == NULL) return;
 
-	if (job_handlers[work->type] != NULL) {
+	utl_vector_t* work_handlers = job_handlers[work->type];
 
-		for (uint32_t i = 0; i < job_handlers[work->type]->size; ++i) {
+	if (work_handlers != NULL) {
 
-			job_handler_t handler = UTL_VECTOR_GET_AS(job_handler_t, job_handlers[work->type], i);
-			if (!handler(worker, work)) {
+		for (size_t i = 0; i < work_handlers->size; ++i) {
+
+			job_handler_t handler = UTL_VECTOR_GET_AS(job_handler_t, work_handlers, i);
+			if (!handler(work)) {
 				break;
 			}
 
@@ -175,8 +178,8 @@ job_work_t* job_get() {
 
 }
 
-void job_work(sky_worker_t* worker) {
+void job_work() {
 
-	job_handle(worker, job_get());
+	job_handle(job_get());
 
 }

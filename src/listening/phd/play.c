@@ -2,9 +2,11 @@
 #include "../../io/logger/logger.h"
 #include "../../motor.h"
 #include "../../world/world.h"
+#include "../../world/entity/entity.h"
 #include "../../jobs/board.h"
 #include "../../jobs/jobs.h"
 #include "../../jobs/scheduler/scheduler.h"
+#include "../../util/util.h"
 
 bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
@@ -46,6 +48,7 @@ bool_t phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 	PCK_READ_STRING(message, packet);
 
 	if (message_length > 0 && message[0] == '/') {
+		log_info("%s issued server command: %s", client->username.value, message);
 		const cmd_sender_t sender = {
 			.type = cmd_player,
 			.player = client
@@ -70,14 +73,20 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	client->locale.length = pck_read_var_int(packet);
 	pck_read_bytes(packet, (byte_t*) client->locale.value, client->locale.length);
 
-	log_info("View distance: %d", pck_read_int8(packet));
-	log_info("Chat mode: %d", pck_read_var_int(packet));
-	log_info("Colors: %d", pck_read_int8(packet));
-	log_info("Displayed skin parts: %x", pck_read_int8(packet));
-	log_info("Main hand: %d", pck_read_var_int(packet));
-	log_info("Disable text filtering: %d", pck_read_int8(packet));
+	client->render_distance = pck_read_int8(packet);
+	client->chat_mode = pck_read_var_int(packet);
+	__attribute__((unused)) bool_t colors = pck_read_int8(packet);
 
-	phd_send_player_position_and_look(client);
+	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+
+	pthread_mutex_lock(&player->living_entity.entity.lock);
+
+	player->displayed_skin_parts = pck_read_int8(packet);
+	player->main_hand = (byte_t) pck_read_var_int(packet);
+	
+	pthread_mutex_unlock(&player->living_entity.entity.lock);
+
+	__attribute__((unused)) bool_t disable_text_filtering = pck_read_int8(packet);
 
 	return true;
 
@@ -86,14 +95,15 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 bool_t phd_handle_plugin_message(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet, int32_t length) {
 
 	PCK_READ_STRING(channel, packet);
-	log_info("Plugin message for channel: %s", channel);
 
 	int32_t payload_length = length - (1 + io_var_int_length(channel_length) + channel_length);
 	byte_t payload[payload_length];
 	pck_read_bytes(packet, payload, payload_length);
 
-	log_info("Packet cursor: %d", packet->cursor);
-	log_info("Packet length: %d", packet->length);
+	switch(utl_hash(channel)) {
+		default:
+			break;
+	}
 
 	return true;
 
@@ -113,12 +123,23 @@ bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_player_position(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
-	log_info("X: %f", pck_read_float64(packet));
-	log_info("Feet Y: %f", pck_read_float64(packet));
-	log_info("Z: %f", pck_read_float64(packet));
-	log_info("On Ground: %d", pck_read_int8(packet));
+	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+	
+	pthread_mutex_lock(&player->living_entity.entity.lock);
+	
+	player->living_entity.entity.position.x = pck_read_float64(packet);
+	player->living_entity.entity.position.y = pck_read_float64(packet);
+	player->living_entity.entity.position.z = pck_read_float64(packet);
+	
+	if (pck_read_int8(packet)) {
+		utl_set_bit(player->living_entity.entity.status, ent_on_ground);
+	} else {
+		utl_reset_bit(player->living_entity.entity.status, ent_on_ground);
+	}
+
+	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
 	return true;
 
@@ -126,12 +147,24 @@ bool_t phd_handle_player_position(__attribute__((unused)) ltg_client_t* client, 
 
 bool_t phd_handle_player_position_and_look(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
 
-	log_info("X: %f", pck_read_float64(packet));
-	log_info("Feet Y: %f", pck_read_float64(packet));
-	log_info("Z: %f", pck_read_float64(packet));
-	log_info("Yaw: %f", pck_read_float32(packet));
-	log_info("Pitch: %f", pck_read_float32(packet));
-	log_info("On Ground: %d", pck_read_int8(packet));
+	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+	
+	pthread_mutex_lock(&player->living_entity.entity.lock);
+
+	player->living_entity.entity.position.x = pck_read_float64(packet);
+	player->living_entity.entity.position.y = pck_read_float64(packet);
+	player->living_entity.entity.position.z = pck_read_float64(packet);
+
+	player->living_entity.rotation.yaw = pck_read_float32(packet);
+	player->living_entity.rotation.pitch = pck_read_float32(packet);
+	
+	if (pck_read_int8(packet)) {
+		utl_set_bit(player->living_entity.entity.status, ent_on_ground);
+	} else {
+		utl_reset_bit(player->living_entity.entity.status, ent_on_ground);
+	}
+	
+	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
 	return true;
 
@@ -206,6 +239,10 @@ void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 void phd_send_join_game(ltg_client_t* client) {
 
+	// create an entity for the player
+	ent_player_t* player = calloc(1, sizeof(ent_player_t));
+	client->entity_id = ent_register_entity((ent_entity_t*) player);
+
 	// set last recieve packet to now
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
@@ -221,7 +258,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	PCK_INLINE(packet, codec->size + dimension_codec->size + 1024, io_big_endian);
 
 	pck_write_var_int(packet, 0x26);
-	pck_write_int32(packet, 0); // entity ID
+	pck_write_int32(packet, client->entity_id); // entity ID
 	pck_write_int8(packet, sky_main.hardcore);
 	pck_write_int8(packet, sky_main.gamemode);
 	pck_write_int8(packet, -1); // previous game mode
@@ -250,6 +287,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_plugin_message(client, "minecraft:brand", 15, (const byte_t*) "\x07MotorMC", 8);
 	phd_send_declare_commands(client);
 	phd_send_player_info_add_players(client);
+	phd_send_player_position_and_look(client);
 
 	// add to online players
 	pthread_mutex_lock(&sky_main.listener.online.lock);
@@ -383,15 +421,21 @@ void phd_send_player_position_and_look(ltg_client_t* client) {
 
 	PCK_INLINE(packet, 40, io_big_endian);
 
+	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+
+	pthread_mutex_lock(&player->living_entity.entity.lock);
+
 	pck_write_var_int(packet, 0x38);
-	pck_write_float64(packet, 0); // x
-	pck_write_float64(packet, 0); // y
-	pck_write_float64(packet, 0); // z
-	pck_write_float32(packet, 0); // pitch
-	pck_write_float32(packet, 0); // yaw
+	pck_write_float64(packet, player->living_entity.entity.position.x); // x
+	pck_write_float64(packet, player->living_entity.entity.position.y); // y
+	pck_write_float64(packet, player->living_entity.entity.position.z); // z
+	pck_write_float32(packet, player->living_entity.rotation.pitch); // pitch
+	pck_write_float32(packet, player->living_entity.rotation.yaw); // yaw
 	pck_write_int8(packet, 0); // flags
 	pck_write_var_int(packet, 0); // teleport id
 	pck_write_int8(packet, 0); // dismount vehicle
+
+	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
 	ltg_send(client, packet);
 

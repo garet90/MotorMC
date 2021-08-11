@@ -28,6 +28,7 @@ typedef struct {
 	utl_doubly_linked_node_t* online_node;
 
 	uint32_t id;
+	uint32_t entity_id;
 
 	// address
 	int32_t socket;
@@ -73,6 +74,9 @@ typedef struct {
 	} address;
 
 	int32_t keep_alive;
+
+	uint8_t render_distance;
+	uint8_t chat_mode;
 
 	ltg_state_t state;
 

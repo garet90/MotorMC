@@ -6,14 +6,7 @@
 
 typedef struct {
 
-	uint8_t instruction;
-
-} sky_instruction_t;
-
-typedef struct {
-
 	pthread_t thread;
-	pthread_mutex_t world_lock;
 	uint16_t id;
 
 } sky_worker_t;
@@ -29,19 +22,6 @@ typedef struct {
 
 	pthread_t console_thread;
 	pthread_t thread;
-
-	/* instructions */
-	struct {
-		pthread_mutex_t lock;
-		utl_vector_t vector;
-	} instructions;
-
-	/* entities */
-	struct {
-		utl_vector_t vector;
-		/* next entity id */
-		utl_vector_t next_id;
-	} entities;
 
 	/* workers */
 	struct {
