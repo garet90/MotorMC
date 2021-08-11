@@ -18,6 +18,13 @@ typedef enum {
 	sky_stopped = 3
 } sky_status_t;
 
+typedef enum {
+	sky_peaceful = 0,
+	sky_easy = 1,
+	sky_normal = 2,
+	sky_hard = 3
+} sky_difficulty_t;
+
 typedef struct {
 
 	pthread_t console_thread;
@@ -50,7 +57,11 @@ typedef struct {
 	sky_status_t status;
 	cmd_op_level_t op_permission_level;
 
-	bool_t hardcore;
+	struct {
+		uint8_t level;
+		bool_t hardcore;
+	} difficulty;
+	
 	uint8_t gamemode;
 	uint8_t render_distance;
 	bool_t reduced_debug_info;

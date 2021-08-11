@@ -68,7 +68,7 @@ extern void phd_send_block_entity_data(ltg_client_t*);
 extern void phd_send_block_action(ltg_client_t*);
 extern void phd_send_block_change(ltg_client_t*);
 extern void phd_send_boss_bar(ltg_client_t*);
-extern void phd_send_server_difficulty(ltg_client_t*);
+extern void phd_send_server_difficulty(ltg_client_t* client);
 
 extern void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_length, ltg_uuid_t uuid);
 extern void phd_send_system_chat_message(ltg_client_t* client, const char* message, size_t message_length);
@@ -120,7 +120,7 @@ extern void phd_send_player_info_update_display_name(ltg_client_t* client, ltg_c
 extern void phd_send_player_info_remove_player(ltg_client_t* client, ltg_uuid_t uuid);
 
 extern void phd_send_face_player(ltg_client_t*);
-extern void phd_send_player_position_and_look(ltg_client_t*);
+extern void phd_send_player_position_and_look(ltg_client_t* client);
 extern void phd_send_unlock_recipes(ltg_client_t*);
 extern void phd_send_destroy_entities(ltg_client_t*);
 extern void phd_send_remove_entity_effect(ltg_client_t*);
@@ -136,7 +136,7 @@ extern void phd_send_world_border_size(ltg_client_t*);
 extern void phd_send_world_border_warning_delay(ltg_client_t*);
 extern void phd_send_world_border_warning_reach(ltg_client_t*);
 extern void phd_send_camera(ltg_client_t*);
-extern void phd_send_held_item_change(ltg_client_t*);
+extern void phd_send_held_item_change(ltg_client_t* client);
 extern void phd_send_update_view_position(ltg_client_t*);
 extern void phd_send_update_view_distance(ltg_client_t*);
 extern void phd_send_spawn_position(ltg_client_t*);

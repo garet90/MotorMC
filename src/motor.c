@@ -42,6 +42,11 @@ sky_main_t sky_main = {
 		.seed = 0
 	},
 
+	.difficulty = {
+		.level = sky_easy,
+		.hardcore = false
+	},
+
 	.render_distance = 10,
 
 	// listener
@@ -192,9 +197,44 @@ int main(int argc, char* argv[]) {
 				case 0xbaa497e4: // "gamemode"
 					// TODO
 					break;
-				case 0x5af71738: // "difficulty"
+				case 0x5af71738: { // "difficulty"
 					// TODO
-					break;
+					size_t j, j_max;
+					yyjson_val *difficulty_key, *difficulty_val;
+					yyjson_obj_foreach(server_val, j, j_max, difficulty_key, difficulty_val) {
+						const char* d_key = yyjson_get_str(difficulty_key);
+						int32_t d_hash = utl_hash(d_key);
+						switch (d_hash) {
+							case 0xfdabc3d: { // level
+								const char* l_key = yyjson_get_str(difficulty_val);
+								int32_t l_hash = utl_hash(l_key);
+								switch (l_hash) {
+									case 0x20b7672a:
+										sky_main.difficulty.level = sky_peaceful;
+										break;
+									case 0x7c961db7:
+										sky_main.difficulty.level = sky_easy;
+										break;
+									case 0x108f79ae:
+										sky_main.difficulty.level = sky_normal;
+										break;
+									case 0x7c97c2a4:
+										sky_main.difficulty.level = sky_hard;
+										break;
+									default:
+										log_warn("Unknown difficulty level '%s'! (%x)", l_key, l_hash);
+										break;
+								}
+							} break;
+							case 0xb278a56d: // hardcore
+								sky_main.difficulty.hardcore = yyjson_get_bool(difficulty_val);
+								break;
+							default:
+								log_warn("Unknown value '%s' in server.json! (%x)", d_key, d_hash);
+								break;
+						}
+					}
+				} break;
 				case 0xc865ee91: // "enforce-whitelist"
 					sky_main.enforce_whitelist = yyjson_get_bool(server_val);
 					break;

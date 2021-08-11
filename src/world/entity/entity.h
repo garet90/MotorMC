@@ -43,17 +43,53 @@ typedef struct {
 
     pthread_mutex_t lock;
     int32_t entity_id;
-    ent_type_t type;
 
     wld_position_t position;
 
     cht_component_t custom_name;
-    ent_pose_t pose;
     uint16_t air_ticks;
+    uint8_t pose;
+    uint8_t type;
     utl_bitset(ent_status_length, status);
     uint8_t powder_snow_ticks;
 
 } ent_entity_t;
+
+static inline bool_t ent_is_sneaking(ent_entity_t* entity) {
+    return utl_test_bit(entity->status, ent_crouching);
+}
+
+static inline void ent_start_sneaking(ent_entity_t* entity) {
+    utl_set_bit(entity->status, ent_crouching);
+}
+
+static inline void ent_stop_sneaking(ent_entity_t* entity) {
+    utl_reset_bit(entity->status, ent_crouching);
+}
+
+static inline bool_t ent_is_sprinting(ent_entity_t* entity) {
+    return utl_test_bit(entity->status, ent_sprinting);
+}
+
+static inline void ent_start_sprinting(ent_entity_t* entity) {
+    utl_set_bit(entity->status, ent_sprinting);
+}
+
+static inline void ent_stop_sprinting(ent_entity_t* entity) {
+    utl_reset_bit(entity->status, ent_sprinting);
+}
+
+static inline bool_t ent_is_flying_with_elytra(ent_entity_t* entity) {
+    return utl_test_bit(entity->status, ent_flying_elytra);
+}
+
+static inline void ent_start_flying_with_elytra(ent_entity_t* entity) {
+    utl_set_bit(entity->status, ent_flying_elytra);
+}
+
+static inline void ent_stop_flying_with_elytra(ent_entity_t* entity) {
+    utl_reset_bit(entity->status, ent_flying_elytra);
+}
 
 typedef enum {
 
@@ -85,14 +121,27 @@ typedef struct {
 
 } ent_living_entity_t;
 
+typedef enum {
+
+    ent_survival = 0,
+    ent_creative = 1,
+    ent_adventure = 2,
+    ent_spectator = 3
+
+} ent_gamemode_t;
+
 typedef struct {
 
     ent_living_entity_t living_entity;
     float32_t additional_hearts;
     int32_t score;
 
+    uint8_t held_item;
+
     byte_t displayed_skin_parts;
     byte_t main_hand;
+
+    uint8_t gamemode;
 
     // for parrots
     ent_living_entity_t* left_shoulder;

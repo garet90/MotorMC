@@ -20,6 +20,8 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		return phd_handle_chat_message(client, packet);
 	case 0x05:
 		return phd_handle_client_settings(client, packet);
+	case 0x09:
+		return phd_handle_close_window(client, packet);
 	case 0x0a:
 		return phd_handle_plugin_message(client, packet, length);
 	case 0x0f:
@@ -28,6 +30,12 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		return phd_handle_player_position(client, packet);
 	case 0x12:
 		return phd_handle_player_position_and_look(client, packet);
+	case 0x1b:
+		return phd_handle_entity_action(client, packet);
+	case 0x25:
+		return phd_handle_held_item_change(client, packet);
+	case 0x2c:
+		return phd_handle_animation(client, packet);
 	default:
 		log_warn("Unknown packet %02x received in play state!", id);
 		return false;
@@ -35,9 +43,14 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_teleport_confirm(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 
-	log_info("Teleport confirm: %d", pck_read_var_int(packet));
+	uint32_t confirm = pck_read_var_int(packet);
+
+	// the player must've not heard us right
+	if (confirm != client->entity_id) {
+		phd_send_player_position_and_look(client);
+	}
 
 	return true;
 
@@ -87,6 +100,15 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
 	__attribute__((unused)) bool_t disable_text_filtering = pck_read_int8(packet);
+
+	return true;
+
+}
+
+bool_t phd_handle_close_window(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
+
+	// TODO actually do stuff
+	__attribute__((unused)) uint8_t window_id = pck_read_int8(packet);
 
 	return true;
 
@@ -145,7 +167,7 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_player_position_and_look(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
+bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
 	
@@ -170,6 +192,91 @@ bool_t phd_handle_player_position_and_look(__attribute__((unused)) ltg_client_t*
 
 }
 
+bool_t phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
+
+	// at this point, i have no idea what the client is doing
+	// it should send its own entity id
+	if (client->entity_id != (uint32_t) pck_read_var_int(packet)) {
+		return false;
+	}
+
+	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+
+	pthread_mutex_lock(&player->living_entity.entity.lock);
+
+	int32_t action = pck_read_var_int(packet);
+	__attribute__((unused)) int32_t jump_boost = pck_read_var_int(packet); // for jumping with horses
+
+	switch (action) {
+	case 0: // start sneaking
+		ent_start_sneaking((ent_entity_t*) player);
+		break;
+	case 1: // stop sneaking
+		ent_stop_sneaking((ent_entity_t*) player);
+		break;
+	case 2: // leave bed
+		break;
+	case 3: // start sprinting
+		ent_start_sprinting((ent_entity_t*) player);
+		break;
+	case 4: // stop sprinting
+		ent_stop_sprinting((ent_entity_t*) player);
+		break;
+	case 5: // start jump with horse
+		break;
+	case 6: // stop jump with horse
+		break;
+	case 7: // open horse inventory
+		break;
+	case 8: // start flying with elytra
+		ent_start_flying_with_elytra((ent_entity_t*) player);
+		break;
+	}
+
+	pthread_mutex_unlock(&player->living_entity.entity.lock);
+
+	return true;
+
+}
+
+bool_t phd_handle_held_item_change(ltg_client_t* client, pck_packet_t* packet) {
+
+	uint16_t slot = pck_read_int16(packet);
+	
+	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+
+	pthread_mutex_lock(&player->living_entity.entity.lock);
+
+	player->held_item = slot;
+
+	pthread_mutex_unlock(&player->living_entity.entity.lock);
+
+	return true;
+
+}
+
+bool_t phd_handle_animation(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
+
+	__attribute__((unused)) uint8_t hand = pck_read_var_int(packet);
+
+	// TODO
+
+	return true;
+
+}
+
+void phd_send_server_difficulty(ltg_client_t* client) {
+
+	PCK_INLINE(packet, 3, io_big_endian);
+
+	pck_write_var_int(packet, 0x0e);
+	pck_write_int8(packet, sky_main.difficulty.level);
+	pck_write_int8(packet, 0); // difficulty locked
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_len, ltg_uuid_t uuid) {
 
 	PCK_INLINE(packet, 23 + message_len, io_big_endian);
@@ -189,8 +296,8 @@ void phd_send_system_chat_message(ltg_client_t* client, const char* message, siz
 
 	pck_write_var_int(packet, 0x0F);
 	pck_write_string(packet, message, message_len);
-	pck_write_int8(packet, 1);
-	pck_write_int64(packet, 0);
+	pck_write_int8(packet, 1); // position
+	pck_write_int64(packet, 0); // sender
 	pck_write_int64(packet, 0);
 	
 	ltg_send(client, packet);
@@ -237,10 +344,17 @@ void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 }
 
+
+/**
+ * @EntryPoint
+ * This is the first function called in state play
+ */
 void phd_send_join_game(ltg_client_t* client) {
 
 	// create an entity for the player
 	ent_player_t* player = calloc(1, sizeof(ent_player_t));
+	player->living_entity.entity.type = ent_player;
+	player->living_entity.entity.position.y = 256;
 	client->entity_id = ent_register_entity((ent_entity_t*) player);
 
 	// set last recieve packet to now
@@ -259,7 +373,7 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	pck_write_var_int(packet, 0x26);
 	pck_write_int32(packet, client->entity_id); // entity ID
-	pck_write_int8(packet, sky_main.hardcore);
+	pck_write_int8(packet, sky_main.difficulty.hardcore);
 	pck_write_int8(packet, sky_main.gamemode);
 	pck_write_int8(packet, -1); // previous game mode
 
@@ -275,16 +389,19 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	pck_write_string(packet, "world", 5); // world name
 	pck_write_int64(packet, 0); // hashed seed
-	pck_write_var_int(packet, 0); // max players
-	pck_write_var_int(packet, 10); // view distance
-	pck_write_int8(packet, 0); // reduced debug info
-	pck_write_int8(packet, 1); // enable respawn screen
+	pck_write_var_int(packet, sky_main.listener.online.max);
+	pck_write_var_int(packet, sky_main.render_distance); // view distance
+	pck_write_int8(packet, sky_main.reduced_debug_info); // reduced debug info
+	pck_write_int8(packet, sky_main.enable_respawn_screen); // enable respawn screen
 	pck_write_int8(packet, 0); // is debug
 	pck_write_int8(packet, 0); // is flat
 
 	ltg_send(client, packet);
 
+	// NORMAL LOGIN SEQUENCE
+	phd_send_server_difficulty(client);
 	phd_send_plugin_message(client, "minecraft:brand", 15, (const byte_t*) "\x07MotorMC", 8);
+	phd_send_held_item_change(client);
 	phd_send_declare_commands(client);
 	phd_send_player_info_add_players(client);
 	phd_send_player_position_and_look(client);
@@ -336,7 +453,15 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 		} else {
 			pck_write_var_int(packet, 0);
 		}
-		pck_write_var_int(packet, 0); // game mode
+		
+		ent_player_t* player_ent = (ent_player_t*) ent_get_entity_by_id(player->entity_id);
+
+		pthread_mutex_lock(&player_ent->living_entity.entity.lock);
+
+		pck_write_var_int(packet, player_ent->gamemode); // game mode
+
+		pthread_mutex_unlock(&player_ent->living_entity.entity.lock);
+		
 		pck_write_var_int(packet, player->ping); // ping
 		pck_write_int8(packet, 0); // has display name
 		node = node->next;
@@ -352,8 +477,8 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 
 	PCK_INLINE(packet, 2048, io_big_endian);
 	pck_write_var_int(packet, 0x36);
-	pck_write_var_int(packet, 0);
-	pck_write_var_int(packet, 1);
+	pck_write_var_int(packet, 0); // action
+	pck_write_var_int(packet, 1); // number of players
 	pck_write_bytes(packet, player->uuid, 16);
 	pck_write_string(packet, player->username.value, player->username.length);
 	if (player->textures.value.value != NULL) {
@@ -369,10 +494,18 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 	} else {
 		pck_write_var_int(packet, 0);
 	}
-	pck_write_var_int(packet, 0); // game mode
-	pck_write_var_int(packet, player->ping); // ping
-	pck_write_int8(packet, 0); // has display name
+	ent_player_t* player_ent = (ent_player_t*) ent_get_entity_by_id(player->entity_id);
+
+	pthread_mutex_lock(&player_ent->living_entity.entity.lock);
+
+	pck_write_var_int(packet, player_ent->gamemode); // game mode
+
+	pthread_mutex_unlock(&player_ent->living_entity.entity.lock);
 	
+	pck_write_var_int(packet, player->ping); // ping
+
+	pck_write_int8(packet, 0); // has display name
+
 	ltg_send(client, packet);
 
 }
@@ -432,8 +565,25 @@ void phd_send_player_position_and_look(ltg_client_t* client) {
 	pck_write_float32(packet, player->living_entity.rotation.pitch); // pitch
 	pck_write_float32(packet, player->living_entity.rotation.yaw); // yaw
 	pck_write_int8(packet, 0); // flags
-	pck_write_var_int(packet, 0); // teleport id
+	pck_write_var_int(packet, player->living_entity.entity.entity_id); // teleport id
 	pck_write_int8(packet, 0); // dismount vehicle
+
+	pthread_mutex_unlock(&player->living_entity.entity.lock);
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_held_item_change(ltg_client_t* client) {
+	
+	PCK_INLINE(packet, 2, io_big_endian);
+
+	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+
+	pthread_mutex_lock(&player->living_entity.entity.lock);
+
+	pck_write_var_int(packet, 0x48);
+	pck_write_int8(packet, player->held_item);
 
 	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
