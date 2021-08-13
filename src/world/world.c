@@ -97,7 +97,7 @@ wld_world_t* wld_get_world(uint16_t world_id) {
 
 inline void wld_set_relatives(wld_world_t* world, wld_region_t* region) {
     
-	int64_t key = ((uint64_t) region->x << 16) + region->z;
+	const int64_t key = ((uint64_t) region->x << 16) + region->z;
 	region->relative.north = utl_tree_get(&world->regions, key - 1);
 	if (region->relative.north != NULL) {
 		region->relative.north->relative.south = region;
@@ -166,7 +166,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint16_t idx) {
 wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
 
 	wld_region_t* region = wld_get_region(world, x >> 5, z >> 5);
-	uint16_t idx = ((x & 0x1F) << 5) + (z & 0x1F);
+	const uint16_t idx = ((x & 0x1F) << 5) + (z & 0x1F);
 
 	wld_chunk_t* chunk = region->chunks[idx];
 

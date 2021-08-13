@@ -9,7 +9,7 @@ bool_t job_handle_keep_alive(job_keep_alive_t* work) {
 
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
-    int64_t out_ms = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
+    const int64_t out_ms = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
 
     if (out_ms - work->client->last_recv >= 30000) {
         ltg_disconnect(work->client);
@@ -35,7 +35,7 @@ bool_t job_handle_global_chat_message(job_global_chat_message_t* work) {
     cht_add_with(&translation, &message);
 
     char out[1536];
-    size_t out_len = cht_write_translation(&translation, out);
+    const size_t out_len = cht_write_translation(&translation, out);
     // lock client vector
     pthread_mutex_lock(&sky_main.listener.online.lock);
     utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
@@ -62,7 +62,7 @@ bool_t job_handle_player_join(job_player_join_t* work) {
     cht_add_with(&translation, &name);
 
     char out[128];
-    size_t out_len = cht_write_translation(&translation, out);
+    const size_t out_len = cht_write_translation(&translation, out);
     // lock client vector
     pthread_mutex_lock(&sky_main.listener.online.lock);
     utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
@@ -92,8 +92,8 @@ bool_t job_handle_player_leave(job_player_leave_t* work) {
     cht_add_with(&translation, &name);
 
     char out[128];
-    size_t out_len = cht_write_translation(&translation, out);
-    // TODO send player leave message
+    const size_t out_len = cht_write_translation(&translation, out);
+    
     pthread_mutex_lock(&sky_main.listener.online.lock);
     utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
     while (node != NULL) {

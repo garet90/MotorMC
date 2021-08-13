@@ -59,8 +59,8 @@ void* t_ltg_run(void* input) {
 
 		int32_t socket;
 		struct sockaddr_in address;
-		int addressSize = sizeof(struct sockaddr_in);
-		socket = sck_accept(sky_main.listener.address.socket, (struct sockaddr*) &address, &addressSize);
+		int address_size = sizeof(struct sockaddr_in);
+		socket = sck_accept(sky_main.listener.address.socket, (struct sockaddr*) &address, &address_size);
 
 		if (socket == SCK_FAILED) {
 
@@ -73,7 +73,7 @@ void* t_ltg_run(void* input) {
 			ltg_client_t* client = calloc(1, sizeof(ltg_client_t));
 			client->socket = socket;
 			client->address.addr = address;
-			client->address.size = addressSize;
+			client->address.size = address_size;
 			client->state = ltg_handshake;
 			client->keep_alive = -1;
 
@@ -192,7 +192,7 @@ bool_t ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 	size_t length = packet->cursor;
-	size_t length_length = io_var_int_length(length);
+	const size_t length_length = io_var_int_length(length);
 	byte_t* bytes = packet->bytes - length_length;
 	io_write_var_int(bytes, length);
 	length += length_length;

@@ -11,8 +11,8 @@
 
 bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
-	int32_t length = pck_read_var_int(packet); // packet length
-	int32_t id = pck_read_var_int(packet);
+	const int32_t length = pck_read_var_int(packet); // packet length
+	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
 	case 0x00:

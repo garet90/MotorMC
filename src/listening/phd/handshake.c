@@ -10,8 +10,8 @@ bool_t phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
 		return phd_handle_legacy_slp(client, packet);
 	}
 
-	pck_read_var_int(packet); // packet length
-	int32_t id = pck_read_var_int(packet);
+	__attribute__((unused)) const int32_t length = pck_read_var_int(packet); // packet length
+	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
 	case 0x00:

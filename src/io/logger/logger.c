@@ -24,7 +24,7 @@ void log_info(const char* format, ...) {
 	pthread_mutex_lock(&log_lock);
 
 	// prefix
-	time_t now = time(NULL);
+	const time_t now = time(NULL);
 	struct tm *tm_struct = localtime(&now);
 	fprintf(stdout, LOG_P1 "0" LOG_P2 "INFO" LOG_P3, tm_struct->tm_hour, tm_struct->tm_min, tm_struct->tm_sec);
 
@@ -52,7 +52,7 @@ void log_warn(const char* format, ...) {
 	pthread_mutex_lock(&log_lock);
 
 	// prefix
-	time_t now = time(NULL);
+	const time_t now = time(NULL);
 	struct tm *tm_struct = localtime(&now);
 	fprintf(stdout, LOG_P1 "93" LOG_P2 "WARN" LOG_P3, tm_struct->tm_hour, tm_struct->tm_min, tm_struct->tm_sec);
 
@@ -80,7 +80,7 @@ void log_error(const char* format, ...) {
 	pthread_mutex_lock(&log_lock);
 
 	// prefix
-	time_t now = time(NULL);
+	const time_t now = time(NULL);
 	struct tm *tm_struct = localtime(&now);
 	fprintf(stdout, LOG_P1 "91" LOG_P2 "ERROR" LOG_P3, tm_struct->tm_hour, tm_struct->tm_min, tm_struct->tm_sec);
 

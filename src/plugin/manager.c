@@ -94,21 +94,21 @@ void plg_on_startup() {
 
 			log_info("Enabling %s version %s...", plugin.meta->name, plugin.meta->version);
 
-			plg_on_enable_t onEnable = NULL;
+			plg_on_enable_t on_enable = NULL;
 
 #ifdef __WINDOWS__
 
-			onEnable = (void*) GetProcAddress(plugin.lib, "on_enable");
+			on_enable = (void*) GetProcAddress(plugin.lib, "on_enable");
 
 #else
 
-			onEnable = dlsym(plugin.lib, "on_enable");
+			on_enable = dlsym(plugin.lib, "on_enable");
 
 #endif
-			if (onEnable == NULL) {
+			if (on_enable == NULL) {
 				log_error("Failed to enable %s", plugin.meta->name);
 			} else {
-				onEnable();
+				on_enable();
 			}
 
 		}
@@ -127,21 +127,21 @@ void plg_on_postworld() {
 
 			log_info("Enabling %s version %s...", plugin.meta->name, plugin.meta->version);
 
-			plg_on_enable_t onEnable = NULL;
+			plg_on_enable_t on_enable = NULL;
 
 #ifdef __WINDOWS__
 
-			onEnable = (void*) GetProcAddress(plugin.lib, "on_enable");
+			on_enable = (void*) GetProcAddress(plugin.lib, "on_enable");
 
 #else
 
-			onEnable = dlsym(plugin.lib, "on_enable");
+			on_enable = dlsym(plugin.lib, "on_enable");
 
 #endif
-			if (onEnable == NULL) {
+			if (on_enable == NULL) {
 				log_error("Failed to enable %s", plugin.meta->name);
 			} else {
-				onEnable();
+				on_enable();
 			}
 
 		}
@@ -158,22 +158,22 @@ void plg_on_disable() {
 
 		log_info("Disabling %s...", plugin.meta->name);
 
-		plg_on_disable_t onDisable = NULL;
+		plg_on_disable_t on_disable = NULL;
 
 #ifdef __WINDOWS__
 
-		onDisable = (void*) GetProcAddress(plugin.lib, "on_disable");
+		on_disable = (void*) GetProcAddress(plugin.lib, "on_disable");
 
 #else
 
-		onDisable = dlsym(plugin.lib, "on_disable");
+		on_disable = dlsym(plugin.lib, "on_disable");
 
 #endif
 
-		if (onDisable == NULL) {
+		if (on_disable == NULL) {
 			log_error("Failed to disable %s", plugin.meta->name);
 		} else {
-			onDisable();
+			on_disable();
 		}
 
 #ifdef __WINDOWS__

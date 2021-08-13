@@ -128,4 +128,15 @@ static inline wld_chunk_t* wld_get_chunk_at(wld_world_t* world, int32_t x, int32
 	return wld_get_chunk(world, x >> 4, z >> 4);
 }
 
+static inline int32_t wld_get_chunk_x(wld_chunk_t* chunk) {
+	int32_t x = chunk->region->x << 5; // region x * 32
+	x += chunk->idx >> 5;
+	return x;
+}
+static inline int32_t wld_get_chunk_z(wld_chunk_t* chunk) {
+	int32_t z = chunk->region->z << 5; // region z * 32
+	z += chunk->idx & 0x1F;
+	return z;
+}
+
 extern void wld_unload(wld_world_t* world);

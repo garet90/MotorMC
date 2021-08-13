@@ -22,7 +22,7 @@ struct {
 
 size_t phd_auth_response_write(void* ptr, size_t size, size_t nmemb, phd_auth_response_t* r) {
 	
-	size_t new_len = r->len + size * nmemb;
+	const size_t new_len = r->len + size * nmemb;
 	r->ptr = realloc(r->ptr, new_len + 1);
 
 	memcpy(r->ptr + r->len, ptr, size * nmemb);
@@ -35,8 +35,8 @@ size_t phd_auth_response_write(void* ptr, size_t size, size_t nmemb, phd_auth_re
 
 bool_t phd_login(ltg_client_t* client, pck_packet_t* packet) {
 
-	pck_read_var_int(packet); // packet length
-	int32_t id = pck_read_var_int(packet);
+	__attribute__((unused)) const int32_t length = pck_read_var_int(packet); // packet length
+	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
 	case 0x00:
@@ -69,7 +69,7 @@ bool_t phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 			cht_add_with(&translation, &version);
 
 			char message[128];
-			size_t message_len = cht_write_translation(&translation, message);
+			const size_t message_len = cht_write_translation(&translation, message);
 
 			phd_send_disconnect_login(client, message, message_len);
 
@@ -85,7 +85,7 @@ bool_t phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 			cht_add_with(&translation, &version);
 
 			char message[128];
-			size_t message_len = cht_write_translation(&translation, message);
+			const size_t message_len = cht_write_translation(&translation, message);
 
 			phd_send_disconnect_login(client, message, message_len);
 
@@ -118,14 +118,14 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 	utl_reverse_bytes(secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH);
 	
 	// start encryption cypher
-	int cres = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.encrypt);
-	if (cres != CRYPT_OK) {
-		log_error("Could not start encryption cipher! Error code: %d", cres);
+	const int enc_res = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.encrypt);
+	if (enc_res != CRYPT_OK) {
+		log_error("Could not start encryption cipher! Error code: %d", enc_res);
 		return false;
 	}
-	cres = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.decrypt);
-	if (cres != CRYPT_OK) {
-		log_error("Could not start decryption cipher! Error code: %d", cres);
+	const int dec_res = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.decrypt);
+	if (dec_res != CRYPT_OK) {
+		log_error("Could not start decryption cipher! Error code: %d", dec_res);
 		return false;
 	}
 	client->encryption.enabled = true;
@@ -208,7 +208,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 		}
 
-		long http_code = 0;
+		long http_code;
 		curl_easy_getinfo(phd_authRequest.curl, CURLINFO_RESPONSE_CODE, &http_code);
 
 		pthread_mutex_unlock(&phd_authRequest.lock);

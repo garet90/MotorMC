@@ -210,7 +210,7 @@ void cmd_message(const cmd_sender_t sender, const cht_component_t* component) {
 			break;
 		case cmd_player: {
 			char message[4096];
-			size_t message_length = cht_write(component, message);
+			const size_t message_length = cht_write(component, message);
 			phd_send_system_chat_message(sender.player, message, message_length);
 		} break;
 		case cmd_command_block:

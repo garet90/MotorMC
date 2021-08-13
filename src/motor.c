@@ -288,7 +288,7 @@ int main(int argc, char* argv[]) {
 
 		log_info("server.json not found! Generating one...");
 		
-		byte_t server_json[] = {
+		const byte_t server_json[] = {
 			0x7b, 0x0d, 0x0a, 0x09, 0x22, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x2d,
 			0x63, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x3a, 0x20, 0x34, 0x2c, 0x0d, 0x0a,
 			0x09, 0x22, 0x6d, 0x61, 0x78, 0x2d, 0x74, 0x69, 0x63, 0x6b, 0x2d, 0x74,
@@ -440,7 +440,7 @@ int main(int argc, char* argv[]) {
 
 }
 
-void* t_sky_main(void* input) {
+void* t_sky_main(__attribute__((unused)) void* input) {
 
 	JOB_CREATE_WORK(update_pings, job_send_update_pings);
 	sch_schedule_repeating(&update_pings->header, 200, 200);
@@ -482,11 +482,11 @@ void* t_sky_main(void* input) {
 
 	}
 
-	return input;
+	return NULL;
 
 }
 
-void* t_sky_worker(void* args) {
+void* t_sky_worker(__attribute__((unused)) void* input) {
 
 	while (sky_main.status != sky_stopping) {
 
@@ -495,7 +495,7 @@ void* t_sky_worker(void* args) {
 
 	}
 
-	return args;
+	return NULL;
 
 }
 

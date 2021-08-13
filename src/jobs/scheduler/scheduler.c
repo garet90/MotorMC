@@ -37,7 +37,7 @@ void sch_push(sch_scheduled_t* scheduled, uint32_t delay) {
 
 	pthread_mutex_lock(&sch_board.lock);
 
-	void* null = NULL;
+	const void* null = NULL;
 	while (sch_board.elements.size < delay) {
 		utl_vector_push(&sch_board.elements, &null);
 	}

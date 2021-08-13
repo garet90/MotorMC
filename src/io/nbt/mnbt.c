@@ -312,7 +312,7 @@ size_t mnbt_write(mnbt_doc* document, uint8_t* bytes, mnbt_compression compressi
 size_t mnbt_write_file(mnbt_doc* document, const char* file, size_t max_file_length, mnbt_compression compression) {
 
 	uint8_t buffer[max_file_length];
-	size_t size = mnbt_write(document, buffer, compression);
+	const size_t size = mnbt_write(document, buffer, compression);
 
 	FILE* f = fopen(file, "wb");
 
@@ -341,7 +341,7 @@ size_t _mnbt_write_tag(mnbt_tag* tag, uint8_t* bytes) {
 	memcpy(bytes, tag->label, tag->label_length);
 	bytes += tag->label_length;
 
-	size_t val_len = _mnbt_write_val(tag->type, tag->value, bytes);
+	const size_t val_len = _mnbt_write_val(tag->type, tag->value, bytes);
 
 	return val_len + 3 + tag->label_length;
 
