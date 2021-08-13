@@ -1,6 +1,6 @@
 #include "board.h"
 #include "../motor.h"
-#include "../util/linkedlist.h"
+#include "../util/linked_list.h"
 #include "../util/vector.h"
 #include "handlers.h"
 #include <pthread.h>

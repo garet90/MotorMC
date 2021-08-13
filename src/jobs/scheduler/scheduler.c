@@ -2,7 +2,7 @@
 #include "../../motor.h"
 #include "../../util/id_vector.h"
 #include "../../util/vector.h"
-#include "../../util/linkedlist.h"
+#include "../../util/linked_list.h"
 #include <pthread.h>
 
 typedef struct {

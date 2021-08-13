@@ -1,8 +1,10 @@
+#include <stdio.h>
 #include "commands.h"
 #include "../../motor.h"
 #include "../../util/tree.h"
 #include "../../util/vector.h"
 #include "../../listening/phd/play.h"
+#include "../../plugin/manager.h"
 #include "../logger/logger.h"
 
 utl_tree_t cmd_handlers = {
@@ -467,11 +469,30 @@ bool_t cmd_plugins(char* args, const cmd_sender_t sender) {
 		return false;
 	}
 
+	char plugin_text[17];
+	sprintf(plugin_text, "Plugins (%lld): ", plg_links.size);
+
 	cht_component_t plugins = cht_new;
-	plugins.text = "Plugins: ";
-	plugins.color = cht_yellow;
+	plugins.text = plugin_text;
+	plugins.color = cht_white;
+
+	for (size_t i = 0; i < plg_links.size; ++i) {
+		plg_link_t* link = UTL_VECTOR_GET_AS(plg_link_t*, &plg_links, i);
+		cht_component_t* plugin = cht_alloc();
+		plugin->text = (char*) link->meta->name;
+		plugin->color = cht_bright_green;
+		if (i < plg_links.size - 1) {
+			cht_component_t* comma = cht_alloc();
+			comma->text = ", ";
+			comma->color = cht_white;
+			cht_add_extra(plugin, comma);
+		}
+		cht_add_extra(&plugins, plugin);
+	}
 
 	cmd_message(sender, &plugins);
+
+	cht_free(&plugins);
 
 	return true;
 

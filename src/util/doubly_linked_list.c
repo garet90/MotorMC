@@ -1,21 +1,21 @@
 #include <stdlib.h>
-#include "doublylinkedlist.h"
+#include "doubly_linked_list.h"
 
-utl_doubly_linked_list_t* utl_create_doubly_list() {
+utl_doubly_linked_list_t* utl_create_dllist() {
 	utl_doubly_linked_list_t* list = calloc(1, sizeof(utl_doubly_linked_list_t));
 	return list;
 }
 
-utl_doubly_linked_node_t* utl_create_doubly_node() {
+utl_doubly_linked_node_t* utl_create_dlnode() {
 
 	utl_doubly_linked_node_t* node = calloc(1, sizeof(utl_doubly_linked_node_t));
 	return node;
 
 }
 
-utl_doubly_linked_node_t* utl_list_doubly_push(utl_doubly_linked_list_t* list, void* element) {
+utl_doubly_linked_node_t* utl_dllist_push(utl_doubly_linked_list_t* list, void* element) {
 
-	utl_doubly_linked_node_t* node = utl_create_doubly_node();
+	utl_doubly_linked_node_t* node = utl_create_dlnode();
 	node->element = element;
 
 	if (list->first == NULL) {
@@ -33,7 +33,7 @@ utl_doubly_linked_node_t* utl_list_doubly_push(utl_doubly_linked_list_t* list, v
 
 }
 
-void* utl_list_doubly_shift(utl_doubly_linked_list_t* list) {
+void* utl_dllist_shift(utl_doubly_linked_list_t* list) {
 
 	if (list->first == NULL) return NULL;
 

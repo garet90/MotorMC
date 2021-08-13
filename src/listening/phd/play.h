@@ -91,7 +91,7 @@ extern void phd_send_change_game_state(ltg_client_t*);
 extern void phd_send_open_horse_window(ltg_client_t*);
 extern void phd_send_initialize_world_border(ltg_client_t*);
 extern void phd_send_keep_alive(ltg_client_t* client, uint64_t id);
-extern void phd_send_chunk_data(ltg_client_t*);
+extern void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk);
 extern void phd_send_effect(ltg_client_t*);
 extern void phd_send_particle(ltg_client_t*);
 extern void phd_send_update_light(ltg_client_t*);
@@ -137,7 +137,10 @@ extern void phd_send_world_border_warning_delay(ltg_client_t*);
 extern void phd_send_world_border_warning_reach(ltg_client_t*);
 extern void phd_send_camera(ltg_client_t*);
 extern void phd_send_held_item_change(ltg_client_t* client);
-extern void phd_send_update_view_position(ltg_client_t*);
+
+extern void phd_send_update_view_position_spawn(ltg_client_t* client);
+extern void phd_send_update_view_position(ltg_client_t* client, wld_position_t old_position);
+
 extern void phd_send_update_view_distance(ltg_client_t*);
 extern void phd_send_spawn_position(ltg_client_t*);
 extern void phd_send_display_scoreboard(ltg_client_t*);

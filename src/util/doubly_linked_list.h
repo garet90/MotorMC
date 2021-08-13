@@ -19,15 +19,15 @@ typedef struct {
 
 } utl_doubly_linked_list_t;
 
-extern utl_doubly_linked_list_t* utl_create_doubly_list();
+extern utl_doubly_linked_list_t* utl_create_dllist();
 
-static inline void utl_init_doubly_list(utl_doubly_linked_list_t* list) {
+static inline void utl_init_dllist(utl_doubly_linked_list_t* list) {
 	list->first = NULL;
 	list->last = NULL;
 	list->length = 0;
 }
 
-extern utl_doubly_linked_node_t* utl_create_doubly_node();
-extern utl_doubly_linked_node_t* utl_list_doubly_push(utl_doubly_linked_list_t*, void*);
-extern void* utl_list_doubly_shift(utl_doubly_linked_list_t*);
+extern utl_doubly_linked_node_t* utl_create_dlnode();
+extern utl_doubly_linked_node_t* utl_dllist_push(utl_doubly_linked_list_t*, void*);
+extern void* utl_dllist_shift(utl_doubly_linked_list_t*);
 extern void utl_list_doubly_remove_by_reference(utl_doubly_linked_list_t* list, utl_doubly_linked_node_t* node);

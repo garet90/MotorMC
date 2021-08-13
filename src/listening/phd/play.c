@@ -87,7 +87,7 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	client->locale.length = pck_read_var_int(packet);
 	pck_read_bytes(packet, (byte_t*) client->locale.value, client->locale.length);
 
-	client->render_distance = pck_read_int8(packet);
+	client->render_distance = UTL_MIN(pck_read_int8(packet), sky_main.render_distance);
 	client->chat_mode = pck_read_var_int(packet);
 	__attribute__((unused)) bool_t colors = pck_read_int8(packet);
 
@@ -345,6 +345,11 @@ void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 }
 
+void phd_send_chunk_data(__attribute__((unused)) ltg_client_t* client, __attribute__((unused)) wld_chunk_t* chunk) {
+
+	// TODO send the chunk
+
+}
 
 /**
  * @EntryPoint
@@ -429,7 +434,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	// add to online players
 	pthread_mutex_lock(&sky_main.listener.online.lock);
 	
-	client->online_node = utl_list_doubly_push(&sky_main.listener.online.list, client);
+	client->online_node = utl_dllist_push(&sky_main.listener.online.list, client);
 
 	pthread_mutex_unlock(&sky_main.listener.online.lock);
 
@@ -608,5 +613,28 @@ void phd_send_held_item_change(ltg_client_t* client) {
 	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
 	ltg_send(client, packet);
+
+}
+
+void phd_send_update_view_position_spawn(ltg_client_t* client) {
+	
+	PCK_INLINE(packet, 11, io_big_endian);
+
+	ent_player_t* player = client->entity;
+
+	pthread_mutex_lock(&player->living_entity.entity.lock);
+
+	wld_chunk_t* chunk = player->living_entity.entity.chunk;
+
+	pthread_mutex_unlock(&player->living_entity.entity.lock);
+
+	pck_write_var_int(packet, 0x49);
+	pck_write_var_int(packet, wld_get_chunk_x(chunk));
+	pck_write_var_int(packet, wld_get_chunk_z(chunk));
+
+	ltg_send(client, packet);
+
+	wld_subscribe_chunk(chunk, client->id);
+	phd_send_chunk_data(client, chunk);
 
 }

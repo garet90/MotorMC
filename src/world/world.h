@@ -1,8 +1,9 @@
 #pragma once
 #include <pthread.h>
 #include "../main.h"
-#include "../util/doublylinkedlist.h"
+#include "../util/doubly_linked_list.h"
 #include "../util/id_vector.h"
+#include "../util/bit_vector.h"
 #include "../util/tree.h"
 #include "../util/bitset.h"
 #include "material/material.h"
@@ -35,7 +36,7 @@ struct wld_chunk {
 
 	// subscribers are "subscribed" to updates in the chunk
 	// they also are useful when calculating the chunk ticket
-	utl_doubly_linked_list_t subscribers;
+	utl_bit_vector_t subscribers;
 
 	utl_id_vector_t block_entities;
 	utl_doubly_linked_list_t entities;
@@ -137,6 +138,13 @@ static inline int32_t wld_get_chunk_z(wld_chunk_t* chunk) {
 	int32_t z = chunk->region->z << 5; // region z * 32
 	z += chunk->idx & 0x1F;
 	return z;
+}
+
+static inline void wld_subscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
+	utl_bit_vector_set_bit(&chunk->subscribers, client_id);
+}
+static inline void wld_unsubscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
+	utl_bit_vector_reset_bit(&chunk->subscribers, client_id);
 }
 
 extern void wld_unload(wld_world_t* world);

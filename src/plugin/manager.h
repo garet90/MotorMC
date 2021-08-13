@@ -1,6 +1,7 @@
 #pragma once
 #include "../main.h"
 #include "../io/logger/logger.h"
+#include "../util/vector.h"
 #include "plugin.h"
 
 #ifdef __WINDOWS__
@@ -57,6 +58,8 @@ struct plg_link {
 };
 
 #endif
+
+extern utl_vector_t plg_links;
 
 extern void plg_register_plugin(const char*);
 extern void plg_register_plugins();

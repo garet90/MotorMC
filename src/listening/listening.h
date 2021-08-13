@@ -2,7 +2,7 @@
 #include <pthread.h>
 #include "../main.h"
 #include "../util/id_vector.h"
-#include "../util/doublylinkedlist.h"
+#include "../util/doubly_linked_list.h"
 #include "../io/packet/packet.h"
 #include "../crypt/rsa.h"
 #include "../crypt/cfb8.h"

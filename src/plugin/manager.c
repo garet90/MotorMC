@@ -1,6 +1,5 @@
 #include "manager.h"
 #include <stdio.h>
-#include "../util/vector.h"
 #include "../io/logger/logger.h"
 #include "../io/filesystem/filesystem.h"
 
