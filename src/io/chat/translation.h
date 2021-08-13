@@ -37,4 +37,6 @@ static inline void cht_add_with(cht_translation_t* translation, const cht_compon
 extern void cht_jsonify_translation(yyjson_mut_doc*, yyjson_mut_val*, const cht_translation_t*);
 extern size_t cht_write_translation(const cht_translation_t*, char*);
 
-extern void cht_term_translation(cht_translation_t* translation);
+static inline void cht_term_translation(cht_translation_t* translation) {
+    utl_vector_term(&translation->with);
+}

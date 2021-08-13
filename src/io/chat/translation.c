@@ -87,9 +87,3 @@ size_t cht_write_translation(const cht_translation_t* translation, char* message
 	return str_len;
 
 }
-
-void cht_term_translation(cht_translation_t* translation) {
-    
-    utl_vector_term(&translation->with);
-
-}
