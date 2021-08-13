@@ -293,7 +293,7 @@ void phd_send_chat_message(ltg_client_t* client, const char* message, size_t mes
 
 void phd_send_system_chat_message(ltg_client_t* client, const char* message, size_t message_len) {
 
-	PCK_INLINE(packet, 7 + message_len, io_big_endian);
+	PCK_INLINE(packet, 23 + message_len, io_big_endian);
 
 	pck_write_var_int(packet, 0x0F);
 	pck_write_string(packet, message, message_len);
