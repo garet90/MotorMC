@@ -9,6 +9,8 @@ void _mnbt_add(mnbt_doc* document, mnbt_tag* tag);
 size_t _mnbt_write_tag(mnbt_tag* tag, uint8_t* bytes);
 size_t _mnbt_write_val(mnbt_type type, mnbt_val val, uint8_t* bytes);
 
+void _mnbt_free_val(mnbt_type type, mnbt_val val);
+
 static inline int16_t _mnbt_reverse_short(int16_t val) {
 	const uint8_t e[2] = { 0xAA, 0xBB };
 	if (*((uint16_t*) e) == 0xAABB) {

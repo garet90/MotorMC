@@ -323,6 +323,8 @@ void cmd_write_node(pck_packet_t* packet, cmd_node_t* node) {
 		cmd_write_node(packet, child);
 	}
 
+	utl_vector_term(&node->children);
+
 }
 
 pck_packet_t* cmd_get_graph() {

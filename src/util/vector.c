@@ -76,8 +76,11 @@ void utl_vector_resize(utl_vector_t* vector, size_t capacity) {
 
 void utl_vector_term(utl_vector_t* vector) {
 
-	free(vector->array);
-	vector->capacity = 0;
+	if (vector->capacity > 0) {
+		free(vector->array);
+		vector->capacity = 0;
+		vector->size = 0;
+	}
 
 }
 

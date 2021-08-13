@@ -521,6 +521,43 @@ void mnbt_val_list_push(mnbt_val* list, mnbt_val val) {
 
 }
 
+void _mnbt_free_val(mnbt_type type, mnbt_val val) {
+
+	switch (type) {
+		case MNBT_BYTE_ARRAY: {
+			free(val.Byte_Array.bytes);
+			break;
+		}
+		case MNBT_STRING: {
+			free(val.String.string);
+			break;
+		}
+		case MNBT_LIST: {
+			for (uint32_t i = 0; i < val.List.size; ++i) {
+				_mnbt_free_val(val.List.type, val.List.list[i]);
+			}
+			free(val.List.list);
+			break;
+		}
+		case MNBT_COMPOUND: {
+			free(val.Compound.tags);
+			break;
+		}
+		case MNBT_INT_ARRAY: {
+			free(val.Int_Array.ints);
+			break;
+		}
+		case MNBT_LONG_ARRAY: {
+			free(val.Long_Array.longs);
+			break;
+		}
+		default: {
+			break;
+		}
+	}
+
+}
+
 void mnbt_free(mnbt_doc* document) {
 
 	for (uint32_t i = 0; i < document->count; ++i) {
@@ -529,40 +566,13 @@ void mnbt_free(mnbt_doc* document) {
 
 		free(tag->label);
 		
-		switch (tag->type) {
-			case MNBT_BYTE_ARRAY: {
-				free(tag->value.Byte_Array.bytes);
-				break;
-			}
-			case MNBT_STRING: {
-				free(tag->value.String.string);
-				break;
-			}
-			case MNBT_LIST: {
-				free(tag->value.List.list);
-				break;
-			}
-			case MNBT_COMPOUND: {
-				free(tag->value.Compound.tags);
-				break;
-			}
-			case MNBT_INT_ARRAY: {
-				free(tag->value.Int_Array.ints);
-				break;
-			}
-			case MNBT_LONG_ARRAY: {
-				free(tag->value.Long_Array.longs);
-				break;
-			}
-			default: {
-				break;
-			}
-		}
+		_mnbt_free_val(tag->type, tag->value);
 
 		free(tag);
 
 	}
 
+	free(document->tags);
 	free(document);
 
 }
