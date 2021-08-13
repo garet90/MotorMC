@@ -122,7 +122,7 @@ void sky_handle_signal_crash(int signal) {
 	}
 	identified:
 	log_error("REPORT THIS CRASH TO MOTORMC ALONG WITH THE STEPS TO REPRODUCE IT");
-	exit(signal);
+	abort();
 }
 
 int main(int argc, char* argv[]) {
