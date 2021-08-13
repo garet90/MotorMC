@@ -32,10 +32,6 @@ sky_main_t sky_main = {
 		}
 	},
 	.status = sky_starting,
-
-	.worlds = {
-		.bytes_per_element = sizeof(wld_world_t*)
-	},
 	
 	.world = {
 		.name = "world",
@@ -58,9 +54,6 @@ sky_main_t sky_main = {
 			.lock = PTHREAD_MUTEX_INITIALIZER,
 			.vector = {
 				.bytes_per_element = sizeof(ltg_client_t*)
-			},
-			.next_id = {
-				.bytes_per_element = sizeof(uint32_t)
 			}
 		},
 		.online = {
@@ -116,7 +109,7 @@ void sky_handle_signal_crash(int signal) {
 		}
 
 		for (size_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
-			ltg_client_t* client = UTL_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
+			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 			if (client != NULL && pthread_self() == client->thread) {
 				log_error("\t\tCLIENT #%lld", i);
 				log_error("\tCLIENT STATE %ld", client->state);
@@ -402,12 +395,10 @@ int main(int argc, char* argv[]) {
 	// TODO load world
 	if (fs_dir_exists(sky_main.world.name)) {
 		log_info("Loading world %s...", sky_main.world.name);
-		wld_world_t* world = wld_load(sky_main.world.name);
-		utl_vector_push(&sky_main.worlds, &world);
+		wld_load(sky_main.world.name);
 	} else {
 		log_info("Generating world %s...", sky_main.world.name);
-		wld_world_t* world = wld_new(sky_main.world.name, (sky_main.world.seed == 0 ? time(NULL) : sky_main.world.seed), mat_dimension_overworld);
-		utl_vector_push(&sky_main.worlds, &world);
+		wld_new(sky_main.world.name, (sky_main.world.seed == 0 ? time(NULL) : sky_main.world.seed), mat_dimension_overworld);
 	}
 
 	// load postworld plugins

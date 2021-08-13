@@ -40,9 +40,6 @@ typedef struct {
 	const char* mcver;
 	cht_component_t* motd;
 	
-	/* worlds */
-	utl_vector_t worlds;
-	
 	cmd_sender_t console;
 	
 	/* Default world */

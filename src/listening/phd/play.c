@@ -1,3 +1,4 @@
+#include <tomcrypt.h>
 #include "play.h"
 #include "../../io/logger/logger.h"
 #include "../../motor.h"
@@ -48,7 +49,7 @@ bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 	uint32_t confirm = pck_read_var_int(packet);
 
 	// the player must've not heard us right
-	if (confirm != client->entity_id) {
+	if (confirm != client->entity->living_entity.entity.id) {
 		phd_send_player_position_and_look(client);
 	}
 
@@ -90,7 +91,7 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	client->chat_mode = pck_read_var_int(packet);
 	__attribute__((unused)) bool_t colors = pck_read_int8(packet);
 
-	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+	ent_player_t* player = client->entity;
 
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 
@@ -147,7 +148,7 @@ bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
 bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
-	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+	ent_player_t* player = client->entity;
 	
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 	
@@ -169,7 +170,7 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet) {
 
-	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+	ent_player_t* player = client->entity;
 	
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 
@@ -194,13 +195,13 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 
 bool_t phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 
+	ent_player_t* player = client->entity;
+
 	// at this point, i have no idea what the client is doing
 	// it should send its own entity id
-	if (client->entity_id != (uint32_t) pck_read_var_int(packet)) {
+	if (player->living_entity.entity.id != (uint32_t) pck_read_var_int(packet)) {
 		return false;
 	}
-
-	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
 
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 
@@ -243,7 +244,7 @@ bool_t phd_handle_held_item_change(ltg_client_t* client, pck_packet_t* packet) {
 
 	uint16_t slot = pck_read_int16(packet);
 	
-	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+	ent_player_t* player = client->entity;
 
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 
@@ -351,11 +352,16 @@ void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
  */
 void phd_send_join_game(ltg_client_t* client) {
 
+	wld_world_t* player_world = wld_get_default();
+
 	// create an entity for the player
-	ent_player_t* player = calloc(1, sizeof(ent_player_t));
+	ent_player_t* player = client->entity = calloc(1, sizeof(ent_player_t));
 	player->living_entity.entity.type = ent_player;
+	player->living_entity.entity.position.world = player_world;
 	player->living_entity.entity.position.y = 256;
-	client->entity_id = ent_register_entity((ent_entity_t*) player);
+	player->living_entity.entity.position.x = player_world->spawn.x;
+	player->living_entity.entity.position.z = player_world->spawn.z;
+	ent_register_entity((ent_entity_t*) player);
 
 	// set last recieve packet to now
 	struct timespec time;
@@ -367,34 +373,48 @@ void phd_send_join_game(ltg_client_t* client) {
 	client->keep_alive = sch_schedule_repeating(&keep_alive->header, 200, 200);
 
 	const mat_codec_t* codec = mat_get_codec();
-	const mat_codec_t* dimension_codec = mat_get_dimension_codec(mat_dimension_overworld);
+	const mat_codec_t* dimension_codec = mat_get_dimension_codec(player_world->environment);
 
 	PCK_INLINE(packet, codec->size + dimension_codec->size + 1024, io_big_endian);
 
 	pck_write_var_int(packet, 0x26);
-	pck_write_int32(packet, client->entity_id); // entity ID
+	pck_write_int32(packet, player->living_entity.entity.id); // entity ID
 	pck_write_int8(packet, sky_main.difficulty.hardcore);
 	pck_write_int8(packet, sky_main.gamemode);
 	pck_write_int8(packet, -1); // previous game mode
 
 	// worlds
-	pck_write_var_int(packet, sky_main.worlds.size);
-	for (size_t i = 0; i < sky_main.worlds.size; ++i) {
-		wld_world_t* world = UTL_VECTOR_GET_AS(wld_world_t*, &sky_main.worlds, i);
-		pck_write_string(packet, world->name, world->name_length);
+	uint16_t world_count = wld_get_count();
+	pck_write_var_int(packet, world_count);
+	for (size_t i = 0; i < world_count; ++i) {
+		wld_world_t* world = wld_get_world(i);
+		if (world != NULL) {
+			pck_write_string(packet, world->name.value, world->name.length);
+		} else {
+			pck_write_string(packet, "", 0);
+		}
 	}
 
 	pck_write_bytes(packet, codec->bytes, codec->size);
 	pck_write_bytes(packet, dimension_codec->bytes, dimension_codec->size);
 
-	pck_write_string(packet, "world", 5); // world name
-	pck_write_int64(packet, 0); // hashed seed
+	pck_write_string(packet, player_world->name.value, player_world->name.length);
+	
+	// hash seed
+	byte_t seed_hash[sha256_desc.hashsize];
+	hash_state hash;
+	sha256_init(&hash);
+	sha256_process(&hash, (byte_t*) &player_world->seed, 8);
+	sha1_done(&hash, seed_hash);
+
+	pck_write_int64(packet, *((uint64_t*) seed_hash)); // hashed seed
+	
 	pck_write_var_int(packet, sky_main.listener.online.max);
 	pck_write_var_int(packet, sky_main.render_distance); // view distance
 	pck_write_int8(packet, sky_main.reduced_debug_info); // reduced debug info
 	pck_write_int8(packet, sky_main.enable_respawn_screen); // enable respawn screen
-	pck_write_int8(packet, 0); // is debug
-	pck_write_int8(packet, 0); // is flat
+	pck_write_int8(packet, player_world->debug); // is debug
+	pck_write_int8(packet, player_world->flat); // is flat
 
 	ltg_send(client, packet);
 
@@ -454,7 +474,7 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 			pck_write_var_int(packet, 0);
 		}
 		
-		ent_player_t* player_ent = (ent_player_t*) ent_get_entity_by_id(player->entity_id);
+		ent_player_t* player_ent = client->entity;
 
 		pthread_mutex_lock(&player_ent->living_entity.entity.lock);
 
@@ -494,7 +514,7 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 	} else {
 		pck_write_var_int(packet, 0);
 	}
-	ent_player_t* player_ent = (ent_player_t*) ent_get_entity_by_id(player->entity_id);
+	ent_player_t* player_ent = player->entity;
 
 	pthread_mutex_lock(&player_ent->living_entity.entity.lock);
 
@@ -554,7 +574,7 @@ void phd_send_player_position_and_look(ltg_client_t* client) {
 
 	PCK_INLINE(packet, 40, io_big_endian);
 
-	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+	ent_player_t* player = client->entity;
 
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 
@@ -565,7 +585,7 @@ void phd_send_player_position_and_look(ltg_client_t* client) {
 	pck_write_float32(packet, player->living_entity.rotation.pitch); // pitch
 	pck_write_float32(packet, player->living_entity.rotation.yaw); // yaw
 	pck_write_int8(packet, 0); // flags
-	pck_write_var_int(packet, player->living_entity.entity.entity_id); // teleport id
+	pck_write_var_int(packet, player->living_entity.entity.id); // teleport id
 	pck_write_int8(packet, 0); // dismount vehicle
 
 	pthread_mutex_unlock(&player->living_entity.entity.lock);
@@ -578,7 +598,7 @@ void phd_send_held_item_change(ltg_client_t* client) {
 	
 	PCK_INLINE(packet, 2, io_big_endian);
 
-	ent_player_t* player = (ent_player_t*) ent_get_entity_by_id(client->entity_id);
+	ent_player_t* player = client->entity;
 
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 

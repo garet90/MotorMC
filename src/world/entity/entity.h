@@ -42,9 +42,11 @@ typedef enum {
 typedef struct {
 
     pthread_mutex_t lock;
-    int32_t entity_id;
 
     wld_position_t position;
+    wld_chunk_t* chunk;
+
+    uint32_t id;
 
     cht_component_t custom_name;
     uint16_t air_ticks;

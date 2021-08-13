@@ -40,9 +40,9 @@ typedef struct {
 	float32_t ambient_light;
 	float32_t coordinate_scale;
 	uint16_t fixed_time; // 0xFFFF = no fixed time
-	uint16_t min_y;
-	uint16_t height;
-	uint16_t logical_height;
+	int16_t min_y;
+	int16_t height;
+	int16_t logical_height;
 	uint16_t name_length;
 	uint16_t effects_length;
 	utl_bitset(mat_dimension_properties_count, properties);

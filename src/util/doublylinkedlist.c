@@ -52,3 +52,22 @@ void* utl_list_doubly_shift(utl_doubly_linked_list_t* list) {
 	return element;
 
 }
+
+void utl_list_doubly_remove_by_reference(utl_doubly_linked_list_t* list, utl_doubly_linked_node_t* node) {
+
+	if (node->previous != NULL) {
+		node->previous->next = node->next;
+	} else {
+		list->first = node->next;
+	}
+	if (node->next != NULL) {
+		node->next->previous = node->previous;
+	} else {
+		list->last = node->previous;
+	}
+
+	list->length -= 1;
+
+	free(node);
+
+}

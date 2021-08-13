@@ -1,5 +1,6 @@
 #include "scheduler.h"
 #include "../../motor.h"
+#include "../../util/id_vector.h"
 #include "../../util/vector.h"
 #include "../../util/linkedlist.h"
 #include <pthread.h>
@@ -23,15 +24,11 @@ struct {
 };
 
 struct {
-	utl_vector_t elements;
-	utl_vector_t next_id;
+	utl_id_vector_t elements;
 	pthread_mutex_t lock;
 } sch_scheduled = {
 	.elements = {
 		.bytes_per_element = sizeof(sch_scheduled_t*)
-	},
-	.next_id = {
-		.bytes_per_element = sizeof(int32_t)
 	},
 	.lock = PTHREAD_MUTEX_INITIALIZER
 };
@@ -69,19 +66,7 @@ sch_scheduled_t* sch_new(int32_t* id) {
 
 	pthread_mutex_lock(&sch_scheduled.lock);
 
-	if (sch_scheduled.next_id.size > 0) {
-
-		*id = UTL_VECTOR_GET_AS(int32_t, &sch_scheduled.next_id, 0);
-		utl_vector_set(&sch_scheduled.elements, *id, &scheduled);
-		utl_vector_set(&sch_scheduled.next_id, 0, utl_vector_get(&sch_scheduled.next_id, sch_scheduled.next_id.size - 1));
-		sch_scheduled.next_id.size -= 1;
-
-	} else {
-
-		*id = sch_scheduled.elements.size;
-		utl_vector_push(&sch_scheduled.elements, &scheduled);
-
-	}
+	*id = utl_id_vector_add(&sch_scheduled.elements, &scheduled);
 
 	pthread_mutex_unlock(&sch_scheduled.lock);
 
@@ -125,10 +110,10 @@ void sch_cancel(int32_t id) {
 
 	pthread_mutex_lock(&sch_scheduled.lock);
 
-	sch_scheduled_t* scheduled = UTL_VECTOR_GET_AS(sch_scheduled_t*, &sch_scheduled.elements, id);
+	sch_scheduled_t* scheduled = UTL_ID_VECTOR_GET_AS(sch_scheduled_t*, &sch_scheduled.elements, id);
 	scheduled->cancel = true;
 
-	utl_vector_push(&sch_scheduled.next_id, &id);
+	utl_id_vector_remove(&sch_scheduled.elements, id);
 
 	pthread_mutex_unlock(&sch_scheduled.lock);
 

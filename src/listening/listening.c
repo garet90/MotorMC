@@ -92,33 +92,8 @@ void ltg_accept(ltg_client_t* client) {
 	// lock clients
 	pthread_mutex_lock(&sky_main.listener.clients.lock);
 
-	if (sky_main.listener.clients.next_id.size > 0) {
-
-		// allocate to next client id
-
-		client->id = UTL_VECTOR_GET_AS(uint32_t, &sky_main.listener.clients.next_id, 0);
-
-		// replace first with last and decrement size
-		if (sky_main.listener.clients.next_id.size > 1) {
-			uint32_t lastCLID = UTL_VECTOR_GET_AS(uint32_t, &sky_main.listener.clients.next_id, sky_main.listener.clients.next_id.size - 1);
-			utl_vector_set(&sky_main.listener.clients.next_id, 0, &lastCLID);
-		}
-
-		sky_main.listener.clients.next_id.size -= 1;
-
-		// set the client to the id
-		utl_vector_set(&sky_main.listener.clients.vector, client->id, &client);
-
-	} else {
-
-		// allocate at end of array
-
-		client->id = sky_main.listener.clients.vector.size;
-
-		utl_vector_push(&sky_main.listener.clients.vector, &client);
-
-	}
-
+	client->id = utl_id_vector_add(&sky_main.listener.clients.vector, &client);
+	
 	pthread_mutex_unlock(&sky_main.listener.clients.lock);
 
 	// create client listening thread
@@ -161,6 +136,18 @@ void* t_ltg_client(void* args) {
 	ltg_disconnect(client);
 
 	return NULL;
+}
+
+ltg_client_t* ltg_get_client_by_id(uint32_t id) {
+
+	pthread_mutex_lock(&sky_main.listener.clients.lock);
+
+	ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, id);
+
+	pthread_mutex_unlock(&sky_main.listener.clients.lock);
+
+	return client;
+
 }
 
 /*
@@ -242,20 +229,7 @@ void ltg_disconnect(ltg_client_t* client) {
 
 		pthread_mutex_lock(&sky_main.listener.online.lock);
 
-		if (client->online_node->previous != NULL) {
-			client->online_node->previous->next = client->online_node->next;
-		} else {
-			sky_main.listener.online.list.first = client->online_node->next;
-		}
-		if (client->online_node->next != NULL) {
-			client->online_node->next->previous = client->online_node->previous;
-		} else {
-			sky_main.listener.online.list.last = client->online_node->previous;
-		}
-
-		sky_main.listener.online.list.length -= 1;
-
-		free(client->online_node);
+		utl_list_doubly_remove_by_reference(&sky_main.listener.online.list, client->online_node);
 
 		pthread_mutex_unlock(&sky_main.listener.online.lock);
 
@@ -267,17 +241,18 @@ void ltg_disconnect(ltg_client_t* client) {
 
 	}
 
+	// free entity
+	if (client->entity != NULL) {
+		ent_free_entity((ent_entity_t*) client->entity);
+	}
+
 	sck_close(client->socket);
 
 	// lock clients
 	pthread_mutex_lock(&sky_main.listener.clients.lock);
 
-	void* null = NULL;
-
-	// push id to next id stack and set last client to NULL
-	utl_vector_push(&sky_main.listener.clients.next_id, &client->id);
-	utl_vector_set(&sky_main.listener.clients.vector, client->id, &null);
-
+	utl_id_vector_remove(&sky_main.listener.clients.vector, client->id);
+	
 	pthread_mutex_unlock(&sky_main.listener.clients.lock);
 	
 	// free skin
@@ -315,7 +290,7 @@ void ltg_term() {
 
 	// disconnect all clients
 	for (uint32_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
-		ltg_client_t* client = UTL_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
+		ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 		if (client != NULL) {
 			pthread_mutex_unlock(&sky_main.listener.clients.lock);
 			phd_send_disconnect(client, message, message_length);

@@ -1,11 +1,12 @@
 #pragma once
 #include <pthread.h>
 #include "../main.h"
-#include "../util/vector.h"
+#include "../util/id_vector.h"
 #include "../util/doublylinkedlist.h"
 #include "../io/packet/packet.h"
 #include "../crypt/rsa.h"
 #include "../crypt/cfb8.h"
+#include "../world/entity/entity.h"
 #include "socket/socket.h"
 
 #define LTG_MAX_RECIEVE 32767
@@ -26,9 +27,9 @@ typedef struct {
 	pthread_t thread;
 	
 	utl_doubly_linked_node_t* online_node;
+	ent_player_t* entity;
 
 	uint32_t id;
-	uint32_t entity_id;
 
 	// address
 	int32_t socket;
@@ -95,8 +96,7 @@ typedef struct {
 
 	struct {
 		pthread_mutex_t lock;
-		utl_vector_t vector;
-		utl_vector_t next_id;
+		utl_id_vector_t vector;
 	} clients;
 
 	struct {

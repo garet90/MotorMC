@@ -1,5 +1,6 @@
 #pragma once
 #include "../main.h"
+#include "world.h"
 
 typedef struct {
 
@@ -11,6 +12,7 @@ typedef struct {
 
 typedef struct {
 
+    wld_world_t* world;
     float64_t x;
     float64_t y;
     float64_t z;
