@@ -470,7 +470,7 @@ bool_t cmd_plugins(char* args, const cmd_sender_t sender) {
 	}
 
 	char plugin_text[17];
-	sprintf(plugin_text, "Plugins (%lld): ", plg_links.size);
+	sprintf(plugin_text, "Plugins (%zu): ", plg_links.size);
 
 	cht_component_t plugins = cht_new;
 	plugins.text = plugin_text;

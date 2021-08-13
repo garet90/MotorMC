@@ -67,7 +67,7 @@ void utl_bit_vector_foreach(utl_bit_vector_t* vector, void (*function) (uint32_t
 
     for (uint32_t i = 0; i < vector->capacity; ++i) {
         
-        byte_t byte = vector->array[byte];
+        byte_t byte = vector->array[i];
 
         while (byte) {
             function((i << 3) + ffs[byte], input);
