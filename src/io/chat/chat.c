@@ -384,14 +384,14 @@ size_t cht_server_list_ping(char* message) {
 
 	yyjson_mut_obj_add(players, yyjson_mut_str(doc, "max"), yyjson_mut_uint(doc, sky_main.listener.online.max));
 	
-    pthread_mutex_lock(&sky_main.listener.online.lock);
+	pthread_mutex_lock(&sky_main.listener.online.lock);
 	yyjson_mut_obj_add(players, yyjson_mut_str(doc, "online"), yyjson_mut_uint(doc, sky_main.listener.online.list.length));
-    
+	
 	// TODO limit sample to however long it's supposed to be
 	if (sky_main.listener.online.list.length > 0) {
 		yyjson_mut_val* sample = yyjson_mut_arr(doc);
 		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
-    	while (node != NULL) {
+		while (node != NULL) {
 			ltg_client_t* player = node->element;
 			yyjson_mut_val* val = yyjson_mut_obj(doc);
 			yyjson_mut_obj_add(val, yyjson_mut_str(doc, "name"), yyjson_mut_str(doc, player->username.value));

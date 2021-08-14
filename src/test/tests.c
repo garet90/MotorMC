@@ -1,6 +1,8 @@
 #include "tests.h"
+#include <stdlib.h>
 #include "../io/logger/logger.h"
 #include "../util/util.h"
+#include "../util/bit_stream.h"
 #include "../world/material/material.h"
 
 bool_t test_materials() {
@@ -76,6 +78,22 @@ bool_t test_materials() {
 
 }
 
+extern bool_t test_bit_streams() {
+
+	utl_bit_stream_t* stream = calloc(1, sizeof(stream) + 32);
+	utl_write_bit_stream(stream, 0xFFFFFFFFFFFFFFFFl, 23);
+
+	log_info("%02x", stream->bytes[0]); // works
+	log_info("%02x", stream->bytes[1]);
+	log_info("%02x", stream->bytes[2]);
+
+	stream->cursor = 0;
+	log_info("%llx", utl_read_bit_stream(stream, 23));
+
+	return true;
+
+}
+
 int test_run_all() {
 
 	log_info("Running materials test...");
@@ -83,6 +101,13 @@ int test_run_all() {
 		log_info("Material test passed.");
 	} else {
 		return 1;
+	}
+
+	log_info("Running bit streams test...");
+	if (test_bit_streams()) {
+		log_info("Bit streams test passed.");
+	} else {
+		return 2;
 	}
 
 	log_info("All tests passed.");

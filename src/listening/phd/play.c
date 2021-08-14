@@ -138,7 +138,7 @@ bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
-    client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
+	client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
 
 	client->ping = client->last_recv - out_ms;
 
@@ -371,7 +371,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	// set last recieve packet to now
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
-    client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
+	client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
 
 	JOB_CREATE_WORK(keep_alive, job_keep_alive);
 	keep_alive->client = client;

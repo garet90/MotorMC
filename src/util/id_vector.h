@@ -5,9 +5,9 @@ typedef struct {
 
 	byte_t* array;
 
-    uint32_t* next_id;
-    uint32_t next_id_size;
-    uint32_t next_id_capacity;
+	uint32_t* next_id;
+	uint32_t next_id_size;
+	uint32_t next_id_capacity;
 
 	uint32_t size;
 	uint32_t capacity;

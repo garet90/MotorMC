@@ -13,39 +13,39 @@ typedef struct {
 } job_keep_alive_t;
 
 typedef struct {
-    
-    job_work_t header;
+	
+	job_work_t header;
 
-    ltg_client_t* sender;
+	ltg_client_t* sender;
 
-    struct {
-        
-        char value[1025];
-        int32_t length;
+	struct {
+		
+		char value[1025];
+		int32_t length;
 
-    } message;
+	} message;
 
 } job_global_chat_message_t;
 
 typedef struct {
 
-    job_work_t header;
+	job_work_t header;
 
-    ltg_client_t* player;
+	ltg_client_t* player;
 
 } job_player_join_t;
 
 typedef struct {
 
-    job_work_t header;
+	job_work_t header;
 
-    ltg_uuid_t uuid;
-    char username[17];
+	ltg_uuid_t uuid;
+	char username[17];
 
 } job_player_leave_t;
 
 typedef struct {
 
-    job_work_t header;
+	job_work_t header;
 
 } job_send_update_pings_t;

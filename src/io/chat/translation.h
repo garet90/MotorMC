@@ -4,7 +4,7 @@
 
 typedef enum {
 
-    cht_translation_chat_type_text,
+	cht_translation_chat_type_text,
 	cht_translation_multiplayer_player_joined,
 	cht_translation_multiplayer_player_left,
 	cht_translation_multiplayer_disconnect_outdated_client,
@@ -15,11 +15,11 @@ typedef enum {
 
 typedef struct {
 
-    cht_translation_type_t translate;
+	cht_translation_type_t translate;
 
 	cht_color_t color;
 
-    utl_vector_t with;
+	utl_vector_t with;
 
 } cht_translation_t;
 
@@ -38,5 +38,5 @@ extern void cht_jsonify_translation(yyjson_mut_doc*, yyjson_mut_val*, const cht_
 extern size_t cht_write_translation(const cht_translation_t*, char*);
 
 static inline void cht_term_translation(cht_translation_t* translation) {
-    utl_vector_term(&translation->with);
+	utl_vector_term(&translation->with);
 }

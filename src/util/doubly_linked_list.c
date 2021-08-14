@@ -23,13 +23,13 @@ utl_doubly_linked_node_t* utl_dllist_push(utl_doubly_linked_list_t* list, void* 
 		list->last = node;
 	} else {
 		list->last->next = node;
-        node->previous = list->last;
+		node->previous = list->last;
 		list->last = node;
 	}
 
 	list->length += 1;
 
-    return node;
+	return node;
 
 }
 
@@ -39,7 +39,7 @@ void* utl_dllist_shift(utl_doubly_linked_list_t* list) {
 
 	utl_doubly_linked_node_t* node = list->first;
 	list->first = node->next;
-    node->next->previous = NULL;
+	node->next->previous = NULL;
 
 	if (node->next == NULL) list->last = NULL;
 

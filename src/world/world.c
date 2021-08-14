@@ -96,7 +96,7 @@ wld_world_t* wld_get_world(uint16_t world_id) {
 }
 
 inline void wld_set_relatives(wld_world_t* world, wld_region_t* region) {
-    
+	
 	const int64_t key = ((uint64_t) region->x << 16) + region->z;
 	region->relative.north = utl_tree_get(&world->regions, key - 1);
 	if (region->relative.north != NULL) {

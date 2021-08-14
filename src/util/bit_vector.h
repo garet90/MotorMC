@@ -10,14 +10,14 @@ typedef struct {
 
 static inline bool_t utl_bit_vector_test_bit(utl_bit_vector_t* vector, uint32_t bit) {
 
-    const uint32_t byte = bit >> 3;
-    bit &= 0x7;
+	const uint32_t byte = bit >> 3;
+	bit &= 0x7;
 
-    if (byte >= vector->capacity) {
-        return false;
-    } else {
-        return (vector->array[byte] & (1 << bit)) ? true : false;
-    }
+	if (byte >= vector->capacity) {
+		return false;
+	} else {
+		return (vector->array[byte] & (1 << bit)) ? true : false;
+	}
 
 }
 
