@@ -51,27 +51,28 @@ typedef struct {
 
 	const uint16_t protocol;
 
-	sky_status_t status;
-	cmd_op_level_t op_permission_level;
-
-	struct {
-		uint8_t level;
-		bool_t hardcore;
-	} difficulty;
-	
-	uint8_t gamemode;
-	uint8_t render_distance;
-	bool_t reduced_debug_info;
-
 	uint32_t max_tick_time;
-
-	bool_t enable_respawn_screen;
-	bool_t enforce_whitelist;
-	bool_t enable_command_block;
-	bool_t pvp;
 	
 	/* listener */
 	ltg_main_t listener;
+	
+	uint8_t render_distance;
+
+	sky_status_t status : 2;
+	cmd_op_level_t op_permission_level : 3;
+
+	struct {
+		sky_difficulty_t level : 2;
+		bool_t hardcore : 1;
+	} difficulty;
+
+	bool_t enable_respawn_screen : 1;
+	bool_t enforce_whitelist : 1;
+	bool_t enable_command_block : 1;
+	bool_t pvp : 1;
+	bool_t reduced_debug_info : 1;
+	
+	ent_gamemode_t gamemode : 2;
 
 } sky_main_t;
 

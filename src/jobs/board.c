@@ -77,15 +77,6 @@ struct {
 	}
 };
 
-void job_init_work(job_work_t* job, uint32_t id) {
-
-	job->type = id;
-	for (size_t i = 0; i < sizeof(job->flags); ++i) {
-		job->flags[i] = 0;
-	}
-
-}
-
 void job_add_handler(job_type_t job, job_handler_t handler) {
 	
 	if (job_handlers[job] == NULL) {
@@ -115,9 +106,8 @@ void job_handle(job_work_t* work) {
 
 	}
 
-	if (!utl_test_bit(work->flags, job_flag_repeating)) {
+	if (!work->repeating)
 		free(work);
-	}
 
 }
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "../../main.h"
-#include "../../util/bitset.h"
 #include "../../util/vector.h"
 #include <yyjson.h>
 
@@ -23,7 +22,7 @@ typedef enum {
 	cht_yellow = 0xE,
 	cht_white = 0xF,
 
-	cht_nocolor = -0x01
+	cht_no_color = 0x10
 
 } cht_color_t;
 
@@ -41,41 +40,28 @@ typedef enum {
 	cht_show_entity
 } cht_hover_action_t;
 
-typedef enum {
-	cht_bold_set = 0,
-	cht_bold,
-	cht_italic_set,
-	cht_italic,
-	cht_underlined_set,
-	cht_underlined,
-	cht_strikethrough_set,
-	cht_strikethrough,
-	cht_obfuscated_set,
-	cht_obfuscated,
-
-	cht_heap,
-
-	cht_format_max
-} cht_fields_t;
-
 typedef struct {
 
 	char* text;
 
-	// format bitset
-	utl_bitset(cht_format_max, format);
+	bool_t bold : 2;
+	bool_t italic : 2;
+	bool_t underlined : 2;
+	bool_t strikethrough : 2;
+	bool_t obfuscated : 2;
+	bool_t heap : 1;
 
 	cht_color_t color;
 
 	char* insertion;
 
 	struct {
-		cht_click_action_t action;
+		cht_click_action_t action : 3;
 		char* value;
 	} click_event;
 
 	struct {
-		cht_hover_action_t action;
+		cht_hover_action_t action : 3;
 		char* value;
 	} hover_event;
 
@@ -84,7 +70,13 @@ typedef struct {
 } cht_component_t;
 
 static /*in-plugin*/ const cht_component_t cht_new = {
-	.color = cht_nocolor,
+	.bold = UNSET,
+	.italic = UNSET,
+	.underlined = UNSET,
+	.strikethrough = UNSET,
+	.obfuscated = UNSET,
+	.heap = false,
+	.color = cht_no_color,
 	.extra = {
 		.bytes_per_element = sizeof(cht_component_t*)
 	}

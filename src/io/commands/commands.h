@@ -96,10 +96,10 @@ static const cht_component_t cmd_no_permission = {
 
 static const cht_component_t cmd_not_found = {
 	.text = "Unknown command. Type 'help' for a list of commands.",
-	.color = cht_nocolor
+	.color = cht_no_color
 };
 
 static const cht_component_t cmd_stopping_server = {
 	.text = "Stopping the server...",
-	.color = cht_nocolor
+	.color = cht_no_color
 };

@@ -6,33 +6,33 @@ typedef struct {
 
 	size_t cursor;
 
-	byte_t bytes[];
+	uint64_t quads[];
 
 } utl_bit_stream_t;
 
-static inline int64_t utl_read_bit_stream(utl_bit_stream_t* stream, size_t bits) {
+static inline uint64_t utl_read_bit_stream(utl_bit_stream_t* stream, size_t bits) {
 
-	int64_t result = 0;
+	uint64_t result = 0;
 
 	while (bits > 0) {
 		
 		// get bits and bytes of cursor
-		const size_t byte = stream->cursor >> 3;
-		const byte_t bit = stream->cursor & 0x7;
+		const size_t quad = stream->cursor >> 6;
+		const byte_t bit = stream->cursor & 0x3F;
 
-		if (bits > (unsigned) (8 - bit)) { // get the rest of the current byte
+		if (bits > (unsigned) (64 - bit)) { // get the rest of the current byte
 
-			byte_t add = (stream->bytes[byte] << bit) >> bit;
-			result = (result << (8 - bit)) | add;
+			uint64_t add = (stream->quads[quad] << bit) >> bit;
+			result = (result << (64 - bit)) | add;
 
-			bits -= 8 - bit;
-			stream->cursor += 8 - bit;
+			bits -= 64 - bit;
+			stream->cursor += 64 - bit;
 
 		} else { // get only a little bit of this byte
 
 			// get remaining bits in current cursor
-			byte_t add = (stream->bytes[byte] << bit) >> bit;
-			add = (add >> (8 - bit - (8 - bit - bits)));
+			uint64_t add = (stream->quads[quad] << bit) >> bit;
+			add >>= (64 - bit - bits);
 			result = (result << bits) | add;
 
 			stream->cursor += bits;
@@ -66,9 +66,9 @@ static inline int64_t utl_read_bit_stream(utl_bit_stream_t* stream, size_t bits)
 
 }
 
-static inline void utl_write_bit_stream(utl_bit_stream_t* stream, int64_t val, size_t bits) {
+static inline void utl_write_bit_stream(utl_bit_stream_t* stream, uint64_t val, size_t bits) {
 
-	if (io_get_endianness() == io_little_endian) {
+	if (io_get_endianness() == io_big_endian) {
 
 		// convert the number to big endian
 
@@ -91,28 +91,24 @@ static inline void utl_write_bit_stream(utl_bit_stream_t* stream, int64_t val, s
 	}
 
 	while (bits > 0) {
-		
-		// get bits and bytes of cursor
-		const size_t byte = stream->cursor >> 3;
-		const byte_t bit = stream->cursor & 0x7;
 
-		if (bits > (unsigned) (8 - bit)) { // rest of current byte should be this number
+		// get bits and quad of cursor
+		const size_t quad = stream->cursor >> 6;
+		const byte_t bit = stream->cursor & 0x3F;
 
-			byte_t add = (val << bit) >> bit;
-			stream->bytes[byte] |= add;
+		if (bits > (unsigned) (64 - bit)) {
 
-			stream->cursor += (8 - bit);
-			val <<= (8 - bit);
-			bits -= (8 - bit);
+			stream->quads[quad] |= (val << (64 - bits)) >> bit;
 
-		} else { // only part of this byte should be this number
+			stream->cursor += (64 - bit);
+			val <<= (64 - bit);
+			bits -= (64 - bit);
 
-			byte_t add = (val << bit) >> bit;
-			add = (add >> (8 - bit - (8 - bit - bits))) << (8 - bit - (8 - bit - bits));
-			stream->bytes[byte] |= add;
+		} else {
+
+			stream->quads[quad] |= (val << (64 - bits)) >> bit;
 
 			stream->cursor += bits;
-			val <<= bits;
 			bits = 0;
 
 		}

@@ -2,7 +2,7 @@
 #include "../main.h"
 #include "board.h"
 
-#define JOB_CREATE_WORK(name, job_type) job_type ##_t* name = malloc(sizeof(job_type ##_t)); name->header.type = job_type; memset(name->header.flags, 0, sizeof(name->header.flags));
+#define JOB_CREATE_WORK(name, job_type) job_type ##_t* name = malloc(sizeof(job_type ##_t)); job_init_work((job_work_t*) name, job_type);
 
 typedef struct {
 

@@ -156,11 +156,7 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 	player->living_entity.entity.position.y = pck_read_float64(packet);
 	player->living_entity.entity.position.z = pck_read_float64(packet);
 	
-	if (pck_read_int8(packet)) {
-		utl_set_bit(player->living_entity.entity.status, ent_on_ground);
-	} else {
-		utl_reset_bit(player->living_entity.entity.status, ent_on_ground);
-	}
+	player->living_entity.entity.on_ground = pck_read_int8(packet);
 
 	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
@@ -181,11 +177,7 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 	player->living_entity.rotation.yaw = pck_read_float32(packet);
 	player->living_entity.rotation.pitch = pck_read_float32(packet);
 	
-	if (pck_read_int8(packet)) {
-		utl_set_bit(player->living_entity.entity.status, ent_on_ground);
-	} else {
-		utl_reset_bit(player->living_entity.entity.status, ent_on_ground);
-	}
+	player->living_entity.entity.on_ground = pck_read_int8(packet);
 	
 	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
@@ -210,18 +202,18 @@ bool_t phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 
 	switch (action) {
 	case 0: // start sneaking
-		ent_start_sneaking((ent_entity_t*) player);
+		player->living_entity.entity.crouching = true;
 		break;
 	case 1: // stop sneaking
-		ent_stop_sneaking((ent_entity_t*) player);
+		player->living_entity.entity.crouching = false;
 		break;
 	case 2: // leave bed
 		break;
 	case 3: // start sprinting
-		ent_start_sprinting((ent_entity_t*) player);
+		player->living_entity.entity.sprinting = true;
 		break;
 	case 4: // stop sprinting
-		ent_stop_sprinting((ent_entity_t*) player);
+		player->living_entity.entity.sprinting = false;
 		break;
 	case 5: // start jump with horse
 		break;
@@ -230,7 +222,7 @@ bool_t phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 	case 7: // open horse inventory
 		break;
 	case 8: // start flying with elytra
-		ent_start_flying_with_elytra((ent_entity_t*) player);
+		player->living_entity.entity.flying_with_elytra = true;
 		break;
 	}
 

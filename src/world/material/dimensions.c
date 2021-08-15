@@ -7,13 +7,14 @@ const mat_dimension_t mat_dimension_overworld_d = {
 	.effects_length = 19,
 	.ambient_light = 0,
 	.coordinate_scale = 1,
-	.fixed_time = 0xFFFF,
+	.has_fixed_time = false,
 	.min_y = 0,
 	.height = 256,
 	.logical_height = 256,
-	.properties = {
-		utl_arraybit(mat_dimension_natural) | utl_arraybit(mat_dimension_bed) | utl_arraybit(mat_dimension_raids) | utl_arraybit(mat_dimension_skylight)
-	}
+	.natural = true,
+	.bed_works = true,
+	.has_raids = true,
+	.has_skylight = true
 };
 const mat_dimension_t mat_dimension_nether_d = {
 	.name = "minecraft:the_nether",
@@ -22,13 +23,15 @@ const mat_dimension_t mat_dimension_nether_d = {
 	.effects_length = 20,
 	.ambient_light = 0.1,
 	.coordinate_scale = 8.0,
+	.has_fixed_time = true,
 	.fixed_time = 18000,
 	.min_y = 0,
 	.height = 256,
 	.logical_height = 128,
-	.properties = {
-		utl_arraybit(mat_dimension_ultrawarm) | utl_arraybit(mat_dimension_piglin_safe) | utl_arraybit(mat_dimension_respawn_anchor) | utl_arraybit(mat_dimension_ceiling)
-	}
+	.ultrawarm = true,
+	.piglin_safe = true,
+	.respawn_anchor_works = true,
+	.has_ceiling = true
 };
 const mat_dimension_t mat_dimension_end_d = {
 	.name = "minecraft:the_end",
@@ -37,13 +40,12 @@ const mat_dimension_t mat_dimension_end_d = {
 	.effects_length = 17,
 	.ambient_light = 0,
 	.coordinate_scale = 1,
+	.has_fixed_time = true,
 	.fixed_time = 6000,
 	.min_y = 0,
 	.height = 256,
 	.logical_height = 256,
-	.properties = {
-		utl_arraybit(mat_dimension_raids)
-	}
+	.has_raids = true
 };
 
 const mat_dimension_t* mat_dimensions[] = {

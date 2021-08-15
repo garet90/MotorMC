@@ -8,8 +8,13 @@ cht_component_t* cht_alloc() {
 
 	cht_component_t* alloc = calloc(1, sizeof(cht_component_t));
 
-	utl_set_bit(alloc->format, cht_heap);
-	alloc->color = cht_nocolor;
+	alloc->bold = UNSET;
+	alloc->italic = UNSET;
+	alloc->underlined = UNSET;
+	alloc->strikethrough = UNSET;
+	alloc->obfuscated = UNSET;
+	alloc->heap = true;
+	alloc->color = cht_no_color;
 
 	return alloc;
 
@@ -31,29 +36,39 @@ cht_component_t* cht_from_json(yyjson_val* obj) {
 			break;
 		}
 		case 0x7c94b326: // "bold"
-			utl_set_bit(component->format, cht_bold_set);
-			if (yyjson_get_bool(obj_val))
-				utl_set_bit(component->format, cht_bold);
+			if (yyjson_get_bool(obj_val)) {
+				component->bold = true;
+			} else {
+				component->bold = false;
+			}
 			break;
 		case 0x0536d35b: // "italic"
-			utl_set_bit(component->format, cht_italic_set);
-			if (yyjson_get_bool(obj_val))
-				utl_set_bit(component->format, cht_italic);
+			if (yyjson_get_bool(obj_val)) {
+				component->italic = true;
+			} else {
+				component->italic = false;
+			}
 			break;
 		case 0xd635c50f: // "underlined"
-			utl_set_bit(component->format, cht_underlined_set);
-			if (yyjson_get_bool(obj_val))
-				utl_set_bit(component->format, cht_underlined);
+			if (yyjson_get_bool(obj_val)) {
+				component->underlined = true;
+			} else {
+				component->underlined = false;
+			}
 			break;
 		case 0x10d72f78: // "strikethrough"
-			utl_set_bit(component->format, cht_strikethrough_set);
-			if (yyjson_get_bool(obj_val))
-				utl_set_bit(component->format, cht_strikethrough);
+			if (yyjson_get_bool(obj_val)) {
+				component->strikethrough = true;
+			} else {
+				component->strikethrough = false;
+			}
 			break;
 		case 0xf1f68aa5: // "obfuscated"
-			utl_set_bit(component->format, cht_obfuscated_set);
-			if (yyjson_get_bool(obj_val))
-				utl_set_bit(component->format, cht_obfuscated);
+			if (yyjson_get_bool(obj_val)) {
+				component->obfuscated = true;
+			} else {
+				component->obfuscated = false;
+			}
 			break;
 		case 0x0f3d3244: // "color"
 			switch (utl_hash(yyjson_get_str(obj_val))) {
@@ -211,22 +226,22 @@ void cht_jsonify(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_component_t
 	if (component->text != NULL)
 		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "text"), yyjson_mut_str(doc, component->text));
 
-	if (utl_test_bit(component->format, cht_bold_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "bold"), utl_test_bit(component->format, cht_bold) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (component->bold != UNSET)
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "bold"), component->bold ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
-	if (utl_test_bit(component->format, cht_italic_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "italic"), utl_test_bit(component->format, cht_italic) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (component->italic != UNSET)
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "italic"), component->italic ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
-	if (utl_test_bit(component->format, cht_underlined_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "underlined"), utl_test_bit(component->format, cht_underlined) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (component->underlined != UNSET)
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "underlined"), component->underlined ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
-	if (utl_test_bit(component->format, cht_strikethrough_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "strikethrough"), utl_test_bit(component->format, cht_strikethrough) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (component->strikethrough != UNSET)
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "strikethrough"), component->strikethrough ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 		
-	if (utl_test_bit(component->format, cht_obfuscated_set))
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "obfuscated"), utl_test_bit(component->format, cht_obfuscated) ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
+	if (component->obfuscated != UNSET)
+		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "obfuscated"), component->obfuscated ? yyjson_mut_true(doc) : yyjson_mut_false(doc));
 
-	if (component->color != cht_nocolor) {
+	if (component->color != cht_no_color) {
 		if (component->color <= 0xF) {
 			const char* colors[] = {
 				"black",
@@ -347,7 +362,7 @@ void cht_free(cht_component_t* component) {
 		utl_vector_term(&component->extra);
 	}
 
-	if (utl_test_bit(component->format, cht_heap)) {
+	if (component->heap) {
 		
 		if (component->text != NULL) {
 			free(component->text);

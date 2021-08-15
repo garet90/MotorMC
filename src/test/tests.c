@@ -81,14 +81,21 @@ bool_t test_materials() {
 extern bool_t test_bit_streams() {
 
 	utl_bit_stream_t* stream = calloc(1, sizeof(stream) + 32);
-	utl_write_bit_stream(stream, 0xFFFFFFFFFFFFFFFFl, 23);
+	utl_write_bit_stream(stream, 0xABCDEF123456L, 12);
+	utl_write_bit_stream(stream, 0xABCDEF123456L, 12);
+	utl_write_bit_stream(stream, 0xABCDEF123456L, 12);
+	utl_write_bit_stream(stream, 0xABCDEF123456L, 12);
+	utl_write_bit_stream(stream, 0xABCDEF123456L, 12);
+	utl_write_bit_stream(stream, 0xABCDEF123456L, 12);
 
-	log_info("%02x", stream->bytes[0]); // works
-	log_info("%02x", stream->bytes[1]);
-	log_info("%02x", stream->bytes[2]);
+	log_info("%llx", stream->quads[0]);
+	log_info("%llx", stream->quads[1]);
+	for (size_t i = 0; i < 8; ++i) {
+		log_info("%02x", ((byte_t*) stream->quads)[i]);
+	}
 
 	stream->cursor = 0;
-	log_info("%llx", utl_read_bit_stream(stream, 23));
+	log_info("%llx", utl_read_bit_stream(stream, 16));
 
 	return true;
 

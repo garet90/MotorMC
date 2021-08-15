@@ -32,13 +32,11 @@ for f in listdir(sys.argv[1]):
     print("\t\t.water_fog_color = " + str(data["effects"]["water_fog_color"]) + ",")
     print("\t\t.fog_color = " + str(data["effects"]["fog_color"]) + ",")
     if "foliage_color" in data["effects"]:
+        print("\t\t.has_foliage_color = true,")
         print("\t\t.foliage_color = " + str(data["effects"]["foliage_color"]) + ",")
-    else:
-        print("\t\t.foliage_color = 0xFFFFFFFF,")
     if "grass_color" in data["effects"]:
+        print("\t\t.has_grass_color = true,")
         print("\t\t.grass_color = " + str(data["effects"]["grass_color"]) + ",")
-    else:
-        print("\t\t.grass_color = 0xFFFFFFFF,")
     if "grass_color_modifier" in data["effects"]:
         print("\t\t.grass_color_modifier = mat_grass_color_modifier_" + data["effects"]["grass_color_modifier"] + ",")
     if "music" in data["effects"]:

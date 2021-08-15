@@ -25,24 +25,24 @@ const mat_codec_t* mat_get_codec() {
 			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, "name", 4, MNBT_STRING, mnbt_val_string(dimension->name, dimension->name_length)));
 			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, "id", 2, MNBT_INT, mnbt_val_int(i)));
 			mnbt_tag* element = mnbt_new_tag(doc, "element", 7, MNBT_COMPOUND, mnbt_val_compound());
-			mnbt_push_tag(element, mnbt_new_tag(doc, "piglin_safe", 11, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_piglin_safe(i))));
-			mnbt_push_tag(element, mnbt_new_tag(doc, "natural", 7, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_natural(i))));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "piglin_safe", 11, MNBT_BYTE, mnbt_val_byte(dimension->piglin_safe)));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "natural", 7, MNBT_BYTE, mnbt_val_byte(dimension->natural)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "ambient_light", 13, MNBT_FLOAT, mnbt_val_float(dimension->ambient_light)));
-			if (mat_dimension_has_fixed_time(i)) {
-				mnbt_push_tag(element, mnbt_new_tag(doc, "fixed_time", 10, MNBT_LONG, mnbt_val_long(mat_dimension_get_fixed_time(i))));
+			if (dimension->has_fixed_time) {
+				mnbt_push_tag(element, mnbt_new_tag(doc, "fixed_time", 10, MNBT_LONG, mnbt_val_long(dimension->fixed_time)));
 			}
 			mnbt_push_tag(element, mnbt_new_tag(doc, "infiniburn", 10, MNBT_STRING, mnbt_val_string("", 0)));
-			mnbt_push_tag(element, mnbt_new_tag(doc, "respawn_anchor_works", 20, MNBT_BYTE, mnbt_val_byte(mat_dimension_respawn_anchor_works(i))));
-			mnbt_push_tag(element, mnbt_new_tag(doc, "has_skylight", 12, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_skylight(i))));
-			mnbt_push_tag(element, mnbt_new_tag(doc, "bed_works", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_bed_works(i))));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "respawn_anchor_works", 20, MNBT_BYTE, mnbt_val_byte(dimension->respawn_anchor_works)));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "has_skylight", 12, MNBT_BYTE, mnbt_val_byte(dimension->has_skylight)));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "bed_works", 9, MNBT_BYTE, mnbt_val_byte(dimension->bed_works)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "effects", 7, MNBT_STRING, mnbt_val_string(dimension->effects, dimension->effects_length)));
-			mnbt_push_tag(element, mnbt_new_tag(doc, "has_raids", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_raids(i))));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "has_raids", 9, MNBT_BYTE, mnbt_val_byte(dimension->has_raids)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "min_y", 5, MNBT_INT, mnbt_val_int(dimension->min_y)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "height", 6, MNBT_INT, mnbt_val_int(dimension->height)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "logical_height", 14, MNBT_INT, mnbt_val_int(dimension->logical_height)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "coordinate_scale", 16, MNBT_FLOAT, mnbt_val_float(dimension->coordinate_scale)));
-			mnbt_push_tag(element, mnbt_new_tag(doc, "ultrawarm", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_ultrawarm(i))));
-			mnbt_push_tag(element, mnbt_new_tag(doc, "has_ceiling", 11, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_ceiling(i))));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "ultrawarm", 9, MNBT_BYTE, mnbt_val_byte(dimension->ultrawarm)));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "has_ceiling", 11, MNBT_BYTE, mnbt_val_byte(dimension->has_ceiling)));
 			mnbt_val_push_tag(&compound, element);
 			mnbt_list_push(dimension_list, compound);
 		}
@@ -72,10 +72,10 @@ const mat_codec_t* mat_get_codec() {
 			mnbt_push_tag(effects, mnbt_new_tag(doc, "water_color", 11, MNBT_INT, mnbt_val_int(biome->effects.water_color)));
 			mnbt_push_tag(effects, mnbt_new_tag(doc, "water_fog_color", 15, MNBT_INT, mnbt_val_int(biome->effects.water_fog_color)));
 			mnbt_push_tag(effects, mnbt_new_tag(doc, "fog_color", 9, MNBT_INT, mnbt_val_int(biome->effects.fog_color)));
-			if (mat_biome_has_foliage_color(i)) {
+			if (biome->effects.has_foliage_color) {
 				mnbt_push_tag(effects, mnbt_new_tag(doc, "foliage_color", 13, MNBT_INT, mnbt_val_int(biome->effects.foliage_color)));
 			}
-			if (mat_biome_has_grass_color(i)) {
+			if (biome->effects.has_grass_color) {
 				mnbt_push_tag(effects, mnbt_new_tag(doc, "grass_color", 11, MNBT_INT, mnbt_val_int(biome->effects.grass_color)));
 			}
 			if (biome->effects.grass_color_modifier != mat_grass_color_modifier_none) {
@@ -140,24 +140,24 @@ const mat_codec_t* mat_get_dimension_codec(mat_dimension_type_t type) {
 		const mat_dimension_t* dimension = mat_get_dimension_by_type(type);
 		mnbt_doc* doc = mnbt_new();
 		mnbt_tag* element = mnbt_new_tag(doc, "", 0, MNBT_COMPOUND, mnbt_val_compound());
-		mnbt_push_tag(element, mnbt_new_tag(doc, "piglin_safe", 11, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_piglin_safe(type))));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "natural", 7, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_natural(type))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "piglin_safe", 11, MNBT_BYTE, mnbt_val_byte(dimension->piglin_safe)));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "natural", 7, MNBT_BYTE, mnbt_val_byte(dimension->natural)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "ambient_light", 13, MNBT_FLOAT, mnbt_val_float(dimension->ambient_light)));
-		if (mat_dimension_has_fixed_time(type)) {
-			mnbt_push_tag(element, mnbt_new_tag(doc, "fixed_time", 10, MNBT_LONG, mnbt_val_long(mat_dimension_get_fixed_time(type))));
+		if (dimension->has_fixed_time) {
+			mnbt_push_tag(element, mnbt_new_tag(doc, "fixed_time", 10, MNBT_LONG, mnbt_val_long(dimension->fixed_time)));
 		}
 		mnbt_push_tag(element, mnbt_new_tag(doc, "infiniburn", 10, MNBT_STRING, mnbt_val_string("", 0)));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "respawn_anchor_works", 20, MNBT_BYTE, mnbt_val_byte(mat_dimension_respawn_anchor_works(type))));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "has_skylight", 12, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_skylight(type))));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "bed_works", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_bed_works(type))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "respawn_anchor_works", 20, MNBT_BYTE, mnbt_val_byte(dimension->respawn_anchor_works)));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "has_skylight", 12, MNBT_BYTE, mnbt_val_byte(dimension->has_skylight)));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "bed_works", 9, MNBT_BYTE, mnbt_val_byte(dimension->bed_works)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "effects", 7, MNBT_STRING, mnbt_val_string(dimension->effects, dimension->effects_length)));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "has_raids", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_raids(type))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "has_raids", 9, MNBT_BYTE, mnbt_val_byte(dimension->has_raids)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "min_y", 5, MNBT_INT, mnbt_val_int(dimension->min_y)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "height", 6, MNBT_INT, mnbt_val_int(dimension->height)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "logical_height", 14, MNBT_INT, mnbt_val_int(dimension->logical_height)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, "coordinate_scale", 16, MNBT_FLOAT, mnbt_val_float(dimension->coordinate_scale)));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "ultrawarm", 9, MNBT_BYTE, mnbt_val_byte(mat_dimension_is_ultrawarm(type))));
-		mnbt_push_tag(element, mnbt_new_tag(doc, "has_ceiling", 11, MNBT_BYTE, mnbt_val_byte(mat_dimension_has_ceiling(type))));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "ultrawarm", 9, MNBT_BYTE, mnbt_val_byte(dimension->ultrawarm)));
+		mnbt_push_tag(element, mnbt_new_tag(doc, "has_ceiling", 11, MNBT_BYTE, mnbt_val_byte(dimension->has_ceiling)));
 		mnbt_set_root(doc, element);
 
 		mat_dimension_codec[type] = malloc(sizeof(mat_codec_t) + 1024);

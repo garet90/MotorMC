@@ -5,24 +5,6 @@
 #include "../positions.h"
 
 typedef enum {
-	
-	ent_on_fire,
-	ent_crouching,
-	ent_sprinting,
-	ent_swimming,
-	ent_invisible,
-	ent_glowing_effect,
-	ent_flying_elytra,
-	ent_custom_name_visible,
-	ent_silent,
-	ent_no_gravity,
-	ent_on_ground,
-
-	ent_status_length
-
-} ent_status_t;
-
-typedef enum {
 
 	ent_standing,
 	ent_fall_flying,
@@ -50,60 +32,22 @@ typedef struct {
 
 	cht_component_t custom_name;
 	uint16_t air_ticks;
-	uint8_t pose;
-	uint8_t type;
-	utl_bitset(ent_status_length, status);
+	ent_pose_t pose : 5;
+	ent_type_t type : 1;
+	bool_t on_fire : 1;
+	bool_t crouching : 1;
+	bool_t sprinting : 1;
+	bool_t swimming : 1;
+	bool_t invisible : 1;
+	bool_t glowing : 1;
+	bool_t flying_with_elytra : 1;
+	bool_t custom_name_visible : 1;
+	bool_t silent : 1;
+	bool_t no_gravity : 1;
+	bool_t on_ground : 1;
 	uint8_t powder_snow_ticks;
 
 } ent_entity_t;
-
-static inline bool_t ent_is_sneaking(ent_entity_t* entity) {
-	return utl_test_bit(entity->status, ent_crouching);
-}
-
-static inline void ent_start_sneaking(ent_entity_t* entity) {
-	utl_set_bit(entity->status, ent_crouching);
-}
-
-static inline void ent_stop_sneaking(ent_entity_t* entity) {
-	utl_reset_bit(entity->status, ent_crouching);
-}
-
-static inline bool_t ent_is_sprinting(ent_entity_t* entity) {
-	return utl_test_bit(entity->status, ent_sprinting);
-}
-
-static inline void ent_start_sprinting(ent_entity_t* entity) {
-	utl_set_bit(entity->status, ent_sprinting);
-}
-
-static inline void ent_stop_sprinting(ent_entity_t* entity) {
-	utl_reset_bit(entity->status, ent_sprinting);
-}
-
-static inline bool_t ent_is_flying_with_elytra(ent_entity_t* entity) {
-	return utl_test_bit(entity->status, ent_flying_elytra);
-}
-
-static inline void ent_start_flying_with_elytra(ent_entity_t* entity) {
-	utl_set_bit(entity->status, ent_flying_elytra);
-}
-
-static inline void ent_stop_flying_with_elytra(ent_entity_t* entity) {
-	utl_reset_bit(entity->status, ent_flying_elytra);
-}
-
-typedef enum {
-
-	ent_hand_active,
-	ent_active_hand,
-	ent_riptide_spin_attack,
-	ent_potion_effect_ambient,
-	ent_sleeping_in_bed,
-
-	ent_living_status_length
-
-} ent_living_status_t;
 
 typedef struct {
 
@@ -119,7 +63,11 @@ typedef struct {
 
 	wld_block_position_t sleeping_bed;
 
-	utl_bitset(ent_living_status_length, living_status);
+	uint8_t hand : 1;
+	bool_t hand_active : 1;
+	bool_t riptide_spin_attack : 1;
+	bool_t potion_effect_ambient : 1;
+	bool_t sleeping_in_bed : 1;
 
 } ent_living_entity_t;
 
@@ -141,9 +89,9 @@ typedef struct {
 	uint8_t held_item;
 
 	byte_t displayed_skin_parts;
-	byte_t main_hand;
+	byte_t main_hand : 1;
 
-	uint8_t gamemode;
+	ent_gamemode_t gamemode : 2;
 
 	// for parrots
 	ent_living_entity_t* left_shoulder;

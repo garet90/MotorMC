@@ -2,15 +2,6 @@
 #include "../main.h"
 #include "../listening/listening.h"
 #include "../io/packet/packet.h"
-#include "../util/bitset.h"
-
-typedef enum {
-
-	job_flag_repeating,
-
-	job_flag_count
-
-} job_flags_t;
 
 typedef enum {
 
@@ -27,13 +18,16 @@ typedef enum {
 typedef struct {
 
 	job_type_t type;
-	utl_bitset(job_flag_count, flags);
+	bool_t repeating : 1;
 
 } job_work_t;
 
 typedef bool_t (*job_handler_t) (job_work_t*);
 
-void job_init_work(job_work_t*, uint32_t);
+static inline void job_init_work(job_work_t* work, job_type_t type) {
+	work->type = type;
+	work->repeating = false;
+}
 
 void job_add_handler(job_type_t, job_handler_t);
 void job_handle(job_work_t*);

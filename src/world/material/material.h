@@ -1,12 +1,11 @@
 #pragma once
 #include "../../main.h"
-#include "../../util/bitset.h"
 
 /*
 	DIMENSIONS
 */
 
-enum mat_dimension_type {
+typedef enum {
 
 	mat_dimension_overworld,
 	mat_dimension_nether,
@@ -14,24 +13,7 @@ enum mat_dimension_type {
 
 	mat_dimension_count
 
-};
-
-typedef uint8_t mat_dimension_type_t;
-
-typedef enum {
-
-	mat_dimension_piglin_safe,
-	mat_dimension_natural,
-	mat_dimension_respawn_anchor,
-	mat_dimension_skylight,
-	mat_dimension_bed,
-	mat_dimension_raids,
-	mat_dimension_ultrawarm,
-	mat_dimension_ceiling,
-
-	mat_dimension_properties_count
-
-} mat_dimension_properties_t;
+} mat_dimension_type_t;
 
 typedef struct {
 
@@ -39,13 +21,21 @@ typedef struct {
 	const char* effects;
 	float32_t ambient_light;
 	float32_t coordinate_scale;
-	uint16_t fixed_time; // 0xFFFF = no fixed time
+	bool_t has_fixed_time : 1;
+	uint16_t fixed_time : 15;
 	int16_t min_y;
 	int16_t height;
 	int16_t logical_height;
 	uint16_t name_length;
 	uint16_t effects_length;
-	utl_bitset(mat_dimension_properties_count, properties);
+	bool_t piglin_safe : 1;
+	bool_t natural : 1;
+	bool_t respawn_anchor_works : 1;
+	bool_t has_skylight : 1;
+	bool_t bed_works : 1;
+	bool_t has_raids : 1;
+	bool_t ultrawarm : 1;
+	bool_t has_ceiling : 1;
 
 } mat_dimension_t;
 
@@ -55,51 +45,11 @@ static inline const mat_dimension_t* mat_get_dimension_by_type(mat_dimension_typ
 	return mat_dimensions[type];
 }
 
-static inline bool_t mat_dimension_is_piglin_safe(mat_dimension_type_t dimension) {
-	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_piglin_safe);
-}
-
-static inline bool_t mat_dimension_is_natural(mat_dimension_type_t dimension) {
-	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_natural);
-}
-
-static inline bool_t mat_dimension_respawn_anchor_works(mat_dimension_type_t dimension) {
-	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_respawn_anchor);
-}
-
-static inline bool_t mat_dimension_has_skylight(mat_dimension_type_t dimension) {
-	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_skylight);
-}
-
-static inline bool_t mat_dimension_bed_works(mat_dimension_type_t dimension) {
-	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_bed);
-}
-
-static inline bool_t mat_dimension_has_raids(mat_dimension_type_t dimension) {
-	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_raids);
-}
-
-static inline bool_t mat_dimension_is_ultrawarm(mat_dimension_type_t dimension) {
-	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_ultrawarm);
-}
-
-static inline bool_t mat_dimension_has_ceiling(mat_dimension_type_t dimension) {
-	return utl_test_bit(mat_get_dimension_by_type(dimension)->properties, mat_dimension_ceiling);
-}
-
-static inline bool_t mat_dimension_has_fixed_time(mat_dimension_type_t dimension) {
-	return mat_get_dimension_by_type(dimension)->fixed_time == 0xFFFF ? false : true;
-}
-
-static inline uint16_t mat_dimension_get_fixed_time(mat_dimension_type_t dimension) {
-	return mat_get_dimension_by_type(dimension)->fixed_time;
-}
-
 /*
 	BIOMES
 */
 
-enum mat_biome_type {
+typedef enum {
 
 	mat_biome_badlands,
 	mat_biome_badlands_plateau,
@@ -185,9 +135,7 @@ enum mat_biome_type {
 
 	mat_biome_count
 
-};
-
-typedef uint8_t mat_biome_type_t;
+} mat_biome_type_t;
 
 typedef enum {
 
@@ -362,41 +310,43 @@ static inline uint16_t mat_temperature_modifier_length(mat_temperature_modifier_
 typedef struct {
 
 	const char* name;
-	uint32_t name_length;
-	mat_precipitation_type_t precipitation;
 	float32_t depth;
 	float32_t temperature;
-	mat_temperature_modifier_t temperature_modifier;
 	float32_t scale;
 	float32_t downfall;
-	mat_biome_category_t category;
+	uint16_t name_length;
+	mat_biome_category_t category : 5;
+	mat_temperature_modifier_t temperature_modifier : 1;
+	mat_precipitation_type_t precipitation : 2;
 
 	struct {
 
-		uint32_t sky_color;
-		uint32_t water_fog_color;
-		uint32_t fog_color;
-		uint32_t water_color;
-		uint32_t foliage_color; // 0xFFFFFFFF if no foliage color
-		uint32_t grass_color; // 0xFFFFFFFF if no grass color
-		mat_grass_color_modifier_t grass_color_modifier;
+		uint32_t sky_color : 24;
+		uint32_t water_fog_color : 24;
+		uint32_t fog_color : 24;
+		uint32_t water_color : 24;
+		uint32_t foliage_color : 24;
+		bool_t has_foliage_color : 1;
+		uint32_t grass_color : 24;
+		bool_t has_grass_color: 1;
+		mat_grass_color_modifier_t grass_color_modifier : 2;
 
 		struct {
 
-			uint32_t sound_length;
 			const char* sound;
 			uint32_t max_delay;
 			uint32_t min_delay;
-			bool_t replace_current_music;
+			uint16_t sound_length;
+			bool_t replace_current_music : 1;
 		
 		} music;
 
 		const char* ambient_sound;
-		uint32_t ambient_sound_length;
+		uint16_t ambient_sound_length;
 
 		struct {
 		
-			uint32_t sound_length;
+			uint16_t sound_length;
 			const char* sound;
 			float64_t tick_chance;
 		
@@ -408,7 +358,7 @@ typedef struct {
 			float64_t offset;
 			uint32_t tick_delay;
 			uint32_t block_search_extent;
-			uint32_t sound_length;
+			uint16_t sound_length;
 		
 		} mood_sound;
 
@@ -418,7 +368,7 @@ typedef struct {
 		
 		float32_t probability;
 		struct {
-			uint32_t type_length;
+			uint16_t type_length;
 			const char* type;
 		} options;
 
@@ -430,14 +380,6 @@ extern const mat_biome_t* mat_biomes[];
 
 static inline const mat_biome_t* mat_get_biome_by_type(mat_biome_type_t type) {
 	return mat_biomes[type];
-}
-
-static inline bool_t mat_biome_has_foliage_color(mat_biome_type_t type) {
-	return mat_get_biome_by_type(type)->effects.foliage_color == 0xFFFFFFFF ? false : true;
-}
-
-static inline bool_t mat_biome_has_grass_color(mat_biome_type_t type) {
-	return mat_get_biome_by_type(type)->effects.grass_color == 0xFFFFFFFF ? false : true;
 }
 
 /*
@@ -460,7 +402,7 @@ extern const mat_codec_t* mat_get_dimension_codec(mat_dimension_type_t dimension
 	State modifiers are used to determine the state
 */
 
-enum mat_state_modifier_type {
+typedef enum {
 
 		// north
 		// south
@@ -920,9 +862,7 @@ enum mat_state_modifier_type {
 		// full
 	mat_state_modifier_dripleaf_tilt,
 
-};
-
-typedef uint8_t mat_state_modifier_type_t;
+} mat_state_modifier_type_t;
 
 typedef struct {
 
@@ -1033,7 +973,7 @@ typedef enum {
 	Blocks are the basic building blocks of the world
 */
 
-enum mat_block_type {
+typedef enum {
 
 	mat_block_air,
 	mat_block_acacia_button,
@@ -1936,21 +1876,9 @@ enum mat_block_type {
 
 	mat_block_count
 
-};
+} mat_block_type_t;
 
-typedef uint16_t mat_block_type_t;
 typedef uint16_t mat_block_protocol_id_t;
-
-typedef enum {
-
-	mat_block_tag_catches_fire_from_lava,
-
-	mat_block_tag_light_filtering,
-	mat_block_tag_transparent,
-
-	mat_block_tag_max
-
-} mat_block_tag_t;
 
 typedef struct {
 
@@ -1960,22 +1888,24 @@ typedef struct {
 	float32_t hardness;
 		// hardness value for calculating break times
 
-	utl_bitset(mat_block_tag_max - 1, tags);
-
-	uint8_t luminance;
-	uint8_t encouragement;
-	uint8_t flammability;
+	uint8_t luminance : 4;
+	uint8_t encouragement : 6;
+	uint8_t flammability : 7;
 
 	struct {
 		
-		uint8_t type;
-		uint8_t tier;
+		mat_equipment_type_t type : 5;
+		mat_equipment_tier_t tier : 3;
 
 	} best_tool;
 
-	uint8_t entity;
+	mat_block_entity_type_t entity : 5;
 
-	uint8_t modifiers_count;
+	bool_t catches_fire_from_lava : 1;
+	bool_t light_filtering : 1;
+	bool_t transparent : 1;
+
+	uint8_t modifiers_count : 3;
 	mat_state_modifier_type_t modifiers[];
 
 } mat_block_t;
@@ -2055,1320 +1985,4 @@ static inline mat_block_protocol_id_t mat_set_block_state_value(mat_block_protoc
 
 	return block_protocol;
 
-}
-
-static inline bool_t mat_catches_fire_from_lava(const mat_block_t* block) {
-
-	return utl_test_bit(block->tags, mat_block_tag_catches_fire_from_lava);
-
-}
-
-static inline bool_t mat_can_burn_away(const mat_block_t* block) {
-
-	return block->flammability > 0 ? true : false;
-
-}
-
-/*
-	ITEMS
-	Every single item in minecraft
-*/
-
-typedef enum {
-
-	mat_item_acacia_boat,
-	mat_item_armor_stand,
-	mat_item_beetroot_seeds,
-	mat_item_birch_boat,
-	mat_item_bottle_o_enchanting,
-	mat_item_bow,
-	mat_item_bucket,
-	mat_item_bucket_of_axolotl,
-	mat_item_bucket_of_cod,
-	mat_item_bucket_of_pufferfish,
-	mat_item_bucket_of_salmon,
-	mat_item_bucket_of_tropical_fish,
-	mat_item_carrot,
-	mat_item_cocoa_beans,
-	mat_item_crossbow,
-	mat_item_dark_oak_boat,
-	mat_item_egg,
-	mat_item_end_crystal,
-	mat_item_ender_pearl,
-	mat_item_eye_of_ender,
-	mat_item_fire_charge,
-	mat_item_firework_rocket,
-	mat_item_fishing_rod,
-	mat_item_flint_and_steel,
-	mat_item_glow_berries,
-	mat_item_glow_item_frame,
-	mat_item_item_frame,
-	mat_item_jungle_boat,
-	mat_item_kelp,
-	mat_item_lava_bucket,
-	mat_item_lead,
-	mat_item_lingering_potion,
-	mat_item_melon_seeds,
-	mat_item_minecart,
-	mat_item_minecart_with_chest,
-	mat_item_minecart_with_command_block,
-	mat_item_minecart_with_furnace_,
-	mat_item_minecart_with_hopper,
-	mat_item_minecart_with_tnt,
-	mat_item_oak_boat,
-	mat_item_painting,
-	mat_item_potato,
-	mat_item_powder_snow_bucket,
-	mat_item_pumpkin_seeds,
-	mat_item_redstone_dust,
-	mat_item_snowball,
-	mat_item_splash_potion,
-	mat_item_spruce_boat,
-	mat_item_string,
-	mat_item_sweet_berries,
-	mat_item_trident,
-	mat_item_water_bucket,
-	mat_item_wheat_seeds,
-	mat_item_apple,
-	mat_item_arrow,
-	mat_item_baked_potato,
-	mat_item_beetroot,
-	mat_item_beetroot_soup,
-	mat_item_black_dye,
-	mat_item_blue_dye,
-	mat_item_bone,
-	mat_item_bone_meal,
-	mat_item_book_and_quill,
-	mat_item_bowl,
-	mat_item_bread,
-	mat_item_brown_dye,
-	mat_item_bundle,
-	mat_item_carrot_on_a_stick,
-	mat_item_chainmail_boots,
-	mat_item_chainmail_chestplate,
-	mat_item_chainmail_helmet,
-	mat_item_chainmail_leggings,
-	mat_item_chorus_fruit,
-	mat_item_compass,
-	mat_item_cooked_chicken,
-	mat_item_cooked_cod,
-	mat_item_cooked_mutton,
-	mat_item_cooked_porkchop,
-	mat_item_cooked_rabbit,
-	mat_item_cooked_salmon,
-	mat_item_cookie,
-	mat_item_cyan_dye,
-	mat_item_debug_stick_,
-	mat_item_diamond_axe,
-	mat_item_diamond_boots,
-	mat_item_diamond_chestplate,
-	mat_item_diamond_helmet,
-	mat_item_diamond_hoe,
-	mat_item_diamond_horse_armor,
-	mat_item_diamond_leggings,
-	mat_item_diamond_pickaxe,
-	mat_item_diamond_shovel,
-	mat_item_diamond_sword,
-	mat_item_dried_kelp,
-	mat_item_elytra,
-	mat_item_empty_map,
-	mat_item_enchanted_golden_apple,
-	mat_item_goat_horn_,
-	mat_item_glass_bottle,
-	mat_item_glow_ink_sac,
-	mat_item_gold_ingot,
-	mat_item_golden_apple,
-	mat_item_golden_axe,
-	mat_item_golden_boots,
-	mat_item_golden_carrot,
-	mat_item_golden_chestplate,
-	mat_item_golden_helmet,
-	mat_item_golden_hoe,
-	mat_item_golden_horse_armor,
-	mat_item_golden_leggings,
-	mat_item_golden_pickaxe,
-	mat_item_golden_shovel,
-	mat_item_golden_sword,
-	mat_item_gray_dye,
-	mat_item_green_dye,
-	mat_item_honeycomb,
-	mat_item_honey_bottle,
-	mat_item_ink_sac,
-	mat_item_iron_axe,
-	mat_item_iron_boots,
-	mat_item_iron_chestplate,
-	mat_item_iron_helmet,
-	mat_item_iron_hoe,
-	mat_item_iron_horse_armor,
-	mat_item_iron_ingot,
-	mat_item_iron_leggings,
-	mat_item_iron_pickaxe,
-	mat_item_iron_shovel,
-	mat_item_iron_sword,
-	mat_item_knowledge_book_,
-	mat_item_leather_boots,
-	mat_item_leather_cap,
-	mat_item_leather_horse_armor,
-	mat_item_leather_pants,
-	mat_item_leather_tunic,
-	mat_item_light_blue_dye,
-	mat_item_light_gray_dye,
-	mat_item_lime_dye,
-	mat_item_magenta_dye,
-	mat_item_map_or_explorer_map,
-	mat_item_melon_slice,
-	mat_item_milk_bucket,
-	mat_item_mushroom_stew,
-	mat_item_music_disc_11,
-	mat_item_music_disc_13,
-	mat_item_music_disc_blocks,
-	mat_item_music_disc_cat,
-	mat_item_music_disc_chirp,
-	mat_item_music_disc_far,
-	mat_item_music_disc_mall,
-	mat_item_music_disc_mellohi,
-	mat_item_music_disc_pigstep,
-	mat_item_music_disc_stal,
-	mat_item_music_disc_strad,
-	mat_item_music_disc_wait,
-	mat_item_music_disc_ward,
-	mat_item_name_tag,
-	mat_item_netherite_axe,
-	mat_item_netherite_boots,
-	mat_item_netherite_chestplate,
-	mat_item_netherite_helmet,
-	mat_item_netherite_hoe,
-	mat_item_netherite_leggings,
-	mat_item_netherite_pickaxe,
-	mat_item_netherite_shovel,
-	mat_item_netherite_sword,
-	mat_item_orange_dye,
-	mat_item_pink_dye,
-	mat_item_poisonous_potato,
-	mat_item_potions,
-	mat_item_pufferfish,
-	mat_item_pumpkin_pie,
-	mat_item_purple_dye,
-	mat_item_rabbit_stew,
-	mat_item_raw_beef,
-	mat_item_raw_chicken,
-	mat_item_raw_cod,
-	mat_item_raw_mutton,
-	mat_item_raw_porkchop,
-	mat_item_raw_rabbit,
-	mat_item_raw_salmon,
-	mat_item_red_dye,
-	mat_item_rotten_flesh,
-	mat_item_saddle,
-	mat_item_shears,
-	mat_item_shield,
-	mat_item_spectral_arrow_,
-	mat_item_spider_eye,
-	mat_item_spyglass,
-	mat_item_steak,
-	mat_item_stone_axe,
-	mat_item_stone_hoe,
-	mat_item_stone_pickaxe,
-	mat_item_stone_shovel,
-	mat_item_stone_sword,
-	mat_item_sugar,
-	mat_item_suspicious_stew,
-	mat_item_tipped_arrow,
-	mat_item_totem_of_undying,
-	mat_item_tropical_fish,
-	mat_item_turtle_shell,
-	mat_item_warped_fungus_on_a_stick,
-	mat_item_wheat,
-	mat_item_white_dye,
-	mat_item_wooden_axe,
-	mat_item_wooden_hoe,
-	mat_item_wooden_pickaxe,
-	mat_item_wooden_shovel,
-	mat_item_wooden_sword,
-	mat_item_written_book,
-	mat_item_yellow_dye,
-	mat_item_amethyst_shard,
-	mat_item_banner_pattern_creeper_charge,
-	mat_item_banner_pattern_flower_charge,
-	mat_item_banner_pattern_globe,
-	mat_item_banner_pattern_skull_charge,
-	mat_item_banner_pattern_snout,
-	mat_item_banner_pattern_thing,
-	mat_item_blaze_powder,
-	mat_item_blaze_rod,
-	mat_item_book,
-	mat_item_brick,
-	mat_item_charcoal,
-	mat_item_clay_ball,
-	mat_item_clock,
-	mat_item_coal,
-	mat_item_copper_ingot,
-	mat_item_diamond,
-	mat_item_dragon_breath,
-	mat_item_emerald,
-	mat_item_enchanted_book,
-	mat_item_feather,
-	mat_item_fermented_spider_eye,
-	mat_item_firework_star,
-	mat_item_flint,
-	mat_item_ghast_tear,
-	mat_item_glistering_melon_slice,
-	mat_item_glowstone_dust,
-	mat_item_gold_nugget,
-	mat_item_gunpowder,
-	mat_item_heart_of_the_sea,
-	mat_item_iron_nugget,
-	mat_item_lapis_lazuli,
-	mat_item_leather,
-	mat_item_magma_cream,
-	mat_item_nautilus_shell,
-	mat_item_nether_brick,
-	mat_item_nether_quartz,
-	mat_item_nether_star,
-	mat_item_netherite_ingot,
-	mat_item_netherite_scrap,
-	mat_item_paper,
-	mat_item_phantom_membrane,
-	mat_item_popped_chorus_fruit,
-	mat_item_prismarine_crystals,
-	mat_item_prismarine_shard,
-	mat_item_rabbit_hide,
-	mat_item_rabbit_foot,
-	mat_item_raw_copper,
-	mat_item_raw_gold,
-	mat_item_raw_iron,
-	mat_item_scute,
-	mat_item_shulker_shell,
-	mat_item_slimeball,
-	mat_item_stick,
-	mat_item_spawn_eggs,
-	mat_item_axolotl_spawn_egg,
-	mat_item_bat_spawn_egg,
-	mat_item_bee_spawn_egg,
-	mat_item_blaze_spawn_egg,
-	mat_item_cat_spawn_egg,
-	mat_item_cave_spider_spawn_egg,
-	mat_item_chicken_spawn_egg,
-	mat_item_cod_spawn_egg,
-	mat_item_cow_spawn_egg,
-	mat_item_creeper_spawn_egg,
-	mat_item_dolphin_spawn_egg,
-	mat_item_donkey_spawn_egg,
-	mat_item_drowned_spawn_egg,
-	mat_item_elder_guardian_spawn_egg,
-	mat_item_enderman_spawn_egg,
-	mat_item_endermite_spawn_egg,
-	mat_item_evoker_spawn_egg,
-	mat_item_fox_spawn_egg,
-	mat_item_ghast_spawn_egg,
-	mat_item_glow_squid_spawn_egg,
-	mat_item_goat_spawn_egg,
-	mat_item_guardian_spawn_egg,
-	mat_item_hoglin_spawn_egg,
-	mat_item_horse_spawn_egg,
-	mat_item_husk_spawn_egg,
-	mat_item_llama_spawn_egg,
-	mat_item_magma_cube_spawn_egg,
-	mat_item_mooshroom_spawn_egg,
-	mat_item_mule_spawn_egg,
-	mat_item_ocelot_spawn_egg,
-	mat_item_panda_spawn_egg,
-	mat_item_parrot_spawn_egg,
-	mat_item_phantom_spawn_egg,
-	mat_item_pig_spawn_egg,
-	mat_item_piglin_spawn_egg,
-	mat_item_piglin_brute_spawn_egg,
-	mat_item_pillager_spawn_egg,
-	mat_item_polar_bear_spawn_egg,
-	mat_item_pufferfish_spawn_egg,
-	mat_item_rabbit_spawn_egg,
-	mat_item_ravager_spawn_egg,
-	mat_item_salmon_spawn_egg,
-	mat_item_sheep_spawn_egg,
-	mat_item_shulker_spawn_egg,
-	mat_item_silverfish_spawn_egg,
-	mat_item_skeleton_horse_spawn_egg,
-	mat_item_skeleton_spawn_egg,
-	mat_item_slime_spawn_egg,
-	mat_item_spider_spawn_egg,
-	mat_item_squid_spawn_egg,
-	mat_item_stray_spawn_egg,
-	mat_item_strider_spawn_egg,
-	mat_item_trader_llama_spawn_egg,
-	mat_item_tropical_fish_spawn_egg,
-	mat_item_turtle_spawn_egg,
-	mat_item_vex_spawn_egg,
-	mat_item_villager_spawn_egg,
-	mat_item_vindicator_spawn_egg,
-	mat_item_wandering_trader_spawn_egg,
-	mat_item_witch_spawn_egg,
-	mat_item_wither_skeleton_spawn_egg,
-	mat_item_wolf_spawn_egg,
-	mat_item_zoglin_spawn_egg,
-	mat_item_zombie_horse_spawn_egg,
-	mat_item_zombie_spawn_egg,
-	mat_item_zombie_villager_spawn_egg,
-	mat_item_zombified_piglin_spawn_egg,
-	mat_item_acacia_button,
-	mat_item_acacia_door,
-	mat_item_acacia_fence,
-	mat_item_acacia_fence_gate,
-	mat_item_acacia_leaves,
-	mat_item_acacia_log,
-	mat_item_acacia_planks,
-	mat_item_acacia_pressure_plate,
-	mat_item_acacia_sapling,
-	mat_item_acacia_sign,
-	mat_item_acacia_slab,
-	mat_item_acacia_stairs,
-	mat_item_acacia_trapdoor,
-	mat_item_acacia_wood,
-	mat_item_activator_rail,
-	mat_item_allium,
-	mat_item_amethyst_cluster,
-	mat_item_ancient_debris,
-	mat_item_andesite,
-	mat_item_andesite_slab,
-	mat_item_andesite_stairs,
-	mat_item_andesite_wall,
-	mat_item_anvil,
-	mat_item_azalea,
-	mat_item_azalea_leaves,
-	mat_item_azure_bluet,
-	mat_item_bamboo,
-	mat_item_bamboo_sapling,
-	mat_item_beetroots,
-	mat_item_barrel,
-	mat_item_barrier,
-	mat_item_basalt,
-	mat_item_beacon,
-	mat_item_bedrock,
-	mat_item_beehive,
-	mat_item_bee_nest,
-	mat_item_bell,
-	mat_item_big_dripleaf,
-	mat_item_birch_button,
-	mat_item_birch_door,
-	mat_item_birch_fence,
-	mat_item_birch_fence_gate,
-	mat_item_birch_leaves,
-	mat_item_birch_log,
-	mat_item_birch_planks,
-	mat_item_birch_pressure_plate,
-	mat_item_birch_sapling,
-	mat_item_birch_sign,
-	mat_item_birch_slab,
-	mat_item_birch_stairs,
-	mat_item_birch_trapdoor,
-	mat_item_birch_wood,
-	mat_item_black_banner,
-	mat_item_black_bed,
-	mat_item_black_candle,
-	mat_item_black_carpet,
-	mat_item_black_concrete,
-	mat_item_black_concrete_powder,
-	mat_item_black_glazed_terracotta,
-	mat_item_black_shulker_box,
-	mat_item_black_stained_glass,
-	mat_item_black_stained_glass_pane,
-	mat_item_black_terracotta,
-	mat_item_black_wool,
-	mat_item_blackstone,
-	mat_item_blackstone_slab,
-	mat_item_blackstone_stairs,
-	mat_item_blackstone_wall,
-	mat_item_blast_furnace,
-	mat_item_block_of_amethyst,
-	mat_item_block_of_coal,
-	mat_item_block_of_copper,
-	mat_item_block_of_diamond,
-	mat_item_emerald_block,
-	mat_item_gold_block,
-	mat_item_iron_block,
-	mat_item_block_of_lapis_lazuli,
-	mat_item_block_of_netherite,
-	mat_item_block_of_quartz,
-	mat_item_raw_copper_block,
-	mat_item_block_of_raw_gold,
-	mat_item_block_of_raw_iron,
-	mat_item_block_of_redstone,
-	mat_item_blue_banner,
-	mat_item_blue_bed,
-	mat_item_blue_candle,
-	mat_item_blue_carpet,
-	mat_item_blue_concrete,
-	mat_item_blue_concrete_powder,
-	mat_item_blue_glazed_terracotta,
-	mat_item_blue_ice,
-	mat_item_blue_orchid,
-	mat_item_blue_shulker_box,
-	mat_item_blue_stained_glass,
-	mat_item_blue_stained_glass_pane,
-	mat_item_blue_terracotta,
-	mat_item_blue_wool,
-	mat_item_bone_block,
-	mat_item_bookshelf,
-	mat_item_brain_coral,
-	mat_item_brain_coral_block,
-	mat_item_brain_coral_fan,
-	mat_item_brewing_stand,
-	mat_item_brick_slab,
-	mat_item_brick_stairs,
-	mat_item_brick_wall,
-	mat_item_bricks,
-	mat_item_brown_banner,
-	mat_item_brown_bed,
-	mat_item_brown_candle,
-	mat_item_brown_carpet,
-	mat_item_brown_concrete,
-	mat_item_brown_concrete_powder,
-	mat_item_brown_glazed_terracotta,
-	mat_item_brown_mushroom,
-	mat_item_brown_mushroom_block,
-	mat_item_brown_shulker_box,
-	mat_item_brown_stained_glass,
-	mat_item_brown_stained_glass_pane,
-	mat_item_brown_terracotta,
-	mat_item_brown_wool,
-	mat_item_bubble_coral,
-	mat_item_bubble_coral_block,
-	mat_item_bubble_coral_fan,
-	mat_item_budding_amethyst,
-	mat_item_cactus,
-	mat_item_cake,
-	mat_item_calcite,
-	mat_item_campfire,
-	mat_item_candle,
-	mat_item_carrots,
-	mat_item_cartography_table,
-	mat_item_carved_pumpkin,
-	mat_item_cauldron,
-	mat_item_cave_vines,
-	mat_item_chain,
-	mat_item_chain_command_block,
-	mat_item_chest,
-	mat_item_chipped_anvil,
-	mat_item_chiseled_deepslate,
-	mat_item_chiseled_nether_bricks,
-	mat_item_chiseled_polished_blackstone,
-	mat_item_chiseled_quartz_block,
-	mat_item_chiseled_red_sandstone,
-	mat_item_chiseled_sandstone,
-	mat_item_chiseled_stone_bricks,
-	mat_item_chorus_flower,
-	mat_item_chorus_plant,
-	mat_item_clay,
-	mat_item_coal_ore,
-	mat_item_coarse_dirt,
-	mat_item_cobbled_deepslate,
-	mat_item_cobbled_deepslate_slab,
-	mat_item_cobbled_deepslate_stairs,
-	mat_item_cobbled_deepslate_wall,
-	mat_item_cobblestone,
-	mat_item_cobblestone_slab,
-	mat_item_cobblestone_stairs,
-	mat_item_cobblestone_wall,
-	mat_item_cobweb,
-	mat_item_cocoa,
-	mat_item_command_block,
-	mat_item_composter,
-	mat_item_conduit,
-	mat_item_copper_ore,
-	mat_item_cornflower,
-	mat_item_cracked_deepslate_bricks,
-	mat_item_cracked_deepslate_tiles,
-	mat_item_cracked_nether_bricks,
-	mat_item_cracked_polished_blackstone_bricks,
-	mat_item_cracked_stone_bricks,
-	mat_item_crafting_table,
-	mat_item_creeper_head,
-	mat_item_crimson_button,
-	mat_item_crimson_door,
-	mat_item_crimson_fence,
-	mat_item_crimson_fence_gate,
-	mat_item_crimson_fungus,
-	mat_item_crimson_hyphae,
-	mat_item_crimson_nylium,
-	mat_item_crimson_planks,
-	mat_item_crimson_pressure_plate,
-	mat_item_crimson_roots,
-	mat_item_crimson_sign,
-	mat_item_crimson_slab,
-	mat_item_crimson_stairs,
-	mat_item_crimson_stem,
-	mat_item_crimson_trapdoor,
-	mat_item_crying_obsidian,
-	mat_item_cut_copper,
-	mat_item_cut_copper_slab,
-	mat_item_cut_copper_stairs,
-	mat_item_cut_red_sandstone,
-	mat_item_cut_red_sandstone_slab,
-	mat_item_cut_sandstone,
-	mat_item_cut_sandstone_slab,
-	mat_item_cyan_banner,
-	mat_item_cyan_bed,
-	mat_item_cyan_candle,
-	mat_item_cyan_carpet,
-	mat_item_cyan_concrete,
-	mat_item_cyan_concrete_powder,
-	mat_item_cyan_glazed_terracotta,
-	mat_item_cyan_shulker_box,
-	mat_item_cyan_stained_glass,
-	mat_item_cyan_stained_glass_pane,
-	mat_item_cyan_terracotta,
-	mat_item_cyan_wool,
-	mat_item_damaged_anvil,
-	mat_item_dandelion,
-	mat_item_dark_oak_button,
-	mat_item_dark_oak_door,
-	mat_item_dark_oak_fence,
-	mat_item_dark_oak_fence_gate,
-	mat_item_dark_oak_leaves,
-	mat_item_dark_oak_log,
-	mat_item_dark_oak_planks,
-	mat_item_dark_oak_pressure_plate,
-	mat_item_dark_oak_sapling,
-	mat_item_dark_oak_sign,
-	mat_item_dark_oak_slab,
-	mat_item_dark_oak_stairs,
-	mat_item_dark_oak_trapdoor,
-	mat_item_dark_oak_wood,
-	mat_item_dark_prismarine,
-	mat_item_dark_prismarine_slab,
-	mat_item_dark_prismarine_stairs,
-	mat_item_daylight_detector,
-	mat_item_dead_brain_coral,
-	mat_item_dead_brain_coral_block,
-	mat_item_dead_brain_coral_fan,
-	mat_item_dead_bubble_coral,
-	mat_item_dead_bubble_coral_block,
-	mat_item_dead_bubble_coral_fan,
-	mat_item_dead_bush,
-	mat_item_dead_fire_coral,
-	mat_item_dead_fire_coral_block,
-	mat_item_dead_fire_coral_fan,
-	mat_item_dead_horn_coral,
-	mat_item_dead_horn_coral_block,
-	mat_item_dead_horn_coral_fan,
-	mat_item_dead_tube_coral,
-	mat_item_dead_tube_coral_block,
-	mat_item_dead_tube_coral_fan,
-	mat_item_deepslate,
-	mat_item_deepslate_bricks,
-	mat_item_deepslate_brick_slab,
-	mat_item_deepslate_brick_stairs,
-	mat_item_deepslate_brick_wall,
-	mat_item_deepslate_coal_ore,
-	mat_item_deepslate_copper_ore,
-	mat_item_deepslate_diamond_ore,
-	mat_item_deepslate_emerald_ore,
-	mat_item_deepslate_gold_ore,
-	mat_item_deepslate_iron_ore,
-	mat_item_deepslate_lapis_lazuli_ore,
-	mat_item_deepslate_redstone_ore,
-	mat_item_deepslate_tiles,
-	mat_item_deepslate_tile_slab,
-	mat_item_deepslate_tile_stairs,
-	mat_item_deepslate_tile_wall,
-	mat_item_detector_rail,
-	mat_item_diamond_ore,
-	mat_item_diorite,
-	mat_item_diorite_slab,
-	mat_item_diorite_stairs,
-	mat_item_diorite_wall,
-	mat_item_dirt,
-	mat_item_dirt_path,
-	mat_item_dispenser,
-	mat_item_dragon_egg,
-	mat_item_dragon_head,
-	mat_item_dried_kelp_block,
-	mat_item_dripstone_block,
-	mat_item_dropper,
-	mat_item_emerald_ore,
-	mat_item_enchanting_table,
-	mat_item_end_portal_frame,
-	mat_item_end_rod,
-	mat_item_end_stone,
-	mat_item_end_stone_brick_slab,
-	mat_item_end_stone_brick_stairs,
-	mat_item_end_stone_brick_wall,
-	mat_item_end_stone_bricks,
-	mat_item_ender_chest,
-	mat_item_exposed_copper,
-	mat_item_exposed_cut_copper,
-	mat_item_exposed_cut_copper_slab,
-	mat_item_exposed_cut_copper_stairs,
-	mat_item_farmland,
-	mat_item_fern,
-	mat_item_fire,
-	mat_item_fire_coral,
-	mat_item_fire_coral_block,
-	mat_item_fire_coral_fan,
-	mat_item_fletching_table,
-	mat_item_flower_pot,
-	mat_item_flowering_azalea,
-	mat_item_flowering_azalea_leaves,
-	mat_item_furnace,
-	mat_item_gilded_blackstone,
-	mat_item_glass,
-	mat_item_glass_pane,
-	mat_item_glow_lichen,
-	mat_item_glowstone,
-	mat_item_gold_ore,
-	mat_item_granite,
-	mat_item_granite_slab,
-	mat_item_granite_stairs,
-	mat_item_granite_wall,
-	mat_item_grass,
-	mat_item_grass_block,
-	mat_item_gravel,
-	mat_item_gray_banner,
-	mat_item_gray_bed,
-	mat_item_gray_candle,
-	mat_item_gray_carpet,
-	mat_item_gray_concrete,
-	mat_item_gray_concrete_powder,
-	mat_item_gray_glazed_terracotta,
-	mat_item_gray_shulker_box,
-	mat_item_gray_stained_glass,
-	mat_item_gray_stained_glass_pane,
-	mat_item_gray_terracotta,
-	mat_item_gray_wool,
-	mat_item_green_banner,
-	mat_item_green_bed,
-	mat_item_green_candle,
-	mat_item_green_carpet,
-	mat_item_green_concrete,
-	mat_item_green_concrete_powder,
-	mat_item_green_glazed_terracotta,
-	mat_item_green_shulker_box,
-	mat_item_green_stained_glass,
-	mat_item_green_stained_glass_pane,
-	mat_item_green_terracotta,
-	mat_item_green_wool,
-	mat_item_grindstone,
-	mat_item_hanging_roots,
-	mat_item_hay_bale,
-	mat_item_heavy_weighted_pressure_plate,
-	mat_item_honey_block,
-	mat_item_honeycomb_block,
-	mat_item_hopper,
-	mat_item_horn_coral,
-	mat_item_horn_coral_block,
-	mat_item_horn_coral_fan,
-	mat_item_ice,
-	mat_item_infested_chiseled_stone_bricks,
-	mat_item_infested_cobblestone,
-	mat_item_infested_cracked_stone_bricks,
-	mat_item_infested_deepslate,
-	mat_item_infested_mossy_stone_bricks,
-	mat_item_infested_stone,
-	mat_item_infested_stone_bricks,
-	mat_item_iron_bars,
-	mat_item_iron_door,
-	mat_item_iron_ore,
-	mat_item_iron_trapdoor,
-	mat_item_jack_o_lantern,
-	mat_item_jigsaw_block,
-	mat_item_jukebox,
-	mat_item_jungle_button,
-	mat_item_jungle_door,
-	mat_item_jungle_fence,
-	mat_item_jungle_fence_gate,
-	mat_item_jungle_leaves,
-	mat_item_jungle_log,
-	mat_item_jungle_planks,
-	mat_item_jungle_pressure_plate,
-	mat_item_jungle_sapling,
-	mat_item_jungle_sign,
-	mat_item_jungle_slab,
-	mat_item_jungle_stairs,
-	mat_item_jungle_trapdoor,
-	mat_item_jungle_wood,
-	mat_item_ladder,
-	mat_item_lantern,
-	mat_item_lapis_lazuli_ore,
-	mat_item_large_amethyst_bud,
-	mat_item_large_fern,
-	mat_item_lava,
-	mat_item_lectern,
-	mat_item_lever,
-	mat_item_light_block,
-	mat_item_light_blue_banner,
-	mat_item_light_blue_bed,
-	mat_item_light_blue_candle,
-	mat_item_light_blue_carpet,
-	mat_item_light_blue_concrete,
-	mat_item_light_blue_concrete_powder,
-	mat_item_light_blue_glazed_terracotta,
-	mat_item_light_blue_shulker_box,
-	mat_item_light_blue_stained_glass,
-	mat_item_light_blue_stained_glass_pane,
-	mat_item_light_blue_terracotta,
-	mat_item_light_blue_wool,
-	mat_item_light_gray_banner,
-	mat_item_light_gray_bed,
-	mat_item_light_gray_candle,
-	mat_item_light_gray_carpet,
-	mat_item_light_gray_concrete,
-	mat_item_light_gray_concrete_powder,
-	mat_item_light_gray_glazed_terracotta,
-	mat_item_light_gray_shulker_box,
-	mat_item_light_gray_stained_glass,
-	mat_item_light_gray_stained_glass_pane,
-	mat_item_light_gray_terracotta,
-	mat_item_light_gray_wool,
-	mat_item_light_weighted_pressure_plate,
-	mat_item_lightning_rod,
-	mat_item_lilac,
-	mat_item_lily_of_the_valley,
-	mat_item_lily_pad,
-	mat_item_lime_banner,
-	mat_item_lime_bed,
-	mat_item_lime_candle,
-	mat_item_lime_carpet,
-	mat_item_lime_concrete,
-	mat_item_lime_concrete_powder,
-	mat_item_lime_glazed_terracotta,
-	mat_item_lime_shulker_box,
-	mat_item_lime_stained_glass,
-	mat_item_lime_stained_glass_pane,
-	mat_item_lime_terracotta,
-	mat_item_lime_wool,
-	mat_item_lodestone,
-	mat_item_loom,
-	mat_item_magenta_banner,
-	mat_item_magenta_bed,
-	mat_item_magenta_candle,
-	mat_item_magenta_carpet,
-	mat_item_magenta_concrete,
-	mat_item_magenta_concrete_powder,
-	mat_item_magenta_glazed_terracotta,
-	mat_item_magenta_shulker_box,
-	mat_item_magenta_stained_glass,
-	mat_item_magenta_stained_glass_pane,
-	mat_item_magenta_terracotta,
-	mat_item_magenta_wool,
-	mat_item_magma_block,
-	mat_item_medium_amethyst_bud,
-	mat_item_melon,
-	mat_item_melon_stem,
-	mat_item_moss_block,
-	mat_item_moss_carpet,
-	mat_item_mossy_cobblestone,
-	mat_item_mossy_cobblestone_slab,
-	mat_item_mossy_cobblestone_stairs,
-	mat_item_mossy_cobblestone_wall,
-	mat_item_mossy_stone_brick_slab,
-	mat_item_mossy_stone_brick_stairs,
-	mat_item_mossy_stone_brick_wall,
-	mat_item_mossy_stone_bricks,
-	mat_item_mushroom_stem,
-	mat_item_mycelium,
-	mat_item_nether_brick_fence,
-	mat_item_nether_brick_slab,
-	mat_item_nether_brick_stairs,
-	mat_item_nether_brick_wall,
-	mat_item_nether_bricks,
-	mat_item_nether_gold_ore,
-	mat_item_nether_quartz_ore,
-	mat_item_nether_sprouts,
-	mat_item_nether_wart,
-	mat_item_nether_wart_block,
-	mat_item_netherrack,
-	mat_item_note_block,
-	mat_item_oak_button,
-	mat_item_oak_door,
-	mat_item_oak_fence,
-	mat_item_oak_fence_gate,
-	mat_item_oak_leaves,
-	mat_item_oak_log,
-	mat_item_oak_planks,
-	mat_item_oak_pressure_plate,
-	mat_item_oak_sapling,
-	mat_item_oak_sign,
-	mat_item_oak_slab,
-	mat_item_oak_stairs,
-	mat_item_oak_trapdoor,
-	mat_item_oak_wood,
-	mat_item_observer,
-	mat_item_obsidian,
-	mat_item_ominous_banner,
-	mat_item_orange_banner,
-	mat_item_orange_bed,
-	mat_item_orange_candle,
-	mat_item_orange_carpet,
-	mat_item_orange_concrete,
-	mat_item_orange_concrete_powder,
-	mat_item_orange_glazed_terracotta,
-	mat_item_orange_shulker_box,
-	mat_item_orange_stained_glass,
-	mat_item_orange_stained_glass_pane,
-	mat_item_orange_terracotta,
-	mat_item_orange_tulip,
-	mat_item_orange_wool,
-	mat_item_oxeye_daisy,
-	mat_item_oxidized_copper,
-	mat_item_oxidized_cut_copper,
-	mat_item_oxidized_cut_copper_slab,
-	mat_item_oxidized_cut_copper_stairs,
-	mat_item_packed_ice,
-	mat_item_peony,
-	mat_item_petrified_oak_slab,
-	mat_item_pink_banner,
-	mat_item_pink_bed,
-	mat_item_pink_candle,
-	mat_item_pink_carpet,
-	mat_item_pink_concrete,
-	mat_item_pink_concrete_powder,
-	mat_item_pink_glazed_terracotta,
-	mat_item_pink_shulker_box,
-	mat_item_pink_stained_glass,
-	mat_item_pink_stained_glass_pane,
-	mat_item_pink_terracotta,
-	mat_item_pink_tulip,
-	mat_item_pink_wool,
-	mat_item_piston,
-	mat_item_player_head,
-	mat_item_podzol,
-	mat_item_pointed_dripstone,
-	mat_item_polished_andesite,
-	mat_item_polished_andesite_slab,
-	mat_item_polished_andesite_stairs,
-	mat_item_polished_basalt,
-	mat_item_polished_blackstone,
-	mat_item_polished_blackstone_brick_slab,
-	mat_item_polished_blackstone_brick_stairs,
-	mat_item_polished_blackstone_brick_wall,
-	mat_item_polished_blackstone_bricks,
-	mat_item_polished_blackstone_button,
-	mat_item_polished_blackstone_pressure_plate,
-	mat_item_polished_blackstone_slab,
-	mat_item_polished_blackstone_stairs,
-	mat_item_polished_blackstone_wall,
-	mat_item_polished_diorite,
-	mat_item_polished_diorite_slab,
-	mat_item_polished_diorite_stairs,
-	mat_item_polished_granite,
-	mat_item_polished_granite_slab,
-	mat_item_polished_granite_stairs,
-	mat_item_polished_deepslate,
-	mat_item_polished_deepslate_slab,
-	mat_item_polished_deepslate_stairs,
-	mat_item_polished_deepslate_wall,
-	mat_item_poppy,
-	mat_item_potatoes,
-	mat_item_powder_snow,
-	mat_item_powered_rail,
-	mat_item_prismarine,
-	mat_item_prismarine_brick_slab,
-	mat_item_prismarine_brick_stairs,
-	mat_item_prismarine_bricks,
-	mat_item_prismarine_slab,
-	mat_item_prismarine_stairs,
-	mat_item_prismarine_wall,
-	mat_item_pumpkin,
-	mat_item_pumpkin_stem,
-	mat_item_purple_banner,
-	mat_item_purple_bed,
-	mat_item_purple_candle,
-	mat_item_purple_carpet,
-	mat_item_purple_concrete,
-	mat_item_purple_concrete_powder,
-	mat_item_purple_glazed_terracotta,
-	mat_item_purple_shulker_box,
-	mat_item_purple_stained_glass,
-	mat_item_purple_stained_glass_pane,
-	mat_item_purple_terracotta,
-	mat_item_purple_wool,
-	mat_item_purpur_block,
-	mat_item_purpur_pillar,
-	mat_item_purpur_slab,
-	mat_item_purpur_stairs,
-	mat_item_quartz_bricks,
-	mat_item_quartz_pillar,
-	mat_item_quartz_slab,
-	mat_item_quartz_stairs,
-	mat_item_rail,
-	mat_item_red_banner,
-	mat_item_red_bed,
-	mat_item_red_candle,
-	mat_item_red_carpet,
-	mat_item_red_concrete,
-	mat_item_red_concrete_powder,
-	mat_item_red_glazed_terracotta,
-	mat_item_red_mushroom,
-	mat_item_red_mushroom_block,
-	mat_item_red_nether_brick_slab,
-	mat_item_red_nether_brick_stairs,
-	mat_item_red_nether_brick_wall,
-	mat_item_red_nether_bricks,
-	mat_item_red_sand,
-	mat_item_red_sandstone,
-	mat_item_red_sandstone_slab,
-	mat_item_red_sandstone_stairs,
-	mat_item_red_sandstone_wall,
-	mat_item_red_shulker_box,
-	mat_item_red_stained_glass,
-	mat_item_red_stained_glass_pane,
-	mat_item_red_terracotta,
-	mat_item_red_tulip,
-	mat_item_red_wool,
-	mat_item_comparator,
-	mat_item_redstone_lamp,
-	mat_item_redstone_ore,
-	mat_item_repeater,
-	mat_item_redstone_torch,
-	mat_item_redstone_wire,
-	mat_item_repeating_command_block,
-	mat_item_respawn_anchor,
-	mat_item_rooted_dirt,
-	mat_item_rose_bush,
-	mat_item_sand,
-	mat_item_sandstone,
-	mat_item_sandstone_slab,
-	mat_item_sandstone_stairs,
-	mat_item_sandstone_wall,
-	mat_item_scaffolding,
-	mat_item_sculk_sensor,
-	mat_item_sea_lantern,
-	mat_item_sea_pickle,
-	mat_item_seagrass,
-	mat_item_shroomlight,
-	mat_item_shulker_box,
-	mat_item_skeleton_skull,
-	mat_item_slime_block,
-	mat_item_small_amethyst_bud,
-	mat_item_small_dripleaf,
-	mat_item_smithing_table,
-	mat_item_smoker,
-	mat_item_smooth_basalt,
-	mat_item_smooth_quartz_block,
-	mat_item_smooth_quartz_slab,
-	mat_item_smooth_quartz_stairs,
-	mat_item_smooth_red_sandstone,
-	mat_item_smooth_red_sandstone_slab,
-	mat_item_smooth_red_sandstone_stairs,
-	mat_item_smooth_sandstone,
-	mat_item_smooth_sandstone_slab,
-	mat_item_smooth_sandstone_stairs,
-	mat_item_smooth_stone,
-	mat_item_smooth_stone_slab,
-	mat_item_snow,
-	mat_item_snow_block,
-	mat_item_soul_campfire,
-	mat_item_soul_fire,
-	mat_item_soul_lantern,
-	mat_item_soul_sand,
-	mat_item_soul_soil,
-	mat_item_soul_torch,
-	mat_item_spawner,
-	mat_item_sponge,
-	mat_item_spore_blossom,
-	mat_item_spruce_button,
-	mat_item_spruce_door,
-	mat_item_spruce_fence,
-	mat_item_spruce_fence_gate,
-	mat_item_spruce_leaves,
-	mat_item_spruce_log,
-	mat_item_spruce_planks,
-	mat_item_spruce_pressure_plate,
-	mat_item_spruce_sapling,
-	mat_item_spruce_sign,
-	mat_item_spruce_slab,
-	mat_item_spruce_stairs,
-	mat_item_spruce_trapdoor,
-	mat_item_spruce_wood,
-	mat_item_sticky_piston,
-	mat_item_stone,
-	mat_item_stone_brick_slab,
-	mat_item_stone_brick_stairs,
-	mat_item_stone_brick_wall,
-	mat_item_stone_bricks,
-	mat_item_stone_button,
-	mat_item_stone_pressure_plate,
-	mat_item_stone_slab,
-	mat_item_stone_stairs,
-	mat_item_stonecutter,
-	mat_item_stripped_acacia_log,
-	mat_item_stripped_acacia_wood,
-	mat_item_stripped_birch_log,
-	mat_item_stripped_birch_wood,
-	mat_item_stripped_crimson_hyphae,
-	mat_item_stripped_crimson_stem,
-	mat_item_stripped_dark_oak_log,
-	mat_item_stripped_dark_oak_wood,
-	mat_item_stripped_jungle_log,
-	mat_item_stripped_jungle_wood,
-	mat_item_stripped_oak_log,
-	mat_item_stripped_oak_wood,
-	mat_item_stripped_spruce_log,
-	mat_item_stripped_spruce_wood,
-	mat_item_stripped_warped_hyphae,
-	mat_item_stripped_warped_stem,
-	mat_item_structure_block,
-	mat_item_structure_void,
-	mat_item_sugar_cane,
-	mat_item_sunflower,
-	mat_item_sweet_berry_bush,
-	mat_item_tall_grass,
-	mat_item_tall_seagrass,
-	mat_item_target,
-	mat_item_terracotta,
-	mat_item_tinted_glass,
-	mat_item_tnt,
-	mat_item_torch,
-	mat_item_trapped_chest,
-	mat_item_tripwire,
-	mat_item_tripwire_hook,
-	mat_item_tube_coral,
-	mat_item_tube_coral_block,
-	mat_item_tube_coral_fan,
-	mat_item_tuff,
-	mat_item_turtle_egg,
-	mat_item_twisting_vines,
-	mat_item_vines,
-	mat_item_warped_button,
-	mat_item_warped_door,
-	mat_item_warped_fence,
-	mat_item_warped_fence_gate,
-	mat_item_warped_fungus,
-	mat_item_warped_hyphae,
-	mat_item_warped_nylium,
-	mat_item_warped_planks,
-	mat_item_warped_pressure_plate,
-	mat_item_warped_roots,
-	mat_item_warped_sign,
-	mat_item_warped_slab,
-	mat_item_warped_stairs,
-	mat_item_warped_stem,
-	mat_item_warped_trapdoor,
-	mat_item_warped_wart_block,
-	mat_item_water,
-	mat_item_waxed_block_of_copper,
-	mat_item_waxed_cut_copper,
-	mat_item_waxed_cut_copper_slab,
-	mat_item_waxed_cut_copper_stairs,
-	mat_item_waxed_exposed_copper,
-	mat_item_waxed_exposed_cut_copper,
-	mat_item_waxed_exposed_cut_copper_slab,
-	mat_item_waxed_exposed_cut_copper_stairs,
-	mat_item_waxed_oxidized_copper,
-	mat_item_waxed_oxidized_cut_copper,
-	mat_item_waxed_oxidized_cut_copper_slab,
-	mat_item_waxed_oxidized_cut_copper_stairs,
-	mat_item_waxed_weathered_copper,
-	mat_item_waxed_weathered_cut_copper,
-	mat_item_waxed_weathered_cut_copper_slab,
-	mat_item_waxed_weathered_cut_copper_stairs,
-	mat_item_weathered_copper,
-	mat_item_weathered_cut_copper,
-	mat_item_weathered_cut_copper_slab,
-	mat_item_weathered_cut_copper_stairs,
-	mat_item_weeping_vines,
-	mat_item_wet_sponge,
-	mat_item_wheat_crops,
-	mat_item_white_banner,
-	mat_item_white_bed,
-	mat_item_white_candle,
-	mat_item_white_carpet,
-	mat_item_white_concrete,
-	mat_item_white_concrete_powder,
-	mat_item_white_glazed_terracotta,
-	mat_item_white_shulker_box,
-	mat_item_white_stained_glass,
-	mat_item_white_stained_glass_pane,
-	mat_item_white_terracotta,
-	mat_item_white_tulip,
-	mat_item_white_wool,
-	mat_item_wither_rose,
-	mat_item_wither_skeleton_skull,
-	mat_item_yellow_banner,
-	mat_item_yellow_bed,
-	mat_item_yellow_candle,
-	mat_item_yellow_carpet,
-	mat_item_yellow_concrete,
-	mat_item_yellow_concrete_powder,
-	mat_item_yellow_glazed_terracotta,
-	mat_item_yellow_shulker_box,
-	mat_item_yellow_stained_glass,
-	mat_item_yellow_stained_glass_pane,
-	mat_item_yellow_terracotta,
-	mat_item_yellow_wool,
-	mat_item_zombie_head
-
-} mat_item_id_t;
-
-typedef enum {
-
-	mat_item_tag_equipment, // equipment tag
-		mat_item_tag_weapon, // weapon tag
-			mat_item_tag_tier, // tier tag
-
-		mat_item_tag_armor, // armor tag
-
-	mat_item_tag_stacks,
-		mat_item_tag_stacks_16,
-
-	mat_item_tag_block, // block tag
-
-	mat_item_tag_food, // food tag
-
-	mat_item_tag_entity, // entity tag
-		mat_item_tag_entity_place, // throw_speed tag
-
-	mat_item_tag_max
-
-} mat_item_tag_t;
-
-typedef struct {
-
-	utl_bitset(mat_item_tag_max - 1, tags_set);
-
-	union {
-
-		struct {
-
-			mat_equipment_type_t type;
-			uint32_t max_durability;
-
-		} equipment;
-
-		struct {
-			
-			float32_t attack_speed;
-			float32_t damage;
-
-		} weapon;
-
-		mat_equipment_tier_t tier;
-
-		struct {
-
-			uint8_t defense;
-			uint8_t toughness;
-			uint8_t knockback_resistance;
-
-		} armor;
-
-		mat_block_type_t block;
-
-		struct {
-
-			float32_t saturation;
-
-			uint8_t speed; // how fast you eat it
-			uint8_t food; // how much hunger it restores
-
-		} food;
-
-		uint32_t entity;
-
-		float32_t throw_speed;
-
-	} tags[];
-
-} mat_item_t;
-
-extern const mat_item_t* mat_items[];
-extern const mat_item_id_t mat_items_protocol[];
-
-static inline const mat_item_t* mat_get_item_by_id(mat_item_id_t id) {
-	return mat_items[id];
-}
-
-static inline bool_t mat_is_equipment(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_equipment);
-}
-
-static inline mat_equipment_type_t mat_get_equipment_type(const mat_item_t* item) {
-	return item->tags[0].equipment.type;
-}
-
-static inline uint32_t mat_get_max_durability(const mat_item_t* item) {
-	return item->tags[0].equipment.max_durability;
-}
-
-static inline bool_t mat_is_weapon(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_weapon);
-}
-
-static inline float32_t mat_get_attack_speed(const mat_item_t* item) {
-	return item->tags[1].weapon.attack_speed;
-}
-
-static inline float32_t mat_get_damage(const mat_item_t* item) {
-	return item->tags[1].weapon.damage;
-}
-
-static inline bool_t mat_is_tiered(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_tier);
-}
-
-static inline mat_equipment_tier_t mat_get_tier(const mat_item_t* item) {
-	return item->tags[2].tier;
-}
-
-static inline bool_t mat_is_armor(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_armor);
-}
-
-static inline uint8_t mat_get_defense(const mat_item_t* item) {
-	return item->tags[1].armor.defense;
-}
-
-static inline uint8_t mat_get_toughness(const mat_item_t* item) {
-	return item->tags[1].armor.toughness;
-}
-
-static inline uint8_t mat_get_knockback_resistance(const mat_item_t* item) {
-	return item->tags[1].armor.knockback_resistance;
-}
-
-static inline bool_t mat_item_stacks(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_stacks);
-}
-
-static inline bool_t mat_item_stacks_16(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_stacks_16);
-}
-
-static inline bool_t mat_is_block(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_block);
-}
-
-static inline mat_block_type_t mat_get_block_id(const mat_item_t* item) {
-	return item->tags[0].block;
-}
-
-static inline bool_t mat_is_food(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_food);
-}
-
-static inline float32_t mat_get_saturation(const mat_item_t* item) {
-	return item->tags[0].food.saturation;
-}
-
-static inline uint8_t mat_get_food(const mat_item_t* item) {
-	return item->tags[0].food.food;
-}
-
-static inline uint8_t mat_get_consume_speed(const mat_item_t* item) {
-	return item->tags[0].food.speed;
-}
-
-static inline bool_t mat_is_entity(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_entity);
-}
-
-static inline uint32_t mat_get_entity(const mat_item_t* item) {
-	return item->tags[0].entity;
-}
-
-static inline bool_t mat_is_placed_entity(const mat_item_t* item) {
-	return utl_test_bit(item->tags_set, mat_item_tag_entity_place);
-}
-
-static inline float32_t mat_get_throw_speed(const mat_item_t* item) {
-	return item->tags[0].throw_speed;
 }

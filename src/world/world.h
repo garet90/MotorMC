@@ -5,7 +5,6 @@
 #include "../util/id_vector.h"
 #include "../util/bit_vector.h"
 #include "../util/tree.h"
-#include "../util/bitset.h"
 #include "material/material.h"
 
 typedef struct wld_world wld_world_t;
@@ -18,13 +17,13 @@ struct wld_chunk_section {
 	// block map
 	struct {
 
-		mat_block_protocol_id_t state;
+		uint16_t state;
 		uint16_t entity;
 
 	} blocks[16 * 16 * 16];
 
 	// biome map
-	mat_biome_type_t biome[4 * 4 * 4];
+	uint8_t biome[4 * 4 * 4];
 
 };
 
@@ -49,8 +48,8 @@ struct wld_chunk {
 
 	} highest[16 * 16];
 	
-	uint16_t idx; // index of chunk in region (used for finding chunk x and y)
-	uint8_t ticket;
+	uint16_t idx : 10; // index of chunk in region (used for finding chunk x and y)
+	uint8_t ticket : 6;
 	uint8_t min_ticket;
 
 	wld_chunk_section_t sections[]; // y = section index * 16, count of sections = World.height / 16
@@ -100,10 +99,10 @@ struct wld_world {
 	
 	uint16_t id;
 
-	bool_t debug;
-	bool_t flat;
+	bool_t debug : 1;
+	bool_t flat : 1;
 
-	uint8_t environment;
+	mat_dimension_type_t environment : 6;
 
 };
 

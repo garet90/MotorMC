@@ -90,8 +90,8 @@ int32_t sch_schedule(job_work_t* job, uint32_t delay) {
 
 int32_t sch_schedule_repeating(job_work_t* job, uint32_t delay, uint32_t interval) {
 
-	utl_set_bit(job->flags, job_flag_repeating);
-
+	job->repeating = true;
+	
 	int32_t id;
 	sch_scheduled_t* scheduled = sch_new(&id);
 	scheduled->job = job;

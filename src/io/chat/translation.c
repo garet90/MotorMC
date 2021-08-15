@@ -15,7 +15,7 @@ void cht_jsonify_translation(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht
 
 	yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "translate"), yyjson_mut_str(doc, translations[translation->translate]));
 
-	if (translation->color != cht_nocolor) {
+	if (translation->color != cht_no_color) {
 		if (translation->color <= 0xF) {
 			const char* colors[] = {
 				"black",

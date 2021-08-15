@@ -158,7 +158,7 @@ size_t log_to_string(char* message, const cht_component_t* chat) {
 		case cht_white:
 			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_WHITE);
 			break;
-		case cht_nocolor:
+		case cht_no_color:
 			break;
 		}
 	}

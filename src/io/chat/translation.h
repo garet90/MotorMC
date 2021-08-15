@@ -24,7 +24,7 @@ typedef struct {
 } cht_translation_t;
 
 static /*in-plugin*/ const cht_translation_t cht_translation_new = {
-	.color = cht_nocolor,
+	.color = cht_no_color,
 	.with = {
 		.bytes_per_element = sizeof(cht_component_t*)
 	}

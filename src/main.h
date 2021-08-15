@@ -21,6 +21,8 @@ typedef enum bool {
 
 } bool_t;
 
+#define UNSET 0x02
+
 typedef float float32_t;
 typedef double float64_t;
 
