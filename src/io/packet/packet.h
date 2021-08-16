@@ -7,7 +7,7 @@ typedef struct {
 	size_t cursor;
 	size_t length;
 	
-	io_endianness_t endianness;
+	io_endianness_t endianness : 1;
 	
 	byte_t length_prefix[5]; // the length of the packet
 	byte_t bytes[];

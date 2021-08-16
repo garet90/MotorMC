@@ -86,7 +86,7 @@ typedef struct {
 	float32_t additional_hearts;
 	int32_t score;
 
-	uint8_t held_item;
+	uint8_t held_item : 4;
 
 	byte_t displayed_skin_parts;
 	byte_t main_hand : 1;

@@ -49,8 +49,8 @@ struct wld_chunk {
 	} highest[16 * 16];
 	
 	uint16_t idx : 10; // index of chunk in region (used for finding chunk x and y)
-	uint8_t ticket : 6;
-	uint8_t min_ticket;
+	uint8_t ticket : 7;
+	uint8_t min_ticket : 7;
 
 	wld_chunk_section_t sections[]; // y = section index * 16, count of sections = World.height / 16
 

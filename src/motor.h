@@ -46,25 +46,23 @@ typedef struct {
 	struct {
 		const char* name;
 		int64_t seed;
-		uint16_t max_height;
+		int16_t max_height;
 	} world;
-
-	const uint16_t protocol;
 
 	uint32_t max_tick_time;
 	
 	/* listener */
 	ltg_main_t listener;
 	
-	uint8_t render_distance;
+	uint8_t render_distance : 6;
+	
+	const uint16_t protocol : 10;
 
 	sky_status_t status : 2;
 	cmd_op_level_t op_permission_level : 3;
 
-	struct {
-		sky_difficulty_t level : 2;
-		bool_t hardcore : 1;
-	} difficulty;
+	sky_difficulty_t difficulty : 2;
+	bool_t hardcore : 1;
 
 	bool_t enable_respawn_screen : 1;
 	bool_t enforce_whitelist : 1;

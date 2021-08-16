@@ -87,7 +87,7 @@ union mnbt_val {
 
 struct mnbt_tag {
 
-	mnbt_type type;
+	mnbt_type type : 4;
 	
 	uint16_t label_length;
 	char* label;

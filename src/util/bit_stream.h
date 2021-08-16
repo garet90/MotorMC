@@ -42,7 +42,7 @@ static inline uint64_t utl_read_bit_stream(utl_bit_stream_t* stream, size_t bits
 
 	}
 
-	if (io_get_endianness() == io_little_endian) {
+	if (io_get_endianness() == io_big_endian) {
 
 		union {
 			int64_t num;
@@ -101,7 +101,6 @@ static inline void utl_write_bit_stream(utl_bit_stream_t* stream, uint64_t val, 
 			stream->quads[quad] |= (val << (64 - bits)) >> bit;
 
 			stream->cursor += (64 - bit);
-			val <<= (64 - bit);
 			bits -= (64 - bit);
 
 		} else {

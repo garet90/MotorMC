@@ -18,6 +18,14 @@ typedef enum {
 	ltg_play = 3
 } ltg_state_t;
 
+typedef enum {
+
+	ltg_chat_enabled = 0,
+	ltg_chat_commands_only = 1,
+	ltg_chat_hidden = 2
+
+} ltg_chat_mode_t;
+
 #define LTG_AES_KEY_LENGTH 16
 
 typedef byte_t ltg_uuid_t[16];
@@ -37,27 +45,26 @@ typedef struct {
 	struct {
 		struct {
 			char* value;
-			size_t length;
+			size_t length : 11;
 		} value;
 		struct {
 			char* value;
-			size_t length;
+			size_t length : 11;
 		} signature;
 	} textures;
 
 	struct {
-		size_t length;
+		size_t length : 3;
 		char value[16];
 	} username;
 
 	struct {
-		size_t length;
+		size_t length : 3;
 		char value[16];
 	} locale;
 
 	ltg_uuid_t uuid;
 
-	uint32_t protocol;
 	uint32_t verify;
 
 	int64_t last_recv;
@@ -76,10 +83,11 @@ typedef struct {
 
 	int32_t keep_alive;
 
-	uint8_t render_distance;
-	uint8_t chat_mode;
+	uint16_t protocol : 10;
+	uint8_t render_distance : 6;
+	ltg_chat_mode_t chat_mode : 2;
 
-	ltg_state_t state;
+	ltg_state_t state : 2;
 
 } ltg_client_t;
 
@@ -102,12 +110,12 @@ typedef struct {
 	struct {
 		pthread_mutex_t lock;
 		utl_doubly_linked_list_t list;
-		size_t max;
+		size_t max : 16;
 	} online;
 
 	uint16_t network_compression_threshold;
-	bool_t online_mode;
-	bool_t prevent_proxy_connections;
+	bool_t online_mode : 1;
+	bool_t prevent_proxy_connections : 1;
 
 	cry_rsa_keypair_t keypair;
 

@@ -9,7 +9,7 @@ typedef struct {
 
 	job_work_t* job;
 	int32_t repeat;
-	bool_t cancel;
+	bool_t cancel : 1;
 
 } sch_scheduled_t;
 

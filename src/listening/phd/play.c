@@ -263,7 +263,7 @@ void phd_send_server_difficulty(ltg_client_t* client) {
 	PCK_INLINE(packet, 3, io_big_endian);
 
 	pck_write_var_int(packet, 0x0e);
-	pck_write_int8(packet, sky_main.difficulty.level);
+	pck_write_int8(packet, sky_main.difficulty);
 	pck_write_int8(packet, 0); // difficulty locked
 
 	ltg_send(client, packet);
@@ -337,9 +337,15 @@ void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 }
 
-void phd_send_chunk_data(__attribute__((unused)) ltg_client_t* client, __attribute__((unused)) wld_chunk_t* chunk) {
+void phd_send_chunk_data(__attribute__((unused)) ltg_client_t* client, wld_chunk_t* chunk) {
 
-	// TODO send the chunk
+	PCK_INLINE(packet, 5192, io_big_endian);
+	
+	pck_write_var_int(packet, 0x22);
+	pck_write_int32(packet, wld_get_chunk_x(chunk));
+	pck_write_int32(packet, wld_get_chunk_z(chunk));
+
+	// TODO implement chunks
 
 }
 
@@ -376,7 +382,7 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	pck_write_var_int(packet, 0x26);
 	pck_write_int32(packet, player->living_entity.entity.id); // entity ID
-	pck_write_int8(packet, sky_main.difficulty.hardcore);
+	pck_write_int8(packet, sky_main.hardcore);
 	pck_write_int8(packet, sky_main.gamemode);
 	pck_write_int8(packet, -1); // previous game mode
 

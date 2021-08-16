@@ -21,7 +21,7 @@ typedef struct {
 	struct {
 		
 		char value[1025];
-		int32_t length;
+		size_t length : 10;
 
 	} message;
 

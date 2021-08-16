@@ -38,10 +38,8 @@ sky_main_t sky_main = {
 		.seed = 0
 	},
 
-	.difficulty = {
-		.level = sky_easy,
-		.hardcore = false
-	},
+	.difficulty = sky_easy,
+	.hardcore = false,
 
 	.render_distance = 10,
 
@@ -203,16 +201,16 @@ int main(int argc, char* argv[]) {
 								int32_t l_hash = utl_hash(l_key);
 								switch (l_hash) {
 									case 0x20b7672a:
-										sky_main.difficulty.level = sky_peaceful;
+										sky_main.difficulty = sky_peaceful;
 										break;
 									case 0x7c961db7:
-										sky_main.difficulty.level = sky_easy;
+										sky_main.difficulty = sky_easy;
 										break;
 									case 0x108f79ae:
-										sky_main.difficulty.level = sky_normal;
+										sky_main.difficulty = sky_normal;
 										break;
 									case 0x7c97c2a4:
-										sky_main.difficulty.level = sky_hard;
+										sky_main.difficulty = sky_hard;
 										break;
 									default:
 										log_warn("Unknown difficulty level '%s'! (%x)", l_key, l_hash);
@@ -220,7 +218,7 @@ int main(int argc, char* argv[]) {
 								}
 							} break;
 							case 0xb278a56d: // hardcore
-								sky_main.difficulty.hardcore = yyjson_get_bool(difficulty_val);
+								sky_main.hardcore = yyjson_get_bool(difficulty_val);
 								break;
 							default:
 								log_warn("Unknown value '%s' in server.json! (%x)", d_key, d_hash);

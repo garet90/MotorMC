@@ -10,7 +10,7 @@ typedef struct {
 	fp_int n;
 
 	struct {
-		size_t length;
+		size_t length : 8;
 		byte_t bytes[256];
 	} ASN1;
 
