@@ -1940,7 +1940,7 @@ static inline uint8_t mat_get_block_state_value(mat_block_protocol_id_t block_pr
 	mat_block_protocol_id_t block_state = block_protocol - mat_get_block_base_protocol_id_by_id(block_id);
 	const mat_block_t* block_data = mat_get_block_by_id(block_id);
 
-	for (int32_t i = block_data->modifiers_count; i >= 0; --i) {
+	for (int32_t i = block_data->modifiers_count - 1; i >= 0; --i) {
 
 		if (block_data->modifiers[i] != field) {
 
@@ -1968,7 +1968,7 @@ static inline mat_block_protocol_id_t mat_set_block_state_value(mat_block_protoc
 	int32_t state_add = 1;
 	const mat_block_t* block_data = mat_get_block_by_id(block_id);
 
-	for (int32_t i = block_data->modifiers_count; i >= 0; --i) {
+	for (int32_t i = block_data->modifiers_count - 1; i >= 0; --i) {
 
 		const mat_state_modifier_t* modifier = mat_get_state_modifier_by_type(block_data->modifiers[i]);
 
