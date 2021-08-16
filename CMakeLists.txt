@@ -16,7 +16,7 @@ file(GLOB_RECURSE src
      "src/*.c"
 )
 
-link_libraries(tomcrypt tfm yyjson)
+link_libraries(tomcrypt tfm)
 
 if(DEFINED WIN32 OR DEFINED MSYS)
      # LINK CURL

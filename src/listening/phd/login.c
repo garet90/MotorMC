@@ -8,8 +8,6 @@
 #include "../../io/chat/translation.h"
 #include "../../crypt/random.h"
 
-#include <yyjson.h>
-
 struct {
 
 	CURL* curl;
@@ -219,45 +217,44 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 		}
 
-		yyjson_doc* auth = yyjson_read(response.ptr, response.len, 0);
+		mjson_doc* auth = mjson_read(response.ptr, response.len);
 
-		yyjson_val* auth_obj = yyjson_doc_get_root(auth);
-		size_t i, i_max;
-		yyjson_val *auth_key, *auth_val;
-		yyjson_obj_foreach(auth_obj, i, i_max, auth_key, auth_val) {
+		mjson_val* auth_obj = mjson_get_root(auth);
+		for (uint32_t i = 0; i < mjson_get_size(auth_obj); ++i) {
+			mjson_property auth_prop = mjson_obj_get(auth_obj, i);
 			switch (i) {
 				case 0: { // id
-					utl_read_hex_bytes(client->uuid, yyjson_get_str(auth_val), 16);
+					utl_read_hex_bytes(client->uuid, mjson_get_string(auth_prop.value), 16);
 					break;
 				}
 				case 1: { // username
-					const char* auth_username = yyjson_get_str(auth_val);
+					const char* auth_username = mjson_get_string(auth_prop.value);
 					if (strcmp(client->username.value, auth_username) != 0) { // TODO replace for memcmp
 						// free old username
 						free(client->username.value);
 
 						// copy new username
-						client->username.length = yyjson_get_len(auth_val);
+						client->username.length = mjson_get_size(auth_prop.value);
 						memcpy(client->username.value, auth_username, client->username.length);
 					}
 					break;
 				}
 				case 2: { // properties
-					size_t j, j_max;
-					yyjson_val* property_obj;
-					yyjson_arr_foreach(auth_val, j, j_max, property_obj) {
+
+					for (uint32_t j = 0; j < mjson_get_size(auth_prop.value); ++j) {
 						
 						enum {
 							none,
 							textures
 						} property_type = none;
 
-						size_t k, k_max;
-						yyjson_val *property_key, *property_val;
-						yyjson_obj_foreach(property_obj, k, k_max, property_key, property_val) {
+						mjson_val* property = mjson_arr_get(auth_prop.value, j);
+
+						for (uint32_t k = 0; k < mjson_get_size(property); ++k) {
+							mjson_property prop_prop = mjson_obj_get(property, k);
 							switch (k) {
 								case 0: { // name
-									if (yyjson_equals_str(property_val, "textures")) {
+									if (strcmp(mjson_get_string(prop_prop.value), "textures") == 0) {
 										property_type = textures;
 									}
 									break;
@@ -267,14 +264,14 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 										case none: {
 											log_error("Property type has not been set, is the json response from the auth server curropted?");
 											
-											yyjson_doc_free(auth);
+											mjson_free(auth);
 											free(response.ptr);
 											return false;
 										}
 										case textures: {
-											client->textures.value.length = yyjson_get_len(property_val);
+											client->textures.value.length = mjson_get_size(prop_prop.value);
 											client->textures.value.value = malloc(client->textures.value.length);
-											memcpy(client->textures.value.value, yyjson_get_str(property_val), client->textures.value.length);
+											memcpy(client->textures.value.value, mjson_get_string(prop_prop.value), client->textures.value.length);
 											break;
 										}
 									}
@@ -285,14 +282,14 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 										case none: {
 											log_error("Property type has not been set, is the json response from the auth server curropted?");
 											
-											yyjson_doc_free(auth);
+											mjson_free(auth);
 											free(response.ptr);
 											return false;
 										}
 										case textures: {
-											client->textures.signature.length = yyjson_get_len(property_val);
+											client->textures.signature.length = mjson_get_size(prop_prop.value);
 											client->textures.signature.value = malloc(client->textures.signature.length);
-											memcpy(client->textures.signature.value, yyjson_get_str(property_val), client->textures.signature.length);
+											memcpy(client->textures.signature.value, mjson_get_string(prop_prop.value), client->textures.signature.length);
 											break;
 										}
 									}
@@ -308,7 +305,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 		}
 
 		// free auth response and auth json doc
-		yyjson_doc_free(auth);
+		mjson_free(auth);
 		free(response.ptr);
 	}
 

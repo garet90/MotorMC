@@ -13,6 +13,7 @@
 #include "plugin/manager.h"
 #include "io/chat/chat.h"
 #include "io/filesystem/filesystem.h"
+#include "io/json/mjson.h"
 #include "world/world.h"
 #include "world/material/material.h"
 #include "test/tests.h"
@@ -76,7 +77,7 @@ void sky_handle_signal_crash(int signal) {
 	log_error("\tVERSION " __MOTOR_VER__);
 	log_error("\tMCVER " __MC_VER__);
 	log_error("\tCOMPILED " __DATE__ " " __TIME__);
-	log_error("\tCODE 0x%04lx", signal);
+	log_error("\tCODE 0x%04x", signal);
 	switch (signal) {
 		case SIGFPE:
 			log_error("\t\tFLOATING POINT EXCEPTION");
@@ -110,7 +111,7 @@ void sky_handle_signal_crash(int signal) {
 			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 			if (client != NULL && pthread_self() == client->thread) {
 				log_error("\t\tCLIENT #%lld", i);
-				log_error("\tCLIENT STATE %ld", client->state);
+				log_error("\tCLIENT STATE %u", client->state);
 				log_error("\tENCRYPTION ENABLED %d", client->encryption.enabled);
 				goto identified;
 			}
@@ -165,22 +166,21 @@ int main(int argc, char* argv[]) {
 
 	if (fs_file_exists("server.json")) {
 
-		yyjson_doc* server = yyjson_read_file("server.json", 0, NULL, NULL);
+		mjson_doc* server = mjson_read_file("server.json");
 
 		if (server) {
 
-			yyjson_val* server_obj = yyjson_doc_get_root(server);
-			size_t i, i_max;
-			yyjson_val *server_key, *server_val;
-			yyjson_obj_foreach(server_obj, i, i_max, server_key, server_val) {
-				const char* key = yyjson_get_str(server_key);
+			mjson_val* server_obj = mjson_get_root(server);
+			for (uint32_t i = 0; i < mjson_get_size(server_obj); ++i) {
+				mjson_property key_val = mjson_obj_get(server_obj, i);
+				const char* key = mjson_get_string(key_val.label);
 				uint32_t hash = utl_hash(key);
 				switch (hash) {
 				case 0x574c2735: // "worker_count"
-					sky_main.workers.count = yyjson_get_uint(server_val);
+					sky_main.workers.count = mjson_get_int(key_val.value);
 					break;
 				case 0x6f29f27f: // "max-tick-time"
-					sky_main.max_tick_time = yyjson_get_uint(server_val);
+					sky_main.max_tick_time = mjson_get_int(key_val.value);
 					break;
 				case 0xfdabc3d: // "level"
 					// TODO
@@ -189,15 +189,13 @@ int main(int argc, char* argv[]) {
 					// TODO
 					break;
 				case 0x5af71738: { // "difficulty"
-					// TODO
-					size_t j, j_max;
-					yyjson_val *difficulty_key, *difficulty_val;
-					yyjson_obj_foreach(server_val, j, j_max, difficulty_key, difficulty_val) {
-						const char* d_key = yyjson_get_str(difficulty_key);
+					for (uint32_t j = 0; j < mjson_get_size(key_val.value); ++j) {
+						mjson_property difficulty = mjson_obj_get(key_val.value, j);
+						const char* d_key = mjson_get_string(difficulty.label);
 						int32_t d_hash = utl_hash(d_key);
 						switch (d_hash) {
 							case 0xfdabc3d: { // level
-								const char* l_key = yyjson_get_str(difficulty_val);
+								const char* l_key = mjson_get_string(difficulty.value);
 								int32_t l_hash = utl_hash(l_key);
 								switch (l_hash) {
 									case 0x20b7672a:
@@ -218,7 +216,7 @@ int main(int argc, char* argv[]) {
 								}
 							} break;
 							case 0xb278a56d: // hardcore
-								sky_main.hardcore = yyjson_get_bool(difficulty_val);
+								sky_main.hardcore = mjson_get_boolean(difficulty.value);
 								break;
 							default:
 								log_warn("Unknown value '%s' in server.json! (%x)", d_key, d_hash);
@@ -227,46 +225,46 @@ int main(int argc, char* argv[]) {
 					}
 				} break;
 				case 0xc865ee91: // "enforce-whitelist"
-					sky_main.enforce_whitelist = yyjson_get_bool(server_val);
+					sky_main.enforce_whitelist = mjson_get_boolean(key_val.value);
 					break;
 				case 0x2e5c5d10: // "enable-command-block"
-					sky_main.enable_command_block = yyjson_get_bool(server_val);
+					sky_main.enable_command_block = mjson_get_boolean(key_val.value);
 					break;
 				case 0xe526df8: // "max-players"
-					sky_main.listener.online.max = yyjson_get_uint(server_val);
+					sky_main.listener.online.max = mjson_get_int(key_val.value);
 					break;
 				case 0x105f18ee: // "spawn"
 					// TODO
 					break;
 				case 0xbe5ede5d: // "render-distance"
-					sky_main.render_distance = yyjson_get_uint(server_val);
+					sky_main.render_distance = mjson_get_int(key_val.value);
 					break;
 				case 0x55e4fdff: // "op-permission-level"
-					sky_main.op_permission_level = yyjson_get_uint(server_val);
+					sky_main.op_permission_level = mjson_get_int(key_val.value);
 					break;
 				case 0xb889efb: // "pvp"
-					sky_main.pvp = yyjson_get_bool(server_val);
+					sky_main.pvp = mjson_get_boolean(key_val.value);
 					break;
 				case 0x1b84769c: // "server"
 					// TODO
 					break;
 				case 0x4e682648: // "prevent-proxy-connections"
-					sky_main.listener.prevent_proxy_connections = yyjson_get_bool(server_val);
+					sky_main.listener.prevent_proxy_connections = mjson_get_boolean(key_val.value);
 					break;
 				case 0xbb97de68: // "network-compression-threshold"
-					sky_main.listener.network_compression_threshold = yyjson_get_uint(server_val);
+					sky_main.listener.network_compression_threshold = mjson_get_int(key_val.value);
 					break;
 				case 0xa009ab4e: // "reduced-debug-info"
-					sky_main.reduced_debug_info = yyjson_get_bool(server_val);
+					sky_main.reduced_debug_info = mjson_get_boolean(key_val.value);
 					break;
 				case 0x7c9c614a: // "port"
-					sky_main.listener.address.port = yyjson_get_uint(server_val);
+					sky_main.listener.address.port = mjson_get_int(key_val.value);
 					break;
 				case 0x8931d3dc: // "online-mode"
-					sky_main.listener.online_mode = yyjson_get_bool(server_val);
+					sky_main.listener.online_mode = mjson_get_boolean(key_val.value);
 					break;
 				case 0x7c9abc59: // "motd"
-					sky_main.motd = cht_from_json(server_val);
+					sky_main.motd = cht_from_json(key_val.value);
 					break;
 				default:
 					log_warn("Unknown value '%s' in server.json! (%x)", key, hash);
@@ -280,7 +278,7 @@ int main(int argc, char* argv[]) {
 
 		}
 
-		yyjson_doc_free(server);
+		mjson_free(server);
 
 	} else {
 
@@ -462,7 +460,7 @@ void* t_sky_main(__attribute__((unused)) void* input) {
 			sleepTime.tv_sec = 0;
 			sleepTime.tv_nsec = 0;
 			if ((sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / SKY_NANOS_PER_TICK > SKY_SKIP_TICKS) {
-				log_warn("Can't keep up! Is the server overloaded? Running %dms or %d ticks behind", (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / 1000000, (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / SKY_NANOS_PER_TICK);
+				log_warn("Can't keep up! Is the server overloaded? Running %ulms or %d ticks behind", (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / 1000000, (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / SKY_NANOS_PER_TICK);
 				clock_gettime(CLOCK_MONOTONIC, &nextTick);
 			}
 		}

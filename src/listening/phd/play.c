@@ -339,7 +339,7 @@ void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 }
 
-void phd_send_chunk_data(__attribute__((unused)) ltg_client_t* client, wld_chunk_t* chunk) {
+void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	PCK_INLINE(packet, 5192, io_big_endian);
 	
@@ -394,6 +394,8 @@ void phd_send_chunk_data(__attribute__((unused)) ltg_client_t* client, wld_chunk
 	
 	// TODO block entities
 	pck_write_var_int(packet, 0);
+
+	ltg_send(client, packet);
 
 }
 

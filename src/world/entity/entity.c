@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <stdlib.h>
 #include "entity.h"
 #include "../../util/id_vector.h"
 

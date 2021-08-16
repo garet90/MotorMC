@@ -62,13 +62,6 @@ jobs:
         ./configure --disable-shared --with-schannel --disable-ldap --disable-sspi --without-librtmp --disable-ftp --disable-file --disable-dict --disable-telnet --disable-tftp --disable-rtsp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-smb --without-libidn
         make install
         
-    - name: Install yyjson
-      run: |
-        git clone https://github.com/ibireme/yyjson.git $workspace/libs/ibireme/yyjson
-        cd $workspace/libs/ibireme/yyjson
-        cmake .
-        make install
-        
     - name: Install libdeflate
       run: |
         git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
@@ -116,13 +109,6 @@ jobs:
       run: |
         git clone https://github.com/libtom/libtomcrypt.git ${{github.workspace}}/libs/libtom/libtomcrypt
         cd ${{github.workspace}}/libs/libtom/libtomcrypt
-        sudo make install
-
-    - name: Install yyjson
-      run: |
-        git clone https://github.com/ibireme/yyjson.git ${{github.workspace}}/libs/ibireme/yyjson
-        cd ${{github.workspace}}/libs/ibireme/yyjson
-        cmake . -DCMAKE_C_COMPILER=gcc
         sudo make install
     
     - name: Install libdeflate
@@ -177,13 +163,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install libcurl4-openssl-dev
-      
-    - name: Install yyjson
-      run: |
-        git clone https://github.com/ibireme/yyjson.git ${{github.workspace}}/libs/ibireme/yyjson
-        cd ${{github.workspace}}/libs/ibireme/yyjson
-        cmake . -DCMAKE_C_COMPILER=gcc
-        sudo make install
     
     - name: Install libdeflate
       run: |

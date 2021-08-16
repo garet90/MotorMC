@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <string.h>
 #include "translation.h"
 #include "../../util/util.h"
 
-void cht_jsonify_translation(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht_translation_t* translation) {
+void cht_jsonify_translation(mjson_doc* doc, mjson_val* obj, const cht_translation_t* translation) {
 
 	const char* translations[] = {
 		"chat.type.text",
@@ -13,7 +14,7 @@ void cht_jsonify_translation(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht
 		"multiplayer.disconnect.server_shutdown"
 	};
 
-	yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "translate"), yyjson_mut_str(doc, translations[translation->translate]));
+	mjson_obj_add(obj, mjson_string(doc, "translate", 9), mjson_string(doc, translations[translation->translate], strlen(translations[translation->translate])));
 
 	if (translation->color != cht_no_color) {
 		if (translation->color <= 0xF) {
@@ -36,54 +37,49 @@ void cht_jsonify_translation(yyjson_mut_doc* doc, yyjson_mut_val* obj, const cht
 				"white"
 			};
 
-			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, colors[translation->color]));
+			mjson_obj_add(obj, mjson_string(doc, "color", 5), mjson_string(doc, colors[translation->color], strlen(colors[translation->color])));
 		} else {
-			char color[9];
+			char color[8];
 			// convert int to hex
 			utl_write_byte_hex(color, ((byte_t*) &translation->color)[0]);
 			utl_write_byte_hex(color + 2, ((byte_t*) &translation->color)[1]);
 			utl_write_byte_hex(color + 4, ((byte_t*) &translation->color)[2]);
 			utl_write_byte_hex(color + 6, ((byte_t*) &translation->color)[3]);
-			color[8] = '\0';
 
-			yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "color"), yyjson_mut_str(doc, color));
+			mjson_obj_add(obj, mjson_string(doc, "color", 5), mjson_string(doc, color, 8));
 		}
 	}
 
 	if (translation->with.size != 0) {
-		yyjson_mut_val* with = yyjson_mut_arr(doc);
+		mjson_val* with = mjson_arr(doc);
 
 		for (size_t i = 0; i < translation->with.size; ++i) {
 			
-			yyjson_mut_val* with_obj = yyjson_mut_obj(doc);
+			mjson_val* with_obj = mjson_obj(doc);
 
 			cht_jsonify(doc, with_obj, UTL_VECTOR_GET_AS(cht_component_t*, &translation->with, i));
 
-			yyjson_mut_arr_append(with, with_obj);
+			mjson_arr_append(with, with_obj);
 
 		}
 
-		yyjson_mut_obj_add(obj, yyjson_mut_str(doc, "with"), with);
+		mjson_obj_add(obj, mjson_string(doc, "with", 4), with);
 	}
 
 }
 
 size_t cht_write_translation(const cht_translation_t* translation, char* message) {
 
-	yyjson_mut_doc* doc = yyjson_mut_doc_new(NULL);
-	yyjson_mut_val* obj = yyjson_mut_obj(doc);
-	yyjson_mut_doc_set_root(doc, obj);
+	mjson_doc* doc = mjson_new();
+	mjson_val* obj = mjson_obj(doc);
+	mjson_set_root(doc, obj);
 
 	cht_jsonify_translation(doc, obj, translation);
 
-	size_t str_len;
-	char* str = yyjson_mut_write(doc, YYJSON_WRITE_NOFLAG, &str_len);
-	memcpy(message, str, str_len);
+	size_t len = mjson_write(doc, message);
 
-	free(str);
+	mjson_free(doc);
 
-	yyjson_mut_doc_free(doc);
-
-	return str_len;
+	return len;
 
 }

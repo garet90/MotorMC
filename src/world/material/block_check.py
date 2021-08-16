@@ -23,13 +23,13 @@ for line in lines:
         data_line = True
         data_name = re.sub(r'_d = {\s?', '', line.replace("const mat_block_t mat_block_", "").replace("\n", ""))
         
-        test_block == None
+        test_block = None
         for i in test_data:
             if i["name"] == data_name:
                 test_block = i
                 break
 
-        if test_block == None:
+        if test_block is None:
             print("Could not find matching block for " + data_name)
             exit()
     elif line.startswith("};"):

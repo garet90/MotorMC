@@ -46,14 +46,14 @@ void utl_id_vector_remove(utl_id_vector_t* vector, uint32_t id) {
 void utl_id_vector_resize(utl_id_vector_t* vector, uint32_t capacity) {
 
 	if (vector->capacity != 0) {
-		vector->array = realloc(vector->array, vector->bytes_per_element * capacity);
+		vector->array = realloc(vector->array, (size_t) vector->bytes_per_element * capacity);
 	} else {
 		if (vector->size > 0) {
-			void* newarr = malloc(vector->bytes_per_element * capacity);
-			memcpy(newarr, vector->array, vector->bytes_per_element * vector->size);
+			void* newarr = malloc((size_t) vector->bytes_per_element * capacity);
+			memcpy(newarr, vector->array, (size_t) vector->bytes_per_element * vector->size);
 			vector->array = newarr;
 		} else {
-			vector->array = malloc(vector->bytes_per_element * capacity);
+			vector->array = malloc((size_t) vector->bytes_per_element * capacity);
 		}
 	}
 	vector->capacity = capacity;
