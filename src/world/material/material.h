@@ -45,6 +45,11 @@ static inline const mat_dimension_t* mat_get_dimension_by_type(mat_dimension_typ
 	return mat_dimensions[type];
 }
 
+static inline uint16_t mat_get_chunk_height(mat_dimension_type_t type) {
+	const mat_dimension_t* dimension = mat_get_dimension_by_type(type);
+	return (dimension->height - dimension->min_y) >> 4;
+}
+
 /*
 	BIOMES
 */

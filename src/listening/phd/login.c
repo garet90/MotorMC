@@ -232,7 +232,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 				}
 				case 1: { // username
 					const char* auth_username = yyjson_get_str(auth_val);
-					if (strcmp(client->username.value, auth_username) != 0) {
+					if (strcmp(client->username.value, auth_username) != 0) { // TODO replace for memcmp
 						// free old username
 						free(client->username.value);
 

@@ -1,6 +1,7 @@
 #include <tomcrypt.h>
 #include "play.h"
 #include "../../io/logger/logger.h"
+#include "../../io/nbt/mnbt.h"
 #include "../../motor.h"
 #include "../../world/world.h"
 #include "../../world/entity/entity.h"
@@ -8,6 +9,7 @@
 #include "../../jobs/jobs.h"
 #include "../../jobs/scheduler/scheduler.h"
 #include "../../util/util.h"
+#include "../../util/bit_stream.h"
 
 bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
@@ -344,8 +346,54 @@ void phd_send_chunk_data(__attribute__((unused)) ltg_client_t* client, wld_chunk
 	pck_write_var_int(packet, 0x22);
 	pck_write_int32(packet, wld_get_chunk_x(chunk));
 	pck_write_int32(packet, wld_get_chunk_z(chunk));
+	pck_write_int8(packet, true); // full chunk
 
-	// TODO implement chunks
+	pck_write_var_int(packet, 0xFFFF); // primary bit mask
+
+	int64_t motion_blocking[37];
+
+	// just so we can use i and j again
+	{
+		uint8_t i = 0; // long
+		uint8_t j = 0; // in long
+
+		for (uint16_t k = 0; k < 16 * 16; ++k) {
+			motion_blocking[i] |= io_htons(chunk->highest[k].motion_blocking) << (1 + (6 - j++) * 9);
+			if (j > 6) {
+				j = 0;
+				i += 1;
+			}
+		}
+	}
+
+	// create heightmap
+	mnbt_doc* doc = mnbt_new();
+	mnbt_tag* tag = mnbt_new_tag(doc, "MOTION_BLOCKING", 15, MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, 37));
+	mnbt_set_root(doc, tag);
+
+	packet->cursor += mnbt_write(doc, (byte_t*) pck_cursor(packet), MNBT_NONE);
+
+	mnbt_free(doc);
+
+	const uint16_t chunk_height = mat_get_chunk_height(chunk->region->world->environment);
+
+	pck_write_var_int(packet, chunk_height << 6);
+
+	for (uint16_t i = 0; i < chunk_height; ++i) {
+		for (uint8_t x = 0; x < 4; ++x) {
+			for (uint8_t z = 0; z < 4; ++z) {
+				for (uint8_t y = 0; y < 4; ++y) {
+					pck_write_var_int(packet, chunk->sections[i].biome[(x << 4) + (z << 2) + y]);
+				}
+			}
+		}
+	}
+
+	// TODO chunk data
+	pck_write_var_int(packet, 0);
+	
+	// TODO block entities
+	pck_write_var_int(packet, 0);
 
 }
 

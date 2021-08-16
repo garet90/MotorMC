@@ -149,10 +149,7 @@ wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 
 wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint16_t idx) {
 
-	const mat_dimension_t* dimension = mat_get_dimension_by_type(region->world->environment);
-	const uint16_t dimension_height = (dimension->height - dimension->min_y) >> 4;
-
-	wld_chunk_t* chunk = calloc(1, sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * dimension_height);
+	wld_chunk_t* chunk = calloc(1, sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * mat_get_chunk_height(region->world->environment));
 	chunk->region = region;
 	chunk->block_entities.bytes_per_element = sizeof(void*); // TODO block entity struct
 	chunk->idx = idx;

@@ -10,6 +10,8 @@ typedef struct {
 
 } utl_bit_stream_t;
 
+#define UTL_BIT_STREAM_INLINE(name, length) byte_t name ##_r[sizeof(utl_bit_stream_t) + (length << 3)]; memset(name ##_r, 0, sizeof(name ##_r)); utl_bit_stream_t* stream = (utl_bit_stream_t*) &name ##_r;
+
 static inline uint64_t utl_read_bit_stream(utl_bit_stream_t* stream, size_t bits) {
 
 	uint64_t result = 0;
