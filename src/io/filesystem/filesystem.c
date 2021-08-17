@@ -61,9 +61,9 @@ bool_t fs_get_dir_contents(const char* path, const char* extension, void (*handl
 	FindClose(file);
 #else
 	DIR *d;
-	struct dirent *dir;
 	d = opendir(path);
 	if (d) {
+		struct dirent *dir;
 		size_t extension_len = strlen(extension);
 
 		while ((dir = readdir(d)) != NULL) {

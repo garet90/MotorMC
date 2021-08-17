@@ -12,7 +12,6 @@ def pathConcat(p1, p2):
             i -= 1
             continue
         i += 1
-    
     return "/".join(path)
 
 def processFile(name):

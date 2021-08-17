@@ -46,6 +46,7 @@ extern void cry_random_bytes(byte_t* bytes, size_t count) {
 	f = fopen("/dev/urandom", "r");
 	if (feof(f)) {
 		log_error("Could not open /dev/urandom!");
+		fclose(f);
 		return;
 	}
 	if (fread(bytes, sizeof(byte_t), count, f) < sizeof(byte_t) * count) {

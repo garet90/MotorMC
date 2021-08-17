@@ -921,7 +921,6 @@ for i in data:
     for j in data[i]["states"]:
         while j["id"] >= len(items):
             items.append(None)
-        
         items[j["id"]] = name
 
 print("const uint16_t mat_blocks_protocol[] = {")

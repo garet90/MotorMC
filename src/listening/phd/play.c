@@ -2,6 +2,7 @@
 #include "play.h"
 #include "../../io/logger/logger.h"
 #include "../../io/nbt/mnbt.h"
+#include "../../io/commands/graph.h"
 #include "../../motor.h"
 #include "../../world/world.h"
 #include "../../world/entity/entity.h"
@@ -350,7 +351,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	pck_write_var_int(packet, 0xFFFF); // primary bit mask
 
-	int64_t motion_blocking[37];
+	int64_t motion_blocking[37] = { 0 };
 
 	// just so we can use i and j again
 	{
@@ -358,7 +359,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		uint8_t j = 0; // in long
 
 		for (uint16_t k = 0; k < 16 * 16; ++k) {
-			motion_blocking[i] |= io_htons(chunk->highest[k].motion_blocking) << (1 + (6 - j++) * 9);
+			motion_blocking[i] |= (uint64_t) io_htons(chunk->highest[k].motion_blocking) << (1 + (6 - j++) * 9);
 			if (j > 6) {
 				j = 0;
 				i += 1;

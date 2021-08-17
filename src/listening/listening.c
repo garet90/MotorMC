@@ -107,23 +107,21 @@ void* t_ltg_client(void* args) {
 
 	// create receive packet (on stack)
 	PCK_INLINE(recvd, LTG_MAX_RECIEVE, io_big_endian);
-	int32_t recvl = 0;
 
 	for (;;) {
 
 		// receive packet
-		recvl = sck_recv(client->socket, (char*) recvd->bytes, LTG_MAX_RECIEVE);
+		recvd->length = sck_recv(client->socket, (char*) recvd->bytes, LTG_MAX_RECIEVE);
 
-		if (recvl <= 0) {
+		if ((int32_t) recvd->length <= 0) {
 			// client disconnected
 			break;
 		} else {
 			// handle packet
-			recvd->length = recvl;
 			recvd->cursor = 0;
 
 			if (client->encryption.enabled) {
-				cfb8_decrypt(recvd->bytes, recvd->bytes, recvl, &client->encryption.decrypt);
+				cfb8_decrypt(recvd->bytes, recvd->bytes, recvd->length, &client->encryption.decrypt);
 			}
 
 			if (!ltg_handle_packet(client, recvd)) {
@@ -239,7 +237,7 @@ void ltg_disconnect(ltg_client_t* client) {
 		((uint64_t*) work->uuid)[1] = ((uint64_t*) client->uuid)[1];
 		
 		((uint64_t*) work->username)[0] = ((uint64_t*) client->username.value)[0];
-		((uint64_t*) work->username)[0] = ((uint64_t*) client->username.value)[0];
+		((uint64_t*) work->username)[1] = ((uint64_t*) client->username.value)[1];
 		work->username[16] = '\0';
 
 		job_add(&work->header);
