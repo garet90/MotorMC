@@ -384,7 +384,7 @@ size_t cht_server_list_ping(char* message) {
 	
 	// TODO limit sample to however long it's supposed to be
 	if (sky_main.listener.online.list.length > 0) {
-		mjson_val* sample = mjson_obj(doc);
+		mjson_val* sample = mjson_arr(doc);
 		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
 		while (node != NULL) {
 			ltg_client_t* player = node->element;

@@ -41,6 +41,7 @@ mjson_doc* mjson_read_file(const char* file) {
 	char* bytes = malloc(fsize);
 	if (fread(bytes, 1, fsize, f) < fsize) {
 		fclose(f);
+		free(bytes);
 		return NULL;
 	}
 	fclose(f);

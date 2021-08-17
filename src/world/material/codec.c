@@ -126,7 +126,7 @@ const mat_codec_t* mat_get_codec() {
 
 		mnbt_free(doc);
 
-		mat_codec = realloc(mat_codec, sizeof(sizeof(mat_codec_t)) + mat_codec->size);
+		mat_codec = realloc(mat_codec, sizeof(mat_codec_t) + mat_codec->size);
 
 	}
 

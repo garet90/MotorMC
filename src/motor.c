@@ -360,14 +360,13 @@ int main(int argc, char* argv[]) {
 		if (file) {
 
 			fwrite(server_json, sizeof(server_json), 1, file);
+			fclose(file);
 
 		} else {
 
 			log_error("Could not open 'server.json' for writing!");
 
 		}
-
-		fclose(file);
 
 	}
 

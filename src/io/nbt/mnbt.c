@@ -87,6 +87,7 @@ mnbt_doc* mnbt_read_file(const char* file, mnbt_compression compression) {
 	uint8_t* bytes = malloc(fsize);
 	if (fread(bytes, 1, fsize, f) < fsize) {
 		fclose(f);
+		free(bytes);
 		return NULL;
 	}
 	fclose(f);
@@ -113,6 +114,7 @@ size_t _mnbt_read_tag(mnbt_doc* document, mnbt_tag** tag_out, const uint8_t* byt
 	if (tag->type == MNBT_END) {
 		tag->label_length = 0;
 		tag->label = NULL;
+		_mnbt_add(document, tag);
 		return 1;
 	}
 

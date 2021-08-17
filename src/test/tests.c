@@ -80,7 +80,7 @@ bool_t test_materials() {
 
 extern bool_t test_bit_streams() {
 
-	utl_bit_stream_t* stream = calloc(1, sizeof(stream) + 32);
+	utl_bit_stream_t* stream = calloc(1, sizeof(utl_bit_stream_t) + 32);
 	utl_write_bit_stream(stream, 1234, 14);
 	utl_write_bit_stream(stream, 5678, 14);
 	utl_write_bit_stream(stream, 9101, 14);
