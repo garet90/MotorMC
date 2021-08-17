@@ -460,7 +460,7 @@ void* t_sky_main(__attribute__((unused)) void* input) {
 			sleepTime.tv_sec = 0;
 			sleepTime.tv_nsec = 0;
 			if ((sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / SKY_NANOS_PER_TICK > SKY_SKIP_TICKS) {
-				log_warn("Can't keep up! Is the server overloaded? Running %ulms or %d ticks behind", (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / 1000000, (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / SKY_NANOS_PER_TICK);
+				log_warn("Can't keep up! Is the server overloaded? Running %lums or %d ticks behind", (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / 1000000, (sky_to_nanos(currentTime) - sky_to_nanos(nextTick)) / SKY_NANOS_PER_TICK);
 				clock_gettime(CLOCK_MONOTONIC, &nextTick);
 			}
 		}
