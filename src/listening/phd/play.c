@@ -342,14 +342,24 @@ void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
-	PCK_INLINE(packet, 5192, io_big_endian);
+	// damn that's a lot of data, maybe consider this not being on the stack
+	PCK_INLINE(packet, 262144, io_big_endian);
 	
 	pck_write_var_int(packet, 0x22);
 	pck_write_int32(packet, wld_get_chunk_x(chunk));
 	pck_write_int32(packet, wld_get_chunk_z(chunk));
 	pck_write_int8(packet, true); // full chunk
 
-	pck_write_var_int(packet, 0xFFFF); // primary bit mask
+	const uint16_t chunk_height = mat_get_chunk_height(chunk->region->world->environment);
+
+	int32_t primary_chunk_mask = 0;
+	for (uint16_t i = 0; i < chunk_height; ++i) {
+		if (chunk->sections[i].block_count != 0) {
+			primary_chunk_mask |= (1 << i);
+		}
+	}
+
+	pck_write_var_int(packet, primary_chunk_mask);
 
 	int64_t motion_blocking[37] = { 0 };
 
@@ -376,8 +386,6 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	mnbt_free(doc);
 
-	const uint16_t chunk_height = mat_get_chunk_height(chunk->region->world->environment);
-
 	pck_write_var_int(packet, chunk_height << 6);
 
 	for (uint16_t i = 0; i < chunk_height; ++i) {
@@ -390,8 +398,38 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		}
 	}
 
+	// am i really gonna waste time copying data from one stream to another or am i gonna just waste 4 bytes?
+	// you're damn right i'm gonna waste 4 bytes, speed is key
 	// TODO chunk data
-	pck_write_var_int(packet, 0);
+	size_t data_len = packet->cursor;
+	pck_write_long_var_int(packet, 0);
+
+	const uint8_t bits_per_block = 15;
+
+	for (uint16_t i = 0; i < chunk_height; ++i) {
+		if (chunk->sections[i].block_count != 0) {
+			pck_write_int16(packet, 0);
+			pck_write_int8(packet, bits_per_block);
+			pck_write_var_int(packet, 960);
+			utl_bit_stream_t data_array = {
+				.cursor = 0,
+				.quads = (uint64_t*) pck_cursor(packet)
+			};
+			for (uint8_t x = 0; x < 16; ++x) {
+				for (uint8_t z = 0; z < 16; ++z) {
+					for (uint8_t y = 0; y < 16; ++y) {
+						utl_write_bit_stream(&data_array, chunk->sections[i].blocks[(x << 8) + (z << 4) + y].state, bits_per_block);
+					}
+				}
+			}
+			packet->cursor += 960 * 8;
+		}
+	}
+
+	size_t current = packet->cursor;
+	packet->cursor = data_len;
+	pck_write_long_var_int(packet, current - data_len - 5);
+	packet->cursor = current;
 	
 	// TODO block entities
 	pck_write_var_int(packet, 0);

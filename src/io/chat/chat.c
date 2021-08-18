@@ -370,7 +370,7 @@ size_t cht_server_list_ping(char* message) {
 
 	mjson_val* version = mjson_obj(doc);
 
-	mjson_obj_add(version, mjson_string(doc, "name", 4), mjson_string(doc, "MotorMC " __MC_VER__, sizeof("MotorMC" __MC_VER__) - 1));
+	mjson_obj_add(version, mjson_string(doc, "name", 4), mjson_string(doc, "MotorMC " __MC_VER__, sizeof("MotorMC " __MC_VER__) - 1));
 	mjson_obj_add(version, mjson_string(doc, "protocol", 8), mjson_int(doc, sky_main.protocol));
 
 	mjson_obj_add(obj, mjson_string(doc, "version", 7), version);

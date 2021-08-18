@@ -388,6 +388,21 @@ static inline size_t io_write_var_int(byte_t* buffer, uint32_t value) {
 
 }
 
+static inline void io_write_long_var_int(byte_t* buffer, uint32_t value) {
+
+	size_t i = 0;
+	do {
+		int8_t temp = (int8_t) (value & 0x7F);
+
+		value >>= 7;
+		if (i < 4) {
+			temp |= 0x80;
+		}
+		io_write_int8(buffer + i++, temp);
+	} while (i < 5);
+
+}
+
 static inline size_t io_write_var_long(byte_t* buffer, uint64_t value) {
 
 	size_t i = 0;

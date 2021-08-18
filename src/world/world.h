@@ -22,6 +22,8 @@ struct wld_chunk_section {
 
 	} blocks[16 * 16 * 16];
 
+	uint16_t block_count: 12;
+
 	// biome map
 	uint8_t biome[4 * 4 * 4];
 

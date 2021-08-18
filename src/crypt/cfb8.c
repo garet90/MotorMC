@@ -98,6 +98,7 @@ int cfb8_encrypt(const byte_t* pt, byte_t* ct, unsigned long len, symmetric_CFB8
 			return err;
 		}
 
+		// This could be replaced for PERFORMANCE eventually
 		memmove(cfb8->IV, cfb8->IV + 1, cfb8->blocklen - 1);
 		cfb8->IV[cfb8->blocklen - 1] = *ct = cipher_out[0] ^ *pt;
 
