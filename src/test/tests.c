@@ -80,21 +80,26 @@ bool_t test_materials() {
 
 extern bool_t test_bit_streams() {
 
-	utl_bit_stream_t* stream = calloc(1, sizeof(utl_bit_stream_t) + 32);
-	utl_write_bit_stream(stream, 1234, 14);
-	utl_write_bit_stream(stream, 5678, 14);
-	utl_write_bit_stream(stream, 9101, 14);
-	utl_write_bit_stream(stream, 1121, 14);
-	utl_write_bit_stream(stream, 3141, 14);
-	utl_write_bit_stream(stream, 5161, 14);
+	utl_bit_stream_t stream = {
+		.cursor = 0,
+		.quads = calloc(1, sizeof(uint64_t) * 4)
+	};
+	utl_write_bit_stream(&stream, 1234, 14);
+	utl_write_bit_stream(&stream, 5678, 14);
+	utl_write_bit_stream(&stream, 9101, 14);
+	utl_write_bit_stream(&stream, 1121, 14);
+	utl_write_bit_stream(&stream, 3141, 14);
+	utl_write_bit_stream(&stream, 5161, 14);
 
-	stream->cursor = 0;
-	if (utl_read_bit_stream(stream, 14) != 1234) return false;
-	if (utl_read_bit_stream(stream, 14) != 5678) return false;
-	if (utl_read_bit_stream(stream, 14) != 9101) return false;
-	if (utl_read_bit_stream(stream, 14) != 1121) return false;
-	if (utl_read_bit_stream(stream, 14) != 3141) return false;
-	if (utl_read_bit_stream(stream, 14) != 5161) return false;
+	stream.cursor = 0;
+	if (utl_read_bit_stream(&stream, 14) != 1234) return false;
+	if (utl_read_bit_stream(&stream, 14) != 5678) return false;
+	if (utl_read_bit_stream(&stream, 14) != 9101) return false;
+	if (utl_read_bit_stream(&stream, 14) != 1121) return false;
+	if (utl_read_bit_stream(&stream, 14) != 3141) return false;
+	if (utl_read_bit_stream(&stream, 14) != 5161) return false;
+
+	free(stream.quads);
 
 	return true;
 
