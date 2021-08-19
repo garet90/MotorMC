@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "../../main.h"
 #include "material.h"
 #include "../../io/nbt/mnbt.h"
@@ -58,14 +59,14 @@ const mat_codec_t* mat_get_codec() {
 			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, "name", 4, MNBT_STRING, mnbt_val_string(biome->name, biome->name_length)));
 			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, "id", 2, MNBT_INT, mnbt_val_int(i)));
 			mnbt_tag* element = mnbt_new_tag(doc, "element", 7, MNBT_COMPOUND, mnbt_val_compound());
-			mnbt_push_tag(element, mnbt_new_tag(doc, "precipitation", 13, MNBT_STRING, mnbt_val_string(mat_precipitation_type_string(biome->precipitation), mat_precipitation_type_length(biome->precipitation))));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "precipitation", 13, MNBT_STRING, mnbt_val_string(mat_precipitation_type_string(biome->precipitation), strlen(mat_precipitation_type_string(biome->precipitation)))));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "depth", 5, MNBT_FLOAT, mnbt_val_float(biome->depth)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "temperature", 11, MNBT_FLOAT, mnbt_val_float(biome->temperature)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "scale", 5, MNBT_FLOAT, mnbt_val_float(biome->scale)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, "downfall", 8, MNBT_FLOAT, mnbt_val_float(biome->downfall)));
-			mnbt_push_tag(element, mnbt_new_tag(doc, "category", 8, MNBT_STRING, mnbt_val_string(mat_biome_category_string(biome->category), mat_biome_category_length(biome->category))));
+			mnbt_push_tag(element, mnbt_new_tag(doc, "category", 8, MNBT_STRING, mnbt_val_string(mat_biome_category_string(biome->category), strlen(mat_biome_category_string(biome->category)))));
 			if (biome->temperature_modifier != mat_temperature_modifier_none) {
-				mnbt_push_tag(element, mnbt_new_tag(doc, "temperature_modifier", 20, MNBT_STRING, mnbt_val_string(mat_temperature_modifier_string(biome->temperature_modifier), mat_temperature_modifier_length(biome->temperature_modifier))));
+				mnbt_push_tag(element, mnbt_new_tag(doc, "temperature_modifier", 20, MNBT_STRING, mnbt_val_string(mat_temperature_modifier_string(biome->temperature_modifier), strlen(mat_temperature_modifier_string(biome->temperature_modifier)))));
 			}
 			mnbt_tag* effects = mnbt_new_tag(doc, "effects", 7, MNBT_COMPOUND, mnbt_val_compound());
 			mnbt_push_tag(effects, mnbt_new_tag(doc, "sky_color", 9, MNBT_INT, mnbt_val_int(biome->effects.sky_color)));
@@ -79,7 +80,7 @@ const mat_codec_t* mat_get_codec() {
 				mnbt_push_tag(effects, mnbt_new_tag(doc, "grass_color", 11, MNBT_INT, mnbt_val_int(biome->effects.grass_color)));
 			}
 			if (biome->effects.grass_color_modifier != mat_grass_color_modifier_none) {
-				mnbt_push_tag(effects, mnbt_new_tag(doc, "grass_color_modifier", 20, MNBT_STRING, mnbt_val_string(mat_grass_color_modifier_string(biome->effects.grass_color_modifier), mat_grass_color_modifier_length(biome->effects.grass_color_modifier))));
+				mnbt_push_tag(effects, mnbt_new_tag(doc, "grass_color_modifier", 20, MNBT_STRING, mnbt_val_string(mat_grass_color_modifier_string(biome->effects.grass_color_modifier), strlen(mat_grass_color_modifier_string(biome->effects.grass_color_modifier)))));
 			}
 			if (biome->effects.music.sound != NULL) {
 				mnbt_tag* music = mnbt_new_tag(doc, "music", 5, MNBT_COMPOUND, mnbt_val_compound());

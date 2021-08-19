@@ -162,18 +162,6 @@ static inline const char* mat_precipitation_type_string(mat_precipitation_type_t
 
 }
 
-static inline uint16_t mat_precipitation_type_length(mat_precipitation_type_t type) {
-
-	const uint16_t types[] = {
-		4,
-		4,
-		4
-	};
-
-	return types[type];
-
-}
-
 typedef enum {
 
 	mat_biome_category_none,
@@ -224,33 +212,6 @@ static inline const char* mat_biome_category_string(mat_biome_category_t categor
 
 }
 
-static inline uint16_t mat_biome_category_length(mat_biome_category_t category) {
-
-	const uint16_t categories[] = {
-		4,
-		5,
-		6,
-		6,
-		6,
-		13,
-		5,
-		5,
-		5,
-		6,
-		7,
-		3,
-		8,
-		5,
-		6,
-		4,
-		7,
-		11
-	};
-
-	return categories[category];
-
-}
-
 typedef enum {
 
 	mat_grass_color_modifier_none,
@@ -271,18 +232,6 @@ static inline const char* mat_grass_color_modifier_string(mat_grass_color_modifi
 
 }
 
-static inline uint16_t mat_grass_color_modifier_length(mat_grass_color_modifier_t modifier) {
-
-	const uint16_t modifiers[] = {
-		0,
-		5,
-		11
-	};
-	
-	return modifiers[modifier];
-
-}
-
 typedef enum {
 
 	mat_temperature_modifier_none,
@@ -295,17 +244,6 @@ static inline const char* mat_temperature_modifier_string(mat_temperature_modifi
 	const char* modifiers[] = {
 		NULL,
 		"frozen"
-	};
-
-	return modifiers[modifier];
-
-}
-
-static inline uint16_t mat_temperature_modifier_length(mat_temperature_modifier_t modifier) {
-	
-	const uint16_t modifiers[] = {
-		0,
-		6
 	};
 
 	return modifiers[modifier];
@@ -1991,3 +1929,14 @@ static inline mat_block_protocol_id_t mat_set_block_state_value(mat_block_protoc
 	return block_protocol;
 
 }
+
+/*
+	ITEMS
+*/
+
+typedef enum {
+
+	mat_item_air = 0,
+	mat_item_stone_block = 1
+
+} mat_item_type_t;

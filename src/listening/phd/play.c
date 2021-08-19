@@ -6,6 +6,7 @@
 #include "../../motor.h"
 #include "../../world/world.h"
 #include "../../world/entity/entity.h"
+#include "../../world/item/recipe/recipe.h"
 #include "../../jobs/board.h"
 #include "../../jobs/jobs.h"
 #include "../../jobs/scheduler/scheduler.h"
@@ -329,6 +330,18 @@ void phd_send_disconnect(ltg_client_t* client, const char* message, size_t messa
 
 }
 
+void phd_send_entity_status(ltg_client_t* client, int32_t entity_id, uint8_t status) {
+
+	PCK_INLINE(packet, 6, io_big_endian);
+
+	pck_write_var_int(packet, 0x1b);
+	pck_write_int32(packet, entity_id);
+	pck_write_int8(packet, status);
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 	PCK_INLINE(packet, 9, io_big_endian);
@@ -352,16 +365,23 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	const uint16_t chunk_height = mat_get_chunk_height(chunk->region->world->environment);
 
-	int32_t primary_chunk_mask = 0;
+	// CHUNK MASK
+
+	const uint16_t chunk_mask_length = (chunk_height >> 6) + 1;
+	pck_write_var_int(packet, chunk_mask_length);
+	int64_t primary_chunk_mask[chunk_mask_length];
+	memset(primary_chunk_mask, 0, sizeof(primary_chunk_mask));
 	for (uint16_t i = 0; i < chunk_height; ++i) {
 		if (chunk->sections[i].block_count != 0) {
-			primary_chunk_mask |= (1 << i);
+			primary_chunk_mask[i >> 6] |= (1 << (i & 0x3f));
 		}
 	}
+	pck_write_bytes(packet, (byte_t*) primary_chunk_mask, sizeof(primary_chunk_mask));
 
-	pck_write_var_int(packet, primary_chunk_mask);
+	// HEIGHTMAP
 
-	int64_t motion_blocking[37] = { 0 };
+	int64_t motion_blocking[37];
+	memset(motion_blocking, 0, sizeof(motion_blocking));
 
 	// just so we can use i and j again
 	{
@@ -379,12 +399,15 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	// create heightmap
 	mnbt_doc* doc = mnbt_new();
-	mnbt_tag* tag = mnbt_new_tag(doc, "MOTION_BLOCKING", 15, MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, 37));
+	mnbt_tag* tag = mnbt_new_tag(doc, "", 0, MNBT_COMPOUND, mnbt_val_compound());
+	mnbt_push_tag(tag, mnbt_new_tag(doc, "MOTION_BLOCKING", 15, MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, 37)));
 	mnbt_set_root(doc, tag);
 
 	packet->cursor += mnbt_write(doc, (byte_t*) pck_cursor(packet), MNBT_NONE);
 
 	mnbt_free(doc);
+
+	// BIOMES
 
 	pck_write_var_int(packet, chunk_height << 6);
 
@@ -397,6 +420,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 			}
 		}
 	}
+
+	// CHUNK DATA
 
 	// am i really gonna waste time copying data from one stream to another or am i gonna just waste 4 bytes?
 	// you're damn right i'm gonna waste 4 bytes, speed is key
@@ -431,8 +456,35 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 	pck_write_long_var_int(packet, current - data_len - 5);
 	packet->cursor = current;
 	
+	// BLOCK ENTITIES
 	// TODO block entities
 	pck_write_var_int(packet, 0);
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_update_light(ltg_client_t* client, wld_chunk_t* chunk) {
+
+	PCK_INLINE(packet, 8192, io_big_endian);
+
+	pck_write_var_int(packet, 0x25);
+	pck_write_var_int(packet, wld_get_chunk_x(chunk));
+	pck_write_var_int(packet, wld_get_chunk_z(chunk));
+
+	pck_write_int8(packet, true); // trust edges
+	
+	pck_write_var_int(packet, 0); // sky light mask length
+
+	pck_write_var_int(packet, 0); // block light mask length
+
+	pck_write_var_int(packet, 0); // empty sky light mask length
+	
+	pck_write_var_int(packet, 0); // empty block light mask length
+	
+	pck_write_var_int(packet, 0); // sky light array count
+	
+	pck_write_var_int(packet, 0); // block light array count
 
 	ltg_send(client, packet);
 
@@ -514,9 +566,15 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_server_difficulty(client);
 	phd_send_plugin_message(client, "minecraft:brand", 15, (const byte_t*) "\x07MotorMC", 8);
 	phd_send_held_item_change(client);
+	phd_send_declare_recipes(client);
+	// TODO send tags
+	phd_send_entity_status(client, player->living_entity.entity.id, 24); // TODO actual op level
 	phd_send_declare_commands(client);
-	phd_send_player_info_add_players(client);
+	phd_send_unlock_recipes(client);
 	phd_send_player_position_and_look(client);
+	phd_send_player_info_add_players(client);
+
+	phd_send_update_view_position_spawn(client);
 
 	// add to online players
 	pthread_mutex_lock(&sky_main.listener.online.lock);
@@ -686,6 +744,34 @@ void phd_send_player_position_and_look(ltg_client_t* client) {
 
 }
 
+void phd_send_unlock_recipes(ltg_client_t* client) {
+
+	PCK_INLINE(packet, 128, io_big_endian);
+
+	// TODO add seperate functions for different packets,
+	// make this packet actually do something
+
+	pck_write_var_int(packet, 0x39);
+
+	pck_write_var_int(packet, 0); // action
+
+	pck_write_int8(packet, false); // crafting recipe book open
+	pck_write_int8(packet, false); // crafting recipe book filter active
+	pck_write_int8(packet, false); // smelting recipe book open
+	pck_write_int8(packet, false); // smelting recipe book filter active
+	pck_write_int8(packet, false); // blast furnace recipe book open
+	pck_write_int8(packet, false); // blast furnace recipe book filter active
+	pck_write_int8(packet, false); // smoker recipe book open
+	pck_write_int8(packet, false); // smoker recipe book filter active
+	
+	pck_write_var_int(packet, 0); // array 1
+
+	pck_write_var_int(packet, 0); // array 2
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_held_item_change(ltg_client_t* client) {
 	
 	PCK_INLINE(packet, 2, io_big_endian);
@@ -722,6 +808,24 @@ void phd_send_update_view_position_spawn(ltg_client_t* client) {
 	ltg_send(client, packet);
 
 	wld_subscribe_chunk(chunk, client->id);
+	phd_send_update_light(client, chunk);
 	phd_send_chunk_data(client, chunk);
+
+}
+
+void phd_send_declare_recipes(ltg_client_t* client) {
+
+	PCK_INLINE(packet, 6 + rec_recipes.size * 128, io_big_endian);
+	
+	pck_write_var_int(packet, 0x65);
+	pck_write_var_int(packet, rec_recipes.size);
+
+	for (size_t i = 0; i < rec_recipes.size; ++i) {
+
+		rec_serialize(packet, UTL_VECTOR_GET_AS(rec_recipe_t*, &rec_recipes, i));
+
+	}
+
+	ltg_send(client, packet);
 
 }
