@@ -150,18 +150,6 @@ typedef enum {
 
 } mat_precipitation_type_t;
 
-static inline const char* mat_precipitation_type_string(mat_precipitation_type_t type) {
-
-	const char* types[] = {
-		"rain",
-		"snow",
-		"none"
-	};
-
-	return types[type];
-
-}
-
 typedef enum {
 
 	mat_biome_category_none,
@@ -185,33 +173,6 @@ typedef enum {
 
 } mat_biome_category_t;
 
-static inline const char* mat_biome_category_string(mat_biome_category_t category) {
-
-	const char* categories[] = {
-		"none",
-		"ocean",
-		"plains",
-		"desert",
-		"forest",
-		"extreme_hills",
-		"taiga",
-		"swamp",
-		"river",
-		"nether",
-		"the_end",
-		"icy",
-		"mushroom",
-		"beach",
-		"jungle",
-		"mesa",
-		"savanna",
-		"underground",
-	};
-
-	return categories[category];
-
-}
-
 typedef enum {
 
 	mat_grass_color_modifier_none,
@@ -220,35 +181,12 @@ typedef enum {
 
 } mat_grass_color_modifier_t;
 
-static inline const char* mat_grass_color_modifier_string(mat_grass_color_modifier_t modifier) {
-
-	const char* modifiers[] = {
-		NULL,
-		"swamp",
-		"dark_forest"
-	};
-
-	return modifiers[modifier];
-
-}
-
 typedef enum {
 
 	mat_temperature_modifier_none,
 	mat_temperature_modifier_frozen
 	
 } mat_temperature_modifier_t;
-
-static inline const char* mat_temperature_modifier_string(mat_temperature_modifier_t modifier) {
-
-	const char* modifiers[] = {
-		NULL,
-		"frozen"
-	};
-
-	return modifiers[modifier];
-
-}
 
 typedef struct {
 

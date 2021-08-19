@@ -1,4 +1,5 @@
 #include <string.h>
+#include "../../../util/str_util.h"
 #include "recipe.h"
 
 utl_vector_t rec_recipes = {
@@ -7,37 +8,37 @@ utl_vector_t rec_recipes = {
 
 void rec_serialize(pck_packet_t* packet, const rec_recipe_t* recipe) {
 
-	const char* types[] = {
-		"crafting_shapeless",
-		"crafting_shaped",
-		"crafting_special_armordye",
-		"crafting_special_bookcloning",
-		"crafting_special_mapcloning",
-		"crafting_special_mapextending",
-		"crafting_special_firework_rocket",
-		"crafting_special_firework_star",
-		"crafting_special_firework_star_fade",
-		"crafting_special_repairitem",
-		"crafting_special_tippedarrow",
-		"crafting_special_bannerduplicate",
-		"crafting_special_banneraddpattern",
-		"crafting_special_shielddecoration",
-		"crafting_special_shulkerboxcoloring",
-		"crafting_special_suspiciousstew",
-		"smelting",
-		"blasting",
-		"smoking",
-		"campfire_cooking",
-		"stonecutting",
-		"smithing"
+	const string_t types[] = {
+		UTL_CSTRTOSTR("crafting_shapeless"),
+		UTL_CSTRTOSTR("crafting_shaped"),
+		UTL_CSTRTOSTR("crafting_special_armordye"),
+		UTL_CSTRTOSTR("crafting_special_bookcloning"),
+		UTL_CSTRTOSTR("crafting_special_mapcloning"),
+		UTL_CSTRTOSTR("crafting_special_mapextending"),
+		UTL_CSTRTOSTR("crafting_special_firework_rocket"),
+		UTL_CSTRTOSTR("crafting_special_firework_star"),
+		UTL_CSTRTOSTR("crafting_special_firework_star_fade"),
+		UTL_CSTRTOSTR("crafting_special_repairitem"),
+		UTL_CSTRTOSTR("crafting_special_tippedarrow"),
+		UTL_CSTRTOSTR("crafting_special_bannerduplicate"),
+		UTL_CSTRTOSTR("crafting_special_banneraddpattern"),
+		UTL_CSTRTOSTR("crafting_special_shielddecoration"),
+		UTL_CSTRTOSTR("crafting_special_shulkerboxcoloring"),
+		UTL_CSTRTOSTR("crafting_special_suspiciousstew"),
+		UTL_CSTRTOSTR("smelting"),
+		UTL_CSTRTOSTR("blasting"),
+		UTL_CSTRTOSTR("smoking"),
+		UTL_CSTRTOSTR("campfire_cooking"),
+		UTL_CSTRTOSTR("stonecutting"),
+		UTL_CSTRTOSTR("smithing")
 	};
 
-	pck_write_string(packet, types[recipe->type], strlen(types[recipe->type]));
-	pck_write_string(packet, recipe->recipe_id, strlen(recipe->recipe_id));
+	pck_write_string(packet, UTL_STRTOARG(types[recipe->type]));
+	pck_write_string(packet, UTL_STRTOARG(recipe->recipe_id));
 
 	switch (recipe->type) {
 		case rec_crafting_shapeless: {
-			pck_write_string(packet, recipe->data.crafting_shapeless.group, strlen(recipe->data.crafting_shapeless.group));
+			pck_write_string(packet, UTL_STRTOARG(recipe->data.crafting_shapeless.group));
 			pck_write_var_int(packet, recipe->data.crafting_shapeless.ingredient_count);
 			for (size_t i = 0; i < recipe->data.crafting_shapeless.ingredient_count; ++i) {
 				pck_write_var_int(packet, recipe->data.crafting_shapeless.ingredients[i].count);
@@ -48,7 +49,7 @@ void rec_serialize(pck_packet_t* packet, const rec_recipe_t* recipe) {
 		case rec_crafting_shaped: {
 			pck_write_var_int(packet, recipe->data.crafting_shaped.width);
 			pck_write_var_int(packet, recipe->data.crafting_shaped.height);
-			pck_write_string(packet, recipe->data.crafting_shaped.group, strlen(recipe->data.crafting_shaped.group));
+			pck_write_string(packet, UTL_STRTOARG(recipe->data.crafting_shaped.group));
 			for (size_t i = 0; i < recipe->data.crafting_shaped.width * recipe->data.crafting_shaped.height; ++i) {
 				pck_write_var_int(packet, recipe->data.crafting_shaped.ingredients[i].count);
 				itm_serialize(packet, &recipe->data.crafting_shaped.ingredients[i].ingredient);
@@ -59,7 +60,7 @@ void rec_serialize(pck_packet_t* packet, const rec_recipe_t* recipe) {
 		case rec_blasting:
 		case rec_smoking:
 		case rec_campfire_cooking: {
-			pck_write_string(packet, recipe->data.smelting.group, strlen(recipe->data.smelting.group));
+			pck_write_string(packet, UTL_STRTOARG(recipe->data.smelting.group));
 			pck_write_var_int(packet, recipe->data.smelting.ingredient_count);
 			itm_serialize(packet, &recipe->data.smelting.ingredient);
 			itm_serialize(packet, &recipe->data.smelting.result);
@@ -67,7 +68,7 @@ void rec_serialize(pck_packet_t* packet, const rec_recipe_t* recipe) {
 			pck_write_var_int(packet, recipe->data.smelting.cooking_time);
 		} break;
 		case rec_stonecutting: {
-			pck_write_string(packet, recipe->data.stonecutting.group, strlen(recipe->data.stonecutting.group));
+			pck_write_string(packet, UTL_STRTOARG(recipe->data.stonecutting.group));
 			pck_write_var_int(packet, recipe->data.stonecutting.ingredient_count);
 			itm_serialize(packet, &recipe->data.stonecutting.ingredient);
 			itm_serialize(packet, &recipe->data.stonecutting.result);

@@ -36,15 +36,15 @@ typedef struct {
 		utl_vector_t vector;
 	} workers;
 
-	const char* version;
-	const char* mcver;
+	string_t version;
+	string_t mcver;
 	cht_component_t* motd;
 	
 	cmd_sender_t console;
 	
 	/* Default world */
 	struct {
-		const char* name;
+		string_t name;
 		int64_t seed;
 		int16_t max_height;
 	} world;

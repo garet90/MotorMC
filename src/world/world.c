@@ -30,13 +30,12 @@ uint16_t wld_add(wld_world_t* world) {
 
 }
 
-wld_world_t* wld_new(const char* name, int64_t seed, mat_dimension_type_t environment) {
+wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t environment) {
 
 	wld_world_t* world = calloc(1, sizeof(wld_world_t));
 	world->seed = seed;
 	world->environment = environment;
-	world->name.value = name;
-	world->name.length = strlen(name);
+	world->name = name;
 
 	world->id = wld_add(world);
 
@@ -57,11 +56,10 @@ wld_world_t* wld_new(const char* name, int64_t seed, mat_dimension_type_t enviro
 
 }
 
-wld_world_t* wld_load(const char* name) {
+wld_world_t* wld_load(const string_t name) {
 
 	wld_world_t* world = calloc(1, sizeof(wld_world_t));
-	world->name.value = name;
-	world->name.length = strlen(name);
+	world->name = name;
 
 	world->id = wld_add(world);
 

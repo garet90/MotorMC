@@ -18,12 +18,7 @@ typedef struct {
 
 	ltg_client_t* sender;
 
-	struct {
-		
-		char value[1025];
-		size_t length : 10;
-
-	} message;
+	string_t message;
 
 } job_global_chat_message_t;
 
@@ -40,7 +35,7 @@ typedef struct {
 	job_work_t header;
 
 	ltg_uuid_t uuid;
-	char username[17];
+	string_t username;
 
 } job_player_leave_t;
 

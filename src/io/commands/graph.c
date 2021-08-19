@@ -53,7 +53,7 @@ pck_packet_t* cmd_get_graph() {
 			cmd_node_t* node = UTL_VECTOR_GET_AS(cmd_node_t*, &nodes, i);
 			
 			pck_write_int8(cmd_graph, 
-				node->type | (node->is_executable << 2) | (node->has_redirect_node << 3) | ((node->suggestions_type != NULL ? 1 : 0) << 4)
+				node->type | (node->is_executable << 2) | (node->has_redirect_node << 3) | ((UTL_STRTOCSTR(node->suggestions_type) != NULL ? 1 : 0) << 4)
 			);
 			
 			pck_write_var_int(cmd_graph, node->children.size);
@@ -71,16 +71,16 @@ pck_packet_t* cmd_get_graph() {
 				case cmd_node_root:
 					break;
 				case cmd_node_literal:
-					pck_write_string(cmd_graph, node->literal.name, strlen(node->literal.name));
+					pck_write_string(cmd_graph, UTL_STRTOARG(node->literal.name));
 					break;
 				case cmd_node_argument:
-					pck_write_string(cmd_graph, node->argument.name, strlen(node->argument.name));
-					pck_write_string(cmd_graph, node->argument.parser, strlen(node->argument.parser));
+					pck_write_string(cmd_graph, UTL_STRTOARG(node->argument.name));
+					pck_write_string(cmd_graph, UTL_STRTOARG(node->argument.parser));
 					break;
 			}
 
-			if (node->suggestions_type != NULL) {
-				pck_write_string(cmd_graph, node->suggestions_type, strlen(node->suggestions_type));
+			if (UTL_STRTOCSTR(node->suggestions_type) != NULL) {
+				pck_write_string(cmd_graph, UTL_STRTOARG(node->suggestions_type));
 			}
 
 			free(node);

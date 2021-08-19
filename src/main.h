@@ -27,3 +27,8 @@ typedef float float32_t;
 typedef double float64_t;
 
 typedef uint8_t byte_t;
+
+typedef struct {
+	char* value;
+	size_t length;
+} string_t;

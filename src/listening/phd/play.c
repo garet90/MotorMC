@@ -63,21 +63,25 @@ bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 
 bool_t phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 
-	PCK_READ_STRING(message, packet);
+	string_t message;
+	message.length = (unsigned) pck_read_var_int(packet);
+	message.value = malloc(message.length + 1);
+	message.value[message.length] = '\0';
+	pck_read_bytes(packet, (byte_t*) message.value, message.length);
 
-	if (message_length > 0 && message[0] == '/') {
-		log_info("%s issued server command: %s", client->username.value, message);
+	if (message.length > 0 && UTL_STRTOCSTR(message)[0] == '/') {
+		log_info("%s issued server command: %s", UTL_STRTOCSTR(client->username), UTL_STRTOCSTR(message));
 		const cmd_sender_t sender = {
 			.type = cmd_player,
 			.player = client
 		};
-		cmd_handle(message + 1, sender);
+		cmd_handle(UTL_STRTOCSTR(message) + 1, sender);
+		free(UTL_STRTOCSTR(message));
 	} else {
 		JOB_CREATE_WORK(job, job_global_chat_message);
 
 		job->sender = client;
-		job->message.length = message_length;
-		memcpy(job->message.value, message, message_length + 1);
+		job->message = message;
 
 		job_add(&job->header);
 	}
@@ -574,7 +578,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_player_position_and_look(client);
 	phd_send_player_info_add_players(client);
 
-	phd_send_update_view_position_spawn(client);
+	// TODO fix this phd_send_update_view_position_spawn(client);
 
 	// add to online players
 	pthread_mutex_lock(&sky_main.listener.online.lock);

@@ -44,20 +44,11 @@ typedef struct {
 	int32_t socket;
 
 	struct {
-		struct {
-			char* value;
-			size_t length : 11;
-		} value;
-		struct {
-			char* value;
-			size_t length : 11;
-		} signature;
+		string_t value;
+		string_t signature;
 	} textures;
 
-	struct {
-		size_t length : 3;
-		char value[17];
-	} username;
+	string_t username;
 
 	// TODO replace locale for enum
 	struct {

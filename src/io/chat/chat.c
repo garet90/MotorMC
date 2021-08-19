@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include "../../motor.h"
 #include "../../util/util.h"
+#include "../../util/str_util.h"
 #include "../logger/logger.h"
 #include "chat.h"
 
@@ -28,10 +29,11 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 		mjson_property obj_property = mjson_obj_get(obj, i);
 		switch (utl_hash(mjson_get_string(obj_property.label))) {
 			case 0x7c9e690a: { // "text"
-				size_t text_len = mjson_get_size(obj_property.value);
-				component->text = malloc(text_len + 1);
-				memcpy(component->text, mjson_get_string(obj_property.value), text_len);
-				component->text[text_len] = '\0';
+				const size_t text_len = mjson_get_size(obj_property.value);
+				UTL_STRTOCSTR(component->text) = malloc(text_len + 1);
+				memcpy(UTL_STRTOCSTR(component->text), mjson_get_string(obj_property.value), text_len);
+				UTL_STRTOCSTR(component->text)[text_len] = '\0';
+				component->text.length = text_len;
 			} break;
 			case 0x7c94b326: // "bold"
 				if (mjson_get_boolean(obj_property.value)) {
@@ -147,10 +149,11 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 							}
 							break;
 						case 0x108d5742: { // "value"
-							size_t value_len = mjson_get_size(click_event.value);
-							component->click_event.value = malloc(value_len + 1);
-							memcpy(component->click_event.value, mjson_get_string(click_event.value), value_len);
-							component->click_event.value[value_len] = '\0';
+							const size_t value_len = mjson_get_size(click_event.value);
+							UTL_STRTOCSTR(component->click_event.value) = malloc(value_len + 1);
+							memcpy(UTL_STRTOCSTR(component->click_event.value), mjson_get_string(click_event.value), value_len);
+							UTL_STRTOCSTR(component->click_event.value)[value_len] = '\0';
+							component->click_event.value.length = value_len;
 						} break;
 					}
 				}
@@ -174,9 +177,9 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 							break;
 						case 0x108d5742: { // "value"
 							size_t value_len = mjson_get_size(hover_event.value);
-							component->hover_event.value = malloc(value_len + 1);
-							memcpy(component->hover_event.value, mjson_get_string(hover_event.value), value_len);
-							component->hover_event.value[value_len] = '\0';
+							UTL_STRTOCSTR(component->hover_event.value) = malloc(value_len + 1);
+							memcpy(UTL_STRTOCSTR(component->hover_event.value), mjson_get_string(hover_event.value), value_len);
+							UTL_STRTOCSTR(component->hover_event.value)[value_len] = '\0';
 						} break;
 					}
 				}
@@ -208,46 +211,46 @@ cht_component_t* cht_from_string(const char* str, size_t len) {
 
 void cht_jsonify(mjson_doc* doc, mjson_val* obj, const cht_component_t* component) {
 
-	if (component->text != NULL)
-		mjson_obj_add(obj, mjson_string(doc, "text", 4), mjson_string(doc, component->text, strlen(component->text)));
+	if (UTL_STRTOCSTR(component->text) != NULL)
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("text")), mjson_string(doc, UTL_STRTOARG(component->text)));
 
 	if (component->bold != UNSET)
-		mjson_obj_add(obj, mjson_string(doc, "bold", 4), mjson_boolean(doc, component->bold));
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("bold")), mjson_boolean(doc, component->bold));
 
 	if (component->italic != UNSET)
-		mjson_obj_add(obj, mjson_string(doc, "italic", 6), mjson_boolean(doc, component->italic));
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("italic")), mjson_boolean(doc, component->italic));
 
 	if (component->underlined != UNSET)
-		mjson_obj_add(obj, mjson_string(doc, "underlined", 10), mjson_boolean(doc, component->underlined));
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("underlined")), mjson_boolean(doc, component->underlined));
 
 	if (component->strikethrough != UNSET)
-		mjson_obj_add(obj, mjson_string(doc, "strikethrough", 13), mjson_boolean(doc, component->strikethrough));
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("strikethrough")), mjson_boolean(doc, component->strikethrough));
 		
 	if (component->obfuscated != UNSET)
-		mjson_obj_add(obj, mjson_string(doc, "obfuscated", 10), mjson_boolean(doc, component->obfuscated));
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("obfuscated")), mjson_boolean(doc, component->obfuscated));
 
 	if (component->color != cht_no_color) {
 		if (component->color <= 0xF) {
-			const char* colors[] = {
-				"black",
-				"dark_blue",
-				"dark_green",
-				"dark_aqua",
-				"dark_red",
-				"dark_purple",
-				"gold",
-				"gray",
-				"dark_gray",
-				"blue",
-				"green",
-				"aqua",
-				"red",
-				"light_purple",
-				"yellow",
-				"white"
+			const string_t colors[] = {
+				UTL_CSTRTOSTR("black"),
+				UTL_CSTRTOSTR("dark_blue"),
+				UTL_CSTRTOSTR("dark_green"),
+				UTL_CSTRTOSTR("dark_aqua"),
+				UTL_CSTRTOSTR("dark_red"),
+				UTL_CSTRTOSTR("dark_purple"),
+				UTL_CSTRTOSTR("gold"),
+				UTL_CSTRTOSTR("gray"),
+				UTL_CSTRTOSTR("dark_gray"),
+				UTL_CSTRTOSTR("blue"),
+				UTL_CSTRTOSTR("green"),
+				UTL_CSTRTOSTR("aqua"),
+				UTL_CSTRTOSTR("red"),
+				UTL_CSTRTOSTR("light_purple"),
+				UTL_CSTRTOSTR("yellow"),
+				UTL_CSTRTOSTR("white")
 			};
 
-			mjson_obj_add(obj, mjson_string(doc, "color", 5), mjson_string(doc, colors[component->color], strlen(colors[component->color])));
+			mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("color")), mjson_string(doc, UTL_STRTOARG(colors[component->color])));
 		} else {
 			char color[8];
 			// convert int to hex
@@ -256,43 +259,43 @@ void cht_jsonify(mjson_doc* doc, mjson_val* obj, const cht_component_t* componen
 			utl_write_byte_hex(color + 4, ((byte_t*) &component->color)[2]);
 			utl_write_byte_hex(color + 6, ((byte_t*) &component->color)[3]);
 
-			mjson_obj_add(obj, mjson_string(doc, "color", 5), mjson_string(doc, color, 8));
+			mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("color")), mjson_string(doc, color, sizeof(color)));
 		}
 	}
 
-	if (component->click_event.value != NULL) {
+	if (UTL_STRTOCSTR(component->click_event.value) != NULL) {
 
-		const char* click_events[] = {
-			"open_url",
-			"run_command",
-			"suggest_command",
-			"change_page",
-			"copy_to_clipboard"
+		const string_t click_events[] = {
+			UTL_CSTRTOSTR("open_url"),
+			UTL_CSTRTOSTR("run_command"),
+			UTL_CSTRTOSTR("suggest_command"),
+			UTL_CSTRTOSTR("change_page"),
+			UTL_CSTRTOSTR("copy_to_clipboard")
 		};
 
 		mjson_val* click_event = mjson_obj(doc);
 
-		mjson_obj_add(click_event, mjson_string(doc, "action", 6), mjson_string(doc, click_events[component->click_event.action], strlen(click_events[component->click_event.action])));
-		mjson_obj_add(click_event, mjson_string(doc, "value", 5), mjson_string(doc, component->click_event.value, strlen(component->click_event.value)));
+		mjson_obj_add(click_event, mjson_string(doc, UTL_CSTRTOARG("action")), mjson_string(doc, UTL_STRTOARG(click_events[component->click_event.action])));
+		mjson_obj_add(click_event, mjson_string(doc, UTL_CSTRTOARG("value")), mjson_string(doc, UTL_STRTOARG(component->click_event.value)));
 
-		mjson_obj_add(obj, mjson_string(doc, "clickEvent", 10), click_event);
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("clickEvent")), click_event);
 
 	}
 
-	if (component->hover_event.value != NULL) {
+	if (UTL_STRTOCSTR(component->hover_event.value) != NULL) {
 
-		const char* hover_events[] = {
-			"show_text",
-			"show_item",
-			"show_entity"
+		const string_t hover_events[] = {
+			UTL_CSTRTOSTR("show_text"),
+			UTL_CSTRTOSTR("show_item"),
+			UTL_CSTRTOSTR("show_entity")
 		};
 
 		mjson_val* hover_event = mjson_obj(doc);
 
-		mjson_obj_add(hover_event, mjson_string(doc, "action", 6), mjson_string(doc, hover_events[component->hover_event.action], strlen(hover_events[component->hover_event.action])));
-		mjson_obj_add(hover_event, mjson_string(doc, "value", 5), mjson_string(doc, component->hover_event.value, strlen(component->hover_event.value)));
+		mjson_obj_add(hover_event, mjson_string(doc, UTL_CSTRTOARG("action")), mjson_string(doc, UTL_STRTOARG(hover_events[component->hover_event.action])));
+		mjson_obj_add(hover_event, mjson_string(doc, UTL_CSTRTOARG("value")), mjson_string(doc, UTL_STRTOARG(component->hover_event.value)));
 		
-		mjson_obj_add(obj, mjson_string(doc, "hoverEvent", 10), hover_event);
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("hoverEvent")), hover_event);
 
 	}
 
@@ -310,7 +313,7 @@ void cht_jsonify(mjson_doc* doc, mjson_val* obj, const cht_component_t* componen
 
 		}
 
-		mjson_obj_add(obj, mjson_string(doc, "extra", 5), extra);
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("extra")), extra);
 
 	}
 
@@ -344,16 +347,16 @@ void cht_free(cht_component_t* component) {
 
 	if (component->heap) {
 		
-		if (component->text != NULL) {
-			free(component->text);
+		if (UTL_STRTOCSTR(component->text) != NULL) {
+			free(UTL_STRTOCSTR(component->text));
 		}
 
-		if (component->click_event.value != NULL) {
-			free(component->click_event.value);
+		if (UTL_STRTOCSTR(component->click_event.value) != NULL) {
+			free(UTL_STRTOCSTR(component->click_event.value));
 		}
 
-		if (component->hover_event.value != NULL) {
-			free(component->hover_event.value);
+		if (UTL_STRTOCSTR(component->hover_event.value) != NULL) {
+			free(UTL_STRTOCSTR(component->hover_event.value));
 		}
 
 		free(component);
@@ -370,17 +373,17 @@ size_t cht_server_list_ping(char* message) {
 
 	mjson_val* version = mjson_obj(doc);
 
-	mjson_obj_add(version, mjson_string(doc, "name", 4), mjson_string(doc, "MotorMC " __MC_VER__, sizeof("MotorMC " __MC_VER__) - 1));
-	mjson_obj_add(version, mjson_string(doc, "protocol", 8), mjson_int(doc, sky_main.protocol));
+	mjson_obj_add(version, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, UTL_CSTRTOARG("MotorMC " __MC_VER__)));
+	mjson_obj_add(version, mjson_string(doc, UTL_CSTRTOARG("protocol")), mjson_int(doc, sky_main.protocol));
 
-	mjson_obj_add(obj, mjson_string(doc, "version", 7), version);
+	mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("version")), version);
 
 	mjson_val* players = mjson_obj(doc);
 
-	mjson_obj_add(players, mjson_string(doc, "max", 3), mjson_int(doc, sky_main.listener.online.max));
+	mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("max")), mjson_int(doc, sky_main.listener.online.max));
 	
 	pthread_mutex_lock(&sky_main.listener.online.lock);
-	mjson_obj_add(players, mjson_string(doc, "online", 6), mjson_int(doc, sky_main.listener.online.list.length));
+	mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("online")), mjson_int(doc, sky_main.listener.online.list.length));
 	
 	// TODO limit sample to however long it's supposed to be
 	if (sky_main.listener.online.list.length > 0) {
@@ -389,24 +392,24 @@ size_t cht_server_list_ping(char* message) {
 		while (node != NULL) {
 			ltg_client_t* player = node->element;
 			mjson_val* val = mjson_obj(doc);
-			mjson_obj_add(val, mjson_string(doc, "name", 4), mjson_string(doc, player->username.value, player->username.length));
+			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, player->username.value, player->username.length));
 			char uuid[37];
 			ltg_uuid_to_string(player->uuid, uuid);
-			mjson_obj_add(val, mjson_string(doc, "id", 2), mjson_string(doc, uuid, 36));
+			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("id")), mjson_string(doc, uuid, 36));
 			mjson_arr_append(sample, val);
 			node = node->next;
 		}
-		mjson_obj_add(players, mjson_string(doc, "sample", 6), sample);
+		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("sample")), sample);
 	}
 	pthread_mutex_unlock(&sky_main.listener.online.lock);
 
-	mjson_obj_add(obj, mjson_string(doc, "players", 7), players);
+	mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("players")), players);
 
 	mjson_val* description = mjson_obj(doc);
 
 	cht_jsonify(doc, description, sky_main.motd);
 
-	mjson_obj_add(obj, mjson_string(doc, "description", 11), description);
+	mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("description")), description);
 
 	size_t len = mjson_write(doc, message);
 

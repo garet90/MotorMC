@@ -2,42 +2,43 @@
 #include <string.h>
 #include "translation.h"
 #include "../../util/util.h"
+#include "../../util/str_util.h"
 
 void cht_jsonify_translation(mjson_doc* doc, mjson_val* obj, const cht_translation_t* translation) {
 
-	const char* translations[] = {
-		"chat.type.text",
-		"multiplayer.player.joined",
-		"multiplayer.player.left",
-		"multiplayer.disconnect.outdated_client",
-		"multiplayer.disconnect.outdated_server",
-		"multiplayer.disconnect.server_shutdown"
+	const string_t translations[] = {
+		UTL_CSTRTOSTR("chat.type.text"),
+		UTL_CSTRTOSTR("multiplayer.player.joined"),
+		UTL_CSTRTOSTR("multiplayer.player.left"),
+		UTL_CSTRTOSTR("multiplayer.disconnect.outdated_client"),
+		UTL_CSTRTOSTR("multiplayer.disconnect.outdated_server"),
+		UTL_CSTRTOSTR("multiplayer.disconnect.server_shutdown")
 	};
 
-	mjson_obj_add(obj, mjson_string(doc, "translate", 9), mjson_string(doc, translations[translation->translate], strlen(translations[translation->translate])));
+	mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("translate")), mjson_string(doc, UTL_STRTOARG(translations[translation->translate])));
 
 	if (translation->color != cht_no_color) {
 		if (translation->color <= 0xF) {
-			const char* colors[] = {
-				"black",
-				"dark_blue",
-				"dark_green",
-				"dark_aqua",
-				"dark_red",
-				"dark_purple",
-				"gold",
-				"gray",
-				"dark_gray",
-				"blue",
-				"green",
-				"aqua",
-				"red",
-				"light_purple",
-				"yellow",
-				"white"
+			const string_t colors[] = {
+				UTL_CSTRTOSTR("black"),
+				UTL_CSTRTOSTR("dark_blue"),
+				UTL_CSTRTOSTR("dark_green"),
+				UTL_CSTRTOSTR("dark_aqua"),
+				UTL_CSTRTOSTR("dark_red"),
+				UTL_CSTRTOSTR("dark_purple"),
+				UTL_CSTRTOSTR("gold"),
+				UTL_CSTRTOSTR("gray"),
+				UTL_CSTRTOSTR("dark_gray"),
+				UTL_CSTRTOSTR("blue"),
+				UTL_CSTRTOSTR("green"),
+				UTL_CSTRTOSTR("aqua"),
+				UTL_CSTRTOSTR("red"),
+				UTL_CSTRTOSTR("light_purple"),
+				UTL_CSTRTOSTR("yellow"),
+				UTL_CSTRTOSTR("white")
 			};
 
-			mjson_obj_add(obj, mjson_string(doc, "color", 5), mjson_string(doc, colors[translation->color], strlen(colors[translation->color])));
+			mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("color")), mjson_string(doc, UTL_STRTOARG(colors[translation->color])));
 		} else {
 			char color[8];
 			// convert int to hex
@@ -46,7 +47,7 @@ void cht_jsonify_translation(mjson_doc* doc, mjson_val* obj, const cht_translati
 			utl_write_byte_hex(color + 4, ((byte_t*) &translation->color)[2]);
 			utl_write_byte_hex(color + 6, ((byte_t*) &translation->color)[3]);
 
-			mjson_obj_add(obj, mjson_string(doc, "color", 5), mjson_string(doc, color, 8));
+			mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("color")), mjson_string(doc, color, 8));
 		}
 	}
 
@@ -63,7 +64,7 @@ void cht_jsonify_translation(mjson_doc* doc, mjson_val* obj, const cht_translati
 
 		}
 
-		mjson_obj_add(obj, mjson_string(doc, "with", 4), with);
+		mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("with")), with);
 	}
 
 }

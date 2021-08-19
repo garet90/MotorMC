@@ -11,6 +11,10 @@
 #include <dirent.h>
 #endif
 
+#ifndef PATH_MAX
+#define PATH_MAX 1024
+#endif
+
 
 bool_t fs_mkdir(const char* path) {
 
@@ -64,10 +68,10 @@ bool_t fs_get_dir_contents(const char* path, const char* extension, void (*handl
 	d = opendir(path);
 	if (d) {
 		struct dirent *dir;
-		size_t extension_len = strlen(extension);
+		size_t extension_len = strnlen(extension, PATH_MAX);
 
 		while ((dir = readdir(d)) != NULL) {
-			if (strcmp(dir->d_name + (strlen(dir->d_name) - extension_len), extension) == 0) {
+			if (strcmp(dir->d_name + (strnlen(dir->d_name, PATH_MAX) - extension_len), extension) == 0) {
 				handler(dir->d_name);
 			}
 		}

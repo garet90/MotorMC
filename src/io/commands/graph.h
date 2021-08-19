@@ -27,21 +27,21 @@ struct cmd_node {
 
 		struct {
 
-			const char* name;
+			string_t name;
 
 		} literal;
 
 		struct {
 
-			const char* name;
-			const char* parser;
-			const char* properties;
+			string_t name;
+			string_t parser;
+			string_t properties;
 
 		} argument;
 
 	};
 
-	const char* suggestions_type;
+	string_t suggestions_type;
 
 };
 

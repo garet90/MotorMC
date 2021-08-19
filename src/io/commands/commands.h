@@ -1,6 +1,7 @@
 #pragma once
 #include "../../main.h"
 #include "../../listening/listening.h"
+#include "../../util/str_util.h"
 #include "../chat/chat.h"
 
 typedef enum {
@@ -34,14 +35,14 @@ typedef struct {
 
 typedef struct {
 
-	const char* label;
-	const char* description;
-	const char* usage;
-	const char* permission;
-	const char* permission_message;
+	const string_t label;
+	const string_t description;
+	const string_t usage;
+	const string_t permission;
+	const string_t permission_message;
 	bool_t (*const handler) (char*, const cmd_sender_t);
 	const size_t alias_count;
-	const char* aliases[];
+	const string_t aliases[];
 
 } cmd_command_t;
 
@@ -65,40 +66,40 @@ extern bool_t cmd_help(char*, cmd_sender_t);
 extern bool_t cmd_plugins(char*, cmd_sender_t);
 
 static const cmd_command_t cmd_stop_h = {
-	.label = "stop",
-	.description = "Stops the server",
-	.permission = "server.stop",
+	.label = UTL_CSTRTOSTR("stop"),
+	.description = UTL_CSTRTOSTR("Stops the server"),
+	.permission = UTL_CSTRTOSTR("server.stop"),
 	.handler = cmd_stop
 };
 
 static const cmd_command_t cmd_help_h = {
-	.label = "help",
+	.label = UTL_CSTRTOSTR("help"),
 	.alias_count = 1,
-	.aliases = { "?" },
-	.description = "Show a list of commands",
+	.aliases = { UTL_CSTRTOSTR("?") },
+	.description = UTL_CSTRTOSTR("Show a list of commands"),
 	.handler = cmd_help
 };
 
 static const cmd_command_t cmd_plugins_h = {
-	.label = "plugins",
+	.label = UTL_CSTRTOSTR("plugins"),
 	.alias_count = 1,
-	.aliases = { "pl" },
-	.description = "List active plugins",
+	.aliases = { UTL_CSTRTOSTR("pl") },
+	.description = UTL_CSTRTOSTR("List active plugins"),
 	.handler = cmd_plugins
 };
 
 /* CONSTANT MESSAGES */
 static const cht_component_t cmd_no_permission = {
-	.text = "You don't have permission to use this command!",
+	.text = UTL_CSTRTOSTR("You don't have permission to use this command!"),
 	.color = cht_red
 };
 
 static const cht_component_t cmd_not_found = {
-	.text = "Unknown command. Type 'help' for a list of commands.",
+	.text = UTL_CSTRTOSTR("Unknown command. Type 'help' for a list of commands."),
 	.color = cht_no_color
 };
 
 static const cht_component_t cmd_stopping_server = {
-	.text = "Stopping the server...",
+	.text = UTL_CSTRTOSTR("Stopping the server..."),
 	.color = cht_no_color
 };

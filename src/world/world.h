@@ -83,10 +83,7 @@ struct wld_world {
 	int64_t seed;
 	uint64_t time;
 
-	struct {
-		const char* value;
-		size_t length;
-	} name;
+	string_t name;
 
 	// lock for adding and removing regions
 	pthread_mutex_t lock;
@@ -110,8 +107,8 @@ struct wld_world {
 
 extern uint16_t wld_add(wld_world_t* world);
 
-extern wld_world_t* wld_new(const char* name, int64_t seed, mat_dimension_type_t environment);
-extern wld_world_t* wld_load(const char* name);
+extern wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t environment);
+extern wld_world_t* wld_load(const string_t name);
 
 extern uint16_t wld_get_count();
 extern wld_world_t* wld_get_world(uint16_t world_id);

@@ -5,14 +5,7 @@
 
 extern bool_t phd_login(ltg_client_t*, pck_packet_t*);
 
-typedef struct {
-
-	char* ptr;
-	size_t len;
-
-} phd_auth_response_t;
-
-extern size_t phd_auth_response_write(void*, size_t, size_t, phd_auth_response_t*);
+extern size_t phd_auth_response_write(void*, size_t, size_t, string_t*);
 
 //inbound
 extern bool_t phd_handle_login_start(ltg_client_t*, pck_packet_t*);

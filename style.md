@@ -2,7 +2,7 @@
 
 This document outlines the required style guideline for contributing and writing code for the project.
 
-### Names
+## Names
 
 *Naming conventions are less important within functions but should still be followed as much as possible*
 
@@ -13,23 +13,23 @@ This document outlines the required style guideline for contributing and writing
 -   All type names (defined by typedef) must be suffixed by \_t
 -   All function names and global variable names must be prefixed by a (optimally) 3 letter prefix (such as "sky" for the main folder)
 
-### Spaces
+## Spaces
 
 -   Use tabs for indentation, not spaces
 -   Leave one blank space between operators (4 + 3 not 4+3)
 -   Always put one space after commas
 
-### Braces and parenthesis
+## Braces and parenthesis
 
 -   Opening braces should be on the same line as the function or statement
 -   Use parenthesis whenever clarity is needed, especially for bitwise operators
 
-### Structures
+## Structures
 
 -   If using a pointer to a structure, use -> to access members, don't dereference it
 -   Do not put spaces between structs, members, and -> (ex: use struct->member not struct -> member)
 
-### Functions
+## Functions
 
 -   All function declarations in a header file where the function body isn't present should use the extern keyword
 -   Always put input parameters before output parameters

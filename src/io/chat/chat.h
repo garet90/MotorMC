@@ -42,7 +42,7 @@ typedef enum {
 
 typedef struct {
 
-	char* text;
+	string_t text;
 
 	bool_t bold : 2;
 	bool_t italic : 2;
@@ -53,16 +53,16 @@ typedef struct {
 
 	cht_color_t color;
 
-	char* insertion;
+	string_t insertion;
 
 	struct {
 		cht_click_action_t action : 3;
-		char* value;
+		string_t value;
 	} click_event;
 
 	struct {
 		cht_hover_action_t action : 3;
-		char* value;
+		string_t value;
 	} hover_event;
 
 	utl_vector_t extra;

@@ -236,9 +236,7 @@ void ltg_disconnect(ltg_client_t* client) {
 		((uint64_t*) work->uuid)[0] = ((uint64_t*) client->uuid)[0];
 		((uint64_t*) work->uuid)[1] = ((uint64_t*) client->uuid)[1];
 		
-		((uint64_t*) work->username)[0] = ((uint64_t*) client->username.value)[0];
-		((uint64_t*) work->username)[1] = ((uint64_t*) client->username.value)[1];
-		work->username[16] = '\0';
+		work->username = client->username;
 
 		job_add(&work->header);
 

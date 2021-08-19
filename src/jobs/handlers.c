@@ -28,9 +28,9 @@ bool_t job_handle_global_chat_message(job_global_chat_message_t* work) {
 	cht_translation_t translation = cht_translation_new; // todo terminate
 	translation.translate = cht_translation_chat_type_text;
 	cht_component_t name = cht_new;
-	name.text = work->sender->username.value;
+	name.text = work->sender->username;
 	cht_component_t message = cht_new;
-	message.text = work->message.value;
+	message.text = work->message;
 	cht_add_with(&translation, &name);
 	cht_add_with(&translation, &message);
 
@@ -46,6 +46,8 @@ bool_t job_handle_global_chat_message(job_global_chat_message_t* work) {
 	}
 	pthread_mutex_unlock(&sky_main.listener.online.lock);
 	cht_term_translation(&translation);
+
+	free(work->message.value);
 	return true;
 
 }
@@ -58,7 +60,7 @@ bool_t job_handle_player_join(job_player_join_t* work) {
 	translation.translate = cht_translation_multiplayer_player_joined;
 	translation.color = cht_yellow;
 	cht_component_t name = cht_new;
-	name.text = work->player->username.value;
+	name.text = work->player->username;
 	cht_add_with(&translation, &name);
 
 	char out[128];
@@ -82,7 +84,7 @@ bool_t job_handle_player_join(job_player_join_t* work) {
 
 bool_t job_handle_player_leave(job_player_leave_t* work) {
 
-	log_info("%s left the game", work->username);
+	log_info("%s left the game", work->username.value);
 
 	cht_translation_t translation = cht_translation_new;
 	translation.translate = cht_translation_multiplayer_player_left;
@@ -105,6 +107,8 @@ bool_t job_handle_player_leave(job_player_leave_t* work) {
 	pthread_mutex_unlock(&sky_main.listener.online.lock);
 
 	cht_term_translation(&translation);
+
+	free(work->username.value);
 
 	return true;
 

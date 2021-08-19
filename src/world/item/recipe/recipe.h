@@ -33,13 +33,13 @@ typedef enum {
 typedef struct {
 
 	rec_recipe_type_t type : 5;
-	const char* recipe_id;
+	const string_t recipe_id;
 
 	union {
 
 		struct {
 
-			const char* group;
+			const string_t group;
 			itm_item_t result;
 
 			size_t ingredient_count;
@@ -52,7 +52,7 @@ typedef struct {
 
 		struct {
 
-			const char* group;
+			const string_t group;
 			itm_item_t result;
 
 			uint8_t width : 2;
@@ -67,7 +67,7 @@ typedef struct {
 
 		struct {
 
-			const char* group;
+			const string_t group;
 			size_t ingredient_count;
 			itm_item_t ingredient;
 
@@ -79,7 +79,7 @@ typedef struct {
 
 		struct {
 
-			const char* group;
+			const string_t group;
 			size_t ingredient_count;
 			itm_item_t ingredient;
 

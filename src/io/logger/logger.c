@@ -178,7 +178,7 @@ size_t log_to_string(char* message, const cht_component_t* chat) {
 		}
 	}
 
-	offset += sprintf(message + offset, "%s", chat->text);
+	offset += sprintf(message + offset, "%s", UTL_STRTOCSTR(chat->text));
 
 	if (chat->extra.size != 0) {
 

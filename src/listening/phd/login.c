@@ -18,14 +18,14 @@ struct {
 	.lock = PTHREAD_MUTEX_INITIALIZER
 };
 
-size_t phd_auth_response_write(void* ptr, size_t size, size_t nmemb, phd_auth_response_t* r) {
+size_t phd_auth_response_write(void* ptr, size_t size, size_t nmemb, string_t* r) {
 	
-	const size_t new_len = r->len + size * nmemb;
-	r->ptr = realloc(r->ptr, new_len + 1);
+	const size_t new_len = r->length + size * nmemb;
+	r->value = realloc(r->value, new_len + 1);
 
-	memcpy(r->ptr + r->len, ptr, size * nmemb);
-	r->ptr[new_len] = '\0';
-	r->len = new_len;
+	memcpy(r->value + r->length, ptr, size * nmemb);
+	r->value[new_len] = '\0';
+	r->length = new_len;
 
 	return size*nmemb;
 
@@ -53,7 +53,9 @@ bool_t phd_login(ltg_client_t* client, pck_packet_t* packet) {
 bool_t phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 
 	client->username.length = pck_read_var_int(packet);
+	client->username.value = malloc(client->username.length + 1);
 	pck_read_bytes(packet, (byte_t*) client->username.value, client->username.length);
+	client->username.value[client->username.length] = '\0';
 
 	if (client->protocol != sky_main.protocol) {
 
@@ -62,7 +64,7 @@ bool_t phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 			cht_translation_t translation = cht_translation_new;
 			translation.translate = cht_translation_multiplayer_disconnect_outdated_client;
 			cht_component_t version = cht_new;
-			version.text = __MC_VER__;
+			version.text = UTL_CSTRTOSTR(__MC_VER__);
 			
 			cht_add_with(&translation, &version);
 
@@ -78,7 +80,7 @@ bool_t phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 			cht_translation_t translation = cht_translation_new;
 			translation.translate = cht_translation_multiplayer_disconnect_outdated_server;
 			cht_component_t version = cht_new;
-			version.text = __MC_VER__;
+			version.text = UTL_CSTRTOSTR(__MC_VER__);
 			
 			cht_add_with(&translation, &version);
 
@@ -185,10 +187,10 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 		curl_easy_setopt(phd_authRequest.curl, CURLOPT_URL, request);
 
 		// prepare response string
-		phd_auth_response_t response;
-		response.len = 0;
-		response.ptr = malloc(1);
-		response.ptr[0] = '\0';
+		string_t response;
+		response.length = 0;
+		response.value = malloc(1);
+		response.value[0] = '\0';
 
 		curl_easy_setopt(phd_authRequest.curl, CURLOPT_WRITEDATA, &response);
 
@@ -199,8 +201,8 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 			log_error("Could not authenticate client: %s", curl_easy_strerror(res));
 
-			if (response.ptr != NULL)
-				free(response.ptr);
+			if (response.value != NULL)
+				free(response.value);
 			
 			return false;
 
@@ -217,7 +219,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 		}
 
-		mjson_doc* auth = mjson_read(response.ptr, response.len);
+		mjson_doc* auth = mjson_read(response.value, response.length);
 
 		mjson_val* auth_obj = mjson_get_root(auth);
 		for (uint32_t i = 0; i < mjson_get_size(auth_obj); ++i) {
@@ -230,11 +232,10 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 				case 1: { // username
 					const char* auth_username = mjson_get_string(auth_prop.value);
 					if (strcmp(client->username.value, auth_username) != 0) { // TODO replace for memcmp
-						// free old username
-						free(client->username.value);
-
 						// copy new username
 						client->username.length = mjson_get_size(auth_prop.value);
+						client->username.value = realloc(client->username.value, client->username.length + 1);
+						client->username.value[client->username.length] = '\0';
 						memcpy(client->username.value, auth_username, client->username.length);
 					}
 					break;
@@ -265,7 +266,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 											log_error("Property type has not been set, is the json response from the auth server curropted?");
 											
 											mjson_free(auth);
-											free(response.ptr);
+											free(response.value);
 											return false;
 										}
 										case textures: {
@@ -283,7 +284,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 											log_error("Property type has not been set, is the json response from the auth server curropted?");
 											
 											mjson_free(auth);
-											free(response.ptr);
+											free(response.value);
 											return false;
 										}
 										case textures: {
@@ -306,7 +307,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 		// free auth response and auth json doc
 		mjson_free(auth);
-		free(response.ptr);
+		free(response.value);
 	}
 
 	// send login success packet

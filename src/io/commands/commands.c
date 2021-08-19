@@ -29,16 +29,16 @@ void cmd_add_defaults() {
 
 		cmd_command_t* command = UTL_VECTOR_GET_AS(cmd_command_t*, &cmd_list, i);
 
-		if (utl_tree_get(&cmd_handlers, cmd_hash(command->label)) == NULL) {
-			utl_tree_put(&cmd_handlers, cmd_hash(command->label), command);
+		if (utl_tree_get(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->label))) == NULL) {
+			utl_tree_put(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->label)), command);
 		} else {
 			log_warn("Command already exists and was not added: /%s", command->label);
 			continue;
 		}
 
 		for (size_t j = 0; j < command->alias_count; ++j) {
-			if (utl_tree_get(&cmd_handlers, cmd_hash(command->aliases[j])) == NULL) {
-				utl_tree_put(&cmd_handlers, cmd_hash(command->aliases[j]), command);
+			if (utl_tree_get(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->aliases[j]))) == NULL) {
+				utl_tree_put(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->aliases[j])), command);
 			}
 		}
 
@@ -54,8 +54,8 @@ void cmd_add_command(const cmd_command_t* command) {
 		cmd_add_defaults();
 	}
 
-	if (utl_tree_get(&cmd_handlers, cmd_hash(command->label)) == NULL) {
-		utl_tree_put(&cmd_handlers, cmd_hash(command->label), (cmd_command_t*) command);
+	if (utl_tree_get(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->label))) == NULL) {
+		utl_tree_put(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->label)), (cmd_command_t*) command);
 		utl_vector_push(&cmd_list, &command);
 	} else {
 		log_warn("Command already exists and was not added: /%s", command->label);
@@ -63,8 +63,8 @@ void cmd_add_command(const cmd_command_t* command) {
 	}
 
 	for (uint32_t i = 0; i < command->alias_count; ++i) {
-		if (utl_tree_get(&cmd_handlers, cmd_hash(command->aliases[i])) == NULL) {
-			utl_tree_put(&cmd_handlers, cmd_hash(command->aliases[i]), (cmd_command_t*) command);
+		if (utl_tree_get(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->aliases[i]))) == NULL) {
+			utl_tree_put(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->aliases[i])), (cmd_command_t*) command);
 		}
 	}
 
@@ -84,21 +84,21 @@ void cmd_handle(char* cmd, const cmd_sender_t sender) {
 	if (command != NULL) {
 		if (cmd_has_permission(command, sender)) {
 			if (!command->handler(cmd, sender)) {
-				if (command->usage != NULL) {
+				if (UTL_STRTOCSTR(command->usage) != NULL) {
 
 					// its faster technically to create a component when the strings are constant
 					cht_component_t component = cht_new;
-					component.text = (char*) command->usage;
+					component.text = command->usage;
 
 					cmd_message(sender, &component);
 
 				} else {
 
 					cht_component_t component = cht_new;
-					component.text = "Usage: /";
+					component.text = UTL_CSTRTOSTR("Usage: /");
 
 					cht_component_t label = cht_new;
-					label.text = (char*) command->label;
+					label.text = command->label;
 
 					cht_add_extra(&component, &label);
 
@@ -109,10 +109,10 @@ void cmd_handle(char* cmd, const cmd_sender_t sender) {
 				}
 			}
 		} else {
-			if (command->permission_message != NULL) {
+			if (UTL_STRTOCSTR(command->permission_message) != NULL) {
 
 				cht_component_t component = cht_new;
-				component.text = (char*) command->permission_message;
+				component.text = command->permission_message;
 
 				cmd_message(sender, &component);
 
@@ -133,7 +133,7 @@ void cmd_handle(char* cmd, const cmd_sender_t sender) {
 bool_t cmd_has_permission(const cmd_command_t* command, const cmd_sender_t sender) {
 
 	if (sender.op) return true;
-	if (command->permission == NULL) return true;
+	if (UTL_STRTOCSTR(command->permission) == NULL) return true;
 
 	/*
 	for (uint32_t i = 0; i < sender->permissions.size; ++i) {
@@ -240,15 +240,15 @@ bool_t cmd_help(char* args, const cmd_sender_t sender) {
 
 	cht_component_t help = cht_new;
 	help.color = cht_yellow;
-	help.text = "---------- ";
+	help.text = UTL_CSTRTOSTR("---------- ");
 
 	cht_component_t help_0 = cht_new;
 	help_0.color = cht_white;
-	help_0.text = "Help: Commands ";
+	help_0.text = UTL_CSTRTOSTR("Help: Commands ");
 
 	cht_component_t help_1 = cht_new;
 	help_1.color = cht_yellow;
-	help_1.text = "----------";
+	help_1.text = UTL_CSTRTOSTR("----------");
 
 	cht_add_extra(&help, &help_0);
 	cht_add_extra(&help, &help_1);
@@ -258,7 +258,7 @@ bool_t cmd_help(char* args, const cmd_sender_t sender) {
 	cht_free(&help);
 
 	cht_component_t help_help = cht_new;
-	help_help.text = "Use /help [n] to get page n of help";
+	help_help.text = UTL_CSTRTOSTR("Use /help [n] to get page n of help");
 	help_help.color = cht_gray;
 
 	cmd_message(sender, &help_help);
@@ -266,12 +266,12 @@ bool_t cmd_help(char* args, const cmd_sender_t sender) {
 	for (uint32_t i = 0; i < cmd_list.size; ++i) {
 		cmd_command_t* command = UTL_VECTOR_GET_AS(cmd_command_t*, &cmd_list, i);
 		cht_component_t command_label = cht_new;
-		command_label.text = (char*) command->label;
+		command_label.text = command->label;
 		command_label.color = cht_gold;
 		cht_component_t command_semicolon = cht_new;
-		command_semicolon.text = ": ";
+		command_semicolon.text = UTL_CSTRTOSTR(": ");
 		cht_component_t command_description = cht_new;
-		command_description.text = (char*) command->description;
+		command_description.text = command->description;
 		command_description.color = cht_white;
 		cht_add_extra(&command_label, &command_semicolon);
 		cht_add_extra(&command_label, &command_description);
@@ -290,20 +290,20 @@ bool_t cmd_plugins(char* args, const cmd_sender_t sender) {
 	}
 
 	char plugin_text[17];
-	sprintf(plugin_text, "Plugins (%zu): ", plg_links.size);
+	const size_t plugin_text_len = sprintf(plugin_text, "Plugins (%zu): ", plg_links.size);
 
 	cht_component_t plugins = cht_new;
-	plugins.text = plugin_text;
+	plugins.text = UTL_ARRTOSTR(plugin_text, plugin_text_len);
 	plugins.color = cht_white;
 
 	for (size_t i = 0; i < plg_links.size; ++i) {
 		plg_link_t* link = UTL_VECTOR_GET_AS(plg_link_t*, &plg_links, i);
 		cht_component_t* plugin = cht_alloc();
-		plugin->text = (char*) link->meta->name;
+		plugin->text = link->meta->name;
 		plugin->color = cht_bright_green;
 		if (i < plg_links.size - 1) {
 			cht_component_t* comma = cht_alloc();
-			comma->text = ", ";
+			comma->text = UTL_CSTRTOSTR(", ");
 			comma->color = cht_white;
 			cht_add_extra(plugin, comma);
 		}

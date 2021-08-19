@@ -54,11 +54,11 @@ typedef enum {
 
 typedef struct {
 
-	const char* name;
-	const char* description;
-	const char* authors;
-	const char* version;
-	const char* website;
+	const string_t name;
+	const string_t description;
+	const string_t authors;
+	const string_t version;
+	const string_t website;
 	const plg_startup_t load;
 
 } plg_plugin_t;

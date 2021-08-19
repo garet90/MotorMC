@@ -20,8 +20,8 @@
 
 sky_main_t sky_main = {
 	.protocol = __MC_PRO__,
-	.version = __MOTOR_VER__,
-	.mcver = __MC_VER__,
+	.version = UTL_CSTRTOSTR(__MOTOR_VER__),
+	.mcver = UTL_CSTRTOSTR(__MC_VER__),
 	.console = {
 		.type = cmd_console,
 		.op = cmd_op_4
@@ -35,7 +35,7 @@ sky_main_t sky_main = {
 	.status = sky_starting,
 	
 	.world = {
-		.name = "world",
+		.name = UTL_CSTRTOSTR("world"),
 		.seed = 0
 	},
 
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 	log_info("// //// //  //  //    //    //  //  //////");
 	log_info("//  //  //  //  //    //    //  //  // // ");
 	log_info("//      //  //////    //    //////  //  MC");
-	log_info("%s", sky_main.version);
+	log_info(__MOTOR_VER__);
 	log_info("");
 
 	/*
@@ -373,7 +373,7 @@ int main(int argc, char* argv[]) {
 	// setup motd if null
 	if (sky_main.motd == NULL) {
 		sky_main.motd = cht_alloc();
-		sky_main.motd->text = "A Minecraft server";
+		sky_main.motd->text = UTL_CSTRTOSTR("A Minecraft server");
 	}
 	
 	if (argc != 0) {
@@ -388,11 +388,11 @@ int main(int argc, char* argv[]) {
 	plg_on_startup();
 
 	// TODO load world
-	if (fs_dir_exists(sky_main.world.name)) {
-		log_info("Loading world %s...", sky_main.world.name);
+	if (fs_dir_exists(UTL_STRTOCSTR(sky_main.world.name))) {
+		log_info("Loading world %s...", UTL_STRTOCSTR(sky_main.world.name));
 		wld_load(sky_main.world.name);
 	} else {
-		log_info("Generating world %s...", sky_main.world.name);
+		log_info("Generating world %s...", UTL_STRTOCSTR(sky_main.world.name));
 		wld_new(sky_main.world.name, (sky_main.world.seed == 0 ? time(NULL) : sky_main.world.seed), mat_dimension_overworld);
 	}
 
