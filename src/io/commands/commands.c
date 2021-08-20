@@ -32,7 +32,7 @@ void cmd_add_defaults() {
 		if (utl_tree_get(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->label))) == NULL) {
 			utl_tree_put(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->label)), command);
 		} else {
-			log_warn("Command already exists and was not added: /%s", command->label);
+			log_warn("Command already exists and was not added: /%s", UTL_STRTOCSTR(command->label));
 			continue;
 		}
 
@@ -58,7 +58,7 @@ void cmd_add_command(const cmd_command_t* command) {
 		utl_tree_put(&cmd_handlers, cmd_hash(UTL_STRTOCSTR(command->label)), (cmd_command_t*) command);
 		utl_vector_push(&cmd_list, &command);
 	} else {
-		log_warn("Command already exists and was not added: /%s", command->label);
+		log_warn("Command already exists and was not added: /%s", UTL_STRTOCSTR(command->label));
 		return;
 	}
 

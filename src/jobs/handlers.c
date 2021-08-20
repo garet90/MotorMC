@@ -25,7 +25,7 @@ bool_t job_handle_global_chat_message(job_global_chat_message_t* work) {
 
 	log_info("<%s> %s", work->sender->username.value, work->message.value);
 
-	cht_translation_t translation = cht_translation_new; // todo terminate
+	cht_translation_t translation = cht_translation_new;
 	translation.translate = cht_translation_chat_type_text;
 	cht_component_t name = cht_new;
 	name.text = work->sender->username;

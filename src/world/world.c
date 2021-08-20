@@ -4,7 +4,6 @@
 #include "../listening/listening.h"
 #include "entity/entity.h"
 #include <stdlib.h>
-#include <string.h>
 
 struct {
 

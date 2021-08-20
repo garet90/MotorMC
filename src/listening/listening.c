@@ -232,9 +232,7 @@ void ltg_disconnect(ltg_client_t* client) {
 		pthread_mutex_unlock(&sky_main.listener.online.lock);
 
 		JOB_CREATE_WORK(work, job_player_leave);
-		// faster than memcpy
-		((uint64_t*) work->uuid)[0] = ((uint64_t*) client->uuid)[0];
-		((uint64_t*) work->uuid)[1] = ((uint64_t*) client->uuid)[1];
+		memcpy(work->uuid, client->uuid, sizeof(ltg_uuid_t));
 		
 		work->username = client->username;
 

@@ -91,7 +91,7 @@ void plg_on_startup() {
 
 		if (plugin.meta->load == plg_startup) {
 
-			log_info("Enabling %s version %s...", plugin.meta->name, plugin.meta->version);
+			log_info("Enabling %s version %s...", UTL_STRTOCSTR(plugin.meta->name), UTL_STRTOCSTR(plugin.meta->version));
 
 			plg_on_enable_t on_enable = NULL;
 
@@ -105,7 +105,7 @@ void plg_on_startup() {
 
 #endif
 			if (on_enable == NULL) {
-				log_error("Failed to enable %s", plugin.meta->name);
+				log_error("Failed to enable %s", UTL_STRTOCSTR(plugin.meta->name));
 			} else {
 				on_enable();
 			}
@@ -124,7 +124,7 @@ void plg_on_postworld() {
 
 		if (plugin.meta->load == plg_postworld) {
 
-			log_info("Enabling %s version %s...", plugin.meta->name, plugin.meta->version);
+			log_info("Enabling %s version %s...", UTL_STRTOCSTR(plugin.meta->name), UTL_STRTOCSTR(plugin.meta->version));
 
 			plg_on_enable_t on_enable = NULL;
 
@@ -138,7 +138,7 @@ void plg_on_postworld() {
 
 #endif
 			if (on_enable == NULL) {
-				log_error("Failed to enable %s", plugin.meta->name);
+				log_error("Failed to enable %s", UTL_STRTOCSTR(plugin.meta->name));
 			} else {
 				on_enable();
 			}
@@ -155,7 +155,7 @@ void plg_on_disable() {
 
 		plg_link_t plugin = UTL_VECTOR_GET_AS(plg_link_t, &plg_links, i);
 
-		log_info("Disabling %s...", plugin.meta->name);
+		log_info("Disabling %s...", UTL_STRTOCSTR(plugin.meta->name));
 
 		plg_on_disable_t on_disable = NULL;
 
@@ -170,7 +170,7 @@ void plg_on_disable() {
 #endif
 
 		if (on_disable == NULL) {
-			log_error("Failed to disable %s", plugin.meta->name);
+			log_error("Failed to disable %s", UTL_STRTOCSTR(plugin.meta->name));
 		} else {
 			on_disable();
 		}

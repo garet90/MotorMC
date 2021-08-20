@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include "translation.h"
 #include "../../util/util.h"
 #include "../../util/str_util.h"

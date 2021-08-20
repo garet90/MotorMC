@@ -403,8 +403,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	// create heightmap
 	mnbt_doc* doc = mnbt_new();
-	mnbt_tag* tag = mnbt_new_tag(doc, "", 0, MNBT_COMPOUND, mnbt_val_compound());
-	mnbt_push_tag(tag, mnbt_new_tag(doc, "MOTION_BLOCKING", 15, MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, 37)));
+	mnbt_tag* tag = mnbt_new_tag(doc, UTL_CSTRTOARG(""), MNBT_COMPOUND, mnbt_val_compound());
+	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("MOTION_BLOCKING"), MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, 37)));
 	mnbt_set_root(doc, tag);
 
 	packet->cursor += mnbt_write(doc, (byte_t*) pck_cursor(packet), MNBT_NONE);
@@ -568,7 +568,7 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	// NORMAL LOGIN SEQUENCE
 	phd_send_server_difficulty(client);
-	phd_send_plugin_message(client, "minecraft:brand", 15, (const byte_t*) "\x07MotorMC", 8);
+	phd_send_plugin_message(client, UTL_CSTRTOARG("minecraft:brand"), (const byte_t*) UTL_CSTRTOARG("\x07MotorMC"));
 	phd_send_held_item_change(client);
 	phd_send_declare_recipes(client);
 	// TODO send tags
@@ -616,7 +616,7 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 		pck_write_string(packet, player->username.value, player->username.length);
 		if (player->textures.value.value != NULL) {
 			pck_write_var_int(packet, 1);
-			pck_write_string(packet, "textures", 8);
+			pck_write_string(packet, UTL_CSTRTOARG("textures"));
 			pck_write_string(packet, player->textures.value.value, player->textures.value.length);
 			if (player->textures.signature.value != NULL) {
 				pck_write_int8(packet, 1);
@@ -657,7 +657,7 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 	pck_write_string(packet, player->username.value, player->username.length);
 	if (player->textures.value.value != NULL) {
 		pck_write_var_int(packet, 1);
-		pck_write_string(packet, "textures", 8);
+		pck_write_string(packet, UTL_CSTRTOARG("textures"));
 		pck_write_string(packet, player->textures.value.value, player->textures.value.length);
 		if (player->textures.signature.value != NULL) {
 			pck_write_int8(packet, 1);

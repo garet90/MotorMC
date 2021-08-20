@@ -1,4 +1,3 @@
-#include <string.h>
 #include "../../../util/str_util.h"
 #include "recipe.h"
 
