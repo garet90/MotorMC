@@ -231,7 +231,7 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 				}
 				case 1: { // username
 					const char* auth_username = mjson_get_string(auth_prop.value);
-					if (strcmp(client->username.value, auth_username) != 0) { // TODO replace for memcmp
+					if (client->username.length != mjson_get_size(auth_prop.value) || memcmp(client->username.value, auth_username, client->username.length) != 0) {
 						// copy new username
 						client->username.length = mjson_get_size(auth_prop.value);
 						client->username.value = realloc(client->username.value, client->username.length + 1);

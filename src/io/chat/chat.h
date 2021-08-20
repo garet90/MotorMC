@@ -93,6 +93,8 @@ static inline void cht_add_extra(cht_component_t* base, const cht_component_t* e
 extern void cht_jsonify(mjson_doc*, mjson_val*, const cht_component_t*);
 extern size_t cht_write(const cht_component_t*, char*);
 
+extern size_t cht_write_old(const cht_component_t*, char*);
+
 extern void cht_free(cht_component_t*);
 
 extern size_t cht_server_list_ping(char*);

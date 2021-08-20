@@ -387,7 +387,6 @@ int main(int argc, char* argv[]) {
 	// load startup plugins
 	plg_on_startup();
 
-	// TODO load world
 	if (fs_dir_exists(UTL_STRTOCSTR(sky_main.world.name))) {
 		log_info("Loading world %s...", UTL_STRTOCSTR(sky_main.world.name));
 		wld_load(sky_main.world.name);
@@ -521,7 +520,9 @@ void __attribute__((noreturn)) sky_term() {
 
 	}
 
-	// TODO unload world
+	for (size_t i = 0; i < wld_get_count(); ++i) {
+		wld_unload(wld_get_world(i));
+	}
 
 	// disable plugins
 	plg_on_disable();

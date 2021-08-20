@@ -335,6 +335,50 @@ size_t cht_write(const cht_component_t* component, char* message) {
 
 }
 
+size_t cht_write_old(const cht_component_t* component, char* message) {
+
+	size_t len = 0;
+
+	if (component->color <= 0xF) {
+		len += sprintf(message, "\xa7%01x", component->color);
+	}
+
+	if (component->obfuscated == true) {
+		len += sprintf(message, "\xa7k");
+	}
+
+	if (component->bold == true) {
+		len += sprintf(message, "\xa7l");
+	}
+
+	if (component->strikethrough == true) {
+		len += sprintf(message, "\xa7m");
+	}
+
+	if (component->underlined == true) {
+		len += sprintf(message, "\xa7n");
+	}
+
+	if (component->italic == true) {
+		len += sprintf(message, "\xa7o");
+	}
+
+	len += sprintf(message, "%s", UTL_STRTOCSTR(component->text));
+
+	if (component->extra.size != 0) {
+
+		for (size_t i = 0; i < component->extra.size; ++i) {
+
+			len += cht_write_old(UTL_VECTOR_GET_AS(cht_component_t*, &component->extra, i), message + len);
+
+		}
+
+	}
+
+	return len;
+
+}
+
 void cht_free(cht_component_t* component) {
 
 	if (component->extra.size != 0) {
@@ -385,7 +429,6 @@ size_t cht_server_list_ping(char* message) {
 	pthread_mutex_lock(&sky_main.listener.online.lock);
 	mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("online")), mjson_int(doc, sky_main.listener.online.list.length));
 	
-	// TODO limit sample to however long it's supposed to be
 	if (sky_main.listener.online.list.length > 0) {
 		mjson_val* sample = mjson_arr(doc);
 		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;

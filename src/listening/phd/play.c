@@ -92,8 +92,8 @@ bool_t phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 
 bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
-	client->locale.length = pck_read_var_int(packet);
-	pck_read_bytes(packet, (byte_t*) client->locale.value, client->locale.length);
+	PCK_READ_STRING(locale, packet);
+	client->locale = utl_hash(locale);
 
 	client->render_distance = UTL_MIN(pck_read_int8(packet), sky_main.render_distance);
 	client->chat_mode = pck_read_var_int(packet);
@@ -690,7 +690,6 @@ void phd_send_player_info_update_gamemode(__attribute__((unused)) ltg_client_t* 
 
 void phd_send_player_info_update_latency(ltg_client_t* client) {
 
-	// TODO test to make sure this actually works
 	PCK_INLINE(packet, 21 * sky_main.listener.online.list.length + 6, io_big_endian);
 
 	pck_write_var_int(packet, 0x36);
