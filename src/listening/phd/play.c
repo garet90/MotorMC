@@ -95,7 +95,10 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	PCK_READ_STRING(locale, packet);
 	client->locale = utl_hash(locale);
 
-	client->render_distance = UTL_MIN(pck_read_int8(packet), sky_main.render_distance);
+	const uint8_t old_render_distance = client->render_distance;
+	const uint8_t new_render_distance = pck_read_int8(packet);
+	client->render_distance = UTL_MIN(new_render_distance, sky_main.render_distance);
+	phd_update_sent_chunks_vd(client, old_render_distance);
 	client->chat_mode = pck_read_var_int(packet);
 	__attribute__((unused)) bool_t colors = pck_read_int8(packet);
 
@@ -578,7 +581,8 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_player_position_and_look(client);
 	phd_send_player_info_add_players(client);
 
-	// TODO fix this phd_send_update_view_position_spawn(client);
+	phd_send_update_view_position(client);
+	phd_update_send_chunks(client);
 
 	// add to online players
 	pthread_mutex_lock(&sky_main.listener.online.lock);
@@ -792,7 +796,7 @@ void phd_send_held_item_change(ltg_client_t* client) {
 
 }
 
-void phd_send_update_view_position_spawn(ltg_client_t* client) {
+void phd_send_update_view_position(ltg_client_t* client) {
 	
 	PCK_INLINE(packet, 11, io_big_endian);
 
@@ -810,10 +814,6 @@ void phd_send_update_view_position_spawn(ltg_client_t* client) {
 
 	ltg_send(client, packet);
 
-	wld_subscribe_chunk(chunk, client->id);
-	phd_send_update_light(client, chunk);
-	phd_send_chunk_data(client, chunk);
-
 }
 
 void phd_send_declare_recipes(ltg_client_t* client) {
@@ -830,5 +830,33 @@ void phd_send_declare_recipes(ltg_client_t* client) {
 	}
 
 	ltg_send(client, packet);
+
+}
+
+void phd_update_send_chunks(ltg_client_t* client) {
+
+	const wld_chunk_t* chunk = client->entity->living_entity.entity.chunk;
+
+	for (int16_t x = -client->render_distance; x <= client->render_distance; ++x) {
+		for (int16_t z = -client->render_distance; z <= client->render_distance; ++z) {
+			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
+			wld_subscribe_chunk(v_c, client->id);
+		}
+	}
+
+}
+
+void phd_update_sent_chunks_vd(ltg_client_t* client, uint8_t old_view_distance) {
+	
+	const wld_chunk_t* chunk = client->entity->living_entity.entity.chunk;
+
+	for (int16_t x = -client->render_distance; x <= client->render_distance; ++x) {
+		for (int16_t z = -client->render_distance; z <= client->render_distance; ++z) {
+			if (x < -old_view_distance || x > old_view_distance || z < -old_view_distance || z > old_view_distance) {
+				wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
+				wld_subscribe_chunk(v_c, client->id);
+			}
+		}
+	}
 
 }

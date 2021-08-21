@@ -24,6 +24,7 @@ void utl_tree_put(utl_tree_t* tree, int64_t key, void* object) {
 		if (tree->left == NULL) {
 
 			tree->left = utl_create_branch(key, object);
+			tree->left->parent = tree;
 
 		} else {
 
@@ -36,6 +37,7 @@ void utl_tree_put(utl_tree_t* tree, int64_t key, void* object) {
 		if (tree->right == NULL) {
 
 			tree->right = utl_create_branch(key, object);
+			tree->right->parent = tree;
 
 		} else {
 
@@ -223,6 +225,8 @@ void* utl_tree_shift(utl_tree_t* tree) {
 
 	}
 
-	return NULL;
+	void* object = tree->object;
+	tree->object = NULL;
+	return object;
 
 }

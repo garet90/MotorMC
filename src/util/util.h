@@ -4,6 +4,8 @@
 #define UTL_MIN(a, b) ((a) < (b) ? a : b)
 #define UTL_MAX(a, b) ((a) > (b) ? a : b)
 
+#define UTL_ABS(a) ((a) > 0 ? a : -(a))
+
 static const char utl_hexmap[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
 extern size_t utl_to_minecraft_hex(char*, const uint8_t*, size_t);

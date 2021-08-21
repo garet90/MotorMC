@@ -29,6 +29,11 @@ struct wld_chunk_section {
 
 };
 
+#define WLD_TICKET_TICK_ENTITIES 12
+#define WLD_TICKET_TICK 13
+#define WLD_TICKET_BORDER 14
+#define WLD_TICKET_INACCESSIBLE 15
+
 struct wld_chunk {
 
 	wld_region_t* region;
@@ -50,9 +55,21 @@ struct wld_chunk {
 
 	} highest[16 * 16];
 	
-	uint16_t idx : 10; // index of chunk in region (used for finding chunk x and y)
-	uint8_t ticket : 7;
-	uint8_t min_ticket : 7;
+	const union {
+
+		uint16_t idx: 10;
+
+		struct {
+
+			uint8_t x : 5;
+			uint8_t z : 5;
+
+		};
+
+	};
+
+	uint8_t ticket : 4;
+	uint8_t max_ticket : 4;
 
 	wld_chunk_section_t sections[]; // y = section index * 16, count of sections = World.height / 16
 
@@ -62,46 +79,62 @@ struct wld_region {
 	
 	wld_world_t* world; // typeof wld_world_t*
 
+	pthread_mutex_t lock;
+
 	// chunks
 	wld_chunk_t* chunks[32 * 32];
 
 	// relative regions
 	struct {
+
 		wld_region_t* north;
 		wld_region_t* east;
 		wld_region_t* south;
 		wld_region_t* west;
+
 	} relative;
 
-	int16_t x;
-	int16_t z;
+	const union {
+
+		uint32_t idx;
+
+		struct {
+
+			int16_t x;
+			int16_t z;
+
+		};
+
+	};
 
 };
 
 struct wld_world {
 
-	int64_t seed;
+	const int64_t seed;
 	uint64_t time;
 
-	string_t name;
+	const string_t name;
 
-	// lock for adding and removing regions
+	// lock for updating non const variables
 	pthread_mutex_t lock;
 
 	// regions
 	utl_tree_t regions;
 
-	struct {
+	const struct {
+
 		int32_t x;
 		int32_t z;
+
 	} spawn;
 	
-	uint16_t id;
+	const uint16_t id;
 
-	bool_t debug : 1;
-	bool_t flat : 1;
+	const bool_t debug : 1;
+	const bool_t flat : 1;
 
-	mat_dimension_type_t environment : 6;
+	const mat_dimension_type_t environment : 6;
 
 };
 
@@ -126,23 +159,25 @@ extern wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z);
 static inline wld_chunk_t* wld_get_chunk_at(wld_world_t* world, int32_t x, int32_t z) {
 	return wld_get_chunk(world, x >> 4, z >> 4);
 }
+extern wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z);
 
-static inline int32_t wld_get_chunk_x(wld_chunk_t* chunk) {
-	int32_t x = chunk->region->x << 5; // region x * 32
-	x += chunk->idx >> 5;
-	return x;
+static inline int32_t wld_get_chunk_x(const wld_chunk_t* chunk) {
+	return (chunk->region->x << 5) + chunk->x;
 }
-static inline int32_t wld_get_chunk_z(wld_chunk_t* chunk) {
-	int32_t z = chunk->region->z << 5; // region z * 32
-	z += chunk->idx & 0x1F;
-	return z;
+static inline int32_t wld_get_chunk_z(const wld_chunk_t* chunk) {
+	return (chunk->region->z << 5) + chunk->z;
 }
 
 static inline void wld_subscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
+	pthread_mutex_lock(&chunk->lock);
 	utl_bit_vector_set_bit(&chunk->subscribers, client_id);
+	pthread_mutex_unlock(&chunk->lock);
 }
 static inline void wld_unsubscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
+	pthread_mutex_lock(&chunk->lock);
 	utl_bit_vector_reset_bit(&chunk->subscribers, client_id);
+	pthread_mutex_unlock(&chunk->lock);
 }
 
+extern void wld_free_region(wld_region_t* region);
 extern void wld_unload(wld_world_t* world);

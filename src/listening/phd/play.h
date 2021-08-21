@@ -137,10 +137,7 @@ extern void phd_send_world_border_warning_delay(ltg_client_t*);
 extern void phd_send_world_border_warning_reach(ltg_client_t*);
 extern void phd_send_camera(ltg_client_t*);
 extern void phd_send_held_item_change(ltg_client_t* client);
-
-extern void phd_send_update_view_position_spawn(ltg_client_t* client);
-extern void phd_send_update_view_position(ltg_client_t* client, wld_position_t old_position);
-
+extern void phd_send_update_view_position(ltg_client_t* client);
 extern void phd_send_update_view_distance(ltg_client_t*);
 extern void phd_send_spawn_position(ltg_client_t*);
 extern void phd_send_display_scoreboard(ltg_client_t*);
@@ -170,3 +167,9 @@ extern void phd_send_entity_properties(ltg_client_t*);
 extern void phd_send_entity_effect(ltg_client_t*);
 extern void phd_send_declare_recipes(ltg_client_t* client);
 extern void phd_send_tags(ltg_client_t*);
+
+extern void phd_update_send_chunks(ltg_client_t* client);
+extern void phd_update_sent_chunks_vd(ltg_client_t* client, uint8_t old_view_distance);
+extern void phd_update_sent_chunks_move(ltg_client_t* client, int16_t old_x, int16_t old_z);
+extern void phd_update_sent_chunks_tp(ltg_client_t* client, int16_t old_x, int16_t old_z);
+extern void phd_update_sent_chunks_dc(ltg_client_t* client, wld_world_t* old_dimension, int16_t old_x, int16_t old_z);
