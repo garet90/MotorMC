@@ -344,3 +344,26 @@ void wld_unload(wld_world_t* world) {
 	free(world);
 
 }
+
+void wld_unload_all() {
+
+	pthread_mutex_lock(&wld_worlds.lock);
+
+	for (uint32_t i = 0; i < wld_worlds.worlds.size; ++i) {
+		wld_world_t* world = UTL_ID_VECTOR_GET_AS(wld_world_t*, &wld_worlds.worlds, i);
+		utl_id_vector_remove(&wld_worlds.worlds, i);
+		
+		pthread_mutex_destroy(&world->lock);
+
+		wld_region_t* region;
+		while ((region = utl_tree_shift(&world->regions)) != NULL) {
+			wld_free_region(region);
+		}
+		utl_tree_term(&world->regions);
+
+		free(world);
+	}
+
+	pthread_mutex_unlock(&wld_worlds.lock);
+
+}

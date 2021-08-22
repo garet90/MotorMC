@@ -1,10 +1,9 @@
 #include "material.h"
+#include "../../util/str_util.h"
 
 const mat_dimension_t mat_dimension_overworld_d = {
-	.name = "minecraft:overworld",
-	.name_length = 19,
-	.effects = "minecraft:overworld",
-	.effects_length = 19,
+	.name = UTL_CSTRTOSTR("minecraft:overworld"),
+	.effects = UTL_CSTRTOSTR("minecraft:overworld"),
 	.ambient_light = 0,
 	.coordinate_scale = 1,
 	.has_fixed_time = false,
@@ -17,10 +16,8 @@ const mat_dimension_t mat_dimension_overworld_d = {
 	.has_skylight = true
 };
 const mat_dimension_t mat_dimension_nether_d = {
-	.name = "minecraft:the_nether",
-	.name_length = 20,
-	.effects = "minecraft:the_nether",
-	.effects_length = 20,
+	.name = UTL_CSTRTOSTR("minecraft:the_nether"),
+	.effects = UTL_CSTRTOSTR("minecraft:the_nether"),
 	.ambient_light = 0.1,
 	.coordinate_scale = 8.0,
 	.has_fixed_time = true,
@@ -34,10 +31,8 @@ const mat_dimension_t mat_dimension_nether_d = {
 	.has_ceiling = true
 };
 const mat_dimension_t mat_dimension_end_d = {
-	.name = "minecraft:the_end",
-	.name_length = 17,
-	.effects = "minecraft:the_end",
-	.effects_length = 17,
+	.name = UTL_CSTRTOSTR("minecraft:the_end"),
+	.effects = UTL_CSTRTOSTR("minecraft:the_end"),
 	.ambient_light = 0,
 	.coordinate_scale = 1,
 	.has_fixed_time = true,

@@ -61,7 +61,7 @@ const mat_codec_t* mat_get_codec() {
 		for (mat_dimension_type_t i = 0; i < mat_dimension_count; ++i) {
 			const mat_dimension_t* dimension = mat_get_dimension_by_type(i);
 			mnbt_val compound = mnbt_val_compound();
-			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, UTL_CSTRTOARG("name"), MNBT_STRING, mnbt_val_string(dimension->name, dimension->name_length)));
+			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, UTL_CSTRTOARG("name"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(dimension->name))));
 			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, UTL_CSTRTOARG("id"), MNBT_INT, mnbt_val_int(i)));
 			mnbt_tag* element = mnbt_new_tag(doc, UTL_CSTRTOARG("element"), MNBT_COMPOUND, mnbt_val_compound());
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("piglin_safe"), MNBT_BYTE, mnbt_val_byte(dimension->piglin_safe)));
@@ -74,7 +74,7 @@ const mat_codec_t* mat_get_codec() {
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("respawn_anchor_works"), MNBT_BYTE, mnbt_val_byte(dimension->respawn_anchor_works)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("has_skylight"), MNBT_BYTE, mnbt_val_byte(dimension->has_skylight)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("bed_works"), MNBT_BYTE, mnbt_val_byte(dimension->bed_works)));
-			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("effects"), MNBT_STRING, mnbt_val_string(dimension->effects, dimension->effects_length)));
+			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("effects"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(dimension->effects))));
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("has_raids"), MNBT_BYTE, mnbt_val_byte(dimension->has_raids)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("min_y"), MNBT_INT, mnbt_val_int(dimension->min_y)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("height"), MNBT_INT, mnbt_val_int(dimension->height)));
@@ -94,7 +94,7 @@ const mat_codec_t* mat_get_codec() {
 		for (mat_biome_type_t i = 0; i < mat_biome_count; ++i) {
 			const mat_biome_t* biome = mat_get_biome_by_type(i);
 			mnbt_val compound = mnbt_val_compound();
-			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, UTL_CSTRTOARG("name"), MNBT_STRING, mnbt_val_string(biome->name, biome->name_length)));
+			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, UTL_CSTRTOARG("name"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(biome->name))));
 			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, UTL_CSTRTOARG("id"), MNBT_INT, mnbt_val_int(i)));
 			mnbt_tag* element = mnbt_new_tag(doc, UTL_CSTRTOARG("element"), MNBT_COMPOUND, mnbt_val_compound());
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("precipitation"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(precipitation_types[biome->precipitation]))));
@@ -120,37 +120,37 @@ const mat_codec_t* mat_get_codec() {
 			if (biome->effects.grass_color_modifier != mat_grass_color_modifier_none) {
 				mnbt_push_tag(effects, mnbt_new_tag(doc, UTL_CSTRTOARG("grass_color_modifier"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(grass_color_modifiers[biome->effects.grass_color_modifier]))));
 			}
-			if (biome->effects.music.sound != NULL) {
+			if (UTL_STRTOCSTR(biome->effects.music.sound) != NULL) {
 				mnbt_tag* music = mnbt_new_tag(doc, UTL_CSTRTOARG("music"), MNBT_COMPOUND, mnbt_val_compound());
 				mnbt_push_tag(music, mnbt_new_tag(doc, UTL_CSTRTOARG("replace_current_music"), MNBT_BYTE, mnbt_val_byte(biome->effects.music.replace_current_music)));
-				mnbt_push_tag(music, mnbt_new_tag(doc, UTL_CSTRTOARG("sound"), MNBT_STRING, mnbt_val_string(biome->effects.music.sound, biome->effects.music.sound_length)));
+				mnbt_push_tag(music, mnbt_new_tag(doc, UTL_CSTRTOARG("sound"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(biome->effects.music.sound))));
 				mnbt_push_tag(music, mnbt_new_tag(doc, UTL_CSTRTOARG("max_delay"), MNBT_INT, mnbt_val_int(biome->effects.music.max_delay)));
 				mnbt_push_tag(music, mnbt_new_tag(doc, UTL_CSTRTOARG("min_delay"), MNBT_INT, mnbt_val_int(biome->effects.music.min_delay)));
 				mnbt_push_tag(effects, music);
 			}
-			if (biome->effects.ambient_sound != NULL) {
-				mnbt_push_tag(effects, mnbt_new_tag(doc, UTL_CSTRTOARG("ambient_sound"), MNBT_STRING, mnbt_val_string(biome->effects.ambient_sound, biome->effects.ambient_sound_length)));
+			if (UTL_STRTOCSTR(biome->effects.ambient_sound) != NULL) {
+				mnbt_push_tag(effects, mnbt_new_tag(doc, UTL_CSTRTOARG("ambient_sound"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(biome->effects.ambient_sound))));
 			}
-			if (biome->effects.additions_sound.sound != NULL) {
+			if (UTL_STRTOCSTR(biome->effects.additions_sound.sound) != NULL) {
 				mnbt_tag* additions_sound = mnbt_new_tag(doc, UTL_CSTRTOARG("additions_sound"), MNBT_COMPOUND, mnbt_val_compound());
-				mnbt_push_tag(additions_sound, mnbt_new_tag(doc, UTL_CSTRTOARG("sound"), MNBT_STRING, mnbt_val_string(biome->effects.additions_sound.sound, biome->effects.additions_sound.sound_length)));
+				mnbt_push_tag(additions_sound, mnbt_new_tag(doc, UTL_CSTRTOARG("sound"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(biome->effects.additions_sound.sound))));
 				mnbt_push_tag(additions_sound, mnbt_new_tag(doc, UTL_CSTRTOARG("tick_chance"), MNBT_INT, mnbt_val_int(biome->effects.additions_sound.tick_chance)));
 				mnbt_push_tag(effects, additions_sound);
 			}
-			if (biome->effects.mood_sound.sound != NULL) {
+			if (UTL_STRTOCSTR(biome->effects.mood_sound.sound) != NULL) {
 				mnbt_tag* mood_sound = mnbt_new_tag(doc, UTL_CSTRTOARG("mood_sound"), MNBT_COMPOUND, mnbt_val_compound());
-				mnbt_push_tag(mood_sound, mnbt_new_tag(doc, UTL_CSTRTOARG("sound"), MNBT_STRING, mnbt_val_string(biome->effects.mood_sound.sound, biome->effects.mood_sound.sound_length)));
+				mnbt_push_tag(mood_sound, mnbt_new_tag(doc, UTL_CSTRTOARG("sound"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(biome->effects.mood_sound.sound))));
 				mnbt_push_tag(mood_sound, mnbt_new_tag(doc, UTL_CSTRTOARG("tick_delay"), MNBT_INT, mnbt_val_int(biome->effects.mood_sound.tick_delay)));
 				mnbt_push_tag(mood_sound, mnbt_new_tag(doc, UTL_CSTRTOARG("offset"), MNBT_DOUBLE, mnbt_val_double(biome->effects.mood_sound.offset)));
 				mnbt_push_tag(mood_sound, mnbt_new_tag(doc, UTL_CSTRTOARG("block_search_extent"), MNBT_INT, mnbt_val_int(biome->effects.mood_sound.block_search_extent)));
 				mnbt_push_tag(effects, mood_sound);
 			}
 			mnbt_push_tag(element, effects);
-			if (biome->particle.options.type != NULL) {
+			if (UTL_STRTOCSTR(biome->particle.options.type) != NULL) {
 				mnbt_tag* particle = mnbt_new_tag(doc, UTL_CSTRTOARG("particle"), MNBT_COMPOUND, mnbt_val_compound());
 				mnbt_push_tag(particle, mnbt_new_tag(doc, UTL_CSTRTOARG("probability"), MNBT_FLOAT, mnbt_val_float(biome->particle.probability)));
 				mnbt_tag* options = mnbt_new_tag(doc, UTL_CSTRTOARG("options"), MNBT_COMPOUND, mnbt_val_compound());
-				mnbt_push_tag(options, mnbt_new_tag(doc, UTL_CSTRTOARG("type"), MNBT_STRING, mnbt_val_string(biome->particle.options.type, biome->particle.options.type_length)));
+				mnbt_push_tag(options, mnbt_new_tag(doc, UTL_CSTRTOARG("type"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(biome->particle.options.type))));
 				mnbt_push_tag(particle, options);
 				mnbt_push_tag(element, particle);
 			}
@@ -192,7 +192,7 @@ const mat_codec_t* mat_get_dimension_codec(mat_dimension_type_t type) {
 		mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("respawn_anchor_works"), MNBT_BYTE, mnbt_val_byte(dimension->respawn_anchor_works)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("has_skylight"), MNBT_BYTE, mnbt_val_byte(dimension->has_skylight)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("bed_works"), MNBT_BYTE, mnbt_val_byte(dimension->bed_works)));
-		mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("effects"), MNBT_STRING, mnbt_val_string(dimension->effects, dimension->effects_length)));
+		mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("effects"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(dimension->effects))));
 		mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("has_raids"), MNBT_BYTE, mnbt_val_byte(dimension->has_raids)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("min_y"), MNBT_INT, mnbt_val_int(dimension->min_y)));
 		mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("height"), MNBT_INT, mnbt_val_int(dimension->height)));

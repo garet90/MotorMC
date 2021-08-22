@@ -25,7 +25,8 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 
 	cht_component_t* component = cht_alloc();
 
-	for (uint32_t i = 0; i < mjson_get_size(obj); ++i) {
+	const uint32_t obj_size = mjson_get_size(obj);
+	for (uint32_t i = 0; i < obj_size; ++i) {
 		mjson_property obj_property = mjson_obj_get(obj, i);
 		switch (utl_hash(mjson_get_string(obj_property.label))) {
 			case 0x7c9e690a: { // "text"
@@ -126,7 +127,8 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 				}
 				break;
 			case 0x94c4816d: { // "clickEvent"
-				for (uint32_t j = 0; j < mjson_get_size(obj_property.value); ++j) {
+				const uint32_t obj_property_size = mjson_get_size(obj_property.value);
+				for (uint32_t j = 0; j < obj_property_size; ++j) {
 					mjson_property click_event = mjson_obj_get(obj_property.value, j);
 					switch (utl_hash(mjson_get_string(click_event.label))) {
 						case 0xf1644d03: // "action"
@@ -159,7 +161,8 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 				}
 			} break;
 			case 0xb00f0f6b: { // "hoverEvent"
-				for (uint32_t j = 0; j < mjson_get_size(obj_property.value); ++j) {
+				const uint32_t obj_property_size = mjson_get_size(obj_property.value);
+				for (uint32_t j = 0; j < obj_property_size; ++j) {
 					mjson_property hover_event = mjson_obj_get(obj_property.value, j);
 					switch (utl_hash(mjson_get_string(hover_event.label))) {
 						case 0xf1644d03: // "action"
@@ -185,8 +188,9 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 				}
 			} break;
 			case 0x0f667509: { // extra
-				for (uint32_t i = 0; i < mjson_get_size(obj_property.value); ++i) {
-					cht_component_t* extra = cht_from_json(mjson_arr_get(obj_property.value, i));
+				const uint32_t obj_property_size = mjson_get_size(obj_property.value);
+				for (uint32_t j = 0; j < obj_property_size; ++j) {
+					cht_component_t* extra = cht_from_json(mjson_arr_get(obj_property.value, j));
 					cht_add_extra(component, extra);
 				}
 			} break;

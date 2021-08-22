@@ -181,3 +181,4 @@ static inline void wld_unsubscribe_chunk(wld_chunk_t* chunk, uint32_t client_id)
 
 extern void wld_free_region(wld_region_t* region);
 extern void wld_unload(wld_world_t* world);
+extern void wld_unload_all();

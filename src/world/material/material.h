@@ -17,8 +17,8 @@ typedef enum {
 
 typedef struct {
 
-	const char* name;
-	const char* effects;
+	const string_t name;
+	const string_t effects;
 	float32_t ambient_light;
 	float32_t coordinate_scale;
 	bool_t has_fixed_time : 1;
@@ -26,8 +26,6 @@ typedef struct {
 	int16_t min_y;
 	int16_t height;
 	int16_t logical_height;
-	uint16_t name_length;
-	uint16_t effects_length;
 	bool_t piglin_safe : 1;
 	bool_t natural : 1;
 	bool_t respawn_anchor_works : 1;
@@ -190,12 +188,11 @@ typedef enum {
 
 typedef struct {
 
-	const char* name;
+	const string_t name;
 	float32_t depth;
 	float32_t temperature;
 	float32_t scale;
 	float32_t downfall;
-	uint16_t name_length;
 	mat_biome_category_t category : 5;
 	mat_temperature_modifier_t temperature_modifier : 1;
 	mat_precipitation_type_t precipitation : 2;
@@ -214,32 +211,28 @@ typedef struct {
 
 		struct {
 
-			const char* sound;
+			const string_t sound;
 			uint32_t max_delay;
 			uint32_t min_delay;
-			uint16_t sound_length;
 			bool_t replace_current_music : 1;
 		
 		} music;
 
-		const char* ambient_sound;
-		uint16_t ambient_sound_length;
+		const string_t ambient_sound;
 
 		struct {
 		
-			uint16_t sound_length;
-			const char* sound;
+			const string_t sound;
 			float64_t tick_chance;
 		
 		} additions_sound;
 
 		struct {
 		
-			const char* sound;
+			const string_t sound;
 			float64_t offset;
 			uint32_t tick_delay;
 			uint32_t block_search_extent;
-			uint16_t sound_length;
 		
 		} mood_sound;
 
@@ -249,8 +242,7 @@ typedef struct {
 		
 		float32_t probability;
 		struct {
-			uint16_t type_length;
-			const char* type;
+			const string_t type;
 		} options;
 
 	} particle;

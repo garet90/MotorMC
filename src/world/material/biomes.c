@@ -1,8 +1,8 @@
 #include "material.h"
+#include "../../util/str_util.h"
 
 const mat_biome_t mat_biome_badlands_d = {
-	.name = "minecraft:badlands",
-	.name_length = 18,
+	.name = UTL_CSTRTOSTR("minecraft:badlands"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -18,8 +18,7 @@ const mat_biome_t mat_biome_badlands_d = {
 		.has_grass_color = true,
 		.grass_color = 9470285,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -27,8 +26,7 @@ const mat_biome_t mat_biome_badlands_d = {
 	},
 };
 const mat_biome_t mat_biome_badlands_plateau_d = {
-	.name = "minecraft:badlands_plateau",
-	.name_length = 26,
+	.name = UTL_CSTRTOSTR("minecraft:badlands_plateau"),
 	.precipitation = mat_precipitation_none,
 	.depth = 1.5,
 	.temperature = 2.0,
@@ -44,8 +42,7 @@ const mat_biome_t mat_biome_badlands_plateau_d = {
 		.has_grass_color = true,
 		.grass_color = 9470285,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -53,8 +50,7 @@ const mat_biome_t mat_biome_badlands_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_bamboo_jungle_d = {
-	.name = "minecraft:bamboo_jungle",
-	.name_length = 23,
+	.name = UTL_CSTRTOSTR("minecraft:bamboo_jungle"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.95,
@@ -66,8 +62,7 @@ const mat_biome_t mat_biome_bamboo_jungle_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -75,8 +70,7 @@ const mat_biome_t mat_biome_bamboo_jungle_d = {
 	},
 };
 const mat_biome_t mat_biome_bamboo_jungle_hills_d = {
-	.name = "minecraft:bamboo_jungle_hills",
-	.name_length = 29,
+	.name = UTL_CSTRTOSTR("minecraft:bamboo_jungle_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.95,
@@ -88,8 +82,7 @@ const mat_biome_t mat_biome_bamboo_jungle_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -97,8 +90,7 @@ const mat_biome_t mat_biome_bamboo_jungle_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_basalt_deltas_d = {
-	.name = "minecraft:basalt_deltas",
-	.name_length = 23,
+	.name = UTL_CSTRTOSTR("minecraft:basalt_deltas"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -110,21 +102,17 @@ const mat_biome_t mat_biome_basalt_deltas_d = {
 		.water_fog_color = 4341314,
 		.fog_color = 6840176,
 		.music = {
-			.sound = "minecraft:music.nether.basalt_deltas",
-			.sound_length = 36,
+			.sound = UTL_CSTRTOSTR("minecraft:music.nether.basalt_deltas"),
 			.max_delay = 24000,
 			.min_delay = 12000,
 		},
-		.ambient_sound = "minecraft:ambient.basalt_deltas.loop",
-		.ambient_sound_length = 36,
+		.ambient_sound = UTL_CSTRTOSTR("minecraft:ambient.basalt_deltas.loop"),
 		.additions_sound = {
-			.sound = "minecraft:ambient.basalt_deltas.additions",
-			.sound_length = 41,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.basalt_deltas.additions"),
 			.tick_chance = 0.0111,
 		},
 		.mood_sound = {
-			.sound = "minecraft:ambient.basalt_deltas.mood",
-			.sound_length = 36,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.basalt_deltas.mood"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -133,14 +121,12 @@ const mat_biome_t mat_biome_basalt_deltas_d = {
 	.particle = {
 		.probability = 0.118093334,
 		.options = {
-			.type = "minecraft:white_ash",
-			.type_length = 19,
+			.type = UTL_CSTRTOSTR("minecraft:white_ash"),
 		},
 	},
 };
 const mat_biome_t mat_biome_beach_d = {
-	.name = "minecraft:beach",
-	.name_length = 15,
+	.name = UTL_CSTRTOSTR("minecraft:beach"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.0,
 	.temperature = 0.8,
@@ -152,8 +138,7 @@ const mat_biome_t mat_biome_beach_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -161,8 +146,7 @@ const mat_biome_t mat_biome_beach_d = {
 	},
 };
 const mat_biome_t mat_biome_birch_forest_d = {
-	.name = "minecraft:birch_forest",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:birch_forest"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.6,
@@ -174,8 +158,7 @@ const mat_biome_t mat_biome_birch_forest_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -183,8 +166,7 @@ const mat_biome_t mat_biome_birch_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_birch_forest_hills_d = {
-	.name = "minecraft:birch_forest_hills",
-	.name_length = 28,
+	.name = UTL_CSTRTOSTR("minecraft:birch_forest_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.6,
@@ -196,8 +178,7 @@ const mat_biome_t mat_biome_birch_forest_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -205,8 +186,7 @@ const mat_biome_t mat_biome_birch_forest_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_cold_ocean_d = {
-	.name = "minecraft:cold_ocean",
-	.name_length = 20,
+	.name = UTL_CSTRTOSTR("minecraft:cold_ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.0,
 	.temperature = 0.5,
@@ -218,8 +198,7 @@ const mat_biome_t mat_biome_cold_ocean_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -227,8 +206,7 @@ const mat_biome_t mat_biome_cold_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_crimson_forest_d = {
-	.name = "minecraft:crimson_forest",
-	.name_length = 24,
+	.name = UTL_CSTRTOSTR("minecraft:crimson_forest"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -240,21 +218,17 @@ const mat_biome_t mat_biome_crimson_forest_d = {
 		.water_fog_color = 329011,
 		.fog_color = 3343107,
 		.music = {
-			.sound = "minecraft:music.nether.crimson_forest",
-			.sound_length = 37,
+			.sound = UTL_CSTRTOSTR("minecraft:music.nether.crimson_forest"),
 			.max_delay = 24000,
 			.min_delay = 12000,
 		},
-		.ambient_sound = "minecraft:ambient.crimson_forest.loop",
-		.ambient_sound_length = 37,
+		.ambient_sound = UTL_CSTRTOSTR("minecraft:ambient.crimson_forest.loop"),
 		.additions_sound = {
-			.sound = "minecraft:ambient.crimson_forest.additions",
-			.sound_length = 42,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.crimson_forest.additions"),
 			.tick_chance = 0.0111,
 		},
 		.mood_sound = {
-			.sound = "minecraft:ambient.crimson_forest.mood",
-			.sound_length = 37,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.crimson_forest.mood"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -263,14 +237,12 @@ const mat_biome_t mat_biome_crimson_forest_d = {
 	.particle = {
 		.probability = 0.025,
 		.options = {
-			.type = "minecraft:crimson_spore",
-			.type_length = 23,
+			.type = UTL_CSTRTOSTR("minecraft:crimson_spore"),
 		},
 	},
 };
 const mat_biome_t mat_biome_dark_forest_d = {
-	.name = "minecraft:dark_forest",
-	.name_length = 21,
+	.name = UTL_CSTRTOSTR("minecraft:dark_forest"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.7,
@@ -283,8 +255,7 @@ const mat_biome_t mat_biome_dark_forest_d = {
 		.fog_color = 12638463,
 		.grass_color_modifier = mat_grass_color_modifier_dark_forest,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -292,8 +263,7 @@ const mat_biome_t mat_biome_dark_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_dark_forest_hills_d = {
-	.name = "minecraft:dark_forest_hills",
-	.name_length = 27,
+	.name = UTL_CSTRTOSTR("minecraft:dark_forest_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.7,
@@ -306,8 +276,7 @@ const mat_biome_t mat_biome_dark_forest_hills_d = {
 		.fog_color = 12638463,
 		.grass_color_modifier = mat_grass_color_modifier_dark_forest,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -315,8 +284,7 @@ const mat_biome_t mat_biome_dark_forest_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_cold_ocean_d = {
-	.name = "minecraft:deep_cold_ocean",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:deep_cold_ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -328,8 +296,7 @@ const mat_biome_t mat_biome_deep_cold_ocean_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -337,8 +304,7 @@ const mat_biome_t mat_biome_deep_cold_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_frozen_ocean_d = {
-	.name = "minecraft:deep_frozen_ocean",
-	.name_length = 27,
+	.name = UTL_CSTRTOSTR("minecraft:deep_frozen_ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -351,8 +317,7 @@ const mat_biome_t mat_biome_deep_frozen_ocean_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -360,8 +325,7 @@ const mat_biome_t mat_biome_deep_frozen_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_lukewarm_ocean_d = {
-	.name = "minecraft:deep_lukewarm_ocean",
-	.name_length = 29,
+	.name = UTL_CSTRTOSTR("minecraft:deep_lukewarm_ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -373,8 +337,7 @@ const mat_biome_t mat_biome_deep_lukewarm_ocean_d = {
 		.water_fog_color = 267827,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -382,8 +345,7 @@ const mat_biome_t mat_biome_deep_lukewarm_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_ocean_d = {
-	.name = "minecraft:deep_ocean",
-	.name_length = 20,
+	.name = UTL_CSTRTOSTR("minecraft:deep_ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -395,8 +357,7 @@ const mat_biome_t mat_biome_deep_ocean_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -404,8 +365,7 @@ const mat_biome_t mat_biome_deep_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_deep_warm_ocean_d = {
-	.name = "minecraft:deep_warm_ocean",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:deep_warm_ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.8,
 	.temperature = 0.5,
@@ -417,8 +377,7 @@ const mat_biome_t mat_biome_deep_warm_ocean_d = {
 		.water_fog_color = 270131,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -426,8 +385,7 @@ const mat_biome_t mat_biome_deep_warm_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_desert_d = {
-	.name = "minecraft:desert",
-	.name_length = 16,
+	.name = UTL_CSTRTOSTR("minecraft:desert"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.125,
 	.temperature = 2.0,
@@ -439,8 +397,7 @@ const mat_biome_t mat_biome_desert_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -448,8 +405,7 @@ const mat_biome_t mat_biome_desert_d = {
 	},
 };
 const mat_biome_t mat_biome_desert_hills_d = {
-	.name = "minecraft:desert_hills",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:desert_hills"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.45,
 	.temperature = 2.0,
@@ -461,8 +417,7 @@ const mat_biome_t mat_biome_desert_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -470,8 +425,7 @@ const mat_biome_t mat_biome_desert_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_desert_lakes_d = {
-	.name = "minecraft:desert_lakes",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:desert_lakes"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.225,
 	.temperature = 2.0,
@@ -483,8 +437,7 @@ const mat_biome_t mat_biome_desert_lakes_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -492,8 +445,7 @@ const mat_biome_t mat_biome_desert_lakes_d = {
 	},
 };
 const mat_biome_t mat_biome_dripstone_caves_d = {
-	.name = "minecraft:dripstone_caves",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:dripstone_caves"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.125,
 	.temperature = 0.8,
@@ -505,8 +457,7 @@ const mat_biome_t mat_biome_dripstone_caves_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -514,8 +465,7 @@ const mat_biome_t mat_biome_dripstone_caves_d = {
 	},
 };
 const mat_biome_t mat_biome_end_barrens_d = {
-	.name = "minecraft:end_barrens",
-	.name_length = 21,
+	.name = UTL_CSTRTOSTR("minecraft:end_barrens"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -527,8 +477,7 @@ const mat_biome_t mat_biome_end_barrens_d = {
 		.water_fog_color = 329011,
 		.fog_color = 10518688,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -536,8 +485,7 @@ const mat_biome_t mat_biome_end_barrens_d = {
 	},
 };
 const mat_biome_t mat_biome_end_highlands_d = {
-	.name = "minecraft:end_highlands",
-	.name_length = 23,
+	.name = UTL_CSTRTOSTR("minecraft:end_highlands"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -549,8 +497,7 @@ const mat_biome_t mat_biome_end_highlands_d = {
 		.water_fog_color = 329011,
 		.fog_color = 10518688,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -558,8 +505,7 @@ const mat_biome_t mat_biome_end_highlands_d = {
 	},
 };
 const mat_biome_t mat_biome_end_midlands_d = {
-	.name = "minecraft:end_midlands",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:end_midlands"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -571,8 +517,7 @@ const mat_biome_t mat_biome_end_midlands_d = {
 		.water_fog_color = 329011,
 		.fog_color = 10518688,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -580,8 +525,7 @@ const mat_biome_t mat_biome_end_midlands_d = {
 	},
 };
 const mat_biome_t mat_biome_eroded_badlands_d = {
-	.name = "minecraft:eroded_badlands",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:eroded_badlands"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -597,8 +541,7 @@ const mat_biome_t mat_biome_eroded_badlands_d = {
 		.has_grass_color = true,
 		.grass_color = 9470285,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -606,8 +549,7 @@ const mat_biome_t mat_biome_eroded_badlands_d = {
 	},
 };
 const mat_biome_t mat_biome_flower_forest_d = {
-	.name = "minecraft:flower_forest",
-	.name_length = 23,
+	.name = UTL_CSTRTOSTR("minecraft:flower_forest"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.7,
@@ -619,8 +561,7 @@ const mat_biome_t mat_biome_flower_forest_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -628,8 +569,7 @@ const mat_biome_t mat_biome_flower_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_forest_d = {
-	.name = "minecraft:forest",
-	.name_length = 16,
+	.name = UTL_CSTRTOSTR("minecraft:forest"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.7,
@@ -641,8 +581,7 @@ const mat_biome_t mat_biome_forest_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -650,8 +589,7 @@ const mat_biome_t mat_biome_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_frozen_ocean_d = {
-	.name = "minecraft:frozen_ocean",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:frozen_ocean"),
 	.precipitation = mat_precipitation_snow,
 	.depth = -1.0,
 	.temperature = 0.0,
@@ -664,8 +602,7 @@ const mat_biome_t mat_biome_frozen_ocean_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -673,8 +610,7 @@ const mat_biome_t mat_biome_frozen_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_frozen_river_d = {
-	.name = "minecraft:frozen_river",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:frozen_river"),
 	.precipitation = mat_precipitation_snow,
 	.depth = -0.5,
 	.temperature = 0.0,
@@ -686,8 +622,7 @@ const mat_biome_t mat_biome_frozen_river_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -695,8 +630,7 @@ const mat_biome_t mat_biome_frozen_river_d = {
 	},
 };
 const mat_biome_t mat_biome_giant_spruce_taiga_d = {
-	.name = "minecraft:giant_spruce_taiga",
-	.name_length = 28,
+	.name = UTL_CSTRTOSTR("minecraft:giant_spruce_taiga"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.25,
@@ -708,8 +642,7 @@ const mat_biome_t mat_biome_giant_spruce_taiga_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -717,8 +650,7 @@ const mat_biome_t mat_biome_giant_spruce_taiga_d = {
 	},
 };
 const mat_biome_t mat_biome_giant_spruce_taiga_hills_d = {
-	.name = "minecraft:giant_spruce_taiga_hills",
-	.name_length = 34,
+	.name = UTL_CSTRTOSTR("minecraft:giant_spruce_taiga_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.25,
@@ -730,8 +662,7 @@ const mat_biome_t mat_biome_giant_spruce_taiga_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -739,8 +670,7 @@ const mat_biome_t mat_biome_giant_spruce_taiga_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_giant_tree_taiga_d = {
-	.name = "minecraft:giant_tree_taiga",
-	.name_length = 26,
+	.name = UTL_CSTRTOSTR("minecraft:giant_tree_taiga"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.3,
@@ -752,8 +682,7 @@ const mat_biome_t mat_biome_giant_tree_taiga_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -761,8 +690,7 @@ const mat_biome_t mat_biome_giant_tree_taiga_d = {
 	},
 };
 const mat_biome_t mat_biome_giant_tree_taiga_hills_d = {
-	.name = "minecraft:giant_tree_taiga_hills",
-	.name_length = 32,
+	.name = UTL_CSTRTOSTR("minecraft:giant_tree_taiga_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.3,
@@ -774,8 +702,7 @@ const mat_biome_t mat_biome_giant_tree_taiga_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -783,8 +710,7 @@ const mat_biome_t mat_biome_giant_tree_taiga_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_gravelly_mountains_d = {
-	.name = "minecraft:gravelly_mountains",
-	.name_length = 28,
+	.name = UTL_CSTRTOSTR("minecraft:gravelly_mountains"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 1.0,
 	.temperature = 0.2,
@@ -796,8 +722,7 @@ const mat_biome_t mat_biome_gravelly_mountains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -805,8 +730,7 @@ const mat_biome_t mat_biome_gravelly_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_ice_spikes_d = {
-	.name = "minecraft:ice_spikes",
-	.name_length = 20,
+	.name = UTL_CSTRTOSTR("minecraft:ice_spikes"),
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.425,
 	.temperature = 0.0,
@@ -818,8 +742,7 @@ const mat_biome_t mat_biome_ice_spikes_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -827,8 +750,7 @@ const mat_biome_t mat_biome_ice_spikes_d = {
 	},
 };
 const mat_biome_t mat_biome_jungle_d = {
-	.name = "minecraft:jungle",
-	.name_length = 16,
+	.name = UTL_CSTRTOSTR("minecraft:jungle"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.95,
@@ -840,8 +762,7 @@ const mat_biome_t mat_biome_jungle_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -849,8 +770,7 @@ const mat_biome_t mat_biome_jungle_d = {
 	},
 };
 const mat_biome_t mat_biome_jungle_edge_d = {
-	.name = "minecraft:jungle_edge",
-	.name_length = 21,
+	.name = UTL_CSTRTOSTR("minecraft:jungle_edge"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.95,
@@ -862,8 +782,7 @@ const mat_biome_t mat_biome_jungle_edge_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -871,8 +790,7 @@ const mat_biome_t mat_biome_jungle_edge_d = {
 	},
 };
 const mat_biome_t mat_biome_jungle_hills_d = {
-	.name = "minecraft:jungle_hills",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:jungle_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.95,
@@ -884,8 +802,7 @@ const mat_biome_t mat_biome_jungle_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -893,8 +810,7 @@ const mat_biome_t mat_biome_jungle_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_lukewarm_ocean_d = {
-	.name = "minecraft:lukewarm_ocean",
-	.name_length = 24,
+	.name = UTL_CSTRTOSTR("minecraft:lukewarm_ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.0,
 	.temperature = 0.5,
@@ -906,8 +822,7 @@ const mat_biome_t mat_biome_lukewarm_ocean_d = {
 		.water_fog_color = 267827,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -915,8 +830,7 @@ const mat_biome_t mat_biome_lukewarm_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_lush_caves_d = {
-	.name = "minecraft:lush_caves",
-	.name_length = 20,
+	.name = UTL_CSTRTOSTR("minecraft:lush_caves"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -930,8 +844,7 @@ const mat_biome_t mat_biome_lush_caves_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_badlands_plateau_d = {
-	.name = "minecraft:modified_badlands_plateau",
-	.name_length = 35,
+	.name = UTL_CSTRTOSTR("minecraft:modified_badlands_plateau"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.45,
 	.temperature = 2.0,
@@ -947,8 +860,7 @@ const mat_biome_t mat_biome_modified_badlands_plateau_d = {
 		.has_grass_color = true,
 		.grass_color = 9470285,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -956,8 +868,7 @@ const mat_biome_t mat_biome_modified_badlands_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_gravelly_mountains_d = {
-	.name = "minecraft:modified_gravelly_mountains",
-	.name_length = 37,
+	.name = UTL_CSTRTOSTR("minecraft:modified_gravelly_mountains"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 1.0,
 	.temperature = 0.2,
@@ -969,8 +880,7 @@ const mat_biome_t mat_biome_modified_gravelly_mountains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -978,8 +888,7 @@ const mat_biome_t mat_biome_modified_gravelly_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_jungle_d = {
-	.name = "minecraft:modified_jungle",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:modified_jungle"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.95,
@@ -991,8 +900,7 @@ const mat_biome_t mat_biome_modified_jungle_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1000,8 +908,7 @@ const mat_biome_t mat_biome_modified_jungle_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_jungle_edge_d = {
-	.name = "minecraft:modified_jungle_edge",
-	.name_length = 30,
+	.name = UTL_CSTRTOSTR("minecraft:modified_jungle_edge"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.95,
@@ -1013,8 +920,7 @@ const mat_biome_t mat_biome_modified_jungle_edge_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1022,8 +928,7 @@ const mat_biome_t mat_biome_modified_jungle_edge_d = {
 	},
 };
 const mat_biome_t mat_biome_modified_wooded_badlands_plateau_d = {
-	.name = "minecraft:modified_wooded_badlands_plateau",
-	.name_length = 42,
+	.name = UTL_CSTRTOSTR("minecraft:modified_wooded_badlands_plateau"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.45,
 	.temperature = 2.0,
@@ -1039,8 +944,7 @@ const mat_biome_t mat_biome_modified_wooded_badlands_plateau_d = {
 		.has_grass_color = true,
 		.grass_color = 9470285,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1048,8 +952,7 @@ const mat_biome_t mat_biome_modified_wooded_badlands_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_mountains_d = {
-	.name = "minecraft:mountains",
-	.name_length = 19,
+	.name = UTL_CSTRTOSTR("minecraft:mountains"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 1.0,
 	.temperature = 0.2,
@@ -1061,8 +964,7 @@ const mat_biome_t mat_biome_mountains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1070,8 +972,7 @@ const mat_biome_t mat_biome_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_mountain_edge_d = {
-	.name = "minecraft:mountain_edge",
-	.name_length = 23,
+	.name = UTL_CSTRTOSTR("minecraft:mountain_edge"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.8,
 	.temperature = 0.2,
@@ -1083,8 +984,7 @@ const mat_biome_t mat_biome_mountain_edge_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1092,8 +992,7 @@ const mat_biome_t mat_biome_mountain_edge_d = {
 	},
 };
 const mat_biome_t mat_biome_mushroom_fields_d = {
-	.name = "minecraft:mushroom_fields",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:mushroom_fields"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.9,
@@ -1105,8 +1004,7 @@ const mat_biome_t mat_biome_mushroom_fields_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1114,8 +1012,7 @@ const mat_biome_t mat_biome_mushroom_fields_d = {
 	},
 };
 const mat_biome_t mat_biome_mushroom_field_shore_d = {
-	.name = "minecraft:mushroom_field_shore",
-	.name_length = 30,
+	.name = UTL_CSTRTOSTR("minecraft:mushroom_field_shore"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.0,
 	.temperature = 0.9,
@@ -1127,8 +1024,7 @@ const mat_biome_t mat_biome_mushroom_field_shore_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1136,8 +1032,7 @@ const mat_biome_t mat_biome_mushroom_field_shore_d = {
 	},
 };
 const mat_biome_t mat_biome_nether_wastes_d = {
-	.name = "minecraft:nether_wastes",
-	.name_length = 23,
+	.name = UTL_CSTRTOSTR("minecraft:nether_wastes"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -1149,21 +1044,17 @@ const mat_biome_t mat_biome_nether_wastes_d = {
 		.water_fog_color = 329011,
 		.fog_color = 3344392,
 		.music = {
-			.sound = "minecraft:music.nether.nether_wastes",
-			.sound_length = 36,
+			.sound = UTL_CSTRTOSTR("minecraft:music.nether.nether_wastes"),
 			.max_delay = 24000,
 			.min_delay = 12000,
 		},
-		.ambient_sound = "minecraft:ambient.nether_wastes.loop",
-		.ambient_sound_length = 36,
+		.ambient_sound = UTL_CSTRTOSTR("minecraft:ambient.nether_wastes.loop"),
 		.additions_sound = {
-			.sound = "minecraft:ambient.nether_wastes.additions",
-			.sound_length = 41,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.nether_wastes.additions"),
 			.tick_chance = 0.0111,
 		},
 		.mood_sound = {
-			.sound = "minecraft:ambient.nether_wastes.mood",
-			.sound_length = 36,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.nether_wastes.mood"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1171,8 +1062,7 @@ const mat_biome_t mat_biome_nether_wastes_d = {
 	},
 };
 const mat_biome_t mat_biome_ocean_d = {
-	.name = "minecraft:ocean",
-	.name_length = 15,
+	.name = UTL_CSTRTOSTR("minecraft:ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.0,
 	.temperature = 0.5,
@@ -1184,8 +1074,7 @@ const mat_biome_t mat_biome_ocean_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1193,8 +1082,7 @@ const mat_biome_t mat_biome_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_plains_d = {
-	.name = "minecraft:plains",
-	.name_length = 16,
+	.name = UTL_CSTRTOSTR("minecraft:plains"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.125,
 	.temperature = 0.8,
@@ -1206,8 +1094,7 @@ const mat_biome_t mat_biome_plains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1215,8 +1102,7 @@ const mat_biome_t mat_biome_plains_d = {
 	},
 };
 const mat_biome_t mat_biome_river_d = {
-	.name = "minecraft:river",
-	.name_length = 15,
+	.name = UTL_CSTRTOSTR("minecraft:river"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -0.5,
 	.temperature = 0.5,
@@ -1228,8 +1114,7 @@ const mat_biome_t mat_biome_river_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1237,8 +1122,7 @@ const mat_biome_t mat_biome_river_d = {
 	},
 };
 const mat_biome_t mat_biome_savanna_d = {
-	.name = "minecraft:savanna",
-	.name_length = 17,
+	.name = UTL_CSTRTOSTR("minecraft:savanna"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.125,
 	.temperature = 1.2,
@@ -1250,8 +1134,7 @@ const mat_biome_t mat_biome_savanna_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1259,8 +1142,7 @@ const mat_biome_t mat_biome_savanna_d = {
 	},
 };
 const mat_biome_t mat_biome_savanna_plateau_d = {
-	.name = "minecraft:savanna_plateau",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:savanna_plateau"),
 	.precipitation = mat_precipitation_none,
 	.depth = 1.5,
 	.temperature = 1.0,
@@ -1272,8 +1154,7 @@ const mat_biome_t mat_biome_savanna_plateau_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1281,8 +1162,7 @@ const mat_biome_t mat_biome_savanna_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_shattered_savanna_d = {
-	.name = "minecraft:shattered_savanna",
-	.name_length = 27,
+	.name = UTL_CSTRTOSTR("minecraft:shattered_savanna"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.3625,
 	.temperature = 1.1,
@@ -1294,8 +1174,7 @@ const mat_biome_t mat_biome_shattered_savanna_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1303,8 +1182,7 @@ const mat_biome_t mat_biome_shattered_savanna_d = {
 	},
 };
 const mat_biome_t mat_biome_shattered_savanna_plateau_d = {
-	.name = "minecraft:shattered_savanna_plateau",
-	.name_length = 35,
+	.name = UTL_CSTRTOSTR("minecraft:shattered_savanna_plateau"),
 	.precipitation = mat_precipitation_none,
 	.depth = 1.05,
 	.temperature = 1.0,
@@ -1316,8 +1194,7 @@ const mat_biome_t mat_biome_shattered_savanna_plateau_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1325,8 +1202,7 @@ const mat_biome_t mat_biome_shattered_savanna_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_small_end_islands_d = {
-	.name = "minecraft:small_end_islands",
-	.name_length = 27,
+	.name = UTL_CSTRTOSTR("minecraft:small_end_islands"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -1338,8 +1214,7 @@ const mat_biome_t mat_biome_small_end_islands_d = {
 		.water_fog_color = 329011,
 		.fog_color = 10518688,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1347,8 +1222,7 @@ const mat_biome_t mat_biome_small_end_islands_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_beach_d = {
-	.name = "minecraft:snowy_beach",
-	.name_length = 21,
+	.name = UTL_CSTRTOSTR("minecraft:snowy_beach"),
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.0,
 	.temperature = 0.05,
@@ -1360,8 +1234,7 @@ const mat_biome_t mat_biome_snowy_beach_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1369,8 +1242,7 @@ const mat_biome_t mat_biome_snowy_beach_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_mountains_d = {
-	.name = "minecraft:snowy_mountains",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:snowy_mountains"),
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.45,
 	.temperature = 0.0,
@@ -1382,8 +1254,7 @@ const mat_biome_t mat_biome_snowy_mountains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1391,8 +1262,7 @@ const mat_biome_t mat_biome_snowy_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_taiga_d = {
-	.name = "minecraft:snowy_taiga",
-	.name_length = 21,
+	.name = UTL_CSTRTOSTR("minecraft:snowy_taiga"),
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.2,
 	.temperature = -0.5,
@@ -1404,8 +1274,7 @@ const mat_biome_t mat_biome_snowy_taiga_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1413,8 +1282,7 @@ const mat_biome_t mat_biome_snowy_taiga_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_taiga_hills_d = {
-	.name = "minecraft:snowy_taiga_hills",
-	.name_length = 27,
+	.name = UTL_CSTRTOSTR("minecraft:snowy_taiga_hills"),
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.45,
 	.temperature = -0.5,
@@ -1426,8 +1294,7 @@ const mat_biome_t mat_biome_snowy_taiga_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1435,8 +1302,7 @@ const mat_biome_t mat_biome_snowy_taiga_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_taiga_mountains_d = {
-	.name = "minecraft:snowy_taiga_mountains",
-	.name_length = 31,
+	.name = UTL_CSTRTOSTR("minecraft:snowy_taiga_mountains"),
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.3,
 	.temperature = -0.5,
@@ -1448,8 +1314,7 @@ const mat_biome_t mat_biome_snowy_taiga_mountains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1457,8 +1322,7 @@ const mat_biome_t mat_biome_snowy_taiga_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_snowy_tundra_d = {
-	.name = "minecraft:snowy_tundra",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:snowy_tundra"),
 	.precipitation = mat_precipitation_snow,
 	.depth = 0.125,
 	.temperature = 0.0,
@@ -1470,8 +1334,7 @@ const mat_biome_t mat_biome_snowy_tundra_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1479,8 +1342,7 @@ const mat_biome_t mat_biome_snowy_tundra_d = {
 	},
 };
 const mat_biome_t mat_biome_soul_sand_valley_d = {
-	.name = "minecraft:soul_sand_valley",
-	.name_length = 26,
+	.name = UTL_CSTRTOSTR("minecraft:soul_sand_valley"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -1492,21 +1354,17 @@ const mat_biome_t mat_biome_soul_sand_valley_d = {
 		.water_fog_color = 329011,
 		.fog_color = 1787717,
 		.music = {
-			.sound = "minecraft:music.nether.soul_sand_valley",
-			.sound_length = 39,
+			.sound = UTL_CSTRTOSTR("minecraft:music.nether.soul_sand_valley"),
 			.max_delay = 24000,
 			.min_delay = 12000,
 		},
-		.ambient_sound = "minecraft:ambient.soul_sand_valley.loop",
-		.ambient_sound_length = 39,
+		.ambient_sound = UTL_CSTRTOSTR("minecraft:ambient.soul_sand_valley.loop"),
 		.additions_sound = {
-			.sound = "minecraft:ambient.soul_sand_valley.additions",
-			.sound_length = 44,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.soul_sand_valley.additions"),
 			.tick_chance = 0.0111,
 		},
 		.mood_sound = {
-			.sound = "minecraft:ambient.soul_sand_valley.mood",
-			.sound_length = 39,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.soul_sand_valley.mood"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1515,14 +1373,12 @@ const mat_biome_t mat_biome_soul_sand_valley_d = {
 	.particle = {
 		.probability = 0.00625,
 		.options = {
-			.type = "minecraft:ash",
-			.type_length = 13,
+			.type = UTL_CSTRTOSTR("minecraft:ash"),
 		},
 	},
 };
 const mat_biome_t mat_biome_stone_shore_d = {
-	.name = "minecraft:stone_shore",
-	.name_length = 21,
+	.name = UTL_CSTRTOSTR("minecraft:stone_shore"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.1,
 	.temperature = 0.2,
@@ -1534,8 +1390,7 @@ const mat_biome_t mat_biome_stone_shore_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1543,8 +1398,7 @@ const mat_biome_t mat_biome_stone_shore_d = {
 	},
 };
 const mat_biome_t mat_biome_sunflower_plains_d = {
-	.name = "minecraft:sunflower_plains",
-	.name_length = 26,
+	.name = UTL_CSTRTOSTR("minecraft:sunflower_plains"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.125,
 	.temperature = 0.8,
@@ -1556,8 +1410,7 @@ const mat_biome_t mat_biome_sunflower_plains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1565,8 +1418,7 @@ const mat_biome_t mat_biome_sunflower_plains_d = {
 	},
 };
 const mat_biome_t mat_biome_swamp_d = {
-	.name = "minecraft:swamp",
-	.name_length = 15,
+	.name = UTL_CSTRTOSTR("minecraft:swamp"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -0.2,
 	.temperature = 0.8,
@@ -1581,8 +1433,7 @@ const mat_biome_t mat_biome_swamp_d = {
 		.foliage_color = 6975545,
 		.grass_color_modifier = mat_grass_color_modifier_swamp,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1590,8 +1441,7 @@ const mat_biome_t mat_biome_swamp_d = {
 	},
 };
 const mat_biome_t mat_biome_swamp_hills_d = {
-	.name = "minecraft:swamp_hills",
-	.name_length = 21,
+	.name = UTL_CSTRTOSTR("minecraft:swamp_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -0.1,
 	.temperature = 0.8,
@@ -1606,8 +1456,7 @@ const mat_biome_t mat_biome_swamp_hills_d = {
 		.foliage_color = 6975545,
 		.grass_color_modifier = mat_grass_color_modifier_swamp,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1615,8 +1464,7 @@ const mat_biome_t mat_biome_swamp_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_taiga_d = {
-	.name = "minecraft:taiga",
-	.name_length = 15,
+	.name = UTL_CSTRTOSTR("minecraft:taiga"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.25,
@@ -1628,8 +1476,7 @@ const mat_biome_t mat_biome_taiga_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1637,8 +1484,7 @@ const mat_biome_t mat_biome_taiga_d = {
 	},
 };
 const mat_biome_t mat_biome_taiga_hills_d = {
-	.name = "minecraft:taiga_hills",
-	.name_length = 21,
+	.name = UTL_CSTRTOSTR("minecraft:taiga_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.25,
@@ -1650,8 +1496,7 @@ const mat_biome_t mat_biome_taiga_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1659,8 +1504,7 @@ const mat_biome_t mat_biome_taiga_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_taiga_mountains_d = {
-	.name = "minecraft:taiga_mountains",
-	.name_length = 25,
+	.name = UTL_CSTRTOSTR("minecraft:taiga_mountains"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.3,
 	.temperature = 0.25,
@@ -1672,8 +1516,7 @@ const mat_biome_t mat_biome_taiga_mountains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1681,8 +1524,7 @@ const mat_biome_t mat_biome_taiga_mountains_d = {
 	},
 };
 const mat_biome_t mat_biome_tall_birch_forest_d = {
-	.name = "minecraft:tall_birch_forest",
-	.name_length = 27,
+	.name = UTL_CSTRTOSTR("minecraft:tall_birch_forest"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.2,
 	.temperature = 0.6,
@@ -1694,8 +1536,7 @@ const mat_biome_t mat_biome_tall_birch_forest_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1703,8 +1544,7 @@ const mat_biome_t mat_biome_tall_birch_forest_d = {
 	},
 };
 const mat_biome_t mat_biome_tall_birch_hills_d = {
-	.name = "minecraft:tall_birch_hills",
-	.name_length = 26,
+	.name = UTL_CSTRTOSTR("minecraft:tall_birch_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.55,
 	.temperature = 0.6,
@@ -1716,8 +1556,7 @@ const mat_biome_t mat_biome_tall_birch_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1725,8 +1564,7 @@ const mat_biome_t mat_biome_tall_birch_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_the_end_d = {
-	.name = "minecraft:the_end",
-	.name_length = 17,
+	.name = UTL_CSTRTOSTR("minecraft:the_end"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -1738,8 +1576,7 @@ const mat_biome_t mat_biome_the_end_d = {
 		.water_fog_color = 329011,
 		.fog_color = 10518688,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1747,8 +1584,7 @@ const mat_biome_t mat_biome_the_end_d = {
 	},
 };
 const mat_biome_t mat_biome_the_void_d = {
-	.name = "minecraft:the_void",
-	.name_length = 18,
+	.name = UTL_CSTRTOSTR("minecraft:the_void"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 0.5,
@@ -1760,8 +1596,7 @@ const mat_biome_t mat_biome_the_void_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1769,8 +1604,7 @@ const mat_biome_t mat_biome_the_void_d = {
 	},
 };
 const mat_biome_t mat_biome_warm_ocean_d = {
-	.name = "minecraft:warm_ocean",
-	.name_length = 20,
+	.name = UTL_CSTRTOSTR("minecraft:warm_ocean"),
 	.precipitation = mat_precipitation_rain,
 	.depth = -1.0,
 	.temperature = 0.5,
@@ -1782,8 +1616,7 @@ const mat_biome_t mat_biome_warm_ocean_d = {
 		.water_fog_color = 270131,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1791,8 +1624,7 @@ const mat_biome_t mat_biome_warm_ocean_d = {
 	},
 };
 const mat_biome_t mat_biome_warped_forest_d = {
-	.name = "minecraft:warped_forest",
-	.name_length = 23,
+	.name = UTL_CSTRTOSTR("minecraft:warped_forest"),
 	.precipitation = mat_precipitation_none,
 	.depth = 0.1,
 	.temperature = 2.0,
@@ -1804,21 +1636,17 @@ const mat_biome_t mat_biome_warped_forest_d = {
 		.water_fog_color = 329011,
 		.fog_color = 1705242,
 		.music = {
-			.sound = "minecraft:music.nether.warped_forest",
-			.sound_length = 36,
+			.sound = UTL_CSTRTOSTR("minecraft:music.nether.warped_forest"),
 			.max_delay = 24000,
 			.min_delay = 12000,
 		},
-		.ambient_sound = "minecraft:ambient.warped_forest.loop",
-		.ambient_sound_length = 36,
+		.ambient_sound = UTL_CSTRTOSTR("minecraft:ambient.warped_forest.loop"),
 		.additions_sound = {
-			.sound = "minecraft:ambient.warped_forest.additions",
-			.sound_length = 41,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.warped_forest.additions"),
 			.tick_chance = 0.0111,
 		},
 		.mood_sound = {
-			.sound = "minecraft:ambient.warped_forest.mood",
-			.sound_length = 36,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.warped_forest.mood"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1827,14 +1655,12 @@ const mat_biome_t mat_biome_warped_forest_d = {
 	.particle = {
 		.probability = 0.01428,
 		.options = {
-			.type = "minecraft:warped_spore",
-			.type_length = 22,
+			.type = UTL_CSTRTOSTR("minecraft:warped_spore"),
 		},
 	},
 };
 const mat_biome_t mat_biome_wooded_badlands_plateau_d = {
-	.name = "minecraft:wooded_badlands_plateau",
-	.name_length = 33,
+	.name = UTL_CSTRTOSTR("minecraft:wooded_badlands_plateau"),
 	.precipitation = mat_precipitation_none,
 	.depth = 1.5,
 	.temperature = 2.0,
@@ -1850,8 +1676,7 @@ const mat_biome_t mat_biome_wooded_badlands_plateau_d = {
 		.has_grass_color = true,
 		.grass_color = 9470285,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1859,8 +1684,7 @@ const mat_biome_t mat_biome_wooded_badlands_plateau_d = {
 	},
 };
 const mat_biome_t mat_biome_wooded_hills_d = {
-	.name = "minecraft:wooded_hills",
-	.name_length = 22,
+	.name = UTL_CSTRTOSTR("minecraft:wooded_hills"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 0.45,
 	.temperature = 0.7,
@@ -1872,8 +1696,7 @@ const mat_biome_t mat_biome_wooded_hills_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,
@@ -1881,8 +1704,7 @@ const mat_biome_t mat_biome_wooded_hills_d = {
 	},
 };
 const mat_biome_t mat_biome_wooded_mountains_d = {
-	.name = "minecraft:wooded_mountains",
-	.name_length = 26,
+	.name = UTL_CSTRTOSTR("minecraft:wooded_mountains"),
 	.precipitation = mat_precipitation_rain,
 	.depth = 1.0,
 	.temperature = 0.2,
@@ -1894,8 +1716,7 @@ const mat_biome_t mat_biome_wooded_mountains_d = {
 		.water_fog_color = 329011,
 		.fog_color = 12638463,
 		.mood_sound = {
-			.sound = "minecraft:ambient.cave",
-			.sound_length = 22,
+			.sound = UTL_CSTRTOSTR("minecraft:ambient.cave"),
 			.offset = 2.0,
 			.tick_delay = 6000,
 			.block_search_extent = 8,

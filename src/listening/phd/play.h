@@ -168,8 +168,9 @@ extern void phd_send_entity_effect(ltg_client_t*);
 extern void phd_send_declare_recipes(ltg_client_t* client);
 extern void phd_send_tags(ltg_client_t*);
 
-extern void phd_update_send_chunks(ltg_client_t* client);
-extern void phd_update_sent_chunks_vd(ltg_client_t* client, uint8_t old_view_distance);
+extern void phd_update_sent_chunks(ltg_client_t* client);
+extern void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t old_view_distance);
 extern void phd_update_sent_chunks_move(ltg_client_t* client, int16_t old_x, int16_t old_z);
-extern void phd_update_sent_chunks_tp(ltg_client_t* client, int16_t old_x, int16_t old_z);
-extern void phd_update_sent_chunks_dc(ltg_client_t* client, wld_world_t* old_dimension, int16_t old_x, int16_t old_z);
+extern void phd_update_sent_chunks_teleport(ltg_client_t* client, int16_t old_x, int16_t old_z);
+extern void phd_update_sent_chunks_dimension_change(ltg_client_t* client, wld_world_t* old_dimension, int16_t old_x, int16_t old_z);
+extern void phd_update_sent_chunks_leave(ltg_client_t* client);

@@ -222,7 +222,8 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 		mjson_doc* auth = mjson_read(response.value, response.length);
 
 		mjson_val* auth_obj = mjson_get_root(auth);
-		for (uint32_t i = 0; i < mjson_get_size(auth_obj); ++i) {
+		const uint32_t auth_obj_size = mjson_get_size(auth_obj);
+		for (uint32_t i = 0; i < auth_obj_size; ++i) {
 			mjson_property auth_prop = mjson_obj_get(auth_obj, i);
 			switch (i) {
 				case 0: { // id
@@ -242,7 +243,8 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 				}
 				case 2: { // properties
 
-					for (uint32_t j = 0; j < mjson_get_size(auth_prop.value); ++j) {
+					const uint32_t auth_prop_size = mjson_get_size(auth_prop.value);
+					for (uint32_t j = 0; j < auth_prop_size; ++j) {
 						
 						enum {
 							none,
@@ -251,7 +253,8 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 
 						mjson_val* property = mjson_arr_get(auth_prop.value, j);
 
-						for (uint32_t k = 0; k < mjson_get_size(property); ++k) {
+						const uint32_t property_size = mjson_get_size(property);
+						for (uint32_t k = 0; k < property_size; ++k) {
 							mjson_property prop_prop = mjson_obj_get(property, k);
 							switch (k) {
 								case 0: { // name

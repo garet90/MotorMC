@@ -171,7 +171,8 @@ int main(int argc, char* argv[]) {
 		if (server) {
 
 			mjson_val* server_obj = mjson_get_root(server);
-			for (uint32_t i = 0; i < mjson_get_size(server_obj); ++i) {
+			const uint32_t server_obj_size = mjson_get_size(server_obj);
+			for (uint32_t i = 0; i < server_obj_size; ++i) {
 				mjson_property key_val = mjson_obj_get(server_obj, i);
 				const char* key = mjson_get_string(key_val.label);
 				uint32_t hash = utl_hash(key);
@@ -189,7 +190,8 @@ int main(int argc, char* argv[]) {
 					// TODO
 					break;
 				case 0x5af71738: { // "difficulty"
-					for (uint32_t j = 0; j < mjson_get_size(key_val.value); ++j) {
+					const uint32_t key_val_size = mjson_get_size(key_val.value);
+					for (uint32_t j = 0; j < key_val_size; ++j) {
 						mjson_property difficulty = mjson_obj_get(key_val.value, j);
 						const char* d_key = mjson_get_string(difficulty.label);
 						int32_t d_hash = utl_hash(d_key);
@@ -520,9 +522,7 @@ void __attribute__((noreturn)) sky_term() {
 
 	}
 
-	for (size_t i = 0; i < wld_get_count(); ++i) {
-		wld_unload(wld_get_world(i));
-	}
+	wld_unload_all();
 
 	// disable plugins
 	plg_on_disable();

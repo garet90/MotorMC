@@ -242,6 +242,7 @@ void ltg_disconnect(ltg_client_t* client) {
 
 	// free entity
 	if (client->entity != NULL) {
+		phd_update_sent_chunks_leave(client);
 		ent_free_entity((ent_entity_t*) client->entity);
 	}
 

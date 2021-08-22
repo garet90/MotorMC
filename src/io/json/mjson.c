@@ -235,10 +235,47 @@ size_t _mjson_write_val(mjson_val* val, char* bytes) {
 			i += 1;
 		} break;
 		case MJSON_STRING: {
-			bytes[0] = '"';
-			i += 2 + val->value.String.length;
-			memcpy(bytes + 1, val->value.String.value, val->value.String.length);
-			bytes[i - 1] = '"';
+			bytes[i++] = '"';
+			for (uint32_t j = 0; j < val->value.String.length; ++j) {
+				switch (val->value.String.value[j]) {
+					case '"':
+						bytes[i++] = '\\';
+						bytes[i++] = '"';
+						break;
+					case '\\':
+						bytes[i++] = '\\';
+						bytes[i++] = '\\';
+						break;
+					case '/':
+						bytes[i++] = '\\';
+						bytes[i++] = '/';
+						break;
+					case '\b':
+						bytes[i++] = '\\';
+						bytes[i++] = 'b';
+						break;
+					case '\f':
+						bytes[i++] = '\\';
+						bytes[i++] = 'f';
+						break;
+					case '\n':
+						bytes[i++] = '\\';
+						bytes[i++] = 'n';
+						break;
+					case '\r':
+						bytes[i++] = '\\';
+						bytes[i++] = 'r';
+						break;
+					case '\t':
+						bytes[i++] = '\\';
+						bytes[i++] = 't';
+						break;
+					default:
+						bytes[i++] = val->value.String.value[j];
+						break;
+				}
+			}
+			bytes[i++] = '"';
 		} break;
 		case MJSON_INTEGER: {
 			i = sprintf((char*) bytes, "%lld", (long long int) val->value.Integer);
