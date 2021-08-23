@@ -30,4 +30,4 @@ static inline void utl_init_dllist(utl_doubly_linked_list_t* list) {
 extern utl_doubly_linked_node_t* utl_create_dlnode();
 extern utl_doubly_linked_node_t* utl_dllist_push(utl_doubly_linked_list_t*, void*);
 extern void* utl_dllist_shift(utl_doubly_linked_list_t*);
-extern void utl_list_doubly_remove_by_reference(utl_doubly_linked_list_t* list, utl_doubly_linked_node_t* node);
+extern void utl_dllist_remove_by_reference(utl_doubly_linked_list_t* list, utl_doubly_linked_node_t* node);

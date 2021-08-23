@@ -227,7 +227,7 @@ void ltg_disconnect(ltg_client_t* client) {
 
 		pthread_mutex_lock(&sky_main.listener.online.lock);
 
-		utl_list_doubly_remove_by_reference(&sky_main.listener.online.list, client->online_node);
+		utl_dllist_remove_by_reference(&sky_main.listener.online.list, client->online_node);
 
 		pthread_mutex_unlock(&sky_main.listener.online.lock);
 

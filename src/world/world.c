@@ -45,6 +45,7 @@ wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t env
 		}
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
+	pthread_mutex_init(&world->lock, NULL);
 
 	wld_prepare_spawn(world);
 
@@ -60,6 +61,7 @@ wld_world_t* wld_load(const string_t name) {
 		.id = wld_add(world)
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
+	pthread_mutex_init(&world->lock, NULL);
 
 	// TODO
 
@@ -71,14 +73,12 @@ wld_world_t* wld_load(const string_t name) {
 
 void wld_prepare_spawn(wld_world_t* world) {
 	
-	const int32_t spawn_cx = world->spawn.x >> 5;
-	const int32_t spawn_cz = world->spawn.z >> 5;
+	const wld_chunk_t* spawn_chunk = wld_gen_chunk(wld_get_region_at(world, world->spawn.x, world->spawn.z), world->spawn.x & 0x1F, world->spawn.z & 0x1F, WLD_TICKET_TICK_ENTITIES);
 
 	// prepare spawn region
-	for (int32_t x = spawn_cx - 11; x <= spawn_cx + 11; ++x) {
-		for (int32_t z = spawn_cz - 11; z <= spawn_cz + 11; ++z) {
-			wld_chunk_t* chunk = wld_get_chunk(world, x, z);
-			chunk->max_ticket = UTL_MAX(14 - (11 - UTL_ABS(x - spawn_cx)), 14 - (11 - UTL_ABS(z - spawn_cz)));
+	for (int32_t x = -11; x <= 11; ++x) {
+		for (int32_t z = -11; z <= 11; ++z) {
+			wld_gen_relative_chunk(spawn_chunk, x, z, UTL_MAX(14 - (11 - UTL_ABS(x)), 14 - (11 - UTL_ABS(z))));
 		}
 	}
 
@@ -112,7 +112,7 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 
 	wld_region_t* region = calloc(1, sizeof(wld_region_t));
 
-	const int64_t key = ((uint64_t) x << 16) + x;
+	const int64_t key = ((uint64_t) x << 16) + z;
 	wld_region_t region_init = {
 		.world = world,
 		.x = x,
@@ -149,7 +149,7 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 	}
 
 	pthread_mutex_lock(&world->lock);
-	utl_tree_put(&world->regions, ((int64_t) x << 16) + z, region);
+	utl_tree_put(&world->regions, key, region);
 	pthread_mutex_unlock(&world->lock);
 
 	return region;
@@ -159,7 +159,7 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 
 	pthread_mutex_lock(&world->lock);
-	wld_region_t* region = utl_tree_get(&world->regions, (x << 16) + z);
+	wld_region_t* region = utl_tree_get(&world->regions, ((uint64_t) x << 16) + z);
 	pthread_mutex_unlock(&world->lock);
 
 	if (region == NULL) {
@@ -170,7 +170,7 @@ wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 
 }
 
-wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z) {
+wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max_ticket) {
 
 	wld_chunk_t* chunk = calloc(1, sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * mat_get_chunk_height(region->world->environment));
 	wld_chunk_t chunk_init = {
@@ -181,11 +181,11 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z) {
 		.x = x,
 		.z = z,
 		.lock = PTHREAD_MUTEX_INITIALIZER,
-		.max_ticket = 15
+		.max_ticket = max_ticket
 	};
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t));
 
-	region->chunks[chunk_init.idx] = chunk;
+	region->chunks[(x << 5) + z] = chunk;
 
 	return chunk;
 
@@ -195,27 +195,11 @@ wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
 
 	wld_region_t* region = wld_get_region(world, x >> 5, z >> 5);
 
-	union {
-
-		uint16_t idx: 10;
-
-		struct {
-
-			uint8_t x : 5;
-			uint8_t z : 5;
-
-		};
-
-	} chunk_loc = {
-		.x = x,
-		.z = z
-	};
-
-	wld_chunk_t* chunk = region->chunks[chunk_loc.idx];
+	wld_chunk_t* chunk = region->chunks[(x << 5) + z];
 
 	if (chunk == NULL) {
 
-		chunk = wld_gen_chunk(region, x, z);
+		chunk = wld_gen_chunk(region, x, z, WLD_TICKET_MAX);
 
 	}
 
@@ -223,7 +207,7 @@ wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
 
 }
 
-wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z) {
+wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z) {
 
 	x += chunk->x;
 	z += chunk->z;
@@ -237,55 +221,93 @@ wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z) 
 	wld_region_t* region = chunk->region;
 
 	while (r_x < 0) {
-		region = region->relative.west;
-		r_x++;
-		if (region == NULL) {
-			return wld_get_chunk(chunk->region->world, wld_get_chunk_x(chunk) + x, wld_get_chunk_z(chunk) + z);
+		if (region->relative.west == NULL) {
+			region = wld_get_region(region->world, region->x - 1, region->z);
+		} else {
+			region = region->relative.west;
 		}
+		r_x++;
 	}
 	while (r_x > 0) {
-		region = region->relative.east;
-		r_x--;
-		if (region == NULL) {
-			return wld_get_chunk(chunk->region->world, wld_get_chunk_x(chunk) + x, wld_get_chunk_z(chunk) + z);
+		if (region->relative.east == NULL) {
+			region = wld_get_region(region->world, region->x + 1, region->z);
+		} else {
+			region = region->relative.east;
 		}
+		r_x--;
 	}
 
 	while (r_z < 0) {
-		region = region->relative.north;
-		r_z++;
-		if (region == NULL) {
-			return wld_get_chunk(chunk->region->world, wld_get_chunk_x(chunk) + x, wld_get_chunk_z(chunk) + z);
+		if (region->relative.north == NULL) {
+			region = wld_get_region(region->world, region->x, region->z - 1);
+		} else {
+			region = region->relative.north;
 		}
+		r_z++;
 	}
 	while (r_z > 0) {
+		if (region->relative.south == NULL) {
+			region = wld_get_region(region->world, region->x, region->z + 1);
+		} else {
+			region = region->relative.south;
+		}
+		r_z--;
+	}
+
+	if (region->chunks[(x << 5) + z] == NULL) {
+		wld_gen_chunk(region, x, z, WLD_TICKET_MAX);
+	}
+	return region->chunks[(x << 5) + z];
+
+}
+
+wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z, uint8_t max_ticket) {
+	
+	x += chunk->x;
+	z += chunk->z;
+
+	int16_t r_x = x >> 5;
+	int16_t r_z = z >> 5;
+
+	x &= 0x1F;
+	z &= 0x1F;
+
+	wld_region_t* region = chunk->region;
+
+	while (r_x < 0) {
+		if (region->relative.west == NULL) {
+			return wld_gen_chunk(wld_get_region(chunk->region->world, region->x - 1, region->z), x, z, max_ticket);
+		}
+		region = region->relative.west;
+		r_x++;
+	}
+	while (r_x > 0) {
+		if (region->relative.east == NULL) {
+			return wld_gen_chunk(wld_get_region(chunk->region->world, region->x + 1, region->z), x, z, max_ticket);
+		}
+		region = region->relative.east;
+		r_x--;
+	}
+
+	while (r_z < 0) {
+		if (region->relative.north == NULL) {
+			return wld_gen_chunk(wld_get_region(chunk->region->world, region->x, region->z - 1), x, z, max_ticket);
+		}
+		region = region->relative.north;
+		r_z++;
+	}
+	while (r_z > 0) {
+		if (region->relative.south == NULL) {
+			return wld_gen_chunk(wld_get_region(chunk->region->world, region->x, region->z + 1), x, z, max_ticket);
+		}
 		region = region->relative.south;
 		r_z--;
-		if (region == NULL) {
-			return wld_get_chunk(chunk->region->world, wld_get_chunk_x(chunk) + x, wld_get_chunk_z(chunk) + z);
-		}
 	}
 
-	union {
-
-		uint16_t idx: 10;
-
-		struct {
-
-			uint8_t x : 5;
-			uint8_t z : 5;
-
-		};
-
-	} chunk_loc = {
-		.x = x,
-		.z = z
-	};
-
-	if (region->chunks[chunk_loc.idx] == NULL) {
-		wld_gen_chunk(region, x, z);
+	if (region->chunks[(x << 5) + z] == NULL) {
+		wld_gen_chunk(region, x, z, max_ticket);
 	}
-	return region->chunks[chunk_loc.idx];
+	return region->chunks[(x << 5) + z];
 
 }
 

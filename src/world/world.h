@@ -33,6 +33,7 @@ struct wld_chunk_section {
 #define WLD_TICKET_TICK 13
 #define WLD_TICKET_BORDER 14
 #define WLD_TICKET_INACCESSIBLE 15
+#define WLD_TICKET_MAX 15
 
 struct wld_chunk {
 
@@ -54,22 +55,12 @@ struct wld_chunk {
 		int16_t world_surface;
 
 	} highest[16 * 16];
-	
-	const union {
 
-		uint16_t idx: 10;
-
-		struct {
-
-			uint8_t x : 5;
-			uint8_t z : 5;
-
-		};
-
-	};
+	const uint8_t x : 5;
+	const uint8_t z : 5;
 
 	uint8_t ticket : 4;
-	uint8_t max_ticket : 4;
+	const uint8_t max_ticket : 4;
 
 	wld_chunk_section_t sections[]; // y = section index * 16, count of sections = World.height / 16
 
@@ -94,18 +85,8 @@ struct wld_region {
 
 	} relative;
 
-	const union {
-
-		uint32_t idx;
-
-		struct {
-
-			int16_t x;
-			int16_t z;
-
-		};
-
-	};
+	const int16_t x;
+	const int16_t z;
 
 };
 
@@ -159,7 +140,8 @@ extern wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z);
 static inline wld_chunk_t* wld_get_chunk_at(wld_world_t* world, int32_t x, int32_t z) {
 	return wld_get_chunk(world, x >> 4, z >> 4);
 }
-extern wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z);
+// This is fast for short distances (within regions to a few regions over), but for long distances this is excruciatingly slow
+extern wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z);
 
 static inline int32_t wld_get_chunk_x(const wld_chunk_t* chunk) {
 	return (chunk->region->x << 5) + chunk->x;
@@ -168,14 +150,23 @@ static inline int32_t wld_get_chunk_z(const wld_chunk_t* chunk) {
 	return (chunk->region->z << 5) + chunk->z;
 }
 
+static inline void wld_subscribe_chunk_l(wld_chunk_t* chunk, uint32_t client_id) {
+	utl_bit_vector_set_bit(&chunk->subscribers, client_id);
+}
+
 static inline void wld_subscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
 	pthread_mutex_lock(&chunk->lock);
-	utl_bit_vector_set_bit(&chunk->subscribers, client_id);
+	wld_subscribe_chunk_l(chunk, client_id);
 	pthread_mutex_unlock(&chunk->lock);
 }
+
+static inline void wld_unsubscribe_chunk_l(wld_chunk_t* chunk, uint32_t client_id) {
+	utl_bit_vector_reset_bit(&chunk->subscribers, client_id);
+}
+
 static inline void wld_unsubscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
 	pthread_mutex_lock(&chunk->lock);
-	utl_bit_vector_reset_bit(&chunk->subscribers, client_id);
+	wld_unsubscribe_chunk_l(chunk, client_id);
 	pthread_mutex_unlock(&chunk->lock);
 }
 

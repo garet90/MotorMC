@@ -95,10 +95,9 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	PCK_READ_STRING(locale, packet);
 	client->locale = utl_hash(locale);
 
-	const uint8_t old_render_distance = client->render_distance;
 	const uint8_t new_render_distance = pck_read_int8(packet);
+	phd_update_sent_chunks_view_distance(client, new_render_distance);
 	client->render_distance = UTL_MIN(new_render_distance, sky_main.render_distance);
-	phd_update_sent_chunks_view_distance(client, old_render_distance);
 	client->chat_mode = pck_read_var_int(packet);
 	__attribute__((unused)) bool_t colors = pck_read_int8(packet);
 
@@ -160,14 +159,25 @@ bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
-	
+
+	const float64_t x = pck_read_float64(packet);
+	const float64_t y = pck_read_float64(packet);
+	const float64_t z = pck_read_float64(packet);
+	const bool_t on_ground = pck_read_int8(packet);
+
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 	
-	player->living_entity.entity.position.x = pck_read_float64(packet);
-	player->living_entity.entity.position.y = pck_read_float64(packet);
-	player->living_entity.entity.position.z = pck_read_float64(packet);
-	
-	player->living_entity.entity.on_ground = pck_read_int8(packet);
+	const uint64_t c_x = (((uint64_t) x) >> 4);
+	const uint64_t c_z = (((uint64_t) z) >> 4);
+
+	if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
+
+		phd_send_update_view_position_to(client, c_x, c_z);
+		phd_update_sent_chunks_move(client, c_x, c_z);
+
+	}
+
+	ent_move_l(&player->living_entity.entity, x, y, z, on_ground);
 
 	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
@@ -178,20 +188,32 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
+
+	const float64_t x = pck_read_float64(packet);
+	const float64_t y = pck_read_float64(packet);
+	const float64_t z = pck_read_float64(packet);
 	
+	const float32_t yaw = pck_read_float32(packet);
+	const float32_t pitch = pck_read_float32(packet);
+
+	const bool_t on_ground = pck_read_int8(packet);
+
 	pthread_mutex_lock(&player->living_entity.entity.lock);
 
-	player->living_entity.entity.position.x = pck_read_float64(packet);
-	player->living_entity.entity.position.y = pck_read_float64(packet);
-	player->living_entity.entity.position.z = pck_read_float64(packet);
+	const uint64_t c_x = (((uint64_t) x) >> 4);
+	const uint64_t c_z = (((uint64_t) z) >> 4);
 
-	player->living_entity.rotation.yaw = pck_read_float32(packet);
-	player->living_entity.rotation.pitch = pck_read_float32(packet);
-	
-	player->living_entity.entity.on_ground = pck_read_int8(packet);
+	if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
+
+		phd_send_update_view_position_to(client, c_x, c_z);
+		phd_update_sent_chunks_move(client, c_x, c_z);
+
+	}
+
+	ent_move_look_l(&player->living_entity, x, y, z, yaw, pitch, on_ground);
 	
 	pthread_mutex_unlock(&player->living_entity.entity.lock);
-
+	
 	return true;
 
 }
@@ -433,7 +455,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 	// am i really gonna waste time copying data from one stream to another or am i gonna just waste 4 bytes?
 	// you're damn right i'm gonna waste 4 bytes, speed is key
 	// TODO chunk data
-	size_t data_len = packet->cursor;
+	const size_t data_len = packet->cursor;
 	pck_write_long_var_int(packet, 0);
 
 	const uint8_t bits_per_block = 15;
@@ -458,7 +480,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		}
 	}
 
-	size_t current = packet->cursor;
+	const size_t current = packet->cursor;
 	packet->cursor = data_len;
 	pck_write_long_var_int(packet, current - data_len - 5);
 	packet->cursor = current;
@@ -816,6 +838,18 @@ void phd_send_update_view_position(ltg_client_t* client) {
 
 }
 
+void phd_send_update_view_position_to(ltg_client_t* client, int32_t x, int32_t z) {
+	
+	PCK_INLINE(packet, 11, io_big_endian);
+	
+	pck_write_var_int(packet, 0x49);
+	pck_write_var_int(packet, x);
+	pck_write_var_int(packet, z);
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_declare_recipes(ltg_client_t* client) {
 
 	PCK_INLINE(packet, 6 + rec_recipes.size * 128, io_big_endian);
@@ -846,29 +880,87 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 
 }
 
-void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t old_view_distance) {
+void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_distance) {
 	
 	const wld_chunk_t* chunk = client->entity->living_entity.entity.chunk;
 
-	if (client->render_distance > old_view_distance) {
+	if (client->render_distance > view_distance) {
 		for (int16_t x = -client->render_distance; x <= client->render_distance; ++x) {
 			for (int16_t z = -client->render_distance; z <= client->render_distance; ++z) {
-				if (x < -old_view_distance || x > old_view_distance || z < -old_view_distance || z > old_view_distance) {
-					wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
-					wld_subscribe_chunk(v_c, client->id);
-				}
-			}
-		}
-	} else if (client->render_distance < old_view_distance) {
-		for (int16_t x = -old_view_distance; x <= old_view_distance; ++x) {
-			for (int16_t z = -old_view_distance; z <= old_view_distance; ++z) {
-				if (x < -client->render_distance || x > client->render_distance || z < -client->render_distance || z > client->render_distance) {
+				if (x < -view_distance || x > view_distance || z < -view_distance || z > view_distance) {
 					wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
 					wld_unsubscribe_chunk(v_c, client->id);
 				}
 			}
 		}
+	} else if (client->render_distance < view_distance) {
+		for (int16_t x = -view_distance; x <= view_distance; ++x) {
+			for (int16_t z = -view_distance; z <= view_distance; ++z) {
+				if (x < -client->render_distance || x > client->render_distance || z < -client->render_distance || z > client->render_distance) {
+					wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
+					wld_subscribe_chunk(v_c, client->id);
+				}
+			}
+		}
 	}
+
+}
+
+void phd_update_sent_chunks_move(ltg_client_t* client, int32_t x, int32_t z) {
+
+	const wld_chunk_t* old_chunk = client->entity->living_entity.entity.chunk;
+
+	const int32_t old_x = wld_get_chunk_x(client->entity->living_entity.entity.chunk);
+	const int32_t old_z = wld_get_chunk_z(client->entity->living_entity.entity.chunk);
+
+
+	if (x > old_x) {
+
+		const int32_t o_x = -client->render_distance;
+		const int32_t n_x = client->render_distance + 1;
+
+		for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
+			wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+			wld_subscribe_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id);
+		}
+
+	}
+	if (x < old_x) {
+
+		const int32_t o_x = client->render_distance;
+		const int32_t n_x = client->render_distance - 1;
+
+		for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
+			wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+			wld_subscribe_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id);
+		}
+
+	}
+
+	if (z > old_z) {
+
+		const int32_t o_z = client->render_distance;
+		const int32_t n_z = client->render_distance + 1;
+		
+		for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
+			wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+			wld_subscribe_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id);
+		}
+
+	}
+	if (z < old_z) {
+
+		const int32_t o_z = client->render_distance;
+		const int32_t n_z = client->render_distance - 1;
+		
+		for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
+			wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+			wld_subscribe_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id);
+		}
+
+	}
+
+	return;
 
 }
 
