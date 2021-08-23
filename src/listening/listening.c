@@ -290,12 +290,10 @@ void ltg_term() {
 		for (uint32_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
 			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 			if (client != NULL) {
-				with_lock (&sky_main.listener.clients.lock) {
-					phd_send_disconnect(client, message, message_length);
-					ltg_disconnect(client);
-					if (pthread_self() != client->thread) {
-						pthread_join(client->thread, NULL);
-					}
+				phd_send_disconnect(client, message, message_length);
+				ltg_disconnect(client);
+				if (pthread_self() != client->thread) {
+					pthread_join(client->thread, NULL);
 				}
 			}
 		}

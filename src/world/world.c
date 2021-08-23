@@ -183,10 +183,11 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		},
 		.x = x,
 		.z = z,
-		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.max_ticket = max_ticket
 	};
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t));
+
+	pthread_mutex_init(&chunk->lock, NULL);
 
 	region->chunks[(x << 5) + z] = chunk;
 
