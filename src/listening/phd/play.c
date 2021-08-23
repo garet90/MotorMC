@@ -103,12 +103,12 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
 
-	pthread_mutex_lock(&player->living_entity.entity.lock);
+	with_lock (&player->living_entity.entity.lock) {
 
-	player->displayed_skin_parts = pck_read_int8(packet);
-	player->main_hand = (byte_t) pck_read_var_int(packet);
-	
-	pthread_mutex_unlock(&player->living_entity.entity.lock);
+		player->displayed_skin_parts = pck_read_int8(packet);
+		player->main_hand = (byte_t) pck_read_var_int(packet);
+
+	}
 
 	__attribute__((unused)) bool_t disable_text_filtering = pck_read_int8(packet);
 
@@ -165,21 +165,21 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 	const float64_t z = pck_read_float64(packet);
 	const bool_t on_ground = pck_read_int8(packet);
 
-	pthread_mutex_lock(&player->living_entity.entity.lock);
-	
-	const uint64_t c_x = (((uint64_t) x) >> 4);
-	const uint64_t c_z = (((uint64_t) z) >> 4);
+	with_lock (&player->living_entity.entity.lock) {
+		
+		const uint64_t c_x = (((uint64_t) x) >> 4);
+		const uint64_t c_z = (((uint64_t) z) >> 4);
 
-	if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
+		if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
 
-		phd_send_update_view_position_to(client, c_x, c_z);
-		phd_update_sent_chunks_move(client, c_x, c_z);
+			phd_send_update_view_position_to(client, c_x, c_z);
+			phd_update_sent_chunks_move(client, c_x, c_z);
+
+		}
+
+		ent_move_l(&player->living_entity.entity, x, y, z, on_ground);
 
 	}
-
-	ent_move_l(&player->living_entity.entity, x, y, z, on_ground);
-
-	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
 	return true;
 
@@ -198,21 +198,21 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 
 	const bool_t on_ground = pck_read_int8(packet);
 
-	pthread_mutex_lock(&player->living_entity.entity.lock);
+	with_lock (&player->living_entity.entity.lock) {
 
-	const uint64_t c_x = (((uint64_t) x) >> 4);
-	const uint64_t c_z = (((uint64_t) z) >> 4);
+		const uint64_t c_x = (((uint64_t) x) >> 4);
+		const uint64_t c_z = (((uint64_t) z) >> 4);
 
-	if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
+		if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
 
-		phd_send_update_view_position_to(client, c_x, c_z);
-		phd_update_sent_chunks_move(client, c_x, c_z);
+			phd_send_update_view_position_to(client, c_x, c_z);
+			phd_update_sent_chunks_move(client, c_x, c_z);
 
-	}
+		}
 
-	ent_move_look_l(&player->living_entity, x, y, z, yaw, pitch, on_ground);
+		ent_move_look_l(&player->living_entity, x, y, z, yaw, pitch, on_ground);
 	
-	pthread_mutex_unlock(&player->living_entity.entity.lock);
+	}
 	
 	return true;
 
@@ -228,38 +228,38 @@ bool_t phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 		return false;
 	}
 
-	pthread_mutex_lock(&player->living_entity.entity.lock);
+	with_lock (&player->living_entity.entity.lock) {
 
-	int32_t action = pck_read_var_int(packet);
-	__attribute__((unused)) int32_t jump_boost = pck_read_var_int(packet); // for jumping with horses
+		int32_t action = pck_read_var_int(packet);
+		__attribute__((unused)) int32_t jump_boost = pck_read_var_int(packet); // for jumping with horses
 
-	switch (action) {
-	case 0: // start sneaking
-		player->living_entity.entity.crouching = true;
-		break;
-	case 1: // stop sneaking
-		player->living_entity.entity.crouching = false;
-		break;
-	case 2: // leave bed
-		break;
-	case 3: // start sprinting
-		player->living_entity.entity.sprinting = true;
-		break;
-	case 4: // stop sprinting
-		player->living_entity.entity.sprinting = false;
-		break;
-	case 5: // start jump with horse
-		break;
-	case 6: // stop jump with horse
-		break;
-	case 7: // open horse inventory
-		break;
-	case 8: // start flying with elytra
-		player->living_entity.entity.flying_with_elytra = true;
-		break;
+		switch (action) {
+		case 0: // start sneaking
+			player->living_entity.entity.crouching = true;
+			break;
+		case 1: // stop sneaking
+			player->living_entity.entity.crouching = false;
+			break;
+		case 2: // leave bed
+			break;
+		case 3: // start sprinting
+			player->living_entity.entity.sprinting = true;
+			break;
+		case 4: // stop sprinting
+			player->living_entity.entity.sprinting = false;
+			break;
+		case 5: // start jump with horse
+			break;
+		case 6: // stop jump with horse
+			break;
+		case 7: // open horse inventory
+			break;
+		case 8: // start flying with elytra
+			player->living_entity.entity.flying_with_elytra = true;
+			break;
+		}
+
 	}
-
-	pthread_mutex_unlock(&player->living_entity.entity.lock);
 
 	return true;
 
@@ -271,11 +271,9 @@ bool_t phd_handle_held_item_change(ltg_client_t* client, pck_packet_t* packet) {
 	
 	ent_player_t* player = client->entity;
 
-	pthread_mutex_lock(&player->living_entity.entity.lock);
-
-	player->held_item = slot;
-
-	pthread_mutex_unlock(&player->living_entity.entity.lock);
+	with_lock (&player->living_entity.entity.lock) {
+		player->held_item = slot;
+	}
 
 	return true;
 
@@ -534,7 +532,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	player->living_entity.entity.position.y = 256;
 	player->living_entity.entity.position.x = player_world->spawn.x;
 	player->living_entity.entity.position.z = player_world->spawn.z;
-	ent_register_entity((ent_entity_t*) player);
+	ent_register_entity(&player->living_entity.entity);
 
 	// set last recieve packet to now
 	struct timespec time;
@@ -607,11 +605,9 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_update_sent_chunks(client);
 
 	// add to online players
-	pthread_mutex_lock(&sky_main.listener.online.lock);
-	
-	client->online_node = utl_dllist_push(&sky_main.listener.online.list, client);
-
-	pthread_mutex_unlock(&sky_main.listener.online.lock);
+	with_lock (&sky_main.listener.online.lock) {
+		client->online_node = utl_dllist_push(&sky_main.listener.online.list, client);
+	}
 
 	JOB_CREATE_WORK(work, job_player_join);
 	work->player = client;
@@ -622,54 +618,54 @@ void phd_send_join_game(ltg_client_t* client) {
 
 void phd_send_player_info_add_players(ltg_client_t* client) {
 
-	pthread_mutex_lock(&sky_main.listener.online.lock);
+	with_lock (&sky_main.listener.online.lock) {
 
-	if (sky_main.listener.online.list.length == 0) {
-		pthread_mutex_unlock(&sky_main.listener.online.lock);
-		return;
-	}
-
-	PCK_INLINE(packet, 3 + (sky_main.listener.online.list.length * 2048), io_big_endian);
-	
-	pck_write_var_int(packet, 0x36);
-	pck_write_var_int(packet, 0);
-	pck_write_var_int(packet, sky_main.listener.online.list.length);
-
-	utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
-	while (node != NULL) {
-		ltg_client_t* player = node->element;
-		pck_write_bytes(packet, player->uuid, 16);
-		pck_write_string(packet, player->username.value, player->username.length);
-		if (player->textures.value.value != NULL) {
-			pck_write_var_int(packet, 1);
-			pck_write_string(packet, UTL_CSTRTOARG("textures"));
-			pck_write_string(packet, player->textures.value.value, player->textures.value.length);
-			if (player->textures.signature.value != NULL) {
-				pck_write_int8(packet, 1);
-				pck_write_string(packet, player->textures.signature.value, player->textures.signature.length);
-			} else {
-				pck_write_int8(packet, 0);
-			}
-		} else {
-			pck_write_var_int(packet, 0);
+		if (sky_main.listener.online.list.length == 0) {
+			pthread_mutex_unlock(&sky_main.listener.online.lock);
+			return;
 		}
+
+		PCK_INLINE(packet, 3 + (sky_main.listener.online.list.length * 2048), io_big_endian);
 		
-		ent_player_t* player_ent = client->entity;
+		pck_write_var_int(packet, 0x36);
+		pck_write_var_int(packet, 0);
+		pck_write_var_int(packet, sky_main.listener.online.list.length);
 
-		pthread_mutex_lock(&player_ent->living_entity.entity.lock);
+		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
+		while (node != NULL) {
+			ltg_client_t* player = node->element;
+			pck_write_bytes(packet, player->uuid, 16);
+			pck_write_string(packet, player->username.value, player->username.length);
+			if (player->textures.value.value != NULL) {
+				pck_write_var_int(packet, 1);
+				pck_write_string(packet, UTL_CSTRTOARG("textures"));
+				pck_write_string(packet, player->textures.value.value, player->textures.value.length);
+				if (player->textures.signature.value != NULL) {
+					pck_write_int8(packet, 1);
+					pck_write_string(packet, player->textures.signature.value, player->textures.signature.length);
+				} else {
+					pck_write_int8(packet, 0);
+				}
+			} else {
+				pck_write_var_int(packet, 0);
+			}
+			
+			ent_player_t* player_ent = client->entity;
 
-		pck_write_var_int(packet, player_ent->gamemode); // game mode
+			with_lock (&player_ent->living_entity.entity.lock) {
 
-		pthread_mutex_unlock(&player_ent->living_entity.entity.lock);
-		
-		pck_write_var_int(packet, player->ping); // ping
-		pck_write_int8(packet, 0); // has display name
-		node = node->next;
+				pck_write_var_int(packet, player_ent->gamemode); // game mode
+
+			}
+			
+			pck_write_var_int(packet, player->ping); // ping
+			pck_write_int8(packet, 0); // has display name
+			node = node->next;
+		}
+
+		ltg_send(client, packet);
+
 	}
-
-	pthread_mutex_unlock(&sky_main.listener.online.lock);
-
-	ltg_send(client, packet);
 
 }
 
@@ -696,12 +692,10 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 	}
 	ent_player_t* player_ent = player->entity;
 
-	pthread_mutex_lock(&player_ent->living_entity.entity.lock);
+	with_lock (&player_ent->living_entity.entity.lock) {
+		pck_write_var_int(packet, player_ent->gamemode); // game mode
+	}
 
-	pck_write_var_int(packet, player_ent->gamemode); // game mode
-
-	pthread_mutex_unlock(&player_ent->living_entity.entity.lock);
-	
 	pck_write_var_int(packet, player->ping); // ping
 
 	pck_write_int8(packet, 0); // has display name
@@ -755,19 +749,19 @@ void phd_send_player_position_and_look(ltg_client_t* client) {
 
 	ent_player_t* player = client->entity;
 
-	pthread_mutex_lock(&player->living_entity.entity.lock);
+	with_lock (&player->living_entity.entity.lock) {
 
-	pck_write_var_int(packet, 0x38);
-	pck_write_float64(packet, player->living_entity.entity.position.x); // x
-	pck_write_float64(packet, player->living_entity.entity.position.y); // y
-	pck_write_float64(packet, player->living_entity.entity.position.z); // z
-	pck_write_float32(packet, player->living_entity.rotation.pitch); // pitch
-	pck_write_float32(packet, player->living_entity.rotation.yaw); // yaw
-	pck_write_int8(packet, 0); // flags
-	pck_write_var_int(packet, player->living_entity.entity.id); // teleport id
-	pck_write_int8(packet, 0); // dismount vehicle
+		pck_write_var_int(packet, 0x38);
+		pck_write_float64(packet, player->living_entity.entity.position.x); // x
+		pck_write_float64(packet, player->living_entity.entity.position.y); // y
+		pck_write_float64(packet, player->living_entity.entity.position.z); // z
+		pck_write_float32(packet, player->living_entity.rotation.pitch); // pitch
+		pck_write_float32(packet, player->living_entity.rotation.yaw); // yaw
+		pck_write_int8(packet, 0); // flags
+		pck_write_var_int(packet, player->living_entity.entity.id); // teleport id
+		pck_write_int8(packet, 0); // dismount vehicle
 
-	pthread_mutex_unlock(&player->living_entity.entity.lock);
+	}
 
 	ltg_send(client, packet);
 
@@ -807,12 +801,12 @@ void phd_send_held_item_change(ltg_client_t* client) {
 
 	ent_player_t* player = client->entity;
 
-	pthread_mutex_lock(&player->living_entity.entity.lock);
+	with_lock (&player->living_entity.entity.lock) {
 
-	pck_write_var_int(packet, 0x48);
-	pck_write_int8(packet, player->held_item);
+		pck_write_var_int(packet, 0x48);
+		pck_write_int8(packet, player->held_item);
 
-	pthread_mutex_unlock(&player->living_entity.entity.lock);
+	}
 
 	ltg_send(client, packet);
 
@@ -824,11 +818,15 @@ void phd_send_update_view_position(ltg_client_t* client) {
 
 	ent_player_t* player = client->entity;
 
-	pthread_mutex_lock(&player->living_entity.entity.lock);
+	wld_chunk_t* chunk = NULL;
 
-	wld_chunk_t* chunk = player->living_entity.entity.chunk;
+	with_lock (&player->living_entity.entity.lock) {
+	
+		chunk = player->living_entity.entity.chunk;
+	
+	}
 
-	pthread_mutex_unlock(&player->living_entity.entity.lock);
+	assert(chunk != NULL);
 
 	pck_write_var_int(packet, 0x49);
 	pck_write_var_int(packet, wld_get_chunk_x(chunk));

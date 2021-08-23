@@ -114,13 +114,15 @@ void job_handle(job_work_t* work) {
 void job_add(job_work_t* work) {
 
 	if (work != NULL) {
-		pthread_mutex_lock(&job_board.lock);
 
-		utl_list_push(&job_board.list, work);
+		with_lock (&job_board.lock) {
+			
+			utl_list_push(&job_board.list, work);
 
-		pthread_mutex_unlock(&job_board.lock);
+		}
 		
 		pthread_cond_signal(&job_wait.cond);
+		
 	} else {
 		pthread_cond_broadcast(&job_wait.cond);
 	}

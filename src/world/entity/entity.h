@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include "../../main.h"
 #include "../../io/chat/chat.h"
+#include "../../util/lock_util.h"
 #include "../positions.h"
 
 typedef enum {
@@ -107,18 +108,26 @@ extern ent_entity_t* ent_get_entity_by_id(uint32_t id);
 LOCK ENTITY BEFORE USING THIS FUNCTION
 UNLOCK CHUNK BEFORE USING THIS FUNCTION
 */
-static inline void ent_remove_chunk(ent_entity_t* entity) {
+static inline void ent_remove_chunk_l(ent_entity_t* entity) {
 
 	if (entity->chunk != NULL) {
 
-		pthread_mutex_lock(&entity->chunk->lock);
-		
-		utl_dllist_remove_by_reference(&entity->chunk->entities, entity->chunk_node);
+		with_lock (&entity->chunk->lock) {
+			utl_dllist_remove_by_reference(&entity->chunk->entities, entity->chunk_node);
+		}
 		entity->chunk_node = NULL;
 
-		pthread_mutex_unlock(&entity->chunk->lock);
-
 		entity->chunk = NULL;
+
+	}
+
+}
+
+static inline void ent_remove_chunk(ent_entity_t* entity) {
+
+	with_lock (&entity->lock) {
+		
+		ent_remove_chunk_l(entity);
 
 	}
 
@@ -128,7 +137,17 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 LOCK ENTITY BEFORE USING THIS FUNCTION
 UNLOCK CHUNK BEFORE USING THIS FUNCTION
 */
-extern void ent_set_chunk(ent_entity_t* entity);
+extern void ent_set_chunk_l(ent_entity_t* entity);
+
+static inline void ent_set_chunk(ent_entity_t* entity) {
+	
+	with_lock(&entity->lock) {
+
+		ent_set_chunk_l(entity);
+
+	}
+
+}
 
 static inline void ent_move_l(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool_t on_ground) {
 
@@ -137,7 +156,7 @@ static inline void ent_move_l(ent_entity_t* entity, float64_t x, float64_t y, fl
 		entity->position.x = x;
 		entity->position.y = y;
 		entity->position.z = z;
-		ent_set_chunk(entity);
+		ent_set_chunk_l(entity);
 
 	} else {
 
@@ -153,11 +172,9 @@ static inline void ent_move_l(ent_entity_t* entity, float64_t x, float64_t y, fl
 
 static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool_t on_ground) {
 
-	pthread_mutex_lock(&entity->lock);
-
-	ent_move_l(entity, x, y, z, on_ground);
-
-	pthread_mutex_unlock(&entity->lock);
+	with_lock (&entity->lock) {
+		ent_move_l(entity, x, y, z, on_ground);
+	}
 
 }
 
@@ -168,7 +185,7 @@ static inline void ent_move_look_l(ent_living_entity_t* entity, float64_t x, flo
 		entity->entity.position.x = x;
 		entity->entity.position.y = y;
 		entity->entity.position.z = z;
-		ent_set_chunk(&entity->entity);
+		ent_set_chunk_l(&entity->entity);
 
 	} else {
 
@@ -186,43 +203,43 @@ static inline void ent_move_look_l(ent_living_entity_t* entity, float64_t x, flo
 
 static inline void ent_move_look(ent_living_entity_t* entity, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool_t on_ground) {
 	
-	pthread_mutex_lock(&entity->entity.lock);
+	with_lock (&entity->entity.lock) {
 
-	ent_move_look_l(entity, x, y, z, yaw, pitch, on_ground);
+		ent_move_look_l(entity, x, y, z, yaw, pitch, on_ground);
 
-	pthread_mutex_unlock(&entity->entity.lock);
+	}
 
 }
 
 static inline void ent_teleport(ent_entity_t* entity, wld_world_t* world, float64_t x, float64_t y, float64_t z) {
 
-	pthread_mutex_lock(&entity->lock);
+	with_lock (&entity->lock) {
 
-	entity->position.world = world;
-	entity->position.x = x;
-	entity->position.y = y;
-	entity->position.z = z;
-
-	ent_set_chunk(entity);
-
-	pthread_mutex_unlock(&entity->lock);
+		entity->position.world = world;
+		entity->position.x = x;
+		entity->position.y = y;
+		entity->position.z = z;
+		
+		ent_set_chunk(entity);
+	
+	}
 
 }
 
 static inline void ent_teleport_look(ent_living_entity_t* entity, wld_world_t* world, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch) {
 
-	pthread_mutex_lock(&entity->entity.lock);
+	with_lock(&entity->entity.lock) {
 
-	entity->entity.position.world = world;
-	entity->entity.position.x = x;
-	entity->entity.position.y = y;
-	entity->entity.position.z = z;
-	entity->rotation.pitch = pitch;
-	entity->rotation.yaw = yaw;
+		entity->entity.position.world = world;
+		entity->entity.position.x = x;
+		entity->entity.position.y = y;
+		entity->entity.position.z = z;
+		entity->rotation.pitch = pitch;
+		entity->rotation.yaw = yaw;
 
-	ent_set_chunk(&entity->entity);
-	
-	pthread_mutex_unlock(&entity->entity.lock);
+		ent_set_chunk(&entity->entity);
+
+	}
 
 }
 

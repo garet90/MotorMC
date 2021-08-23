@@ -90,11 +90,11 @@ void* t_ltg_run(void* input) {
 void ltg_accept(ltg_client_t* client) {
 
 	// lock clients
-	pthread_mutex_lock(&sky_main.listener.clients.lock);
-
-	client->id = utl_id_vector_add(&sky_main.listener.clients.vector, &client);
+	with_lock (&sky_main.listener.clients.lock) {
+		
+		client->id = utl_id_vector_add(&sky_main.listener.clients.vector, &client);
 	
-	pthread_mutex_unlock(&sky_main.listener.clients.lock);
+	}
 
 	// create client listening thread
 	pthread_create(&client->thread, NULL, t_ltg_client, client);
@@ -138,11 +138,13 @@ void* t_ltg_client(void* args) {
 
 ltg_client_t* ltg_get_client_by_id(uint32_t id) {
 
-	pthread_mutex_lock(&sky_main.listener.clients.lock);
+	ltg_client_t* client = NULL;
 
-	ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, id);
+	with_lock (&sky_main.listener.clients.lock) {
+		
+		client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, id);
 
-	pthread_mutex_unlock(&sky_main.listener.clients.lock);
+	}
 
 	return client;
 
@@ -225,11 +227,9 @@ void ltg_disconnect(ltg_client_t* client) {
 	// if we're on the online players list, remove it
 	if (client->online_node != NULL) {
 
-		pthread_mutex_lock(&sky_main.listener.online.lock);
-
-		utl_dllist_remove_by_reference(&sky_main.listener.online.list, client->online_node);
-
-		pthread_mutex_unlock(&sky_main.listener.online.lock);
+		with_lock (&sky_main.listener.online.lock) {
+			utl_dllist_remove_by_reference(&sky_main.listener.online.list, client->online_node);
+		}
 
 		JOB_CREATE_WORK(work, job_player_leave);
 		memcpy(work->uuid, client->uuid, sizeof(ltg_uuid_t));
@@ -249,12 +249,10 @@ void ltg_disconnect(ltg_client_t* client) {
 	sck_close(client->socket);
 
 	// lock clients
-	pthread_mutex_lock(&sky_main.listener.clients.lock);
+	with_lock (&sky_main.listener.online.lock) {
+		utl_id_vector_remove(&sky_main.listener.clients.vector, client->id);
+	}
 
-	utl_id_vector_remove(&sky_main.listener.clients.vector, client->id);
-	
-	pthread_mutex_unlock(&sky_main.listener.clients.lock);
-	
 	// free skin
 	if (client->textures.value.value != NULL) {
 		free(client->textures.value.value);
@@ -279,27 +277,29 @@ void ltg_term() {
 	sck_close(sky_main.listener.address.socket);
 	pthread_cancel(sky_main.listener.thread);
 
-	pthread_mutex_lock(&sky_main.listener.clients.lock);
+	with_lock (&sky_main.listener.clients.lock) {
 
-	// disconnect message
-	cht_translation_t disconnect_message = cht_translation_new;
-	disconnect_message.translate = cht_translation_multiplayer_disconnect_server_shutdown;
+		// disconnect message
+		cht_translation_t disconnect_message = cht_translation_new;
+		disconnect_message.translate = cht_translation_multiplayer_disconnect_server_shutdown;
 
-	char message[128];
-	size_t message_length = cht_write_translation(&disconnect_message, message);
+		char message[128];
+		size_t message_length = cht_write_translation(&disconnect_message, message);
 
-	// disconnect all clients
-	for (uint32_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
-		ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
-		if (client != NULL) {
-			pthread_mutex_unlock(&sky_main.listener.clients.lock);
-			phd_send_disconnect(client, message, message_length);
-			ltg_disconnect(client);
-			if (pthread_self() != client->thread) {
-				pthread_join(client->thread, NULL);
+		// disconnect all clients
+		for (uint32_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
+			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
+			if (client != NULL) {
+				with_lock (&sky_main.listener.clients.lock) {
+					phd_send_disconnect(client, message, message_length);
+					ltg_disconnect(client);
+					if (pthread_self() != client->thread) {
+						pthread_join(client->thread, NULL);
+					}
+				}
 			}
-			pthread_mutex_lock(&sky_main.listener.clients.lock);
 		}
+
 	}
 
 	sck_term();

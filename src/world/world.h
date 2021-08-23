@@ -5,6 +5,7 @@
 #include "../util/id_vector.h"
 #include "../util/bit_vector.h"
 #include "../util/tree.h"
+#include "../util/lock_util.h"
 #include "material/material.h"
 
 typedef struct wld_world wld_world_t;
@@ -155,9 +156,9 @@ static inline void wld_subscribe_chunk_l(wld_chunk_t* chunk, uint32_t client_id)
 }
 
 static inline void wld_subscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
-	pthread_mutex_lock(&chunk->lock);
-	wld_subscribe_chunk_l(chunk, client_id);
-	pthread_mutex_unlock(&chunk->lock);
+	with_lock (&chunk->lock) {
+		wld_subscribe_chunk_l(chunk, client_id);
+	}
 }
 
 static inline void wld_unsubscribe_chunk_l(wld_chunk_t* chunk, uint32_t client_id) {
@@ -165,9 +166,9 @@ static inline void wld_unsubscribe_chunk_l(wld_chunk_t* chunk, uint32_t client_i
 }
 
 static inline void wld_unsubscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
-	pthread_mutex_lock(&chunk->lock);
-	wld_unsubscribe_chunk_l(chunk, client_id);
-	pthread_mutex_unlock(&chunk->lock);
+	with_lock (&chunk->lock) {
+		wld_unsubscribe_chunk_l(chunk, client_id);
+	}
 }
 
 extern void wld_free_region(wld_region_t* region);

@@ -153,65 +153,66 @@ bool_t phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet
 	if (sky_main.listener.online_mode) {
 		// auth with Mojang's servers...
 
-		pthread_mutex_lock(&phd_authRequest.lock);
-
-		if (phd_authRequest.curl == NULL) {
-			phd_authRequest.curl = curl_easy_init();
-			curl_easy_setopt(phd_authRequest.curl, CURLOPT_TCP_FASTOPEN, 1);
-			curl_easy_setopt(phd_authRequest.curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-			curl_easy_setopt(phd_authRequest.curl, CURLOPT_WRITEFUNCTION, phd_auth_response_write);
-		}
-		CURLcode res;
-
-		if (!phd_authRequest.curl) {
-			pthread_mutex_unlock(&phd_authRequest.lock);
-			log_error("Failed to initialize cURL");
-			return false;
-		}
-
-		// create server_id hash
-		byte_t server_id_hash[sha1_desc.hashsize];
-		hash_state md;
-		sha1_init(&md);
-		sha1_process(&md, (byte_t*) "", 0);
-		sha1_process(&md, secret.bytes, LTG_AES_KEY_LENGTH);
-		sha1_process(&md, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
-		sha1_done(&md, server_id_hash);
-
-		// create server_id string
-		char server_id[(sha1_desc.hashsize << 1) + 2];
-		utl_to_minecraft_hex(server_id, server_id_hash, sha1_desc.hashsize);
-
-		char request[157];
-		sprintf(request, "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", client->username.value, server_id);
-		curl_easy_setopt(phd_authRequest.curl, CURLOPT_URL, request);
-
-		// prepare response string
-		string_t response;
-		response.length = 0;
-		response.value = malloc(1);
-		response.value[0] = '\0';
-
-		curl_easy_setopt(phd_authRequest.curl, CURLOPT_WRITEDATA, &response);
-
-		res = curl_easy_perform(phd_authRequest.curl);
-		if (res != CURLE_OK) {
-			
-			pthread_mutex_unlock(&phd_authRequest.lock);
-
-			log_error("Could not authenticate client: %s", curl_easy_strerror(res));
-
-			if (response.value != NULL)
-				free(response.value);
-			
-			return false;
-
-		}
-
 		long http_code;
-		curl_easy_getinfo(phd_authRequest.curl, CURLINFO_RESPONSE_CODE, &http_code);
+		string_t response;
 
-		pthread_mutex_unlock(&phd_authRequest.lock);
+		with_lock (&phd_authRequest.lock) {
+
+			if (phd_authRequest.curl == NULL) {
+				phd_authRequest.curl = curl_easy_init();
+				curl_easy_setopt(phd_authRequest.curl, CURLOPT_TCP_FASTOPEN, 1);
+				curl_easy_setopt(phd_authRequest.curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+				curl_easy_setopt(phd_authRequest.curl, CURLOPT_WRITEFUNCTION, phd_auth_response_write);
+			}
+			CURLcode res;
+
+			if (!phd_authRequest.curl) {
+				pthread_mutex_unlock(&phd_authRequest.lock);
+				log_error("Failed to initialize cURL");
+				return false;
+			}
+
+			// create server_id hash
+			byte_t server_id_hash[sha1_desc.hashsize];
+			hash_state md;
+			sha1_init(&md);
+			sha1_process(&md, (byte_t*) "", 0);
+			sha1_process(&md, secret.bytes, LTG_AES_KEY_LENGTH);
+			sha1_process(&md, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
+			sha1_done(&md, server_id_hash);
+
+			// create server_id string
+			char server_id[(sha1_desc.hashsize << 1) + 2];
+			utl_to_minecraft_hex(server_id, server_id_hash, sha1_desc.hashsize);
+
+			char request[157];
+			sprintf(request, "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", client->username.value, server_id);
+			curl_easy_setopt(phd_authRequest.curl, CURLOPT_URL, request);
+
+			// prepare response string
+			response.length = 0;
+			response.value = malloc(1);
+			response.value[0] = '\0';
+
+			curl_easy_setopt(phd_authRequest.curl, CURLOPT_WRITEDATA, &response);
+
+			res = curl_easy_perform(phd_authRequest.curl);
+			if (res != CURLE_OK) {
+				
+				pthread_mutex_unlock(&phd_authRequest.lock);
+
+				log_error("Could not authenticate client: %s", curl_easy_strerror(res));
+
+				if (response.value != NULL)
+					free(response.value);
+				
+				return false;
+
+			}
+
+			curl_easy_getinfo(phd_authRequest.curl, CURLINFO_RESPONSE_CODE, &http_code);
+
+		}
 
 		if (http_code != 200) {
 			
