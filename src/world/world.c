@@ -73,7 +73,7 @@ wld_world_t* wld_load(const string_t name) {
 
 void wld_prepare_spawn(wld_world_t* world) {
 	
-	const wld_chunk_t* spawn_chunk = wld_gen_chunk(wld_get_region_at(world, world->spawn.x, world->spawn.z), world->spawn.x & 0x1F, world->spawn.z & 0x1F, WLD_TICKET_TICK_ENTITIES);
+	const wld_chunk_t* spawn_chunk = wld_gen_chunk(wld_get_region_at(world, world->spawn.x, world->spawn.z), (world->spawn.x >> 4) & 0x1F, (world->spawn.z >> 4) & 0x1F, 3);
 
 	// prepare spawn region
 	for (int32_t x = -11; x <= 11; ++x) {
@@ -175,6 +175,8 @@ wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 
 wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max_ticket) {
 
+	assert(x < 32 && z < 32);
+
 	wld_chunk_t* chunk = calloc(1, sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * mat_get_chunk_height(region->world->environment));
 	wld_chunk_t chunk_init = {
 		.region = region,
@@ -198,6 +200,9 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
 
 	wld_region_t* region = wld_get_region(world, x >> 5, z >> 5);
+
+	x &= 0x1F;
+	z &= 0x1F;
 
 	wld_chunk_t* chunk = region->chunks[(x << 5) + z];
 
@@ -340,9 +345,10 @@ void wld_free_region(wld_region_t* region) {
 		}
 	}
 
-	for (size_t i = 0; i < 1024; ++i) {
+	for (size_t i = 0; i < 32 * 32; ++i) {
 		if (region->chunks[i] != NULL) {
 			pthread_mutex_destroy(&region->chunks[i]->lock);
+			utl_bit_vector_term(&region->chunks[i]->subscribers);
 			free(region->chunks[i]);
 		}
 	}

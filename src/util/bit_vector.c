@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "util.h"
 #include "bit_vector.h"
 
 void utl_bit_vector_set_bit(utl_bit_vector_t* vector, uint32_t bit) {
@@ -11,13 +12,13 @@ void utl_bit_vector_set_bit(utl_bit_vector_t* vector, uint32_t bit) {
 		
 		if (vector->capacity == 0) {
 			
-			vector->capacity = byte << 1;
+			vector->capacity = UTL_MAX(byte << 1, 2) << 1;
 			vector->array = calloc(vector->capacity, sizeof(byte_t));
 
 		} else {
 
 			const size_t old_cap = vector->capacity;
-			vector->capacity = byte << 1;
+			vector->capacity = UTL_MAX(byte << 1, 2);
 			vector->array = realloc(vector->array, vector->capacity);
 			memset(vector->array + old_cap, 0, vector->capacity - old_cap);
 
