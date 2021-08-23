@@ -26,6 +26,8 @@ extern void pck_init_from_bytes(pck_packet_t*, byte_t*, size_t, io_endianness_t)
 
 static inline int8_t pck_read_int8(pck_packet_t* packet) {
 
+	if (packet->length - packet->cursor < 1) return 0;
+
 	packet->cursor += 1;
 
 	return io_read_int8(packet->bytes + packet->cursor - 1);
@@ -33,6 +35,8 @@ static inline int8_t pck_read_int8(pck_packet_t* packet) {
 }
 
 static inline int16_t pck_read_int16(pck_packet_t* packet) {
+	
+	if (packet->length - packet->cursor < 2) return 0;
 
 	packet->cursor += 2;
 
@@ -41,6 +45,8 @@ static inline int16_t pck_read_int16(pck_packet_t* packet) {
 }
 
 static inline int32_t pck_read_int32(pck_packet_t* packet) {
+	
+	if (packet->length - packet->cursor < 4) return 0;
 
 	packet->cursor += 4;
 
@@ -49,6 +55,8 @@ static inline int32_t pck_read_int32(pck_packet_t* packet) {
 }
 
 static inline int64_t pck_read_int64(pck_packet_t* packet) {
+	
+	if (packet->length - packet->cursor < 8) return 0;
 
 	packet->cursor += 8;
 
@@ -57,6 +65,8 @@ static inline int64_t pck_read_int64(pck_packet_t* packet) {
 }
 
 static inline float32_t pck_read_float32(pck_packet_t* packet) {
+	
+	if (packet->length - packet->cursor < 4) return 0;
 
 	packet->cursor += 4;
 
@@ -65,6 +75,8 @@ static inline float32_t pck_read_float32(pck_packet_t* packet) {
 }
 
 static inline float64_t pck_read_float64(pck_packet_t* packet) {
+	
+	if (packet->length - packet->cursor < 8) return 0;
 
 	packet->cursor += 8;
 
@@ -75,7 +87,7 @@ static inline float64_t pck_read_float64(pck_packet_t* packet) {
 static inline int32_t pck_read_var_int(pck_packet_t* packet) {
 
 	size_t size = 0;
-	int32_t value = io_read_var_int(packet->bytes + packet->cursor, &size);
+	int32_t value = io_read_var_int(packet->bytes + packet->cursor, packet->length - packet->cursor, &size);
 
 	packet->cursor += size;
 
@@ -86,7 +98,7 @@ static inline int32_t pck_read_var_int(pck_packet_t* packet) {
 static inline int64_t pck_read_var_long(pck_packet_t* packet) {
 
 	size_t size = 0;
-	int64_t value = io_read_var_long(packet->bytes + packet->cursor, &size);
+	int64_t value = io_read_var_long(packet->bytes + packet->cursor, packet->length - packet->cursor, &size);
 
 	packet->cursor += size;
 

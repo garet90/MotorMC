@@ -5,7 +5,7 @@
 bool_t phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
 
 	// legacy server list ping
-	if (packet->bytes[0] == 0xFE && packet->bytes[1] == 0x01) {
+	if (packet->length >= 3 && packet->bytes[0] == 0xFE && packet->bytes[1] == 0x01 && packet->bytes[2] == 0xFA) {
 		packet->cursor = packet->length;
 		return phd_handle_legacy_slp(client, packet);
 	}

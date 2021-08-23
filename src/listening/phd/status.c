@@ -13,7 +13,7 @@ bool_t phd_status(ltg_client_t* client, pck_packet_t* packet) {
 	case 0x01:
 		return phd_handle_ping(client, packet);
 	default:
-		log_warn("Received unknown packet %x in status state!", id);
+		log_warn("Received unknown packet %02x in status state!", id);
 		return false;
 	}
 

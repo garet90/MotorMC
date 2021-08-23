@@ -148,37 +148,26 @@ static inline float64_t io_read_float64(const byte_t* buffer, io_endianness_t en
 
 }
 
-static inline int32_t io_read_var_int(const byte_t* buffer, size_t* length) {
+static inline int32_t io_read_var_int(const byte_t* buffer, size_t max_length, size_t* length) {
 	
 	int32_t result = 0;
-	*length = 0;
-	int8_t read;
+	int8_t read = 0x80;
+
+	if (max_length > 5) max_length = 5;
 
 	if (io_get_endianness() == io_little_endian) {
 
-		do {
+		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
 			result |= ((read & 0x7F) << (7 * *length));
-
-			*length += 1;
-			
-			if (*length > 5) {
-				return -1;
-			}
-		} while ((read & 0x80) != 0);
+		}
 
 	} else {
 
-		do {
+		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
 			result |= ((read & 0x7F) << (32 - (7 * *length)));
-
-			*length += 1;
-
-			if (*length > 5) {
-				return -1;
-			}
-		} while ((read & 0x80) != 0);
+		}
 
 	}
 
@@ -186,37 +175,26 @@ static inline int32_t io_read_var_int(const byte_t* buffer, size_t* length) {
 
 }
 
-static inline int64_t io_read_var_long(const byte_t* buffer, size_t* length) {
+static inline int64_t io_read_var_long(const byte_t* buffer, size_t max_length, size_t* length) {
 	
 	int64_t result = 0;
-	*length = 0;
-	int8_t read;
+	int8_t read = 0x80;
+
+	if (max_length > 10) max_length = 10;
 
 	if (io_get_endianness() == io_little_endian) {
 
-		do {
+		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
 			result |= ((read & 0x7F) << (7 * *length));
-
-			*length += 1;
-
-			if (*length > 10) {
-				return -1;
-			}
-		} while ((read & 0x80) != 0);
+		}
 
 	} else {
 
-		do {
+		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
 			result |= ((read & 0x7F) << (64 - (7 * *length)));
-
-			*length += 1;
-			
-			if (*length > 10) {
-				return -1;
-			}
-		} while ((read & 0x80) != 0);
+		}
 
 	}
 
