@@ -1,10 +1,56 @@
 #pragma once
 #include "../main.h"
 
-#define UTL_MIN(a, b) ((a) < (b) ? a : b)
-#define UTL_MAX(a, b) ((a) > (b) ? a : b)
+#define UTL_MIN(a, b) _Generic((a), float32_t: utl_minf, float64_t: utl_mind, default: utl_min) (a, b)
 
-#define UTL_ABS(a) ((a) > 0 ? a : -(a))
+static inline float32_t utl_minf(float32_t a, float32_t b) {
+	if (a < b) return a;
+	return b;
+}
+
+static inline float64_t utl_mind(float64_t a, float64_t b) {
+	if (a < b) return a;
+	return b;
+}
+
+static inline int64_t utl_min(int64_t a, int64_t b) {
+	if (a < b) return a;
+	return b;
+}
+
+#define UTL_MAX(a, b) _Generic((a), float32_t: utl_maxf, float64_t: utl_maxd, default: utl_max) (a, b)
+
+static inline float32_t utl_maxf(float32_t a, float32_t b) {
+	if (a > b) return a;
+	return b;
+}
+
+static inline float64_t utl_maxd(float64_t a, float64_t b) {
+	if (a > b) return a;
+	return b;
+}
+
+static inline int64_t utl_max(int64_t a, int64_t b) {
+	if (a > b) return a;
+	return b;
+}
+
+#define UTL_ABS(a) _Generic((a), float32_t: utl_absf, float64_t: utl_absd, default: utl_abs) (a)
+
+static inline float32_t utl_absf(float32_t a) {
+	if (a < 0) return -a;
+	return a;
+}
+
+static inline float64_t utl_absd(float64_t a) {
+	if (a < 0) return -a;
+	return a;
+}
+
+static inline int64_t utl_abs(int64_t a) {
+	if (a < 0) return -a;
+	return a;
+}
 
 static const char utl_hexmap[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 

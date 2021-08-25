@@ -10,21 +10,33 @@ pck_packet_t* cmd_get_graph() {
 			.bytes_per_element = sizeof(cmd_node_t*)
 		};
 
-		cmd_node_t* root = calloc(1, sizeof(cmd_node_t));
-		root->type = cmd_node_root;
-		root->idx = nodes.size;
-		root->children.bytes_per_element = sizeof(int32_t);
+		cmd_node_t* root = malloc(sizeof(cmd_node_t));
+		cmd_node_t root_init = {
+			.type = cmd_node_root,
+			.idx = nodes.size,
+			.children = {
+				.bytes_per_element = sizeof(int32_t)
+			}
+		};
+		memcpy(root, &root_init, sizeof(cmd_node_t));
 
 		utl_vector_push(&nodes, &root);
 
 		for (size_t i = 0; i < cmd_list.size; ++i) {
 			cmd_command_t* command = UTL_VECTOR_GET_AS(cmd_command_t*, &cmd_list, i);
 			
-			cmd_node_t* command_node = calloc(1, sizeof(cmd_node_t));
-			command_node->type = cmd_node_literal;
-			command_node->children.bytes_per_element = sizeof(int32_t);
-			command_node->literal.name = command->label;
-			command_node->idx = nodes.size;
+			cmd_node_t* command_node = malloc(sizeof(cmd_node_t));
+			cmd_node_t command_node_init = {
+				.type = cmd_node_literal,
+				.children = {
+					.bytes_per_element = sizeof(int32_t)
+				},
+				.literal = {
+					.name = command->label
+				},
+				.idx = nodes.size
+			};
+			memcpy(command_node, &command_node_init, sizeof(cmd_node_t));
 
 			utl_vector_push(&nodes, &command_node);
 			utl_vector_push(&root->children, &command_node->idx);
@@ -32,13 +44,20 @@ pck_packet_t* cmd_get_graph() {
 			// aliases
 			for (size_t j = 0; j < command->alias_count; ++j) {
 
-				cmd_node_t* command_alias = calloc(1, sizeof(cmd_node_t));
-				command_alias->type = cmd_node_literal;
-				command_alias->children.bytes_per_element = sizeof(int32_t);
-				command_alias->redirect_node = command_node->idx;
-				command_alias->has_redirect_node = true;
-				command_alias->literal.name = command->aliases[j];
-				command_alias->idx = nodes.size;
+				cmd_node_t* command_alias = malloc(sizeof(cmd_node_t));
+				cmd_node_t command_alias_init = {
+					.type = cmd_node_literal,
+					.children = {
+						.bytes_per_element = sizeof(int32_t)
+					},
+					.redirect_node = command_node->idx,
+					.has_redirect_node = true,
+					.literal = {
+						.name = command->aliases[j]
+					},
+					.idx = nodes.size
+				};
+				memcpy(command_alias, &command_alias_init, sizeof(cmd_node_t));
 
 				utl_vector_push(&nodes, &command_alias);
 				utl_vector_push(&root->children, &command_alias->idx);

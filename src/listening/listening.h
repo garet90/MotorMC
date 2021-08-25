@@ -212,13 +212,9 @@ typedef struct {
 		uint16_t port;
 	} address;
 
+	utl_id_vector_t clients;
+	
 	struct {
-		pthread_mutex_t lock;
-		utl_id_vector_t vector;
-	} clients;
-
-	struct {
-		pthread_mutex_t lock;
 		utl_doubly_linked_list_t list;
 		size_t max : 16;
 	} online;
@@ -235,6 +231,8 @@ extern void ltg_init();
 extern void* t_ltg_run(void*);
 extern void ltg_accept(ltg_client_t*);
 extern void* t_ltg_client(void*);
+
+extern ltg_client_t* ltg_get_client_by_id(uint32_t id);
 
 extern bool_t ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet);
 

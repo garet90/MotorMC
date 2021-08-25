@@ -5,19 +5,14 @@
 utl_vector_t* utl_create_vector(size_t bpe, size_t capacity) {
 
 	utl_vector_t* vector = malloc(sizeof(utl_vector_t));
-
-	utl_init_vector(vector, bpe, capacity);
+	utl_vector_t vector_init = {
+		.bytes_per_element = bpe,
+		.array = malloc(bpe * capacity),
+		.capacity = capacity
+	};
+	memcpy(vector, &vector_init, sizeof(utl_vector_t));
 
 	return vector;
-
-}
-
-void utl_init_vector(utl_vector_t* vector, size_t bpe, size_t capacity) {
-
-	vector->bytes_per_element = bpe;
-	vector->capacity = capacity;
-	vector->size = 0;
-	vector->array = malloc(bpe * capacity);
 
 }
 

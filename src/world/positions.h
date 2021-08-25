@@ -4,24 +4,24 @@
 
 typedef struct {
 
-	int32_t x;
-	int32_t y;
-	int32_t z;
+	_Atomic int32_t x;
+	_Atomic int32_t y;
+	_Atomic int32_t z;
 
 } wld_block_position_t;
 
 typedef struct {
 
-	wld_world_t* world;
-	float64_t x;
-	float64_t y;
-	float64_t z;
+	wld_world_t* _Atomic world;
+	_Atomic float64_t x;
+	_Atomic float64_t y;
+	_Atomic float64_t z;
 
 } wld_position_t;
 
 typedef struct {
 
-	float32_t pitch;
-	float32_t yaw;
+	_Atomic float32_t pitch;
+	_Atomic float32_t yaw;
 
 } wld_rotation_t;

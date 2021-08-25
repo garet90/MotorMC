@@ -19,7 +19,7 @@ const cmd_command_t* cmd_defaults[] = {
 };
 utl_vector_t cmd_list = {
 	.bytes_per_element = sizeof(cmd_command_t*),
-	.array = (byte_t*) cmd_defaults,
+	.array = (_Atomic byte_t*) cmd_defaults,
 	.size = sizeof(cmd_defaults) / sizeof(cmd_defaults[0])
 };
 

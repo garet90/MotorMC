@@ -103,12 +103,8 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
 
-	with_lock (&player->living_entity.entity.lock) {
-
-		player->displayed_skin_parts = pck_read_int8(packet);
-		player->main_hand = (byte_t) pck_read_var_int(packet);
-
-	}
+	player->displayed_skin_parts = pck_read_int8(packet);
+	player->main_hand = (byte_t) pck_read_var_int(packet);
 
 	__attribute__((unused)) bool_t disable_text_filtering = pck_read_int8(packet);
 
@@ -164,22 +160,18 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 	const float64_t y = pck_read_float64(packet);
 	const float64_t z = pck_read_float64(packet);
 	const bool_t on_ground = pck_read_int8(packet);
-
-	with_lock (&player->living_entity.entity.lock) {
 		
-		const uint64_t c_x = (((uint64_t) x) >> 4);
-		const uint64_t c_z = (((uint64_t) z) >> 4);
+	const uint64_t c_x = (((uint64_t) x) >> 4);
+	const uint64_t c_z = (((uint64_t) z) >> 4);
 
-		if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
+	if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
 
-			phd_send_update_view_position_to(client, c_x, c_z);
-			phd_update_sent_chunks_move(client, c_x, c_z);
-
-		}
-
-		ent_move_l(&player->living_entity.entity, x, y, z, on_ground);
+		phd_send_update_view_position_to(client, c_x, c_z);
+		phd_update_sent_chunks_move(client, c_x, c_z);
 
 	}
+
+	ent_move(&player->living_entity.entity, x, y, z, on_ground);
 
 	return true;
 
@@ -198,21 +190,17 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 
 	const bool_t on_ground = pck_read_int8(packet);
 
-	with_lock (&player->living_entity.entity.lock) {
+	const uint64_t c_x = (((uint64_t) x) >> 4);
+	const uint64_t c_z = (((uint64_t) z) >> 4);
 
-		const uint64_t c_x = (((uint64_t) x) >> 4);
-		const uint64_t c_z = (((uint64_t) z) >> 4);
+	if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
 
-		if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
+		phd_send_update_view_position_to(client, c_x, c_z);
+		phd_update_sent_chunks_move(client, c_x, c_z);
 
-			phd_send_update_view_position_to(client, c_x, c_z);
-			phd_update_sent_chunks_move(client, c_x, c_z);
-
-		}
-
-		ent_move_look_l(&player->living_entity, x, y, z, yaw, pitch, on_ground);
-	
 	}
+
+	ent_move_look(&player->living_entity, x, y, z, yaw, pitch, on_ground);
 	
 	return true;
 
@@ -228,37 +216,33 @@ bool_t phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 		return false;
 	}
 
-	with_lock (&player->living_entity.entity.lock) {
+	int32_t action = pck_read_var_int(packet);
+	__attribute__((unused)) int32_t jump_boost = pck_read_var_int(packet); // for jumping with horses
 
-		int32_t action = pck_read_var_int(packet);
-		__attribute__((unused)) int32_t jump_boost = pck_read_var_int(packet); // for jumping with horses
-
-		switch (action) {
-		case 0: // start sneaking
-			player->living_entity.entity.crouching = true;
-			break;
-		case 1: // stop sneaking
-			player->living_entity.entity.crouching = false;
-			break;
-		case 2: // leave bed
-			break;
-		case 3: // start sprinting
-			player->living_entity.entity.sprinting = true;
-			break;
-		case 4: // stop sprinting
-			player->living_entity.entity.sprinting = false;
-			break;
-		case 5: // start jump with horse
-			break;
-		case 6: // stop jump with horse
-			break;
-		case 7: // open horse inventory
-			break;
-		case 8: // start flying with elytra
-			player->living_entity.entity.flying_with_elytra = true;
-			break;
-		}
-
+	switch (action) {
+	case 0: // start sneaking
+		player->living_entity.entity.crouching = true;
+		break;
+	case 1: // stop sneaking
+		player->living_entity.entity.crouching = false;
+		break;
+	case 2: // leave bed
+		break;
+	case 3: // start sprinting
+		player->living_entity.entity.sprinting = true;
+		break;
+	case 4: // stop sprinting
+		player->living_entity.entity.sprinting = false;
+		break;
+	case 5: // start jump with horse
+		break;
+	case 6: // stop jump with horse
+		break;
+	case 7: // open horse inventory
+		break;
+	case 8: // start flying with elytra
+		player->living_entity.entity.flying_with_elytra = true;
+		break;
 	}
 
 	return true;
@@ -271,9 +255,7 @@ bool_t phd_handle_held_item_change(ltg_client_t* client, pck_packet_t* packet) {
 	
 	ent_player_t* player = client->entity;
 
-	with_lock (&player->living_entity.entity.lock) {
-		player->held_item = slot;
-	}
+	player->held_item = slot;
 
 	return true;
 
@@ -605,9 +587,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_update_sent_chunks(client);
 
 	// add to online players
-	with_lock (&sky_main.listener.online.lock) {
-		client->online_node = utl_dllist_push(&sky_main.listener.online.list, client);
-	}
+	client->online_node = utl_dllist_push(&sky_main.listener.online.list, client);
 
 	JOB_CREATE_WORK(work, job_player_join);
 	work->player = client;
@@ -618,54 +598,45 @@ void phd_send_join_game(ltg_client_t* client) {
 
 void phd_send_player_info_add_players(ltg_client_t* client) {
 
-	with_lock (&sky_main.listener.online.lock) {
-
-		if (sky_main.listener.online.list.length == 0) {
-			pthread_mutex_unlock(&sky_main.listener.online.lock);
-			return;
-		}
-
-		PCK_INLINE(packet, 3 + (sky_main.listener.online.list.length * 2048), io_big_endian);
-		
-		pck_write_var_int(packet, 0x36);
-		pck_write_var_int(packet, 0);
-		pck_write_var_int(packet, sky_main.listener.online.list.length);
-
-		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
-		while (node != NULL) {
-			ltg_client_t* player = node->element;
-			pck_write_bytes(packet, player->uuid, 16);
-			pck_write_string(packet, player->username.value, player->username.length);
-			if (player->textures.value.value != NULL) {
-				pck_write_var_int(packet, 1);
-				pck_write_string(packet, UTL_CSTRTOARG("textures"));
-				pck_write_string(packet, player->textures.value.value, player->textures.value.length);
-				if (player->textures.signature.value != NULL) {
-					pck_write_int8(packet, 1);
-					pck_write_string(packet, player->textures.signature.value, player->textures.signature.length);
-				} else {
-					pck_write_int8(packet, 0);
-				}
-			} else {
-				pck_write_var_int(packet, 0);
-			}
-			
-			ent_player_t* player_ent = client->entity;
-
-			with_lock (&player_ent->living_entity.entity.lock) {
-
-				pck_write_var_int(packet, player_ent->gamemode); // game mode
-
-			}
-			
-			pck_write_var_int(packet, player->ping); // ping
-			pck_write_int8(packet, 0); // has display name
-			node = node->next;
-		}
-
-		ltg_send(client, packet);
-
+	if (sky_main.listener.online.list.length == 0) {
+		return;
 	}
+
+	PCK_INLINE(packet, 3 + (sky_main.listener.online.list.length * 2048), io_big_endian);
+	
+	pck_write_var_int(packet, 0x36);
+	pck_write_var_int(packet, 0);
+	pck_write_var_int(packet, sky_main.listener.online.list.length);
+
+	utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
+	while (node != NULL) {
+		ltg_client_t* player = node->element;
+		pck_write_bytes(packet, player->uuid, 16);
+		pck_write_string(packet, player->username.value, player->username.length);
+		if (player->textures.value.value != NULL) {
+			pck_write_var_int(packet, 1);
+			pck_write_string(packet, UTL_CSTRTOARG("textures"));
+			pck_write_string(packet, player->textures.value.value, player->textures.value.length);
+			if (player->textures.signature.value != NULL) {
+				pck_write_int8(packet, 1);
+				pck_write_string(packet, player->textures.signature.value, player->textures.signature.length);
+			} else {
+				pck_write_int8(packet, 0);
+			}
+		} else {
+			pck_write_var_int(packet, 0);
+		}
+		
+		ent_player_t* player_ent = client->entity;
+
+		pck_write_var_int(packet, player_ent->gamemode); // game mode
+		
+		pck_write_var_int(packet, player->ping); // ping
+		pck_write_int8(packet, 0); // has display name
+		node = node->next;
+	}
+
+	ltg_send(client, packet);
 
 }
 
@@ -692,9 +663,7 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 	}
 	ent_player_t* player_ent = player->entity;
 
-	with_lock (&player_ent->living_entity.entity.lock) {
-		pck_write_var_int(packet, player_ent->gamemode); // game mode
-	}
+	pck_write_var_int(packet, player_ent->gamemode); // game mode
 
 	pck_write_var_int(packet, player->ping); // ping
 
@@ -749,19 +718,15 @@ void phd_send_player_position_and_look(ltg_client_t* client) {
 
 	ent_player_t* player = client->entity;
 
-	with_lock (&player->living_entity.entity.lock) {
-
-		pck_write_var_int(packet, 0x38);
-		pck_write_float64(packet, player->living_entity.entity.position.x); // x
-		pck_write_float64(packet, player->living_entity.entity.position.y); // y
-		pck_write_float64(packet, player->living_entity.entity.position.z); // z
-		pck_write_float32(packet, player->living_entity.rotation.pitch); // pitch
-		pck_write_float32(packet, player->living_entity.rotation.yaw); // yaw
-		pck_write_int8(packet, 0); // flags
-		pck_write_var_int(packet, player->living_entity.entity.id); // teleport id
-		pck_write_int8(packet, 0); // dismount vehicle
-
-	}
+	pck_write_var_int(packet, 0x38);
+	pck_write_float64(packet, player->living_entity.entity.position.x); // x
+	pck_write_float64(packet, player->living_entity.entity.position.y); // y
+	pck_write_float64(packet, player->living_entity.entity.position.z); // z
+	pck_write_float32(packet, player->living_entity.rotation.pitch); // pitch
+	pck_write_float32(packet, player->living_entity.rotation.yaw); // yaw
+	pck_write_int8(packet, 0); // flags
+	pck_write_var_int(packet, player->living_entity.entity.id); // teleport id
+	pck_write_int8(packet, 0); // dismount vehicle
 
 	ltg_send(client, packet);
 
@@ -801,12 +766,8 @@ void phd_send_held_item_change(ltg_client_t* client) {
 
 	ent_player_t* player = client->entity;
 
-	with_lock (&player->living_entity.entity.lock) {
-
-		pck_write_var_int(packet, 0x48);
-		pck_write_int8(packet, player->held_item);
-
-	}
+	pck_write_var_int(packet, 0x48);
+	pck_write_int8(packet, player->held_item);
 
 	ltg_send(client, packet);
 
@@ -820,11 +781,7 @@ void phd_send_update_view_position(ltg_client_t* client) {
 
 	wld_chunk_t* chunk = NULL;
 
-	with_lock (&player->living_entity.entity.lock) {
-	
-		chunk = player->living_entity.entity.chunk;
-	
-	}
+	chunk = player->living_entity.entity.chunk;
 
 	assert(chunk != NULL);
 
@@ -876,6 +833,21 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 		}
 	}
 
+	// TODO combine these loops /\ \/
+
+	// player chunks
+	for (int16_t x = -(sky_main.render_distance + 2); x <= sky_main.render_distance + 2; ++x) {
+		for (int16_t z = -(sky_main.render_distance + 2); z <= sky_main.render_distance + 2; ++z) {
+			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
+			const uint8_t distance = UTL_MAX(UTL_ABS(x), UTL_ABS(z));
+			if (distance <= sky_main.render_distance) {
+				wld_add_player_chunk(v_c, client->id, WLD_TICKET_TICK_ENTITIES);
+			} else {
+				wld_add_player_chunk(v_c, client->id, distance - sky_main.render_distance + WLD_TICKET_TICK_ENTITIES);
+			}
+		}
+	}
+
 }
 
 void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_distance) {
@@ -911,49 +883,96 @@ void phd_update_sent_chunks_move(ltg_client_t* client, int32_t x, int32_t z) {
 	const int32_t old_x = wld_get_chunk_x(client->entity->living_entity.entity.chunk);
 	const int32_t old_z = wld_get_chunk_z(client->entity->living_entity.entity.chunk);
 
-
 	if (x > old_x) {
+		
+		{ // render chunks
+			const int32_t o_x = -client->render_distance;
+			const int32_t n_x = client->render_distance + 1;
 
-		const int32_t o_x = -client->render_distance;
-		const int32_t n_x = client->render_distance + 1;
+			for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
+				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+				wld_subscribe_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id);
+			}
+		}
 
-		for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
-			wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
-			wld_subscribe_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id);
+		{ // ticket chunks
+			const int32_t o_x = -(sky_main.render_distance + 2);
+			const int32_t n_x = sky_main.render_distance + 3;
+
+			for (int32_t c_z = -(sky_main.render_distance + 2); c_z <= sky_main.render_distance + 2; ++c_z) {
+				wld_remove_player_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+				wld_add_player_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id, WLD_TICKET_BORDER);
+			}
 		}
 
 	}
 	if (x < old_x) {
 
-		const int32_t o_x = client->render_distance;
-		const int32_t n_x = client->render_distance - 1;
+		{
+			const int32_t o_x = client->render_distance;
+			const int32_t n_x = -client->render_distance - 1;
 
-		for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
-			wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
-			wld_subscribe_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id);
+			for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
+				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+				wld_subscribe_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id);
+			}
+		}
+
+		{ // ticket chunks
+			const int32_t o_x = sky_main.render_distance + 2;
+			const int32_t n_x = -(sky_main.render_distance + 3);
+
+			for (int32_t c_z = -(sky_main.render_distance + 2); c_z <= sky_main.render_distance + 2; ++c_z) {
+				wld_remove_player_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+				wld_add_player_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id, WLD_TICKET_BORDER);
+			}
 		}
 
 	}
 
 	if (z > old_z) {
 
-		const int32_t o_z = client->render_distance;
-		const int32_t n_z = client->render_distance + 1;
-		
-		for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
-			wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
-			wld_subscribe_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id);
+		{
+			const int32_t o_z = client->render_distance;
+			const int32_t n_z = client->render_distance + 1;
+			
+			for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
+				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+				wld_subscribe_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id);
+			}
+		}
+
+		{ // ticket chunks
+			const int32_t o_z = -(sky_main.render_distance + 2);
+			const int32_t n_z = sky_main.render_distance + 3;
+
+			for (int32_t c_x = -(sky_main.render_distance + 2); c_x <= sky_main.render_distance + 2; ++c_x) {
+				wld_remove_player_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+				wld_add_player_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id, WLD_TICKET_BORDER);
+			}
 		}
 
 	}
 	if (z < old_z) {
 
-		const int32_t o_z = client->render_distance;
-		const int32_t n_z = client->render_distance - 1;
-		
-		for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
-			wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
-			wld_subscribe_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id);
+		{
+			const int32_t o_z = client->render_distance;
+			const int32_t n_z = -client->render_distance - 1;
+			
+			for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
+				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+				wld_subscribe_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id);
+			}
+		}
+
+		{ // ticket chunks
+			const int32_t o_z = sky_main.render_distance + 2;
+			const int32_t n_z = -(sky_main.render_distance + 3);
+
+			for (int32_t c_x = -(sky_main.render_distance + 2); c_x <= sky_main.render_distance + 2; ++c_x) {
+				wld_remove_player_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+				wld_add_player_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id, WLD_TICKET_BORDER);
+			}
 		}
 
 	}
@@ -970,6 +989,14 @@ void phd_update_sent_chunks_leave(ltg_client_t* client) {
 		for (int16_t z = -client->render_distance; z <= client->render_distance; ++z) {
 			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
 			wld_unsubscribe_chunk(v_c, client->id);
+		}
+	}
+	
+	// player chunks
+	for (int16_t x = -(sky_main.render_distance + 2); x <= sky_main.render_distance + 2; ++x) {
+		for (int16_t z = -(sky_main.render_distance + 2); z <= sky_main.render_distance + 2; ++z) {
+			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
+			wld_remove_player_chunk(v_c, client->id);
 		}
 	}
 

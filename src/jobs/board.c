@@ -12,7 +12,7 @@ job_handler_t job_keep_alive_handlers[] = {
 utl_vector_t job_keep_alive_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (byte_t*) job_keep_alive_handlers
+	.array = (_Atomic byte_t*) job_keep_alive_handlers
 };
 
 job_handler_t job_global_chat_message_handlers[] = {
@@ -21,7 +21,7 @@ job_handler_t job_global_chat_message_handlers[] = {
 utl_vector_t job_global_chat_message_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (byte_t*) job_global_chat_message_handlers
+	.array = (_Atomic byte_t*) job_global_chat_message_handlers
 };
 
 job_handler_t job_player_join_handlers[] = {
@@ -30,7 +30,7 @@ job_handler_t job_player_join_handlers[] = {
 utl_vector_t job_player_join_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (byte_t*) job_player_join_handlers
+	.array = (_Atomic byte_t*) job_player_join_handlers
 };
 
 job_handler_t job_player_leave_handlers[] = {
@@ -39,7 +39,7 @@ job_handler_t job_player_leave_handlers[] = {
 utl_vector_t job_player_leave_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (byte_t*) job_player_leave_handlers
+	.array = (_Atomic byte_t*) job_player_leave_handlers
 };
 
 job_handler_t job_send_update_pings_handlers[] = {
@@ -48,7 +48,7 @@ job_handler_t job_send_update_pings_handlers[] = {
 utl_vector_t job_send_update_pings_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (byte_t*) job_send_update_pings_handlers
+	.array = (_Atomic byte_t*) job_send_update_pings_handlers
 };
 
 utl_vector_t* job_handlers[job_count] = {
@@ -67,14 +67,8 @@ struct {
 	.lock = PTHREAD_MUTEX_INITIALIZER
 };
 
-struct {
-	pthread_mutex_t lock;
-	utl_linked_list_t list;
-} job_board = {
-	.lock = PTHREAD_MUTEX_INITIALIZER,
-	.list = {
-		.length = 0
-	}
+utl_linked_list_t job_board = {
+	.length = 0
 };
 
 void job_add_handler(job_type_t job, job_handler_t handler) {
@@ -115,11 +109,7 @@ void job_add(job_work_t* work) {
 
 	if (work != NULL) {
 
-		with_lock (&job_board.lock) {
-			
-			utl_list_push(&job_board.list, work);
-
-		}
+		utl_list_push(&job_board, work);
 		
 		pthread_cond_signal(&job_wait.cond);
 		
@@ -131,28 +121,28 @@ void job_add(job_work_t* work) {
 
 job_work_t* job_get() {
 
-	pthread_mutex_lock(&job_board.lock);
-	if (job_board.list.first == NULL) {
-		pthread_mutex_unlock(&job_board.lock);
+	job_work_t* job = NULL;
+
+	if (job_board.first == NULL) {
 
 		// wait for jobs
-		pthread_mutex_lock(&job_wait.lock);
+		with_lock (&job_wait.lock) {
 
-		while (job_board.list.first == NULL) {
-		
-			if (sky_main.status == sky_stopping) {
+			while (job_board.first == NULL) {
+			
+				if (sky_main.status == sky_stopping) {
 
-				pthread_mutex_unlock(&job_wait.lock);
+					pthread_mutex_unlock(&job_wait.lock);
 
-				return NULL;
+					return NULL;
 
+				}
+
+				pthread_cond_wait(&job_wait.cond, &job_wait.lock);
+			
 			}
 
-			pthread_cond_wait(&job_wait.cond, &job_wait.lock);
-		
 		}
-
-		pthread_mutex_unlock(&job_wait.lock);
 
 		if (sky_main.status == sky_stopping) {
 
@@ -160,11 +150,9 @@ job_work_t* job_get() {
 
 		}
 
-		pthread_mutex_lock(&job_board.lock);
-	}
+		job = utl_list_shift(&job_board);
 
-	job_work_t* job = utl_list_shift(&job_board.list);
-	pthread_mutex_unlock(&job_board.lock);
+	}
 
 	return job;
 

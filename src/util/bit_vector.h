@@ -3,8 +3,8 @@
 
 typedef struct {
 
-	byte_t* array;
-	size_t capacity;
+	_Atomic byte_t* array;
+	_Atomic size_t capacity;
 
 } utl_bit_vector_t;
 

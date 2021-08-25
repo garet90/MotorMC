@@ -5,16 +5,16 @@ typedef struct utl_linked_node utl_linked_node_t;
 
 struct utl_linked_node {
 
-	void* element;
-	utl_linked_node_t* next;
+	void* _Atomic element;
+	utl_linked_node_t* _Atomic next;
 
 };
 
 typedef struct {
 
-	utl_linked_node_t* first;
-	utl_linked_node_t* last;
-	size_t length;
+	utl_linked_node_t* _Atomic first;
+	utl_linked_node_t* _Atomic last;
+	_Atomic size_t length;
 
 } utl_linked_list_t;
 

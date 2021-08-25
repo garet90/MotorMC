@@ -3,28 +3,19 @@
 #include "../util/id_vector.h"
 #include "../listening/listening.h"
 #include "../io/logger/logger.h"
+#include "../motor.h"
 #include "entity/entity.h"
 #include <stdlib.h>
 
-struct {
-
-	pthread_mutex_t lock;
-	utl_id_vector_t worlds;
-
-} wld_worlds = {
-	.lock = PTHREAD_MUTEX_INITIALIZER,
-	.worlds = {
-		.bytes_per_element = sizeof(wld_world_t*),
-	}
+utl_id_vector_t wld_worlds = {
+	.bytes_per_element = sizeof(wld_world_t*)
 };
 
 uint16_t wld_add(wld_world_t* world) {
 	
 	uint16_t id = 0;
 
-	with_lock (&wld_worlds.lock) {
-		id = utl_id_vector_add(&wld_worlds.worlds, &world);
-	}
+	id = utl_id_vector_add(&wld_worlds, &world);
 
 	return id;
 
@@ -45,7 +36,6 @@ wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t env
 		}
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
-	pthread_mutex_init(&world->lock, NULL);
 
 	wld_prepare_spawn(world);
 
@@ -61,7 +51,6 @@ wld_world_t* wld_load(const string_t name) {
 		.id = wld_add(world)
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
-	pthread_mutex_init(&world->lock, NULL);
 
 	// TODO
 
@@ -78,6 +67,7 @@ void wld_prepare_spawn(wld_world_t* world) {
 	// prepare spawn region
 	for (int32_t x = -11; x <= 11; ++x) {
 		for (int32_t z = -11; z <= 11; ++z) {
+			assert(UTL_MAX(14 - (11 - UTL_ABS(x)), 14 - (11 - UTL_ABS(z))) != WLD_TICKET_INACCESSIBLE);
 			wld_gen_relative_chunk(spawn_chunk, x, z, UTL_MAX(14 - (11 - UTL_ABS(x)), 14 - (11 - UTL_ABS(z))));
 		}
 	}
@@ -85,26 +75,14 @@ void wld_prepare_spawn(wld_world_t* world) {
 }
 
 uint16_t wld_get_count() {
-	
-	uint16_t count = 0;
 
-	with_lock (&wld_worlds.lock) {
-		count = wld_worlds.worlds.size;
-	}
-
-	return count;
+	return wld_worlds.size;
 
 }
 
 wld_world_t* wld_get_world(uint16_t world_id) {
 
-	wld_world_t* world = NULL;
-
-	with_lock (&wld_worlds.lock) {
-		world = UTL_ID_VECTOR_GET_AS(wld_world_t*, &wld_worlds.worlds, world_id);
-	}
-
-	return world;
+	return UTL_ID_VECTOR_GET_AS(wld_world_t*, &wld_worlds, world_id);
 
 }
 
@@ -113,46 +91,33 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 	wld_region_t* region = calloc(1, sizeof(wld_region_t));
 
 	const int64_t key = ((uint64_t) x << 16) + z;
-	with_lock (&wld_worlds.lock) {
-		wld_region_t region_init = (wld_region_t) {
-			.world = world,
-			.x = x,
-			.z = z,
-			.relative = {
-				.north = utl_tree_get(&world->regions, key - 1),
-				.south = utl_tree_get(&world->regions, key + 1),
-				.west = utl_tree_get(&world->regions, key - (1 << 16)),
-				.east = utl_tree_get(&world->regions, key + (1 << 16))
-			},
-			.lock = PTHREAD_MUTEX_INITIALIZER
-		};
-		memcpy(region, &region_init, sizeof(wld_region_t));
-	}
+	wld_region_t region_init = (wld_region_t) {
+		.world = world,
+		.x = x,
+		.z = z,
+		.relative = {
+			.north = utl_tree_get(&world->regions, key - 1),
+			.south = utl_tree_get(&world->regions, key + 1),
+			.west = utl_tree_get(&world->regions, key - (1 << 16)),
+			.east = utl_tree_get(&world->regions, key + (1 << 16))
+		}
+	};
+	memcpy(region, &region_init, sizeof(wld_region_t));
 
 	if (region->relative.north != NULL) {
-		with_lock (&region->relative.north->lock) {
-			region->relative.north->relative.south = region;
-		}
+		region->relative.north->relative.south = region;
 	}
 	if (region->relative.south != NULL) {
-		with_lock (&region->relative.south->lock) {
-			region->relative.south->relative.north = region;
-		}
+		region->relative.south->relative.north = region;
 	}
 	if (region->relative.west != NULL) {
-		with_lock (&region->relative.west->lock) {
-			region->relative.west->relative.east = region;
-		}
+		region->relative.west->relative.east = region;
 	}
 	if (region->relative.east != NULL) {
-		with_lock (&region->relative.east->lock) {
-			region->relative.east->relative.west = region;
-		}
+		region->relative.east->relative.west = region;
 	}
 
-	with_lock (&world->lock) {
-		utl_tree_put(&world->regions, key, region);
-	}
+	utl_tree_put(&world->regions, key, region);
 
 	return region;
 
@@ -160,10 +125,7 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 
 wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 
-	wld_region_t* region = NULL;
-	with_lock (&world->lock) {
-		region = utl_tree_get(&world->regions, ((uint64_t) x << 16) + z);
-	}
+	wld_region_t* region = utl_tree_get(&world->regions, ((uint64_t) x << 16) + z);
 
 	if (region == NULL) {
 		region = wld_gen_region(world, x, z);
@@ -185,13 +147,16 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		},
 		.x = x,
 		.z = z,
-		.max_ticket = max_ticket
+		.max_ticket = max_ticket,
+		.ticket = max_ticket
 	};
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t));
 
-	pthread_mutex_init(&chunk->lock, NULL);
-
 	region->chunks[(x << 5) + z] = chunk;
+
+	if (max_ticket < WLD_TICKET_INACCESSIBLE) {
+		region->loaded_chunks += 1;
+	}
 
 	return chunk;
 
@@ -320,35 +285,46 @@ wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t
 
 }
 
+void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
+	ent_player_t* player = ltg_get_client_by_id(client_id)->entity;
+	const int32_t c_x = wld_get_chunk_x(chunk);
+	const int32_t c_z = wld_get_chunk_z(chunk);
+	int32_t p_x = 0;
+	int32_t p_z = 0;
+	const wld_chunk_t* player_chunk = player->living_entity.entity.chunk;
+	p_x = wld_get_chunk_x(player_chunk);
+	p_z = wld_get_chunk_z(player_chunk);
+
+	uint32_t distance = UTL_MIN(UTL_ABS(c_x - p_x), UTL_ABS(c_z - p_z));
+
+	if (distance < sky_main.render_distance) {
+		chunk->ticket = UTL_MIN(chunk->ticket, WLD_TICKET_TICK_ENTITIES);
+	} else {
+		assert(distance - sky_main.render_distance + WLD_TICKET_TICK_ENTITIES <= WLD_TICKET_MAX);
+		chunk->ticket = UTL_MIN(chunk->ticket, distance - sky_main.render_distance + WLD_TICKET_TICK_ENTITIES);
+	}
+
+}
+
 void wld_free_region(wld_region_t* region) {
 	
-	pthread_mutex_destroy(&region->lock);
-
 	if (region->relative.north != NULL) {
-		with_lock (&region->relative.north->lock) {
-			region->relative.north->relative.south = NULL;
-		}
+		region->relative.north->relative.south = NULL;
 	}
 	if (region->relative.south != NULL) {
-		with_lock (&region->relative.south->lock) {
-			region->relative.south->relative.north = NULL;
-		}
+		region->relative.south->relative.north = NULL;
 	}
 	if (region->relative.west != NULL) {
-		with_lock (&region->relative.west->lock) {
-			region->relative.west->relative.east = NULL;
-		}
+		region->relative.west->relative.east = NULL;
 	}
 	if (region->relative.east != NULL) {
-		with_lock (&region->relative.east->lock) {
-			region->relative.east->relative.west = NULL;
-		}
+		region->relative.east->relative.west = NULL;
 	}
 
 	for (size_t i = 0; i < 32 * 32; ++i) {
 		if (region->chunks[i] != NULL) {
-			pthread_mutex_destroy(&region->chunks[i]->lock);
 			utl_bit_vector_term(&region->chunks[i]->subscribers);
+			utl_bit_vector_term(&region->chunks[i]->players);
 			free(region->chunks[i]);
 		}
 	}
@@ -359,11 +335,7 @@ void wld_free_region(wld_region_t* region) {
 
 void wld_unload(wld_world_t* world) {
 	
-	with_lock (&wld_worlds.lock) {
-		utl_id_vector_remove(&wld_worlds.worlds, world->id);
-	}
-
-	pthread_mutex_destroy(&world->lock);
+	utl_id_vector_remove(&wld_worlds, world->id);
 
 	wld_region_t* region;
 	while ((region = utl_tree_shift(&world->regions)) != NULL) {
@@ -377,23 +349,17 @@ void wld_unload(wld_world_t* world) {
 
 void wld_unload_all() {
 
-	with_lock (&wld_worlds.lock) {
+	for (uint32_t i = 0; i < wld_worlds.size; ++i) {
+		wld_world_t* world = UTL_ID_VECTOR_GET_AS(wld_world_t*, &wld_worlds, i);
+		utl_id_vector_remove(&wld_worlds, i);
 
-		for (uint32_t i = 0; i < wld_worlds.worlds.size; ++i) {
-			wld_world_t* world = UTL_ID_VECTOR_GET_AS(wld_world_t*, &wld_worlds.worlds, i);
-			utl_id_vector_remove(&wld_worlds.worlds, i);
-			
-			pthread_mutex_destroy(&world->lock);
-
-			wld_region_t* region;
-			while ((region = utl_tree_shift(&world->regions)) != NULL) {
-				wld_free_region(region);
-			}
-			utl_tree_term(&world->regions);
-
-			free(world);
+		wld_region_t* region;
+		while ((region = utl_tree_shift(&world->regions)) != NULL) {
+			wld_free_region(region);
 		}
+		utl_tree_term(&world->regions);
 
+		free(world);
 	}
 
 }

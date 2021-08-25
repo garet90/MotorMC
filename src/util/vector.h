@@ -3,10 +3,10 @@
 
 typedef struct {
 
-	byte_t* array;
-	size_t size;
-	size_t capacity;
-	size_t bytes_per_element; // bytes per element
+	_Atomic byte_t* array;
+	_Atomic size_t size;
+	_Atomic size_t capacity;
+	const size_t bytes_per_element; // bytes per element
 
 } utl_vector_t;
 
@@ -14,7 +14,6 @@ typedef struct {
 #define UTL_VECTOR_SHIFT_AS(t, v) *((t*) utl_vector_shift(v))
 
 extern utl_vector_t* utl_create_vector(size_t, size_t);
-extern void utl_init_vector(utl_vector_t*, size_t, size_t);
 
 extern void* utl_vector_push(utl_vector_t*, const void*);
 static inline void* utl_vector_get(const utl_vector_t* vector, size_t idx) {
