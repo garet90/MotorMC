@@ -171,6 +171,6 @@ extern void phd_send_tags(ltg_client_t*);
 
 extern void phd_update_sent_chunks(ltg_client_t* client);
 extern void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_distance);
-extern void phd_update_sent_chunks_move(ltg_client_t* client, int32_t x, int32_t z);
+extern void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* client);
 extern void phd_update_sent_chunks_teleport(ltg_client_t* client, wld_world_t* world, int32_t x, int32_t z);
 extern void phd_update_sent_chunks_leave(ltg_client_t* client);

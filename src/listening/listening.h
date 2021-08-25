@@ -157,7 +157,7 @@ typedef struct {
 	pthread_t thread;
 	
 	utl_doubly_linked_node_t* online_node;
-	ent_player_t* entity;
+	ent_player_t* _Atomic entity;
 
 	uint32_t id;
 
@@ -177,8 +177,8 @@ typedef struct {
 
 	uint32_t verify;
 
-	int64_t last_recv;
-	int64_t ping;
+	_Atomic int64_t last_recv;
+	_Atomic int64_t ping;
 
 	struct {
 		symmetric_CFB8 encrypt;

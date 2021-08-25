@@ -160,18 +160,22 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 	const float64_t y = pck_read_float64(packet);
 	const float64_t z = pck_read_float64(packet);
 	const bool_t on_ground = pck_read_int8(packet);
-		
+	
 	const uint64_t c_x = (((uint64_t) x) >> 4);
 	const uint64_t c_z = (((uint64_t) z) >> 4);
 
-	if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
-
-		phd_send_update_view_position_to(client, c_x, c_z);
-		phd_update_sent_chunks_move(client, c_x, c_z);
-
-	}
+	const wld_chunk_t* old_chunk = player->living_entity.entity.chunk;
+	const uint64_t o_x = wld_get_chunk_x(old_chunk);
+	const uint64_t o_z = wld_get_chunk_x(old_chunk);
 
 	ent_move(&player->living_entity.entity, x, y, z, on_ground);
+
+	if (o_x != c_x || o_z != c_z) {
+
+		phd_send_update_view_position_to(client, c_x, c_z);
+		phd_update_sent_chunks_move(old_chunk, client);
+
+	}
 
 	return true;
 
@@ -193,14 +197,18 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 	const uint64_t c_x = (((uint64_t) x) >> 4);
 	const uint64_t c_z = (((uint64_t) z) >> 4);
 
-	if ((((uint64_t) player->living_entity.entity.position.x) >> 4) != c_x || (((uint64_t) player->living_entity.entity.position.z) >> 4) != c_z) {
-
-		phd_send_update_view_position_to(client, c_x, c_z);
-		phd_update_sent_chunks_move(client, c_x, c_z);
-
-	}
+	const wld_chunk_t* old_chunk = player->living_entity.entity.chunk;
+	const uint64_t o_x = wld_get_chunk_x(old_chunk);
+	const uint64_t o_z = wld_get_chunk_x(old_chunk);
 
 	ent_move_look(&player->living_entity, x, y, z, yaw, pitch, on_ground);
+
+	if (o_x != c_x || o_z != c_z) {
+
+		phd_send_update_view_position_to(client, c_x, c_z);
+		phd_update_sent_chunks_move(old_chunk, client);
+
+	}
 	
 	return true;
 
@@ -508,7 +516,8 @@ void phd_send_join_game(ltg_client_t* client) {
 	wld_world_t* player_world = wld_get_default();
 
 	// create an entity for the player
-	ent_player_t* player = client->entity = calloc(1, sizeof(ent_player_t));
+	ent_player_t* player = calloc(1, sizeof(ent_player_t));
+	client->entity = player;
 	player->living_entity.entity.type = ent_player;
 	player->living_entity.entity.position.world = player_world;
 	player->living_entity.entity.position.y = 256;
@@ -826,16 +835,6 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 
 	const wld_chunk_t* chunk = client->entity->living_entity.entity.chunk;
 
-	for (int16_t x = -client->render_distance; x <= client->render_distance; ++x) {
-		for (int16_t z = -client->render_distance; z <= client->render_distance; ++z) {
-			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
-			wld_subscribe_chunk(v_c, client->id);
-		}
-	}
-
-	// TODO combine these loops /\ \/
-
-	// player chunks
 	for (int16_t x = -(sky_main.render_distance + 2); x <= sky_main.render_distance + 2; ++x) {
 		for (int16_t z = -(sky_main.render_distance + 2); z <= sky_main.render_distance + 2; ++z) {
 			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
@@ -844,6 +843,11 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 				wld_add_player_chunk(v_c, client->id, WLD_TICKET_TICK_ENTITIES);
 			} else {
 				wld_add_player_chunk(v_c, client->id, distance - sky_main.render_distance + WLD_TICKET_TICK_ENTITIES);
+			}
+
+			// subscribe to the chunk if it is in render distance
+			if (distance <= client->render_distance) {
+				wld_subscribe_chunk(v_c, client->id);
 			}
 		}
 	}
@@ -876,12 +880,13 @@ void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_dis
 
 }
 
-void phd_update_sent_chunks_move(ltg_client_t* client, int32_t x, int32_t z) {
+void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* client) {
 
-	const wld_chunk_t* old_chunk = client->entity->living_entity.entity.chunk;
+	const int32_t x = ((uint64_t) client->entity->living_entity.entity.position.x) >> 4;
+	const int32_t z = ((uint64_t) client->entity->living_entity.entity.position.z) >> 4;
 
-	const int32_t old_x = wld_get_chunk_x(client->entity->living_entity.entity.chunk);
-	const int32_t old_z = wld_get_chunk_z(client->entity->living_entity.entity.chunk);
+	const int32_t old_x = wld_get_chunk_x(old_chunk);
+	const int32_t old_z = wld_get_chunk_z(old_chunk);
 
 	if (x > old_x) {
 		
@@ -901,12 +906,15 @@ void phd_update_sent_chunks_move(ltg_client_t* client, int32_t x, int32_t z) {
 
 			for (int32_t c_z = -(sky_main.render_distance + 2); c_z <= sky_main.render_distance + 2; ++c_z) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x + 1, c_z));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x + 2, c_z));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, n_x - 2, c_z));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, n_x - 1, c_z));
 				wld_add_player_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id, WLD_TICKET_BORDER);
 			}
 		}
 
-	}
-	if (x < old_x) {
+	} else if (x < old_x) {
 
 		{
 			const int32_t o_x = client->render_distance;
@@ -924,6 +932,10 @@ void phd_update_sent_chunks_move(ltg_client_t* client, int32_t x, int32_t z) {
 
 			for (int32_t c_z = -(sky_main.render_distance + 2); c_z <= sky_main.render_distance + 2; ++c_z) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x - 1, c_z));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x - 2, c_z));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, n_x + 2, c_z));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, n_x + 1, c_z));
 				wld_add_player_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id, WLD_TICKET_BORDER);
 			}
 		}
@@ -948,12 +960,15 @@ void phd_update_sent_chunks_move(ltg_client_t* client, int32_t x, int32_t z) {
 
 			for (int32_t c_x = -(sky_main.render_distance + 2); c_x <= sky_main.render_distance + 2; ++c_x) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z + 1));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z + 2));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, n_z - 2));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, n_z - 1));
 				wld_add_player_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id, WLD_TICKET_BORDER);
 			}
 		}
 
-	}
-	if (z < old_z) {
+	} else if (z < old_z) {
 
 		{
 			const int32_t o_z = client->render_distance;
@@ -971,6 +986,10 @@ void phd_update_sent_chunks_move(ltg_client_t* client, int32_t x, int32_t z) {
 
 			for (int32_t c_x = -(sky_main.render_distance + 2); c_x <= sky_main.render_distance + 2; ++c_x) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z - 1));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z - 2));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, n_z + 2));
+				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, n_z + 1));
 				wld_add_player_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id, WLD_TICKET_BORDER);
 			}
 		}
@@ -985,18 +1004,16 @@ void phd_update_sent_chunks_leave(ltg_client_t* client) {
 	
 	const wld_chunk_t* chunk = client->entity->living_entity.entity.chunk;
 
-	for (int16_t x = -client->render_distance; x <= client->render_distance; ++x) {
-		for (int16_t z = -client->render_distance; z <= client->render_distance; ++z) {
-			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
-			wld_unsubscribe_chunk(v_c, client->id);
-		}
-	}
-	
 	// player chunks
 	for (int16_t x = -(sky_main.render_distance + 2); x <= sky_main.render_distance + 2; ++x) {
 		for (int16_t z = -(sky_main.render_distance + 2); z <= sky_main.render_distance + 2; ++z) {
 			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
 			wld_remove_player_chunk(v_c, client->id);
+
+			const uint8_t distance = UTL_MAX(UTL_ABS(x), UTL_ABS(z));
+			if (distance <= client->render_distance) {
+				wld_unsubscribe_chunk(v_c, client->id);
+			}
 		}
 	}
 
