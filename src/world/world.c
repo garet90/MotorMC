@@ -4,6 +4,8 @@
 #include "../listening/listening.h"
 #include "../io/logger/logger.h"
 #include "../motor.h"
+#include "../jobs/jobs.h"
+#include "../jobs/scheduler/scheduler.h"
 #include "entity/entity.h"
 #include <stdlib.h>
 
@@ -140,6 +142,11 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 	assert(x < 32 && z < 32);
 
 	wld_chunk_t* chunk = calloc(1, sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * mat_get_chunk_height(region->world->environment));
+	
+	// tick job
+	JOB_CREATE_WORK(tick_job, job_tick_chunk);
+	tick_job->chunk = chunk;
+	
 	wld_chunk_t chunk_init = {
 		.region = region,
 		.block_entities = {
@@ -148,8 +155,12 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		.x = x,
 		.z = z,
 		.max_ticket = max_ticket,
-		.ticket = max_ticket
+		.ticket = max_ticket,
+		.tick = sch_schedule_repeating(&tick_job->header, 1, 0)
 	};
+	for (uint32_t i = 0; i < 256; ++i) {
+		chunk_init.highest[i].motion_blocking = 2;
+	}
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t));
 
 	region->chunks[(x << 5) + z] = chunk;
@@ -283,6 +294,23 @@ wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t
 	}
 	return region->chunks[(x << 5) + z];
 
+}
+
+void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
+	ticket = UTL_MIN(chunk->max_ticket, ticket);
+	if (chunk->ticket == WLD_TICKET_INACCESSIBLE && ticket < WLD_TICKET_INACCESSIBLE) {
+		// loading chunk
+		chunk->region->loaded_chunks += 1;
+	} else if (chunk->ticket < WLD_TICKET_INACCESSIBLE && ticket == WLD_TICKET_INACCESSIBLE) {
+		// unloading chunk
+		chunk->region->loaded_chunks -= 1;
+		if (chunk->region->loaded_chunks == 0) {
+			JOB_CREATE_WORK(unload_job, job_unload_region);
+			unload_job->region = chunk->region;
+			sch_schedule(&unload_job->header, 100); // set to try unload in 5 seconds
+		}
+	}
+	chunk->ticket = ticket;
 }
 
 void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {

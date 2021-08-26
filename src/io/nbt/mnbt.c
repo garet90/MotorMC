@@ -329,7 +329,7 @@ size_t mnbt_write_file(mnbt_doc* document, const char* file, size_t max_file_len
 size_t _mnbt_write_tag(mnbt_tag* tag, uint8_t* bytes) {
 
 	// write type id
-	*bytes = tag->type;
+	*bytes = (uint8_t) tag->type;
 	bytes += 1;
 
 	if (tag->type == MNBT_END) {

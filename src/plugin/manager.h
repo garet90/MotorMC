@@ -1,14 +1,67 @@
 #pragma once
 #include "../main.h"
 #include "../io/logger/logger.h"
+#include "../io/commands/commands.h"
 #include "../util/vector.h"
-#include "plugin.h"
 
 #ifdef __WINDOWS__
 #include <windows.h>
 #else
 #include <dlfcn.h>
 #endif
+
+// PLUGINS
+
+typedef enum {
+
+	plg_postworld = 0,
+	plg_startup
+
+} plg_startup_t;
+
+typedef struct {
+
+	const string_t name;
+	const string_t description;
+	const string_t authors;
+	const string_t version;
+	const string_t website;
+	const plg_startup_t load;
+
+} plg_plugin_t;
+
+// API (Server side)
+
+#define PLG_CURRENT_INTERFACE 0
+
+typedef struct {
+	
+	uint32_t interface_version;
+
+	struct {
+
+		void (*info) (const char*, ...);
+		void (*warn) (const char*, ...);
+		void (*error) (const char*, ...);
+
+	} logger;
+
+	struct {
+
+		void (*add) (const cmd_command_t*);
+		void (*message) (const cmd_sender_t*, const cht_component_t*);
+
+	} commands;
+
+	struct {
+
+		cht_component_t* (*alloc) ();
+		void (*add_extra) (cht_component_t*, const cht_component_t*);
+		void (*free) (cht_component_t*);
+
+	} chat;
+
+} plg_interface_t;
 
 static const plg_interface_t plg_interface = {
 
@@ -27,7 +80,7 @@ static const plg_interface_t plg_interface = {
 
 	.chat = {
 		.alloc = cht_alloc,
-		.addExtra = cht_add_extra,
+		.add_extra = cht_add_extra,
 		.free = cht_free
 	}
 

@@ -65,6 +65,8 @@ struct wld_chunk {
 	_Atomic uint8_t ticket;
 	const uint8_t max_ticket;
 
+	const uint32_t tick;
+
 	wld_chunk_section_t sections[]; // y = section index * 16, count of sections = World.height / 16
 
 };
@@ -158,20 +160,7 @@ static inline void wld_unsubscribe_chunk(wld_chunk_t* chunk, uint32_t client_id)
 	utl_bit_vector_reset_bit(&chunk->subscribers, client_id);
 }
 
-static inline void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
-	ticket = UTL_MIN(chunk->max_ticket, ticket);
-	if (chunk->ticket == WLD_TICKET_INACCESSIBLE && ticket < WLD_TICKET_INACCESSIBLE) {
-		// loading chunk
-		chunk->region->loaded_chunks += 1;
-	} else if (chunk->ticket < WLD_TICKET_INACCESSIBLE && ticket == WLD_TICKET_INACCESSIBLE) {
-		// unloading chunk
-		chunk->region->loaded_chunks -= 1;
-		if (chunk->region->loaded_chunks == 0) {
-			// TODO unload region
-		}
-	}
-	chunk->ticket = ticket;
-}
+extern void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket);
 
 static inline void wld_add_player_chunk(wld_chunk_t* chunk, uint32_t client_id, uint8_t ticket) {
 	utl_bit_vector_set_bit(&chunk->players, client_id);

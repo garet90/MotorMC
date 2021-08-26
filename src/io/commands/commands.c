@@ -6,6 +6,7 @@
 #include "../../util/vector.h"
 #include "../../listening/phd/play.h"
 #include "../../plugin/manager.h"
+#include "../../jobs/board.h"
 #include "../logger/logger.h"
 
 utl_tree_t cmd_handlers = {
@@ -15,7 +16,8 @@ utl_tree_t cmd_handlers = {
 const cmd_command_t* cmd_defaults[] = {
 	&cmd_stop_h,
 	&cmd_help_h,
-	&cmd_plugins_h
+	&cmd_plugins_h,
+	&cmd_jb_h
 };
 utl_vector_t cmd_list = {
 	.bytes_per_element = sizeof(cmd_command_t*),
@@ -70,7 +72,7 @@ void cmd_add_command(const cmd_command_t* command) {
 
 }
 
-void cmd_handle(char* cmd, const cmd_sender_t sender) {
+void cmd_handle(char* cmd, const cmd_sender_t* sender) {
 
 	if (cmd_list.size != 0 && cmd_handlers.object == NULL) {
 		cmd_add_defaults();
@@ -130,9 +132,9 @@ void cmd_handle(char* cmd, const cmd_sender_t sender) {
 
 }
 
-bool_t cmd_has_permission(const cmd_command_t* command, const cmd_sender_t sender) {
+bool_t cmd_has_permission(const cmd_command_t* command, const cmd_sender_t* sender) {
 
-	if (sender.op) return true;
+	if (sender->op) return true;
 	if (UTL_STRTOCSTR(command->permission) == NULL) return true;
 
 	/*
@@ -200,16 +202,16 @@ char* cmd_hash_arg(char* string, uint32_t* hash) {
 
 }
 
-void cmd_message(const cmd_sender_t sender, const cht_component_t* component) {
+void cmd_message(const cmd_sender_t* sender, const cht_component_t* component) {
 
-	switch (sender.type) {
+	switch (sender->type) {
 		case cmd_console:
 			log_command(component);
 			break;
 		case cmd_player: {
 			char message[4096];
 			const size_t message_length = cht_write(component, message);
-			phd_send_system_chat_message(sender.player, message, message_length);
+			phd_send_system_chat_message(sender->player, message, message_length);
 		} break;
 		case cmd_command_block:
 			break;
@@ -217,13 +219,13 @@ void cmd_message(const cmd_sender_t sender, const cht_component_t* component) {
 
 }
 
-bool_t cmd_stop(char* args, const cmd_sender_t sender) {
+bool_t cmd_stop(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
 		return false;
 	}
 
-	if (sender.type != cmd_console)
+	if (sender->type != cmd_console)
 		cmd_message(sender, &cmd_stopping_server);
 
 	sky_term();
@@ -232,7 +234,7 @@ bool_t cmd_stop(char* args, const cmd_sender_t sender) {
 
 }
 
-bool_t cmd_help(char* args, const cmd_sender_t sender) {
+bool_t cmd_help(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
 		return false;
@@ -283,7 +285,7 @@ bool_t cmd_help(char* args, const cmd_sender_t sender) {
 
 }
 
-bool_t cmd_plugins(char* args, const cmd_sender_t sender) {
+bool_t cmd_plugins(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
 		return false;
@@ -313,6 +315,24 @@ bool_t cmd_plugins(char* args, const cmd_sender_t sender) {
 	cmd_message(sender, &plugins);
 
 	cht_free(&plugins);
+
+	return true;
+
+}
+
+bool_t cmd_jb(char* args, const cmd_sender_t* sender) {
+
+	if (args != NULL) {
+		return false;
+	}
+
+	char on_board[256];
+	const size_t on_board_len = sprintf(on_board, "Jobs on board: %zu", job_get_count());
+
+	cht_component_t msg = cht_new;
+	msg.text = UTL_ARRTOSTR(on_board, on_board_len);
+	
+	cmd_message(sender, &msg);
 
 	return true;
 

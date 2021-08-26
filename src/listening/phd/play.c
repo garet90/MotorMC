@@ -75,7 +75,7 @@ bool_t phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 			.type = cmd_player,
 			.player = client
 		};
-		cmd_handle(UTL_STRTOCSTR(message) + 1, sender);
+		cmd_handle(UTL_STRTOCSTR(message) + 1, &sender);
 		free(UTL_STRTOCSTR(message));
 	} else {
 		JOB_CREATE_WORK(job, job_global_chat_message);
@@ -397,31 +397,29 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	// HEIGHTMAP
 
-	int64_t motion_blocking[37];
-	memset(motion_blocking, 0, sizeof(motion_blocking));
+	const uint32_t motion_blocking_size = 37;
 
-	// just so we can use i and j again
-	{
-		uint8_t i = 0; // long
-		uint8_t j = 0; // in long
+	uint64_t motion_blocking[motion_blocking_size];
 
-		for (uint16_t k = 0; k < 16 * 16; ++k) {
-			motion_blocking[i] |= (uint64_t) io_htons(chunk->highest[k].motion_blocking) << (1 + (6 - j++) * 9);
-			if (j > 6) {
-				j = 0;
-				i += 1;
-			}
+	// Set this to superflat world motion blocking heightmap, it still doesn't work for some odd reason FIXME
+	for (uint8_t i = 0; i < motion_blocking_size; ++i) {
+		if (i == motion_blocking_size - 1) {
+			motion_blocking[i] = 0x0000000020100804L;
+		} else {
+			motion_blocking[i] = 0x0100804020100804L;
 		}
 	}
 
 	// create heightmap
 	mnbt_doc* doc = mnbt_new();
 	mnbt_tag* tag = mnbt_new_tag(doc, UTL_CSTRTOARG(""), MNBT_COMPOUND, mnbt_val_compound());
-	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("MOTION_BLOCKING"), MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, 37)));
+	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("MOTION_BLOCKING"), MNBT_LONG_ARRAY, mnbt_val_long_array((int64_t*) motion_blocking, motion_blocking_size)));
+	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("WORLD_SURFACE"), MNBT_LONG_ARRAY, mnbt_val_long_array((int64_t*) motion_blocking, motion_blocking_size)));
 	mnbt_set_root(doc, tag);
 
-	packet->cursor += mnbt_write(doc, (byte_t*) pck_cursor(packet), MNBT_NONE);
+	pck_write_nbt(packet, doc);
 
+	mnbt_write_file(doc, "test.nbt", 1024, MNBT_NONE);
 	mnbt_free(doc);
 
 	// BIOMES
@@ -478,6 +476,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 	pck_write_var_int(packet, 0);
 
 	ltg_send(client, packet);
+
+	pck_log(packet);
 
 }
 
@@ -847,6 +847,8 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 
 			// subscribe to the chunk if it is in render distance
 			if (distance <= client->render_distance) {
+				phd_send_update_light(client, v_c);
+				// TODO phd_send_chunk_data(client, v_c);
 				wld_subscribe_chunk(v_c, client->id);
 			}
 		}

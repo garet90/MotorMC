@@ -1,6 +1,7 @@
 #pragma once
 #include "../../main.h"
 #include "../io.h"
+#include "../nbt/mnbt.h"
 
 typedef struct {
 
@@ -185,9 +186,21 @@ static inline void pck_write_string(pck_packet_t* packet, const char* string, si
 
 }
 
+static inline void pck_write_nbt(pck_packet_t* packet, mnbt_doc* doc) {
+
+	packet->cursor += mnbt_write(doc, packet->bytes + packet->cursor, MNBT_NONE);
+
+}
+
 static inline byte_t* pck_cursor(pck_packet_t* packet) {
 	return packet->bytes + packet->cursor;
 }
+
+#if NDEBUG
+#define pck_log(packet) {}
+#else
+extern void pck_log(pck_packet_t* packet);
+#endif
 
 /*
 static inline void pck_padLength(pck_packet_t* packet) {

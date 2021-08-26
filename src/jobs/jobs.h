@@ -1,5 +1,6 @@
 #pragma once
 #include "../main.h"
+#include "../listening/listening.h"
 #include "board.h"
 
 #define JOB_CREATE_WORK(name, job_type) job_type ##_t* name = malloc(sizeof(job_type ##_t)); job_init_work((job_work_t*) name, job_type);
@@ -44,3 +45,17 @@ typedef struct {
 	job_work_t header;
 
 } job_send_update_pings_t;
+
+typedef struct {
+
+	job_work_t header;
+	wld_chunk_t* chunk;
+
+} job_tick_chunk_t;
+
+typedef struct {
+
+	job_work_t header;
+	wld_region_t* region;
+
+} job_unload_region_t;

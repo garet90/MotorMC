@@ -8,7 +8,9 @@
 typedef struct {
 
 	job_work_t* job;
-	int32_t repeat;
+
+	uint16_t interval;
+	bool_t repeat : 1;
 	bool_t cancel : 1;
 
 } sch_scheduled_t;
@@ -24,13 +26,8 @@ utl_id_vector_t sch_scheduled = {
 void sch_push(sch_scheduled_t* scheduled, uint32_t delay) {
 
 	const void* null = NULL;
-	while (sch_board.size < delay) {
+	while (sch_board.size <= delay) {
 		utl_vector_push(&sch_board, &null);
-	}
-
-	if (sch_board.size == delay) {
-		utl_linked_list_t* list = utl_create_list();
-		utl_vector_push(&sch_board, &list);
 	}
 
 	utl_linked_list_t* list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board, delay);
@@ -59,7 +56,7 @@ int32_t sch_schedule(job_work_t* job, uint32_t delay) {
 	int32_t id = -1;
 	sch_scheduled_t* scheduled = sch_new(&id);
 	scheduled->job = job;
-	scheduled->repeat = -1;
+	scheduled->repeat = false;
 	scheduled->cancel = false;
 
 	sch_push(scheduled, delay);
@@ -75,7 +72,8 @@ int32_t sch_schedule_repeating(job_work_t* job, uint32_t delay, uint32_t interva
 	int32_t id = -1;
 	sch_scheduled_t* scheduled = sch_new(&id);
 	scheduled->job = job;
-	scheduled->repeat = interval;
+	scheduled->repeat = true;
+	scheduled->interval = interval;
 	scheduled->cancel = false;
 
 	sch_push(scheduled, delay);
@@ -100,7 +98,7 @@ void sch_tick() {
 	utl_linked_list_t* list = NULL;
 		
 	// get schedule
-	if (sch_board.size == 0) {	
+	if (sch_board.size == 0) {
 		return;
 	}
 
@@ -117,14 +115,15 @@ void sch_tick() {
 
 		if (!scheduled->cancel) {
 
-			if (scheduled->repeat >= 0) {
+			job_add(scheduled->job);
 
-				job_add(scheduled->job);
-				sch_push(scheduled, scheduled->repeat);
+			if (scheduled->repeat) {
+
+				sch_push(scheduled, scheduled->interval);
 
 			} else {
 
-				job_add(scheduled->job);
+				scheduled->job->repeating = false;
 				free(scheduled);
 
 			}

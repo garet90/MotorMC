@@ -40,7 +40,7 @@ typedef struct {
 	const string_t usage;
 	const string_t permission;
 	const string_t permission_message;
-	bool_t (*const handler) (char*, const cmd_sender_t);
+	bool_t (*const handler) (char*, const cmd_sender_t*);
 	const size_t alias_count;
 	const string_t aliases[];
 
@@ -51,19 +51,20 @@ extern utl_vector_t cmd_list;
 extern void cmd_add_defaults();
 
 extern void cmd_add_command(const cmd_command_t*);
-extern void cmd_handle(char*, const cmd_sender_t);
+extern void cmd_handle(char*, const cmd_sender_t*);
 
-extern bool_t cmd_has_permission(const cmd_command_t*, const cmd_sender_t);
+extern bool_t cmd_has_permission(const cmd_command_t*, const cmd_sender_t*);
 
 extern uint32_t cmd_hash(const char*);
 extern char* cmd_hash_arg(char*, uint32_t*);
 
-extern void cmd_message(cmd_sender_t, const cht_component_t*);
+extern void cmd_message(const cmd_sender_t*, const cht_component_t*);
 
 /* COMMANDS */
-extern bool_t cmd_stop(char*, cmd_sender_t);
-extern bool_t cmd_help(char*, cmd_sender_t);
-extern bool_t cmd_plugins(char*, cmd_sender_t);
+extern bool_t cmd_stop(char*, const cmd_sender_t*);
+extern bool_t cmd_help(char*, const cmd_sender_t*);
+extern bool_t cmd_plugins(char*, const cmd_sender_t*);
+extern bool_t cmd_jb(char*, const cmd_sender_t*);
 
 static const cmd_command_t cmd_stop_h = {
 	.label = UTL_CSTRTOSTR("stop"),
@@ -86,6 +87,12 @@ static const cmd_command_t cmd_plugins_h = {
 	.aliases = { UTL_CSTRTOSTR("pl") },
 	.description = UTL_CSTRTOSTR("List active plugins"),
 	.handler = cmd_plugins
+};
+
+static const cmd_command_t cmd_jb_h = {
+	.label = UTL_CSTRTOSTR("jb"),
+	.description = UTL_CSTRTOSTR("Get current status of the server's job board"),
+	.handler = cmd_jb
 };
 
 /* CONSTANT MESSAGES */

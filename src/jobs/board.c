@@ -51,12 +51,32 @@ utl_vector_t job_send_update_pings_handlers_vector = {
 	.array = (_Atomic byte_t*) job_send_update_pings_handlers
 };
 
+job_handler_t job_tick_chunk_handlers[] = {
+	(job_handler_t) job_handle_tick_chunk
+};
+utl_vector_t job_tick_chunk_handlers_vector = {
+	.bytes_per_element = sizeof(job_handler_t),
+	.size = 1,
+	.array = (_Atomic byte_t*) job_tick_chunk_handlers
+};
+
+job_handler_t job_unload_region_handlers[] = {
+	(job_handler_t) job_unload_region
+};
+utl_vector_t job_unload_region_handlers_vector = {
+	.bytes_per_element = sizeof(job_handler_t),
+	.size = 1,
+	.array = (_Atomic byte_t*) job_unload_region_handlers
+};
+
 utl_vector_t* job_handlers[job_count] = {
 	&job_keep_alive_handlers_vector,
 	&job_global_chat_message_handlers_vector,
 	&job_player_join_handlers_vector,
 	&job_player_leave_handlers_vector,
-	&job_send_update_pings_handlers_vector
+	&job_send_update_pings_handlers_vector,
+	&job_tick_chunk_handlers_vector,
+	&job_unload_region_handlers_vector
 };
 
 struct {
@@ -100,8 +120,9 @@ void job_handle(job_work_t* work) {
 
 	}
 
-	if (!work->repeating)
+	if (!work->repeating) {
 		free(work);
+	}
 
 }
 
@@ -114,7 +135,9 @@ void job_add(job_work_t* work) {
 		pthread_cond_signal(&job_wait.cond);
 		
 	} else {
+
 		pthread_cond_broadcast(&job_wait.cond);
+	
 	}
 
 }
@@ -123,31 +146,21 @@ job_work_t* job_get() {
 
 	job_work_t* job = NULL;
 
-	if (job_board.first == NULL) {
+	// wait for jobs
+	with_lock (&job_wait.lock) {
 
-		// wait for jobs
-		with_lock (&job_wait.lock) {
+		while (job_board.first == NULL) {
+		
+			if (sky_main.status == sky_stopping) {
 
-			while (job_board.first == NULL) {
-			
-				if (sky_main.status == sky_stopping) {
+				pthread_mutex_unlock(&job_wait.lock);
 
-					pthread_mutex_unlock(&job_wait.lock);
+				return NULL;
 
-					return NULL;
-
-				}
-
-				pthread_cond_wait(&job_wait.cond, &job_wait.lock);
-			
 			}
 
-		}
-
-		if (sky_main.status == sky_stopping) {
-
-			return NULL;
-
+			pthread_cond_wait(&job_wait.cond, &job_wait.lock);
+		
 		}
 
 		job = utl_list_shift(&job_board);
@@ -155,6 +168,12 @@ job_work_t* job_get() {
 	}
 
 	return job;
+
+}
+
+size_t job_get_count() {
+
+	return job_board.length;
 
 }
 

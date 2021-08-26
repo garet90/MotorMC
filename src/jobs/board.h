@@ -1,7 +1,5 @@
 #pragma once
 #include "../main.h"
-#include "../listening/listening.h"
-#include "../io/packet/packet.h"
 
 typedef enum {
 
@@ -10,6 +8,8 @@ typedef enum {
 	job_player_join,
 	job_player_leave,
 	job_send_update_pings,
+	job_tick_chunk,
+	job_unload_region,
 
 	job_count
 
@@ -29,10 +29,12 @@ static inline void job_init_work(job_work_t* work, job_type_t type) {
 	work->repeating = false;
 }
 
-void job_add_handler(job_type_t, job_handler_t);
-void job_handle(job_work_t*);
-void job_add(job_work_t*);
+extern void job_add_handler(job_type_t, job_handler_t);
+extern void job_handle(job_work_t*);
+extern void job_add(job_work_t*);
 
-job_work_t* job_get();
+extern job_work_t* job_get();
 
-void job_work();
+extern size_t job_get_count();
+
+extern void job_work();

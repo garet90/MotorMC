@@ -120,3 +120,19 @@ bool_t job_handle_send_update_pings(__attribute__((unused)) job_send_update_ping
 	return true;
 
 }
+
+bool_t job_handle_tick_chunk(__attribute__((unused)) job_tick_chunk_t* work) {
+
+	// TODO
+
+	return true;
+
+}
+
+bool_t job_handle_unload_region(__attribute__((unused)) job_unload_region_t* work) {
+
+	// TODO
+
+	return true;
+
+}

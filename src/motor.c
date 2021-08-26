@@ -431,7 +431,7 @@ int main(int argc, char* argv[]) {
 	for (;;) {
 		if (fgets(in, 256, stdin) != NULL) {
 
-			cmd_handle(in, sky_main.console);
+			cmd_handle(in, &sky_main.console);
 
 		}
 	}
