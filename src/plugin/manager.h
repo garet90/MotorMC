@@ -40,24 +40,71 @@ typedef struct {
 
 	struct {
 
-		void (*info) (const char*, ...);
-		void (*warn) (const char*, ...);
-		void (*error) (const char*, ...);
+		void (*const info) (const char*, ...);
+		void (*const warn) (const char*, ...);
+		void (*const error) (const char*, ...);
 
 	} logger;
 
 	struct {
 
-		void (*add) (const cmd_command_t*);
-		void (*message) (const cmd_sender_t*, const cht_component_t*);
+		void (*const add) (const cmd_command_t*);
+		void (*const message) (const cmd_sender_t*, const cht_component_t*);
+		cmd_op_level_t (*const get_op_level) (const cmd_sender_t*);
+		cmd_sender_type_t (*const get_sender_type) (const cmd_sender_t*);
+		ltg_client_t* (*const get_player) (const cmd_sender_t*);
 
 	} commands;
 
 	struct {
 
+		string_t (*const get_username) (const ltg_client_t*);
+		const byte_t* (*const get_uuid) (const ltg_client_t*);
+		uint16_t (*const get_protocol) (const ltg_client_t*);
+		uint8_t (*const get_render_distance) (const ltg_client_t*);
+		int64_t (*const get_ping) (const ltg_client_t*);
+		string_t (*const get_textures) (const ltg_client_t*);
+		ltg_locale_t (*const get_locale) (const ltg_client_t*);
+		ent_player_t* (*const get_entity) (const ltg_client_t*);
+		void (*const kick) (const ltg_client_t*, const cht_component_t*);
+		void (*const ban) (const ltg_client_t*, const cht_component_t*);
+		void (*const pardon) (const ltg_client_t*);
+
+	} player;
+
+	struct {
+
 		cht_component_t* (*alloc) ();
-		void (*add_extra) (cht_component_t*, const cht_component_t*);
-		void (*free) (cht_component_t*);
+
+		void (*const set_text) (cht_component_t*, const string_t);
+		string_t (*const get_text) (cht_component_t* component);
+
+		void (*const set_bold) (cht_component_t* component, bool_t bold);
+		void (*const unset_bold) (cht_component_t* component);
+		bool_t (*const get_bold) (cht_component_t* component);
+
+		void (*const set_italic) (cht_component_t* component, bool_t italic);
+		void (*const unset_italic) (cht_component_t* component);
+		bool_t (*const get_italic) (cht_component_t* component);
+
+		void (*const set_underlined) (cht_component_t* component, bool_t underlined);
+		void (*const unset_underlined) (cht_component_t* component);
+		bool_t (*const get_underlined) (cht_component_t* component);
+
+		void (*const set_strikethrough) (cht_component_t* component, bool_t strikethrough);
+		void (*const unset_strikethrough) (cht_component_t* component);
+		bool_t (*const get_strikethrough) (cht_component_t* component);
+
+		void (*const set_obfuscated) (cht_component_t* component, bool_t obfuscated);
+		void (*const unset_obfuscated) (cht_component_t* component);
+		bool_t (*const get_obfuscated) (cht_component_t* component);
+
+		void (*const set_color) (cht_component_t* component, cht_color_t color);
+		void (*const unset_color) (cht_component_t* component);
+		cht_color_t (*const get_color) (cht_component_t* component);
+
+		void (*const add_extra) (cht_component_t*, const cht_component_t*);
+		void (*const free) (cht_component_t*);
 
 	} chat;
 
@@ -75,11 +122,45 @@ static const plg_interface_t plg_interface = {
 
 	.commands = {
 		.add = cmd_add_command,
-		.message = cmd_message
+		.message = cmd_message,
+		.get_op_level = cmd_get_op_level,
+		.get_sender_type = cmd_get_sender_type,
+		.get_player = cmd_get_player
+	},
+
+	.player = {
+		.get_username = ltg_get_username,
+		.get_uuid = ltg_get_uuid,
+		.get_protocol = ltg_get_protocol,
+		.get_render_distance = ltg_get_render_distance,
+		.get_ping = ltg_get_ping,
+		.get_textures = ltg_get_textures,
+		.get_locale = ltg_get_locale,
+		.get_entity = ltg_get_entity
 	},
 
 	.chat = {
 		.alloc = cht_alloc,
+		.set_text = cht_set_text,
+		.get_text = cht_get_text,
+		.set_bold = cht_set_bold,
+		.unset_bold = cht_unset_bold,
+		.get_bold = cht_get_bold,
+		.set_italic = cht_set_italic,
+		.unset_italic = cht_unset_italic,
+		.get_italic = cht_get_italic,
+		.set_underlined = cht_set_underlined,
+		.unset_underlined = cht_unset_underlined,
+		.get_underlined = cht_get_underlined,
+		.set_strikethrough = cht_set_strikethrough,
+		.unset_strikethrough = cht_unset_strikethrough,
+		.get_strikethrough = cht_get_strikethrough,
+		.set_obfuscated = cht_set_obfuscated,
+		.unset_obfuscated = cht_unset_obfuscated,
+		.get_obfuscated = cht_get_obfuscated,
+		.set_color = cht_set_color,
+		.unset_color = cht_unset_color,
+		.get_color = cht_get_color,
 		.add_extra = cht_add_extra,
 		.free = cht_free
 	}

@@ -7,15 +7,9 @@
 
 cht_component_t* cht_alloc() {
 
-	cht_component_t* alloc = calloc(1, sizeof(cht_component_t));
-
-	alloc->bold = UNSET;
-	alloc->italic = UNSET;
-	alloc->underlined = UNSET;
-	alloc->strikethrough = UNSET;
-	alloc->obfuscated = UNSET;
+	cht_component_t* alloc = malloc(sizeof(cht_component_t));
+	memcpy(alloc, &cht_new, sizeof(cht_component_t));
 	alloc->heap = true;
-	alloc->color = cht_no_color;
 
 	return alloc;
 
@@ -32,6 +26,7 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 			case 0x7c9e690a: { // "text"
 				const size_t text_len = mjson_get_size(obj_property.value);
 				UTL_STRTOCSTR(component->text) = malloc(text_len + 1);
+				component->text_heap = true;
 				memcpy(UTL_STRTOCSTR(component->text), mjson_get_string(obj_property.value), text_len);
 				UTL_STRTOCSTR(component->text)[text_len] = '\0';
 				component->text.length = text_len;
@@ -153,6 +148,7 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 						case 0x108d5742: { // "value"
 							const size_t value_len = mjson_get_size(click_event.value);
 							UTL_STRTOCSTR(component->click_event.value) = malloc(value_len + 1);
+							component->click_event_heap = true;
 							memcpy(UTL_STRTOCSTR(component->click_event.value), mjson_get_string(click_event.value), value_len);
 							UTL_STRTOCSTR(component->click_event.value)[value_len] = '\0';
 							component->click_event.value.length = value_len;
@@ -181,6 +177,7 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 						case 0x108d5742: { // "value"
 							size_t value_len = mjson_get_size(hover_event.value);
 							UTL_STRTOCSTR(component->hover_event.value) = malloc(value_len + 1);
+							component->hover_event_heap = true;
 							memcpy(UTL_STRTOCSTR(component->hover_event.value), mjson_get_string(hover_event.value), value_len);
 							UTL_STRTOCSTR(component->hover_event.value)[value_len] = '\0';
 						} break;
@@ -393,23 +390,20 @@ void cht_free(cht_component_t* component) {
 		utl_vector_term(&component->extra);
 	}
 
-	if (component->heap) {
-		
-		if (UTL_STRTOCSTR(component->text) != NULL) {
-			free(UTL_STRTOCSTR(component->text));
-		}
+	if (component->text_heap)
+		free(component->text.value);
 
-		if (UTL_STRTOCSTR(component->click_event.value) != NULL) {
-			free(UTL_STRTOCSTR(component->click_event.value));
-		}
+	if (component->insertion_heap)
+		free(component->insertion.value);
 
-		if (UTL_STRTOCSTR(component->hover_event.value) != NULL) {
-			free(UTL_STRTOCSTR(component->hover_event.value));
-		}
+	if (component->click_event_heap)
+		free(component->click_event.value.value);
+	
+	if (component->hover_event_heap)
+		free(component->hover_event.value.value);
 
+	if (component->heap)
 		free(component);
-
-	}
 
 }
 
@@ -462,4 +456,84 @@ size_t cht_server_list_ping(char* message) {
 
 	return len;
 
+}
+
+void cht_set_text(cht_component_t* component, string_t text) {
+	component->text = text;
+}
+
+string_t cht_get_text(cht_component_t* component) {
+	return component->text;
+}
+
+void cht_set_bold(cht_component_t* component, bool_t bold) {
+	component->bold = bold;
+}
+
+void cht_unset_bold(cht_component_t* component) {
+	component->bold = UNSET;
+}
+
+bool_t cht_get_bold(cht_component_t* component) {
+	return component->bold;
+}
+
+void cht_set_italic(cht_component_t* component, bool_t italic) {
+	component->italic = italic;
+}
+
+void cht_unset_italic(cht_component_t* component) {
+	component->italic = UNSET;
+}
+
+bool_t cht_get_italic(cht_component_t* component) {
+	return component->italic;
+}
+
+void cht_set_underlined(cht_component_t* component, bool_t underlined) {
+	component->underlined = underlined;
+}
+
+void cht_unset_underlined(cht_component_t* component) {
+	component->underlined = UNSET;
+}
+
+bool_t cht_get_underlined(cht_component_t* component) {
+	return component->underlined;
+}
+
+void cht_set_strikethrough(cht_component_t* component, bool_t strikethrough) {
+	component->strikethrough = strikethrough;
+}
+
+void cht_unset_strikethrough(cht_component_t* component) {
+	component->strikethrough = UNSET;
+}
+
+bool_t cht_get_strikethrough(cht_component_t* component) {
+	return component->strikethrough;
+}
+
+void cht_set_obfuscated(cht_component_t* component, bool_t obfuscated) {
+	component->obfuscated = obfuscated;
+}
+
+void cht_unset_obfuscated(cht_component_t* component) {
+	component->obfuscated = UNSET;
+}
+
+bool_t cht_get_obfuscated(cht_component_t* component) {
+	return component->obfuscated;
+}
+
+void cht_set_color(cht_component_t* component, cht_color_t color) {
+	component->color = color;
+}
+
+void cht_unset_color(cht_component_t* component) {
+	component->color = cht_no_color;
+}
+
+cht_color_t cht_get_color(cht_component_t* component) {
+	return component->color;
 }

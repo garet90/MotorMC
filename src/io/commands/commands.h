@@ -16,9 +16,9 @@ typedef enum {
 
 typedef enum {
 
-	cmd_console,
-	cmd_player,
-	cmd_command_block
+	cmd_console = 0,
+	cmd_player = 1,
+	cmd_command_block = 2
 
 } cmd_sender_type_t;
 
@@ -59,6 +59,12 @@ extern uint32_t cmd_hash(const char*);
 extern char* cmd_hash_arg(char*, uint32_t*);
 
 extern void cmd_message(const cmd_sender_t*, const cht_component_t*);
+
+// API
+
+extern cmd_op_level_t cmd_get_op_level(const cmd_sender_t*);
+extern cmd_sender_type_t cmd_get_sender_type(const cmd_sender_t*);
+extern ltg_client_t* cmd_get_player(const cmd_sender_t*);
 
 /* COMMANDS */
 extern bool_t cmd_stop(char*, const cmd_sender_t*);

@@ -219,6 +219,24 @@ void cmd_message(const cmd_sender_t* sender, const cht_component_t* component) {
 
 }
 
+cmd_op_level_t cmd_get_op_level(const cmd_sender_t* sender) {
+	return sender->op;
+}
+
+cmd_sender_type_t cmd_get_sender_type(const cmd_sender_t* sender) {
+	return sender->type;
+}
+
+ltg_client_t* cmd_get_player(const cmd_sender_t* sender) {
+
+	if (sender->type == cmd_player) {
+		return sender->player;
+	}
+
+	return NULL;
+
+}
+
 bool_t cmd_stop(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
@@ -291,30 +309,37 @@ bool_t cmd_plugins(char* args, const cmd_sender_t* sender) {
 		return false;
 	}
 
-	char plugin_text[17];
-	const size_t plugin_text_len = sprintf(plugin_text, "Plugins (%zu): ", plg_links.size);
+	if (plg_links.size > 0) {
+		char plugin_text[17];
+		const size_t plugin_text_len = sprintf(plugin_text, "Plugins (%zu): ", plg_links.size);
 
-	cht_component_t plugins = cht_new;
-	plugins.text = UTL_ARRTOSTR(plugin_text, plugin_text_len);
-	plugins.color = cht_white;
+		cht_component_t plugins = cht_new;
+		plugins.text = UTL_ARRTOSTR(plugin_text, plugin_text_len);
+		plugins.color = cht_white;
 
-	for (size_t i = 0; i < plg_links.size; ++i) {
-		plg_link_t* link = UTL_VECTOR_GET_AS(plg_link_t*, &plg_links, i);
-		cht_component_t* plugin = cht_alloc();
-		plugin->text = link->meta->name;
-		plugin->color = cht_bright_green;
-		if (i < plg_links.size - 1) {
-			cht_component_t* comma = cht_alloc();
-			comma->text = UTL_CSTRTOSTR(", ");
-			comma->color = cht_white;
-			cht_add_extra(plugin, comma);
+		for (size_t i = 0; i < plg_links.size; ++i) {
+			plg_link_t link = UTL_VECTOR_GET_AS(plg_link_t, &plg_links, i);
+			cht_component_t* plugin = cht_alloc();
+			plugin->text = link.meta->name;
+			plugin->color = cht_bright_green;
+			if (i < plg_links.size - 1) {
+				cht_component_t* comma = cht_alloc();
+				comma->text = UTL_CSTRTOSTR(", ");
+				comma->color = cht_white;
+				cht_add_extra(plugin, comma);
+			}
+			cht_add_extra(&plugins, plugin);
 		}
-		cht_add_extra(&plugins, plugin);
+
+		cmd_message(sender, &plugins);
+
+		cht_free(&plugins);
+	} else {
+		cht_component_t plugins = cht_new;
+		plugins.text = UTL_CSTRTOSTR("There are no plugins installed on this server");
+		
+		cmd_message(sender, &plugins);
 	}
-
-	cmd_message(sender, &plugins);
-
-	cht_free(&plugins);
 
 	return true;
 

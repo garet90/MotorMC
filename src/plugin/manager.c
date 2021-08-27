@@ -104,9 +104,7 @@ void plg_on_startup() {
 			on_enable = dlsym(plugin.lib, "on_enable");
 
 #endif
-			if (on_enable == NULL) {
-				log_error("Failed to enable %s", UTL_STRTOCSTR(plugin.meta->name));
-			} else {
+			if (on_enable != NULL) {
 				on_enable();
 			}
 
@@ -137,9 +135,7 @@ void plg_on_postworld() {
 			on_enable = dlsym(plugin.lib, "on_enable");
 
 #endif
-			if (on_enable == NULL) {
-				log_error("Failed to enable %s", UTL_STRTOCSTR(plugin.meta->name));
-			} else {
+			if (on_enable != NULL) {
 				on_enable();
 			}
 
@@ -169,9 +165,7 @@ void plg_on_disable() {
 
 #endif
 
-		if (on_disable == NULL) {
-			log_error("Failed to disable %s", UTL_STRTOCSTR(plugin.meta->name));
-		} else {
+		if (on_disable != NULL) {
 			on_disable();
 		}
 
