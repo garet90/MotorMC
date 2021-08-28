@@ -3,14 +3,14 @@
 
 typedef struct {
 
-	_Atomic byte_t* array;
+	byte_t* array;
 
-	_Atomic uint32_t* next_id;
-	_Atomic uint32_t next_id_size;
-	_Atomic uint32_t next_id_capacity;
+	uint32_t* next_id;
+	uint32_t next_id_size;
+	uint32_t next_id_capacity;
 
-	_Atomic uint32_t size;
-	_Atomic uint32_t capacity;
+	uint32_t size;
+	uint32_t capacity;
 	const uint32_t bytes_per_element; // bytes per element
 
 } utl_id_vector_t;

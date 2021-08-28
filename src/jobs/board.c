@@ -1,9 +1,7 @@
-#include "board.h"
-#include "../motor.h"
-#include "../util/linked_list.h"
-#include "../util/vector.h"
+#include "board_private.h"
 #include "handlers.h"
-#include <pthread.h>
+#include "../motor.h"
+#include "../util/vector.h"
 
 // vector of vectors that point to job handlers, the index is the job
 job_handler_t job_keep_alive_handlers[] = {
@@ -12,7 +10,7 @@ job_handler_t job_keep_alive_handlers[] = {
 utl_vector_t job_keep_alive_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (_Atomic byte_t*) job_keep_alive_handlers
+	.array = (byte_t*) job_keep_alive_handlers
 };
 
 job_handler_t job_global_chat_message_handlers[] = {
@@ -21,7 +19,7 @@ job_handler_t job_global_chat_message_handlers[] = {
 utl_vector_t job_global_chat_message_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (_Atomic byte_t*) job_global_chat_message_handlers
+	.array = (byte_t*) job_global_chat_message_handlers
 };
 
 job_handler_t job_player_join_handlers[] = {
@@ -30,7 +28,7 @@ job_handler_t job_player_join_handlers[] = {
 utl_vector_t job_player_join_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (_Atomic byte_t*) job_player_join_handlers
+	.array = (byte_t*) job_player_join_handlers
 };
 
 job_handler_t job_player_leave_handlers[] = {
@@ -39,7 +37,7 @@ job_handler_t job_player_leave_handlers[] = {
 utl_vector_t job_player_leave_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (_Atomic byte_t*) job_player_leave_handlers
+	.array = (byte_t*) job_player_leave_handlers
 };
 
 job_handler_t job_send_update_pings_handlers[] = {
@@ -48,7 +46,7 @@ job_handler_t job_send_update_pings_handlers[] = {
 utl_vector_t job_send_update_pings_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (_Atomic byte_t*) job_send_update_pings_handlers
+	.array = (byte_t*) job_send_update_pings_handlers
 };
 
 job_handler_t job_tick_chunk_handlers[] = {
@@ -57,7 +55,7 @@ job_handler_t job_tick_chunk_handlers[] = {
 utl_vector_t job_tick_chunk_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (_Atomic byte_t*) job_tick_chunk_handlers
+	.array = (byte_t*) job_tick_chunk_handlers
 };
 
 job_handler_t job_unload_region_handlers[] = {
@@ -66,7 +64,7 @@ job_handler_t job_unload_region_handlers[] = {
 utl_vector_t job_unload_region_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (_Atomic byte_t*) job_unload_region_handlers
+	.array = (byte_t*) job_unload_region_handlers
 };
 
 utl_vector_t* job_handlers[job_count] = {
@@ -79,16 +77,12 @@ utl_vector_t* job_handlers[job_count] = {
 	&job_unload_region_handlers_vector
 };
 
-struct {
-	pthread_cond_t cond;
-	pthread_mutex_t lock;
-} job_wait = {
-	.cond = PTHREAD_COND_INITIALIZER,
-	.lock = PTHREAD_MUTEX_INITIALIZER
-};
-
-utl_linked_list_t job_board = {
-	.length = 0
+job_board_t job_board = {
+	.lock = PTHREAD_MUTEX_INITIALIZER,
+	.wait = PTHREAD_COND_INITIALIZER,
+	.list = {
+		.length = 0
+	}
 };
 
 void job_add_handler(job_type_t job, job_handler_t handler) {
@@ -130,13 +124,15 @@ void job_add(job_work_t* work) {
 
 	if (work != NULL) {
 
-		utl_list_push(&job_board, work);
-		
-		pthread_cond_signal(&job_wait.cond);
+		with_lock (&job_board.lock) {
+			utl_list_push(&job_board.list, work);
+		}
+
+		pthread_cond_signal(&job_board.wait);
 		
 	} else {
 
-		pthread_cond_broadcast(&job_wait.cond);
+		pthread_cond_broadcast(&job_board.wait);
 	
 	}
 
@@ -147,23 +143,23 @@ job_work_t* job_get() {
 	job_work_t* job = NULL;
 
 	// wait for jobs
-	with_lock (&job_wait.lock) {
-
-		while (job_board.first == NULL) {
+	with_lock (&job_board.lock) {
+	
+		while (job_board.list.first == NULL) {
 		
 			if (sky_main.status == sky_stopping) {
 
-				pthread_mutex_unlock(&job_wait.lock);
+				pthread_mutex_unlock(&job_board.lock);
 
 				return NULL;
 
 			}
 
-			pthread_cond_wait(&job_wait.cond, &job_wait.lock);
+			pthread_cond_wait(&job_board.wait, &job_board.lock);
 		
 		}
 
-		job = utl_list_shift(&job_board);
+		job = utl_list_shift(&job_board.list);
 
 	}
 
@@ -173,7 +169,13 @@ job_work_t* job_get() {
 
 size_t job_get_count() {
 
-	return job_board.length;
+	size_t length = 0;
+
+	with_lock (&job_board.lock) {
+		length = job_board.list.length;
+	}
+
+	return length;
 
 }
 

@@ -17,7 +17,7 @@ typedef enum {
 
 typedef struct {
 
-	job_type_t type : 3;
+	job_type_t type : 4;
 	bool_t repeating : 1;
 
 } job_work_t;

@@ -3,9 +3,9 @@
 
 typedef struct {
 
-	_Atomic byte_t* array;
-	_Atomic size_t size;
-	_Atomic size_t capacity;
+	byte_t* array;
+	size_t size;
+	size_t capacity;
 	const size_t bytes_per_element; // bytes per element
 
 } utl_vector_t;

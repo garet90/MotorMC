@@ -46,6 +46,7 @@ sky_main_t sky_main = {
 
 	// listener
 	.listener = {
+		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.address = {
 			.port = 25565
 		},

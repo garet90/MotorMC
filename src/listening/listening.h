@@ -204,6 +204,7 @@ typedef struct {
 typedef struct {
 
 	pthread_t thread;
+	pthread_mutex_t lock;
 
 	// address
 	struct {

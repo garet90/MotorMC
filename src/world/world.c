@@ -28,6 +28,7 @@ wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t env
 	wld_world_t* world = calloc(1, sizeof(wld_world_t));
 	srand(seed);
 	wld_world_t world_init = {
+		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.seed = seed,
 		.environment = environment,
 		.name = name,
@@ -49,6 +50,7 @@ wld_world_t* wld_load(const string_t name) {
 
 	wld_world_t* world = calloc(1, sizeof(wld_world_t));
 	wld_world_t world_init = {
+		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.name = name,
 		.id = wld_add(world)
 	};
@@ -91,35 +93,36 @@ wld_world_t* wld_get_world(uint16_t world_id) {
 wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 
 	wld_region_t* region = calloc(1, sizeof(wld_region_t));
-
 	const int64_t key = ((uint64_t) x << 16) + z;
-	wld_region_t region_init = (wld_region_t) {
-		.world = world,
-		.x = x,
-		.z = z,
-		.relative = {
-			.north = utl_tree_get(&world->regions, key - 1),
-			.south = utl_tree_get(&world->regions, key + 1),
-			.west = utl_tree_get(&world->regions, key - (1 << 16)),
-			.east = utl_tree_get(&world->regions, key + (1 << 16))
+
+	with_lock (&world->lock) {
+		wld_region_t region_init = (wld_region_t) {
+			.world = world,
+			.x = x,
+			.z = z,
+			.relative = {
+				.north = utl_tree_get(&world->regions, key - 1),
+				.south = utl_tree_get(&world->regions, key + 1),
+				.west = utl_tree_get(&world->regions, key - (1 << 16)),
+				.east = utl_tree_get(&world->regions, key + (1 << 16))
+			}
+		};
+		memcpy(region, &region_init, sizeof(wld_region_t));
+
+		if (region->relative.north != NULL) {
+			region->relative.north->relative.south = region;
 		}
-	};
-	memcpy(region, &region_init, sizeof(wld_region_t));
-
-	if (region->relative.north != NULL) {
-		region->relative.north->relative.south = region;
+		if (region->relative.south != NULL) {
+			region->relative.south->relative.north = region;
+		}
+		if (region->relative.west != NULL) {
+			region->relative.west->relative.east = region;
+		}
+		if (region->relative.east != NULL) {
+			region->relative.east->relative.west = region;
+		}
+		utl_tree_put(&world->regions, key, region);
 	}
-	if (region->relative.south != NULL) {
-		region->relative.south->relative.north = region;
-	}
-	if (region->relative.west != NULL) {
-		region->relative.west->relative.east = region;
-	}
-	if (region->relative.east != NULL) {
-		region->relative.east->relative.west = region;
-	}
-
-	utl_tree_put(&world->regions, key, region);
 
 	return region;
 
@@ -127,7 +130,11 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 
 wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 
-	wld_region_t* region = utl_tree_get(&world->regions, ((uint64_t) x << 16) + z);
+	wld_region_t* region = NULL;
+
+	with_lock (&world->lock) {
+		region = utl_tree_get(&world->regions, ((uint64_t) x << 16) + z);
+	}
 
 	if (region == NULL) {
 		region = wld_gen_region(world, x, z);
@@ -149,6 +156,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 	
 	wld_chunk_t chunk_init = {
 		.region = region,
+		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.block_entities = {
 			.bytes_per_element = sizeof(void*) // TODO block entity struct
 		},
@@ -156,7 +164,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		.z = z,
 		.max_ticket = max_ticket,
 		.ticket = max_ticket,
-		.tick = sch_schedule_repeating(&tick_job->header, 1, 0)
+		.tick = sch_schedule_repeating(&tick_job->header, 1, 1)
 	};
 	for (uint32_t i = 0; i < 256; ++i) {
 		chunk_init.highest[i].motion_blocking = 2;
@@ -314,16 +322,15 @@ void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
 }
 
 void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
-	ent_player_t* player = ltg_get_client_by_id(client_id)->entity;
+	
+	const ent_player_t* player = ltg_get_client_by_id(client_id)->entity;
 	const int32_t c_x = wld_get_chunk_x(chunk);
 	const int32_t c_z = wld_get_chunk_z(chunk);
-	int32_t p_x = 0;
-	int32_t p_z = 0;
 	const wld_chunk_t* player_chunk = player->living_entity.entity.chunk;
-	p_x = wld_get_chunk_x(player_chunk);
-	p_z = wld_get_chunk_z(player_chunk);
+	const int32_t p_x = wld_get_chunk_x(player_chunk);
+	const int32_t p_z = wld_get_chunk_z(player_chunk);
 
-	uint32_t distance = UTL_MIN(UTL_ABS(c_x - p_x), UTL_ABS(c_z - p_z));
+	const uint32_t distance = UTL_MIN(UTL_ABS(c_x - p_x), UTL_ABS(c_z - p_z));
 
 	if (distance < sky_main.render_distance) {
 		chunk->ticket = UTL_MIN(chunk->ticket, WLD_TICKET_TICK_ENTITIES);
@@ -351,8 +358,10 @@ void wld_free_region(wld_region_t* region) {
 
 	for (size_t i = 0; i < 32 * 32; ++i) {
 		if (region->chunks[i] != NULL) {
+			pthread_mutex_destroy(&region->chunks[i]->lock);
 			utl_bit_vector_term(&region->chunks[i]->subscribers);
 			utl_bit_vector_term(&region->chunks[i]->players);
+			sch_cancel(region->chunks[i]->tick);
 			free(region->chunks[i]);
 		}
 	}
@@ -365,11 +374,15 @@ void wld_unload(wld_world_t* world) {
 	
 	utl_id_vector_remove(&wld_worlds, world->id);
 
-	wld_region_t* region;
-	while ((region = utl_tree_shift(&world->regions)) != NULL) {
-		wld_free_region(region);
+	with_lock (&world->lock) {
+		wld_region_t* region;
+		while ((region = utl_tree_shift(&world->regions)) != NULL) {
+			wld_free_region(region);
+		}
+		utl_tree_term(&world->regions);
 	}
-	utl_tree_term(&world->regions);
+	
+	pthread_mutex_destroy(&world->lock);
 
 	free(world);
 
@@ -381,11 +394,15 @@ void wld_unload_all() {
 		wld_world_t* world = UTL_ID_VECTOR_GET_AS(wld_world_t*, &wld_worlds, i);
 		utl_id_vector_remove(&wld_worlds, i);
 
-		wld_region_t* region;
-		while ((region = utl_tree_shift(&world->regions)) != NULL) {
-			wld_free_region(region);
+		with_lock (&world->lock) {
+			wld_region_t* region;
+			while ((region = utl_tree_shift(&world->regions)) != NULL) {
+				wld_free_region(region);
+			}
+			utl_tree_term(&world->regions);
 		}
-		utl_tree_term(&world->regions);
+
+		pthread_mutex_destroy(&world->lock);
 
 		free(world);
 	}

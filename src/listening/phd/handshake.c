@@ -51,7 +51,9 @@ void phd_send_legacy_slp(ltg_client_t* client) {
 	cht_write_old(sky_main.motd, motd);
 
 	size_t length = 0;
-	length = sprintf(legacy_slp, "\xa7\x31%c127%cMotor MC " __MC_VER__ "%c%s%c%zu%c%zu", '\0', '\0', '\0', motd, '\0', sky_main.listener.online.list.length, '\0', (size_t) sky_main.listener.online.max);
+	with_lock (&sky_main.listener.lock) {
+		length = sprintf(legacy_slp, "\xa7\x31%c127%cMotor MC " __MC_VER__ "%c%s%c%zu%c%zu", '\0', '\0', '\0', motd, '\0', sky_main.listener.online.list.length, '\0', (size_t) sky_main.listener.online.max);
+	}
 	pck_write_int16(packet, length);
 	for (size_t i = 0; i < length; ++i) {
 		pck_write_int8(packet, 0);

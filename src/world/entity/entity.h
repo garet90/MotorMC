@@ -31,26 +31,21 @@ typedef struct {
 	uint32_t id;
 
 	cht_component_t custom_name;
-	_Atomic uint16_t air_ticks;
-	union {
-		_Atomic uint32_t attributes;
-		struct {
-			ent_pose_t pose : 5;
-			ent_type_t type : 1;
-			bool_t on_fire : 1;
-			bool_t crouching : 1;
-			bool_t sprinting : 1;
-			bool_t swimming : 1;
-			bool_t invisible : 1;
-			bool_t glowing : 1;
-			bool_t flying_with_elytra : 1;
-			bool_t custom_name_visible : 1;
-			bool_t silent : 1;
-			bool_t no_gravity : 1;
-			bool_t on_ground : 1;
-		};
-	};
-	_Atomic uint8_t powder_snow_ticks;
+	uint16_t air_ticks;
+	ent_pose_t pose : 5;
+	ent_type_t type : 1;
+	bool_t on_fire : 1;
+	bool_t crouching : 1;
+	bool_t sprinting : 1;
+	bool_t swimming : 1;
+	bool_t invisible : 1;
+	bool_t glowing : 1;
+	bool_t flying_with_elytra : 1;
+	bool_t custom_name_visible : 1;
+	bool_t silent : 1;
+	bool_t no_gravity : 1;
+	bool_t on_ground : 1;
+	uint8_t powder_snow_ticks;
 
 } ent_entity_t;
 
@@ -60,24 +55,19 @@ typedef struct {
 
 	wld_rotation_t rotation;
 
-	_Atomic float32_t health;
+	float32_t health;
 
-	_Atomic uint8_t potion_effect_color;
-	_Atomic uint8_t arrows;
-	_Atomic uint8_t bee_stings;
+	uint8_t potion_effect_color;
+	uint8_t arrows;
+	uint8_t bee_stings;
 
 	wld_block_position_t sleeping_bed;
 
-	union {
-		_Atomic uint8_t attributes;
-		struct {
-			uint8_t hand : 1;
-			bool_t hand_active : 1;
-			bool_t riptide_spin_attack : 1;
-			bool_t potion_effect_ambient : 1;
-			bool_t sleeping_in_bed : 1;
-		};
-	};
+	uint8_t hand : 1;
+	bool_t hand_active : 1;
+	bool_t riptide_spin_attack : 1;
+	bool_t potion_effect_ambient : 1;
+	bool_t sleeping_in_bed : 1;
 
 } ent_living_entity_t;
 
@@ -93,24 +83,19 @@ typedef enum {
 typedef struct {
 
 	ent_living_entity_t living_entity;
-	_Atomic float32_t additional_hearts;
-	_Atomic int32_t score;
+	float32_t additional_hearts;
+	int32_t score;
 
-	_Atomic byte_t displayed_skin_parts;
+	byte_t displayed_skin_parts;
 
-	union {
-		_Atomic uint8_t attributes;
-		struct {
-			uint8_t held_item : 4;
-			byte_t main_hand : 1;
+	uint8_t held_item : 4;
+	byte_t main_hand : 1;
 
-			ent_gamemode_t gamemode : 2;
-		};
-	};
+	ent_gamemode_t gamemode : 2;
 
 	// for parrots
-	ent_living_entity_t* _Atomic left_shoulder;
-	ent_living_entity_t* _Atomic right_shoulder;
+	ent_living_entity_t* left_shoulder;
+	ent_living_entity_t* right_shoulder;
 
 } ent_player_t;
 
@@ -121,7 +106,9 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 
 	if (entity->chunk != NULL) {
 
-		utl_dllist_remove_by_reference(&entity->chunk->entities, entity->chunk_node);
+		with_lock (&entity->chunk->lock) {
+			utl_dllist_remove_by_reference(&entity->chunk->entities, entity->chunk_node);
+		}
 		entity->chunk_node = NULL;
 		entity->chunk = NULL;
 

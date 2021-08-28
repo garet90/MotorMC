@@ -19,15 +19,15 @@ struct wld_chunk_section {
 	// block map
 	struct {
 
-		_Atomic uint16_t state;
-		_Atomic uint16_t entity;
+		uint16_t state;
+		uint16_t entity;
 
 	} blocks[16 * 16 * 16];
 
-	_Atomic uint16_t block_count;
+	uint16_t block_count;
 
 	// biome map
-	_Atomic uint8_t biome[4 * 4 * 4];
+	uint8_t biome[4 * 4 * 4];
 
 };
 
@@ -39,7 +39,9 @@ struct wld_chunk_section {
 
 struct wld_chunk {
 
-	wld_region_t* region;
+	wld_region_t* const region;
+
+	pthread_mutex_t lock;
 
 	// subscribers are "subscribed" to updates in the chunk
 	utl_bit_vector_t subscribers;
@@ -54,8 +56,8 @@ struct wld_chunk {
 	// highest blocks
 	struct {
 
-		_Atomic int16_t motion_blocking;
-		_Atomic int16_t world_surface;
+		int16_t motion_blocking;
+		int16_t world_surface;
 
 	} highest[16 * 16];
 
@@ -65,7 +67,7 @@ struct wld_chunk {
 	_Atomic uint8_t ticket;
 	const uint8_t max_ticket;
 
-	const uint32_t tick;
+	const int32_t tick;
 
 	wld_chunk_section_t sections[]; // y = section index * 16, count of sections = World.height / 16
 
@@ -73,7 +75,7 @@ struct wld_chunk {
 
 struct wld_region {
 	
-	wld_world_t* world; // typeof wld_world_t*
+	wld_world_t* const world; // typeof wld_world_t*
 
 	// chunks
 	wld_chunk_t* _Atomic chunks[32 * 32];
@@ -92,10 +94,11 @@ struct wld_region {
 
 	const int16_t x;
 	const int16_t z;
-
 };
 
 struct wld_world {
+
+	pthread_mutex_t lock;
 
 	const int64_t seed;
 	_Atomic uint64_t time;
@@ -153,24 +156,30 @@ static inline int32_t wld_get_chunk_z(const wld_chunk_t* chunk) {
 }
 
 static inline void wld_subscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
-	utl_bit_vector_set_bit(&chunk->subscribers, client_id);
+	with_lock (&chunk->lock) {
+		utl_bit_vector_set_bit(&chunk->subscribers, client_id);
+	}
 }
 
 static inline void wld_unsubscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
-	utl_bit_vector_reset_bit(&chunk->subscribers, client_id);
+	with_lock (&chunk->lock) {
+		utl_bit_vector_reset_bit(&chunk->subscribers, client_id);
+	}
 }
 
 extern void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket);
 
 static inline void wld_add_player_chunk(wld_chunk_t* chunk, uint32_t client_id, uint8_t ticket) {
-	utl_bit_vector_set_bit(&chunk->players, client_id);
+	with_lock (&chunk->lock) {
+		utl_bit_vector_set_bit(&chunk->players, client_id);
+	}
 	ticket = UTL_MIN(chunk->ticket, ticket);
 	wld_set_chunk_ticket(chunk, ticket);
 }
 
 extern void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk);
 
-static inline void wld_recalc_chunk_ticket(wld_chunk_t* chunk) {
+static inline void wld_recalc_chunk_ticket_l(wld_chunk_t* chunk) {
 	uint8_t old_ticket = chunk->ticket;
 	chunk->ticket = WLD_TICKET_MAX;
 	utl_bit_vector_foreach(&chunk->players, (void (*) (uint32_t, void*)) wld_calc_player_ticket, chunk);
@@ -179,9 +188,17 @@ static inline void wld_recalc_chunk_ticket(wld_chunk_t* chunk) {
 	wld_set_chunk_ticket(chunk, new_ticket);
 }
 
+static inline void wld_recalc_chunk_ticket(wld_chunk_t* chunk) {
+	with_lock (&chunk->lock) {
+		wld_recalc_chunk_ticket_l(chunk);
+	}
+}
+
 static inline void wld_remove_player_chunk(wld_chunk_t* chunk, uint32_t client_id) {
-	utl_bit_vector_reset_bit(&chunk->players, client_id);
-	wld_recalc_chunk_ticket(chunk);
+	with_lock (&chunk->lock) {
+		utl_bit_vector_reset_bit(&chunk->players, client_id);
+		wld_recalc_chunk_ticket_l(chunk);
+	}
 }
 
 extern void wld_free_region(wld_region_t* region);

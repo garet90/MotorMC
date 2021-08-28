@@ -1,8 +1,8 @@
 #include "scheduler.h"
+#include "../board_private.h"
 #include "../../motor.h"
 #include "../../util/id_vector.h"
 #include "../../util/vector.h"
-#include "../../util/linked_list.h"
 #include <pthread.h>
 
 typedef struct {
@@ -10,56 +10,88 @@ typedef struct {
 	job_work_t* job;
 
 	uint16_t interval;
-	bool_t repeat : 1;
-	bool_t cancel : 1;
+	bool_t repeat;
+	bool_t cancel;
 
 } sch_scheduled_t;
 
-utl_vector_t sch_board = {
-	.bytes_per_element = sizeof(utl_linked_list_t*)
+struct {
+
+	pthread_mutex_t lock;
+	utl_vector_t tape;
+	utl_id_vector_t elements;
+
+} sch_scheduler = {
+	.tape = {
+		.bytes_per_element = sizeof(utl_vector_t)
+	},
+	.elements = {
+		.bytes_per_element = sizeof(sch_scheduled_t)
+	}
 };
 
-utl_id_vector_t sch_scheduled = {
-	.bytes_per_element = sizeof(sch_scheduled_t*)
-};
+void sch_push_l(uint32_t id, uint32_t delay) {
 
-void sch_push(sch_scheduled_t* scheduled, uint32_t delay) {
+	if (delay >= sch_scheduler.tape.size) { // fill up to the delay with empty vectors
 
-	const void* null = NULL;
-	while (sch_board.size <= delay) {
-		utl_vector_push(&sch_board, &null);
+		utl_vector_t empty = {
+			.bytes_per_element = sizeof(uint32_t)
+		};
+
+		while (delay >= sch_scheduler.tape.size) {
+			utl_vector_push(&sch_scheduler.tape, &empty);
+		}
+	
 	}
 
-	utl_linked_list_t* list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board, delay);
+	utl_vector_t* vector = utl_vector_get(&sch_scheduler.tape, delay);
 
-	if (list == NULL) {
-		list = utl_create_list();
-		utl_vector_set(&sch_board, delay, &list);
-	}
-
-	utl_list_push(list, scheduled);
+	utl_vector_push(vector, &id);
 
 }
 
-sch_scheduled_t* sch_new(int32_t* id) {
+inline void sch_push(uint32_t id, uint32_t delay) {
 
-	sch_scheduled_t* scheduled = malloc(sizeof(sch_scheduled_t));
+	with_lock (&sch_scheduler.lock) {
 
-	*id = utl_id_vector_add(&sch_scheduled, &scheduled);
+		sch_push_l(id, delay);
+		
+	}
 
-	return scheduled;
+}
+
+sch_scheduled_t* sch_new_l(int32_t* id, sch_scheduled_t scheduled) {
+
+	*id = utl_id_vector_add(&sch_scheduler.elements, &scheduled);
+
+	return utl_id_vector_get(&sch_scheduler.elements, *id);
+
+}
+
+inline sch_scheduled_t* sch_new(int32_t* id, sch_scheduled_t scheduled) {
+
+	sch_scheduled_t* ptr = NULL;
+
+	with_lock (&sch_scheduler.lock) {
+		ptr = sch_new_l(id, scheduled);
+	}
+
+	return ptr;
 
 }
 
 int32_t sch_schedule(job_work_t* job, uint32_t delay) {
 
 	int32_t id = -1;
-	sch_scheduled_t* scheduled = sch_new(&id);
-	scheduled->job = job;
-	scheduled->repeat = false;
-	scheduled->cancel = false;
+	with_lock (&sch_scheduler.lock) {
+		sch_new_l(&id, (sch_scheduled_t) {
+			.job = job,
+			.repeat = false,
+			.cancel = false
+		});
 
-	sch_push(scheduled, delay);
+		sch_push_l(id, delay);
+	}
 
 	return id;
 
@@ -70,13 +102,16 @@ int32_t sch_schedule_repeating(job_work_t* job, uint32_t delay, uint32_t interva
 	job->repeating = true;
 	
 	int32_t id = -1;
-	sch_scheduled_t* scheduled = sch_new(&id);
-	scheduled->job = job;
-	scheduled->repeat = true;
-	scheduled->interval = interval;
-	scheduled->cancel = false;
+	with_lock (&sch_scheduler.lock) {
+		sch_new_l(&id, (sch_scheduled_t) {
+			.job = job,
+			.repeat = true,
+			.interval = interval,
+			.cancel = false
+		});
 
-	sch_push(scheduled, delay);
+		sch_push_l(id, delay);
+	}
 
 	return id;
 
@@ -86,57 +121,63 @@ void sch_cancel(int32_t id) {
 
 	if (id < 0) return;
 
-	sch_scheduled_t* scheduled = UTL_ID_VECTOR_GET_AS(sch_scheduled_t*, &sch_scheduled, id);
-	scheduled->cancel = true;
-
-	utl_id_vector_remove(&sch_scheduled, id);
+	with_lock (&sch_scheduler.lock) {
+	
+		sch_scheduled_t* scheduled = utl_id_vector_get(&sch_scheduler.elements, id);
+		scheduled->cancel = true;
+		
+	}
 
 }
 
 void sch_tick() {
+	
+	with_lock (&sch_scheduler.lock) {
 
-	utl_linked_list_t* list = NULL;
-		
-	// get schedule
-	if (sch_board.size == 0) {
-		return;
-	}
+		// get schedule
+		if (sch_scheduler.tape.size == 0) {
+			pthread_mutex_unlock(&sch_scheduler.lock);
+			return;
+		}
 
-	list = UTL_VECTOR_GET_AS(utl_linked_list_t*, &sch_board, 0);
-	utl_vector_shift(&sch_board);
+		utl_vector_t* vector = utl_vector_get(&sch_scheduler.tape, 0);
 
-	if (list == NULL) {
-		return;
-	}
+		with_lock (&job_board.lock) {
 
-	for (uint32_t i = 0; i < list->length; ++i) {
+			for (uint32_t i = 0; i < vector->size; ++i) {
 
-		sch_scheduled_t* scheduled = utl_list_shift(list);
+				int32_t id = UTL_VECTOR_GET_AS(int32_t, vector, i);
+				sch_scheduled_t* scheduled = utl_id_vector_get(&sch_scheduler.elements, i);
 
-		if (!scheduled->cancel) {
+				if (!scheduled->cancel) {
 
-			job_add(scheduled->job);
+					utl_list_push(&job_board.list, scheduled->job);
 
-			if (scheduled->repeat) {
+					if (scheduled->repeat) {
 
-				sch_push(scheduled, scheduled->interval);
+						sch_push_l(id, scheduled->interval);
 
-			} else {
+					} else {
 
-				scheduled->job->repeating = false;
-				free(scheduled);
+						utl_id_vector_remove(&sch_scheduler.elements, id);
+
+					}
+
+				} else {
+
+					utl_id_vector_remove(&sch_scheduler.elements, id);
+
+				}
 
 			}
 
-		} else {
-
-			free(scheduled->job);
-			free(scheduled);
+			pthread_cond_broadcast(&job_board.wait);
 
 		}
 
-	}
+		utl_vector_term(vector);
+		utl_vector_shift(&sch_scheduler.tape);
 
-	free(list);
+	}
 
 }
