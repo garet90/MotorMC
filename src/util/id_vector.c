@@ -62,11 +62,7 @@ void utl_id_vector_resize(utl_id_vector_t* vector, uint32_t capacity) {
 
 void utl_id_vector_resize_ids(utl_id_vector_t* vector, uint32_t capacity) {
 	
-	if (vector->next_id_capacity != 0) {
-		vector->next_id = realloc(vector->next_id, sizeof(uint32_t) * capacity);
-	} else {
-		vector->next_id = malloc(sizeof(uint32_t) * capacity);
-	}
+	vector->next_id = realloc(vector->next_id, sizeof(uint32_t) * capacity);
 	vector->next_id_capacity = capacity;
 
 }

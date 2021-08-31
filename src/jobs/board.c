@@ -114,15 +114,17 @@ void job_handle(job_work_t* work) {
 
 	}
 
-	if (!work->repeating) {
-		free(work);
-	}
+	work->on_board--;
+
+	job_free(work);
 
 }
 
 void job_add(job_work_t* work) {
 
 	if (work != NULL) {
+
+		work->on_board++;
 
 		with_lock (&job_board.lock) {
 			utl_list_push(&job_board.list, work);
@@ -135,6 +137,20 @@ void job_add(job_work_t* work) {
 		pthread_cond_broadcast(&job_board.wait);
 	
 	}
+
+}
+
+void job_free(job_work_t* work) {
+
+	if (work->repeat) {
+		return;
+	}
+
+	if (work->on_board != 0) {
+		return;
+	}
+
+	free(work);
 
 }
 

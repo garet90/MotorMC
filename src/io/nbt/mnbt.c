@@ -269,13 +269,8 @@ size_t _mnbt_read_val(mnbt_doc* document, mnbt_type type, mnbt_val* value, const
 void _mnbt_add(mnbt_doc* document, mnbt_tag* tag) {
 
 	if (document->count == document->cap) {
-		if (document->cap == 0) {
-			document->cap = 2;
-			document->tags = malloc(sizeof(mnbt_tag*) * 2);
-		} else {
-			document->cap *= 2;
-			document->tags = realloc(document->tags, sizeof(mnbt_tag*) * document->cap);
-		}
+		document->cap = (document->cap > 0 ? document->cap << 1 : 2);
+		document->tags = realloc(document->tags, sizeof(mnbt_tag*) * document->cap);
 	}
 
 	document->tags[document->count++] = tag;
@@ -494,13 +489,8 @@ mnbt_val mnbt_val_long_array(int64_t* longs, uint32_t size) {
 void mnbt_val_push_tag(mnbt_val* value, mnbt_tag* tag) {
 
 	if (value->Compound.size == value->Compound.cap) {
-		if (value->Compound.cap == 0) {
-			value->Compound.cap = 2;
-			value->Compound.tags = malloc(sizeof(mnbt_tag*) * 2);
-		} else {
-			value->Compound.cap *= 2;
-			value->Compound.tags = realloc(value->Compound.tags, sizeof(mnbt_tag*) * value->Compound.cap);
-		}
+		value->Compound.cap = (value->Compound.cap > 0 ? value->Compound.cap << 1 : 2);
+		value->Compound.tags = realloc(value->Compound.tags, sizeof(mnbt_tag*) * value->Compound.cap);
 	}
 
 	value->Compound.tags[value->Compound.size++] = tag;
@@ -510,13 +500,8 @@ void mnbt_val_push_tag(mnbt_val* value, mnbt_tag* tag) {
 void mnbt_val_list_push(mnbt_val* list, mnbt_val val) {
 
 	if (list->List.size == list->List.cap) {
-		if (list->List.cap == 0) {
-			list->List.cap = 2;
-			list->List.list = malloc(sizeof(mnbt_tag) * 2);
-		} else {
-			list->List.cap *= 2;
-			list->List.list = realloc(list->List.list, sizeof(mnbt_val) * list->List.cap);
-		}
+		list->Compound.cap = (list->Compound.cap > 0 ? list->Compound.cap << 1 : 2);
+		list->List.list = realloc(list->List.list, sizeof(mnbt_val) * list->List.cap);
 	}
 
 	list->List.list[list->List.size++] = val;

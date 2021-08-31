@@ -422,7 +422,7 @@ size_t cht_server_list_ping(char* message) {
 
 	mjson_val* players = mjson_obj(doc);
 
-	with_lock (&sky_main.listener.lock) {
+	with_lock (&sky_main.listener.online.lock) {
 
 		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("max")), mjson_int(doc, sky_main.listener.online.max));
 

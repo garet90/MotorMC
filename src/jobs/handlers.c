@@ -37,7 +37,7 @@ bool_t job_handle_global_chat_message(job_global_chat_message_t* work) {
 	char out[1536];
 	const size_t out_len = cht_write_translation(&translation, out);
 	// lock client vector
-	with_lock (&sky_main.listener.lock) {
+	with_lock (&sky_main.listener.online.lock) {
 		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
 		while (node != NULL) {
 			ltg_client_t* client = node->element;
@@ -66,7 +66,7 @@ bool_t job_handle_player_join(job_player_join_t* work) {
 	char out[128];
 	const size_t out_len = cht_write_translation(&translation, out);
 	// lock client vector
-	with_lock (&sky_main.listener.lock) {
+	with_lock (&sky_main.listener.online.lock) {
 		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
 		while (node != NULL) {
 			ltg_client_t* client = node->element;
@@ -96,7 +96,7 @@ bool_t job_handle_player_leave(job_player_leave_t* work) {
 	char out[128];
 	const size_t out_len = cht_write_translation(&translation, out);
 	
-	with_lock (&sky_main.listener.lock) {
+	with_lock (&sky_main.listener.online.lock) {
 		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
 		while (node != NULL) {
 			ltg_client_t* client = node->element;
@@ -116,7 +116,7 @@ bool_t job_handle_player_leave(job_player_leave_t* work) {
 
 bool_t job_handle_send_update_pings(__attribute__((unused)) job_send_update_pings_t* work) {
 
-	with_lock (&sky_main.listener.lock) {
+	with_lock (&sky_main.listener.online.lock) {
 		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
 		while (node != NULL) {
 			ltg_client_t* client = node->element;

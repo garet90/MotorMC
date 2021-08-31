@@ -378,13 +378,8 @@ mjson_val* mjson_arr(mjson_doc* doc) {
 void mjson_arr_append(mjson_val* arr, mjson_val* value) {
 
 	if (arr->value.Array.size >= arr->value.Array.cap) {
-		if (arr->value.Array.cap == 0) {
-			arr->value.Array.cap = 2;
-			arr->value.Array.values = malloc(sizeof(mjson_val*) << 1);
-		} else {
-			arr->value.Array.cap <<= 1;
-			arr->value.Array.values = realloc(arr->value.Array.values, sizeof(mjson_val*) * arr->value.Array.cap);
-		}
+		arr->value.Array.cap = (arr->value.Array.cap > 0 ? arr->value.Array.cap << 1 : 2);
+		arr->value.Array.values = realloc(arr->value.Array.values, sizeof(mjson_val*) * arr->value.Array.cap);
 	}
 
 	arr->value.Array.values[arr->value.Array.size++] = value;
@@ -405,13 +400,8 @@ mjson_val* mjson_obj(mjson_doc* doc) {
 void mjson_obj_add(mjson_val* obj, mjson_val* label, mjson_val* value) {
 
 	if (obj->value.Object.size >= obj->value.Object.cap) {
-		if (obj->value.Object.cap == 0) {
-			obj->value.Object.cap = 2;
-			obj->value.Object.properties = malloc(sizeof(mjson_property) << 1);
-		} else {
-			obj->value.Object.cap <<= 1;
-			obj->value.Object.properties = realloc(obj->value.Object.properties, sizeof(mjson_property) * obj->value.Object.cap);
-		}
+		obj->value.Object.cap = (obj->value.Object.cap > 0 ? obj->value.Object.cap << 1 : 2);
+		obj->value.Object.properties = realloc(obj->value.Object.properties, sizeof(mjson_property) * obj->value.Object.cap);
 	}
 
 	obj->value.Object.properties[obj->value.Object.size].label = label;
@@ -433,13 +423,8 @@ mjson_val* mjson_null(mjson_doc* doc) {
 void _mjson_doc_add(mjson_doc* doc, mjson_val* val) {
 
 	if (doc->count >= doc->cap) {
-		if (doc->cap == 0) {
-			doc->cap = 2;
-			doc->values = malloc(sizeof(mjson_val*) << 1);
-		} else {
-			doc->cap <<= 1;
-			doc->values = realloc(doc->values, sizeof(mjson_val*) * doc->cap);
-		}
+		doc->cap = (doc->cap > 0 ? doc->cap << 1 : 2);
+		doc->values = realloc(doc->values, sizeof(mjson_val*) * doc->cap);
 	}
 
 	doc->values[doc->count++] = val;

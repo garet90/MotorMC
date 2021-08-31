@@ -191,7 +191,7 @@ typedef struct {
 		int size;
 	} address;
 
-	int32_t keep_alive;
+	void* keep_alive;
 
 	uint16_t protocol : 10;
 	uint8_t render_distance : 6;
@@ -204,7 +204,6 @@ typedef struct {
 typedef struct {
 
 	pthread_t thread;
-	pthread_mutex_t lock;
 
 	// address
 	struct {
@@ -213,9 +212,13 @@ typedef struct {
 		uint16_t port;
 	} address;
 
-	utl_id_vector_t clients;
+	struct {
+		pthread_mutex_t lock;
+		utl_id_vector_t vector;
+	} clients;
 	
 	struct {
+		pthread_mutex_t lock;
 		utl_doubly_linked_list_t list;
 		size_t max : 16;
 	} online;

@@ -3,7 +3,7 @@
 #include "../listening/listening.h"
 #include "board.h"
 
-#define JOB_CREATE_WORK(name, job_type) job_type ##_t* name = malloc(sizeof(job_type ##_t)); job_init_work((job_work_t*) name, job_type);
+#define JOB_CREATE_WORK(name, job_type) job_type ##_t* name = malloc(sizeof(job_type ##_t)); job_work_t name ##_init = { .type = job_type }; memcpy(name, &name ##_init, sizeof(job_work_t));
 
 typedef struct {
 

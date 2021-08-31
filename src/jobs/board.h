@@ -17,21 +17,19 @@ typedef enum {
 
 typedef struct {
 
-	job_type_t type : 4;
-	bool_t repeating : 1;
+	const job_type_t type : 8;
+	uint8_t _Atomic repeat;
+	uint8_t _Atomic on_board;
+	uint8_t _Atomic canceled;
 
 } job_work_t;
 
 typedef bool_t (*job_handler_t) (job_work_t*);
 
-static inline void job_init_work(job_work_t* work, job_type_t type) {
-	work->type = type;
-	work->repeating = false;
-}
-
 extern void job_add_handler(job_type_t, job_handler_t);
 extern void job_handle(job_work_t*);
 extern void job_add(job_work_t*);
+extern void job_free(job_work_t*);
 
 extern job_work_t* job_get();
 

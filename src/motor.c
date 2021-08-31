@@ -46,14 +46,17 @@ sky_main_t sky_main = {
 
 	// listener
 	.listener = {
-		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.address = {
 			.port = 25565
 		},
 		.clients = {
-			.bytes_per_element = sizeof(ltg_client_t*)
+			.lock = PTHREAD_MUTEX_INITIALIZER,
+			.vector = {
+				.bytes_per_element = sizeof(ltg_client_t*)
+			}
 		},
 		.online = {
+			.lock = PTHREAD_MUTEX_INITIALIZER,
 			.max = 20
 		},
 		.network_compression_threshold = 256,
@@ -108,8 +111,8 @@ void sky_handle_signal_crash(int signal) {
 			}
 		}
 
-		for (size_t i = 0; i < sky_main.listener.clients.size; ++i) {
-			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients, i);
+		for (size_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
+			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 			if (client != NULL && pthread_self() == client->thread) {
 				log_error("\t\tCLIENT #%lld", i);
 				log_error("\tCLIENT STATE %u", client->state);
