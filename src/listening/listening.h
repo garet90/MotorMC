@@ -177,13 +177,13 @@ typedef struct {
 
 	uint32_t verify;
 
-	_Atomic int64_t last_recv;
-	_Atomic int64_t ping;
+	atomic_int_least64_t last_recv;
+	atomic_int_least64_t ping;
 
 	struct {
 		symmetric_CFB8 encrypt;
 		symmetric_CFB8 decrypt;
-		bool_t enabled;
+		bool enabled;
 	} encryption;
 
 	struct {
@@ -224,8 +224,8 @@ typedef struct {
 	} online;
 
 	uint16_t network_compression_threshold;
-	bool_t online_mode : 1;
-	bool_t prevent_proxy_connections : 1;
+	bool online_mode : 1;
+	bool prevent_proxy_connections : 1;
 
 	cry_rsa_keypair_t keypair;
 
@@ -238,7 +238,7 @@ extern void* t_ltg_client(void*);
 
 extern ltg_client_t* ltg_get_client_by_id(uint32_t id);
 
-extern bool_t ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet);
+extern bool ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet);
 
 extern void ltg_send(ltg_client_t*, pck_packet_t*);
 

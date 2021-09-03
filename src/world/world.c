@@ -167,11 +167,20 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		.tick = sch_schedule_repeating(&tick_job->header, 1, 1)
 	};
 	for (uint32_t i = 0; i < 256; ++i) {
-		chunk_init.highest[i].motion_blocking = 2;
+		chunk_init.highest.motion_blocking[i] = 2;
 	}
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t));
 
 	region->chunks[(x << 5) + z] = chunk;
+
+	// TODO generate actual chunk
+	/*
+	for (uint32_t x = 0; x < 16; ++x) {
+		for (uint32_t z = 0; z < 16; ++z) {
+			chunk->sections[0].blocks[(x << 8) + (z << 4)].state = mat_get_block_base_protocol_id_by_id(mat_block_stone);
+			chunk->sections[0].block_count = 1;
+		}
+	}*/
 
 	if (max_ticket < WLD_TICKET_INACCESSIBLE) {
 		region->loaded_chunks += 1;

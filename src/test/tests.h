@@ -1,7 +1,6 @@
 #pragma once
 #include "../main.h"
 
-extern bool_t test_materials();
-extern bool_t test_bit_streams();
+extern bool test_materials();
 
 extern int test_run_all();

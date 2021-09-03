@@ -17,12 +17,8 @@ typedef struct wld_chunk_section wld_chunk_section_t;
 struct wld_chunk_section {
 
 	// block map
-	struct {
-
-		uint16_t state;
-		uint16_t entity;
-
-	} blocks[16 * 16 * 16];
+	int16_t blocks[16 * 16 * 16];
+	int16_t entity_idx[16 * 16 * 16];
 
 	uint16_t block_count;
 
@@ -56,15 +52,15 @@ struct wld_chunk {
 	// highest blocks
 	struct {
 
-		int16_t motion_blocking;
-		int16_t world_surface;
+		int16_t motion_blocking[16 * 16];
+		int16_t world_surface[16 * 16];
 
-	} highest[16 * 16];
+	} highest;
 
 	const uint8_t x : 5;
 	const uint8_t z : 5;
 
-	_Atomic uint8_t ticket;
+	atomic_uint_least8_t ticket;
 	const uint8_t max_ticket;
 
 	void* tick;
@@ -90,7 +86,7 @@ struct wld_region {
 
 	} relative;
 
-	_Atomic uint16_t loaded_chunks;
+	atomic_uint_least16_t loaded_chunks;
 
 	const int16_t x;
 	const int16_t z;
@@ -101,7 +97,7 @@ struct wld_world {
 	pthread_mutex_t lock;
 
 	const int64_t seed;
-	_Atomic uint64_t time;
+	atomic_uint_least64_t time;
 
 	const string_t name;
 
@@ -117,8 +113,8 @@ struct wld_world {
 	
 	const uint16_t id;
 
-	const bool_t debug : 1;
-	const bool_t flat : 1;
+	const bool debug : 1;
+	const bool flat : 1;
 
 	const mat_dimension_type_t environment : 6;
 

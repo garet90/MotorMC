@@ -44,17 +44,17 @@ typedef struct {
 
 	string_t text;
 
-	bool_t bold : 2;
-	bool_t italic : 2;
-	bool_t underlined : 2;
-	bool_t strikethrough : 2;
-	bool_t obfuscated : 2;
+	uint8_t bold : 2;
+	uint8_t italic : 2;
+	uint8_t underlined : 2;
+	uint8_t strikethrough : 2;
+	uint8_t obfuscated : 2;
 
-	bool_t heap : 1;
-	bool_t text_heap : 1;
-	bool_t insertion_heap : 1;
-	bool_t click_event_heap : 1;
-	bool_t hover_event_heap : 1;
+	bool heap : 1;
+	bool text_heap : 1;
+	bool insertion_heap : 1;
+	bool click_event_heap : 1;
+	bool hover_event_heap : 1;
 
 	cht_color_t color;
 
@@ -109,25 +109,25 @@ extern size_t cht_server_list_ping(char*);
 extern void cht_set_text(cht_component_t*, const string_t);
 extern string_t cht_get_text(cht_component_t*);
 
-extern void cht_set_bold(cht_component_t*, bool_t);
+extern void cht_set_bold(cht_component_t*, bool);
 extern void cht_unset_bold(cht_component_t*);
-extern bool_t cht_get_bold(cht_component_t*);
+extern bool cht_get_bold(cht_component_t*);
 
-extern void cht_set_italic(cht_component_t*, bool_t);
+extern void cht_set_italic(cht_component_t*, bool);
 extern void cht_unset_italic(cht_component_t*);
-extern bool_t cht_get_italic(cht_component_t*);
+extern bool cht_get_italic(cht_component_t*);
 
-extern void cht_set_underlined(cht_component_t*, bool_t);
+extern void cht_set_underlined(cht_component_t*, bool);
 extern void cht_unset_underlined(cht_component_t*);
-extern bool_t cht_get_underlined(cht_component_t*);
+extern bool cht_get_underlined(cht_component_t*);
 
-extern void cht_set_strikethrough(cht_component_t*, bool_t);
+extern void cht_set_strikethrough(cht_component_t*, bool);
 extern void cht_unset_strikethrough(cht_component_t*);
-extern bool_t cht_get_strikethrough(cht_component_t*);
+extern bool cht_get_strikethrough(cht_component_t*);
 
-extern void cht_set_obfuscated(cht_component_t*, bool_t);
+extern void cht_set_obfuscated(cht_component_t*, bool);
 extern void cht_unset_obfuscated(cht_component_t*);
-extern bool_t cht_get_obfuscated(cht_component_t*);
+extern bool cht_get_obfuscated(cht_component_t*);
 
 extern void cht_set_color(cht_component_t*, cht_color_t);
 extern void cht_unset_color(cht_component_t*);

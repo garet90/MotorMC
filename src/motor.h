@@ -1,5 +1,6 @@
 #pragma once
 #include <pthread.h>
+#include <stdnoreturn.h>
 #include "main.h"
 #include "listening/listening.h"
 #include "io/commands/commands.h"
@@ -62,13 +63,13 @@ typedef struct {
 	cmd_op_level_t op_permission_level : 3;
 
 	sky_difficulty_t difficulty : 2;
-	bool_t hardcore : 1;
+	bool hardcore : 1;
 
-	bool_t enable_respawn_screen : 1;
-	bool_t enforce_whitelist : 1;
-	bool_t enable_command_block : 1;
-	bool_t pvp : 1;
-	bool_t reduced_debug_info : 1;
+	bool enable_respawn_screen : 1;
+	bool enforce_whitelist : 1;
+	bool enable_command_block : 1;
+	bool pvp : 1;
+	bool reduced_debug_info : 1;
 	
 	ent_gamemode_t gamemode : 2;
 
@@ -84,7 +85,7 @@ int main(int, char*[]);
 extern void* t_sky_main(void*);
 extern void* t_sky_worker(void*);
 
-extern void __attribute__((noreturn)) sky_term();
+extern noreturn void sky_term();
 
 static inline uint64_t sky_to_nanos(const struct timespec time) {
 	return (time.tv_sec * SKY_NANOS_PER_SECOND) + time.tv_nsec;

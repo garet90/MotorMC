@@ -34,17 +34,17 @@ typedef struct {
 	uint16_t air_ticks;
 	ent_pose_t pose : 5;
 	ent_type_t type : 1;
-	bool_t on_fire : 1;
-	bool_t crouching : 1;
-	bool_t sprinting : 1;
-	bool_t swimming : 1;
-	bool_t invisible : 1;
-	bool_t glowing : 1;
-	bool_t flying_with_elytra : 1;
-	bool_t custom_name_visible : 1;
-	bool_t silent : 1;
-	bool_t no_gravity : 1;
-	bool_t on_ground : 1;
+	bool on_fire : 1;
+	bool crouching : 1;
+	bool sprinting : 1;
+	bool swimming : 1;
+	bool invisible : 1;
+	bool glowing : 1;
+	bool flying_with_elytra : 1;
+	bool custom_name_visible : 1;
+	bool silent : 1;
+	bool no_gravity : 1;
+	bool on_ground : 1;
 	uint8_t powder_snow_ticks;
 
 } ent_entity_t;
@@ -64,10 +64,10 @@ typedef struct {
 	wld_block_position_t sleeping_bed;
 
 	uint8_t hand : 1;
-	bool_t hand_active : 1;
-	bool_t riptide_spin_attack : 1;
-	bool_t potion_effect_ambient : 1;
-	bool_t sleeping_in_bed : 1;
+	bool hand_active : 1;
+	bool riptide_spin_attack : 1;
+	bool potion_effect_ambient : 1;
+	bool sleeping_in_bed : 1;
 
 } ent_living_entity_t;
 
@@ -118,7 +118,7 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 
 extern void ent_set_chunk(ent_entity_t* entity);
 
-static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool_t on_ground) {
+static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool on_ground) {
 
 	if (((uint64_t) entity->position.x >> 4) != ((uint64_t) x >> 4) || ((uint64_t) entity->position.z >> 4) != ((uint64_t) z >> 4)) {
 
@@ -139,7 +139,7 @@ static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, floa
 
 }
 
-static inline void ent_move_look(ent_living_entity_t* entity, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool_t on_ground) {
+static inline void ent_move_look(ent_living_entity_t* entity, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool on_ground) {
 
 	if (((uint64_t) entity->entity.position.x >> 4) != ((uint64_t) x >> 4) || ((uint64_t) entity->entity.position.z >> 4) != ((uint64_t) z >> 4)) {
 

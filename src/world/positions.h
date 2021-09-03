@@ -4,9 +4,9 @@
 
 typedef struct {
 
-	int32_t _Atomic x;
-	int32_t _Atomic y;
-	int32_t _Atomic z;
+	atomic_int_least32_t x;
+	atomic_int_least32_t y;
+	atomic_int_least32_t z;
 
 } wld_block_position_t;
 

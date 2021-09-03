@@ -2,7 +2,7 @@
 #include "../../io/logger/logger.h"
 #include "../../io/chat/chat.h"
 
-bool_t phd_status(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_status(ltg_client_t* client, pck_packet_t* packet) {
 
 	__attribute__((unused)) const int32_t length = pck_read_var_int(packet); // packet length
 	const int32_t id = pck_read_var_int(packet);
@@ -19,7 +19,7 @@ bool_t phd_status(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_request(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_request(ltg_client_t* client, pck_packet_t* packet) {
 
 	if (packet->cursor != packet->length) {
 		log_error("Client sent bad request packet!");
@@ -32,7 +32,7 @@ bool_t phd_handle_request(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_ping(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_ping(ltg_client_t* client, pck_packet_t* packet) {
 
 	int64_t random = pck_read_int64(packet);
 

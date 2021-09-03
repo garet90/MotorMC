@@ -8,7 +8,7 @@ typedef struct {
 
 } utl_bit_vector_t;
 
-static inline bool_t utl_bit_vector_test_bit(utl_bit_vector_t* vector, uint32_t bit) {
+static inline bool utl_bit_vector_test_bit(utl_bit_vector_t* vector, uint32_t bit) {
 
 	const uint32_t byte = bit >> 3;
 	bit &= 0x7;

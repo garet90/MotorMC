@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdatomic.h>
+#include <stdbool.h>
 
 #if defined(__MINGW32__) || defined(__MINGW64__) || defined(__CYGWIN__) || defined(_WIN32) || defined(_WIN64)
 #define __WINDOWS__
@@ -14,14 +16,7 @@
 #define __MOTOR_VER__ "MotorMC InDev 0.0.1"
 #define __MOTOR_UNSAFE__ 1
 
-typedef enum bool {
-
-	false = 0x00,
-	true = 0x01
-
-} bool_t;
-
-#define UNSET 0x02
+#define UNSET 2
 
 typedef float float32_t;
 typedef double float64_t;

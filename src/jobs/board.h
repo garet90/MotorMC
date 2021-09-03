@@ -18,13 +18,13 @@ typedef enum {
 typedef struct {
 
 	const job_type_t type : 8;
-	uint8_t _Atomic repeat;
-	uint8_t _Atomic on_board;
-	uint8_t _Atomic canceled;
+	atomic_uint_least8_t repeat;
+	atomic_uint_least8_t on_board;
+	atomic_uint_least8_t canceled;
 
 } job_work_t;
 
-typedef bool_t (*job_handler_t) (job_work_t*);
+typedef bool (*job_handler_t) (job_work_t*);
 
 extern void job_add_handler(job_type_t, job_handler_t);
 extern void job_handle(job_work_t*);

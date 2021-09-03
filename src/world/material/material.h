@@ -21,19 +21,19 @@ typedef struct {
 	const string_t effects;
 	float32_t ambient_light;
 	float32_t coordinate_scale;
-	bool_t has_fixed_time : 1;
+	bool has_fixed_time : 1;
 	uint16_t fixed_time : 15;
 	int16_t min_y;
 	int16_t height;
 	int16_t logical_height;
-	bool_t piglin_safe : 1;
-	bool_t natural : 1;
-	bool_t respawn_anchor_works : 1;
-	bool_t has_skylight : 1;
-	bool_t bed_works : 1;
-	bool_t has_raids : 1;
-	bool_t ultrawarm : 1;
-	bool_t has_ceiling : 1;
+	bool piglin_safe : 1;
+	bool natural : 1;
+	bool respawn_anchor_works : 1;
+	bool has_skylight : 1;
+	bool bed_works : 1;
+	bool has_raids : 1;
+	bool ultrawarm : 1;
+	bool has_ceiling : 1;
 
 } mat_dimension_t;
 
@@ -204,9 +204,9 @@ typedef struct {
 		uint32_t fog_color : 24;
 		uint32_t water_color : 24;
 		uint32_t foliage_color : 24;
-		bool_t has_foliage_color : 1;
+		bool has_foliage_color : 1;
 		uint32_t grass_color : 24;
-		bool_t has_grass_color: 1;
+		bool has_grass_color: 1;
 		mat_grass_color_modifier_t grass_color_modifier : 2;
 
 		struct {
@@ -214,7 +214,7 @@ typedef struct {
 			const string_t sound;
 			uint32_t max_delay;
 			uint32_t min_delay;
-			bool_t replace_current_music : 1;
+			bool replace_current_music : 1;
 		
 		} music;
 
@@ -1774,9 +1774,9 @@ typedef struct {
 
 	mat_block_entity_type_t entity : 5;
 
-	bool_t catches_fire_from_lava : 1;
-	bool_t light_filtering : 1;
-	bool_t transparent : 1;
+	bool catches_fire_from_lava : 1;
+	bool light_filtering : 1;
+	bool transparent : 1;
 
 	uint8_t modifiers_count : 3;
 	mat_state_modifier_type_t modifiers[];
@@ -1795,8 +1795,8 @@ static inline mat_block_type_t mat_get_block_id_by_protocol_id(mat_block_protoco
 	return mat_blocks_protocol[protocol];
 }
 
-static inline mat_block_protocol_id_t mat_get_block_base_protocol_id_by_id(mat_block_protocol_id_t id) {
-	return mat_blocks_base_protocol[id];
+static inline mat_block_protocol_id_t mat_get_block_base_protocol_id_by_id(mat_block_type_t type) {
+	return mat_blocks_base_protocol[type];
 }
 
 /*

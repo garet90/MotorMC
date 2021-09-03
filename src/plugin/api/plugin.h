@@ -25,13 +25,6 @@ typedef struct {
 
 #define cstr_to_str(x) (string_t) { .value = x, .length = sizeof(x) - 1 }
 
-typedef enum bool {
-
-	false = 0x00,
-	true = 0x01
-
-} bool_t;
-
 // COMMAND
 
 typedef void* command_sender_t;
@@ -43,7 +36,7 @@ typedef struct {
 	const string_t usage;
 	const string_t permission;
 	const string_t permission_message;
-	bool_t (*const handler) (char* args, const command_sender_t sender);
+	bool (*const handler) (char* args, const command_sender_t sender);
 	const size_t alias_count;
 	const string_t aliases[];
 
@@ -342,39 +335,39 @@ typedef struct {
 		string_t (*const get_text) (chat_component_t component);
 
 		// Set the bold field of a chat component
-		void (*const set_bold) (chat_component_t component, bool_t bold);
+		void (*const set_bold) (chat_component_t component, bool bold);
 		// Unset the bold field of a chat component
 		void (*const unset_bold) (chat_component_t component);
 		// Get the bold field of a chat component (returns 2 when unset)
-		bool_t (*const get_bold) (chat_component_t component);
+		bool (*const get_bold) (chat_component_t component);
 
 		// Set the italic field of a chat component
-		void (*const set_italic) (chat_component_t component, bool_t italic);
+		void (*const set_italic) (chat_component_t component, bool italic);
 		// Unset the italic field of a chat component
 		void (*const unset_italic) (chat_component_t component);
 		// Get the italic field of a chat component (returns 2 when unset)
-		bool_t (*const get_italic) (chat_component_t component);
+		bool (*const get_italic) (chat_component_t component);
 
 		// Set the underlined field of a chat component
-		void (*const set_underlined) (chat_component_t component, bool_t underlined);
+		void (*const set_underlined) (chat_component_t component, bool underlined);
 		// Unset the underlined field of a chat component
 		void (*const unset_underlined) (chat_component_t component);
 		// Get the underlined field of a chat component (returns 2 when unset)
-		bool_t (*const get_underlined) (chat_component_t component);
+		bool (*const get_underlined) (chat_component_t component);
 
 		// Set the strikethrough field of a chat component
-		void (*const set_strikethrough) (chat_component_t component, bool_t strikethrough);
+		void (*const set_strikethrough) (chat_component_t component, bool strikethrough);
 		// Unset the strikethrough field of a chat component
 		void (*const unset_strikethrough) (chat_component_t component);
 		// Get the strikethrough field of a chat component (returns 2 when unset)
-		bool_t (*const get_strikethrough) (chat_component_t component);
+		bool (*const get_strikethrough) (chat_component_t component);
 
 		// Set the obfuscated field of a chat component
-		void (*const set_obfuscated) (chat_component_t component, bool_t obfuscated);
+		void (*const set_obfuscated) (chat_component_t component, bool obfuscated);
 		// Unset the obfuscated field of a chat component
 		void (*const unset_obfuscated) (chat_component_t component);
 		// Get the obfuscated field of a chat component (returns 2 when unset)
-		bool_t (*const get_obfuscated) (chat_component_t component);
+		bool (*const get_obfuscated) (chat_component_t component);
 
 		// Set the color of a chat component (Accepts hex values as well)
 		void (*const set_color) (chat_component_t component, chat_color_t color);

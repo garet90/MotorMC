@@ -2,7 +2,7 @@
 #include "../../motor.h"
 #include "../../io/logger/logger.h"
 
-bool_t phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
 
 	// legacy server list ping
 	if (packet->length >= 3 && packet->bytes[0] == 0xFE && packet->bytes[1] == 0x01 && packet->bytes[2] == 0xFA) {
@@ -23,19 +23,24 @@ bool_t phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_handshake(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_handshake(ltg_client_t* client, pck_packet_t* packet) {
 
 	client->protocol = pck_read_var_int(packet); // protocol
 	PCK_READ_STRING(address, packet); // connecting address
 	pck_read_int16(packet); // port
 
 	// set state to next state
-	client->state = pck_read_var_int(packet);
-	return true;
+	int32_t next_state = pck_read_var_int(packet);
+	if (next_state == ltg_login || next_state == ltg_status) {
+		client->state = next_state;
+		return true;
+	} else {
+		return false;
+	}
 
 }
 
-bool_t phd_handle_legacy_slp(ltg_client_t* client, __attribute__((unused)) pck_packet_t* packet) {
+bool phd_handle_legacy_slp(ltg_client_t* client, __attribute__((unused)) pck_packet_t* packet) {
 
 	phd_send_legacy_slp(client);
 	return false;

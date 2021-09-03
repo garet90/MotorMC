@@ -79,25 +79,25 @@ typedef struct {
 		void (*const set_text) (cht_component_t*, const string_t);
 		string_t (*const get_text) (cht_component_t* component);
 
-		void (*const set_bold) (cht_component_t* component, bool_t bold);
+		void (*const set_bold) (cht_component_t* component, bool bold);
 		void (*const unset_bold) (cht_component_t* component);
-		bool_t (*const get_bold) (cht_component_t* component);
+		bool (*const get_bold) (cht_component_t* component);
 
-		void (*const set_italic) (cht_component_t* component, bool_t italic);
+		void (*const set_italic) (cht_component_t* component, bool italic);
 		void (*const unset_italic) (cht_component_t* component);
-		bool_t (*const get_italic) (cht_component_t* component);
+		bool (*const get_italic) (cht_component_t* component);
 
-		void (*const set_underlined) (cht_component_t* component, bool_t underlined);
+		void (*const set_underlined) (cht_component_t* component, bool underlined);
 		void (*const unset_underlined) (cht_component_t* component);
-		bool_t (*const get_underlined) (cht_component_t* component);
+		bool (*const get_underlined) (cht_component_t* component);
 
-		void (*const set_strikethrough) (cht_component_t* component, bool_t strikethrough);
+		void (*const set_strikethrough) (cht_component_t* component, bool strikethrough);
 		void (*const unset_strikethrough) (cht_component_t* component);
-		bool_t (*const get_strikethrough) (cht_component_t* component);
+		bool (*const get_strikethrough) (cht_component_t* component);
 
-		void (*const set_obfuscated) (cht_component_t* component, bool_t obfuscated);
+		void (*const set_obfuscated) (cht_component_t* component, bool obfuscated);
 		void (*const unset_obfuscated) (cht_component_t* component);
-		bool_t (*const get_obfuscated) (cht_component_t* component);
+		bool (*const get_obfuscated) (cht_component_t* component);
 
 		void (*const set_color) (cht_component_t* component, cht_color_t color);
 		void (*const unset_color) (cht_component_t* component);

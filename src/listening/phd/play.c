@@ -11,9 +11,9 @@
 #include "../../jobs/jobs.h"
 #include "../../jobs/scheduler/scheduler.h"
 #include "../../util/util.h"
-#include "../../util/bit_stream.h"
+#include "../../util/long_encode.h"
 
-bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
 	const int32_t length = pck_read_var_int(packet); // packet length
 	const int32_t id = pck_read_var_int(packet);
@@ -48,7 +48,7 @@ bool_t phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 
 	uint32_t confirm = pck_read_var_int(packet);
 
@@ -61,7 +61,7 @@ bool_t phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 
 	string_t message;
 	message.length = (unsigned) pck_read_var_int(packet);
@@ -90,7 +90,7 @@ bool_t phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 	PCK_READ_STRING(locale, packet);
 	client->locale = utl_hash(locale);
@@ -98,20 +98,20 @@ bool_t phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	const uint8_t new_render_distance = UTL_MIN(sky_main.render_distance, pck_read_int8(packet));
 	phd_update_sent_chunks_view_distance(client, new_render_distance);
 	client->chat_mode = pck_read_var_int(packet);
-	__attribute__((unused)) bool_t colors = pck_read_int8(packet);
+	__attribute__((unused)) bool colors = pck_read_int8(packet);
 
 	ent_player_t* player = client->entity;
 
 	player->displayed_skin_parts = pck_read_int8(packet);
 	player->main_hand = (byte_t) pck_read_var_int(packet);
 
-	__attribute__((unused)) bool_t disable_text_filtering = pck_read_int8(packet);
+	__attribute__((unused)) bool disable_text_filtering = pck_read_int8(packet);
 
 	return true;
 
 }
 
-bool_t phd_handle_close_window(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_close_window(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
 
 	// TODO actually do stuff
 	__attribute__((unused)) uint8_t window_id = pck_read_int8(packet);
@@ -120,7 +120,7 @@ bool_t phd_handle_close_window(__attribute__((unused)) ltg_client_t* client, pck
 
 }
 
-bool_t phd_handle_plugin_message(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet, int32_t length) {
+bool phd_handle_plugin_message(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet, int32_t length) {
 
 	PCK_READ_STRING(channel, packet);
 
@@ -137,7 +137,7 @@ bool_t phd_handle_plugin_message(__attribute__((unused)) ltg_client_t* client, p
 
 }
 
-bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
 	int64_t out_ms = pck_read_int64(packet);
 
@@ -151,14 +151,14 @@ bool_t phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
 
 	const float64_t x = pck_read_float64(packet);
 	const float64_t y = pck_read_float64(packet);
 	const float64_t z = pck_read_float64(packet);
-	const bool_t on_ground = pck_read_int8(packet);
+	const bool on_ground = pck_read_int8(packet);
 	
 	const uint64_t c_x = (((uint64_t) x) >> 4);
 	const uint64_t c_z = (((uint64_t) z) >> 4);
@@ -180,7 +180,7 @@ bool_t phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
 
@@ -191,7 +191,7 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 	const float32_t yaw = pck_read_float32(packet);
 	const float32_t pitch = pck_read_float32(packet);
 
-	const bool_t on_ground = pck_read_int8(packet);
+	const bool on_ground = pck_read_int8(packet);
 
 	const uint64_t c_x = (((uint64_t) x) >> 4);
 	const uint64_t c_z = (((uint64_t) z) >> 4);
@@ -213,7 +213,7 @@ bool_t phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* p
 
 }
 
-bool_t phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
 
@@ -256,7 +256,7 @@ bool_t phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_held_item_change(ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_held_item_change(ltg_client_t* client, pck_packet_t* packet) {
 
 	uint16_t slot = pck_read_int16(packet);
 	
@@ -268,7 +268,7 @@ bool_t phd_handle_held_item_change(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
-bool_t phd_handle_animation(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
+bool phd_handle_animation(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
 
 	__attribute__((unused)) uint8_t hand = pck_read_var_int(packet);
 
@@ -383,7 +383,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	// CHUNK MASK
 
-	const uint16_t chunk_mask_length = (chunk_height >> 6) + 1;
+	const uint16_t chunk_mask_length = ((chunk_height - 1) >> 6) + 1;
 	pck_write_var_int(packet, chunk_mask_length);
 	int64_t primary_chunk_mask[chunk_mask_length];
 	memset(primary_chunk_mask, 0, sizeof(primary_chunk_mask));
@@ -392,33 +392,40 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 			primary_chunk_mask[i >> 6] |= (1 << (i & 0x3f));
 		}
 	}
-	pck_write_bytes(packet, (byte_t*) primary_chunk_mask, sizeof(primary_chunk_mask));
+	for (uint16_t i = 0; i < chunk_mask_length; ++i) {
+		pck_write_int64(packet, primary_chunk_mask[i]);
+	}
+
+	/*
+	int32_t primary_chunk_mask = 0;
+	for (uint16_t i = 0; i < chunk_height; ++i) {
+		if (chunk->sections[i].block_count != 0) {
+			primary_chunk_mask |= (1 << i);
+		}
+	}
+	pck_write_var_int(packet, primary_chunk_mask);
+	*/
 
 	// HEIGHTMAP
 
-	const uint32_t motion_blocking_size = 37;
+	const uint32_t heightmap_size = 37;
+	int64_t motion_blocking[heightmap_size];
+	int64_t world_surface[heightmap_size];
 
-	uint64_t motion_blocking[motion_blocking_size];
-
-	// Set this to superflat world motion blocking heightmap, it still doesn't work for some odd reason FIXME
-	for (uint8_t i = 0; i < motion_blocking_size; ++i) {
-		if (i == motion_blocking_size - 1) {
-			motion_blocking[i] = 0x0000000020100804L;
-		} else {
-			motion_blocking[i] = 0x0100804020100804L;
-		}
-	}
+	UTL_ENCODE_TO_LONGS(chunk->highest.motion_blocking, 16 * 16, 9, motion_blocking);
+	UTL_ENCODE_TO_LONGS(chunk->highest.world_surface, 16 * 16, 9, world_surface);
 
 	// create heightmap
 	mnbt_doc* doc = mnbt_new();
 	mnbt_tag* tag = mnbt_new_tag(doc, UTL_CSTRTOARG(""), MNBT_COMPOUND, mnbt_val_compound());
-	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("MOTION_BLOCKING"), MNBT_LONG_ARRAY, mnbt_val_long_array((int64_t*) motion_blocking, motion_blocking_size)));
-	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("WORLD_SURFACE"), MNBT_LONG_ARRAY, mnbt_val_long_array((int64_t*) motion_blocking, motion_blocking_size)));
+	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("MOTION_BLOCKING"), MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, heightmap_size)));
+	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("WORLD_SURFACE"), MNBT_LONG_ARRAY, mnbt_val_long_array(world_surface, heightmap_size)));
 	mnbt_set_root(doc, tag);
+
+	mnbt_write_file(doc, "test.nbt", 1024, MNBT_NONE);
 
 	pck_write_nbt(packet, doc);
 
-	mnbt_write_file(doc, "test.nbt", 1024, MNBT_NONE);
 	mnbt_free(doc);
 
 	// BIOMES
@@ -439,29 +446,21 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	// am i really gonna waste time copying data from one stream to another or am i gonna just waste 4 bytes?
 	// you're damn right i'm gonna waste 4 bytes, speed is key
-	// TODO chunk data
 	const size_t data_len = packet->cursor;
-	pck_write_long_var_int(packet, 0);
-
-	const uint8_t bits_per_block = 15;
+	packet->cursor += 5;
 
 	for (uint16_t i = 0; i < chunk_height; ++i) {
 		if (chunk->sections[i].block_count != 0) {
-			pck_write_int16(packet, 0);
+			const uint8_t bits_per_block = 15;
+			const uint8_t blocks_per_long = 64 / bits_per_block;
+			const int32_t data_array_length = 1 + (4095 / blocks_per_long);
+
+			pck_write_int16(packet, chunk->sections[i].block_count);
 			pck_write_int8(packet, bits_per_block);
-			pck_write_var_int(packet, 960);
-			utl_bit_stream_t data_array = {
-				.cursor = 0,
-				.quads = (uint64_t*) pck_cursor(packet)
-			};
-			for (uint8_t x = 0; x < 16; ++x) {
-				for (uint8_t z = 0; z < 16; ++z) {
-					for (uint8_t y = 0; y < 16; ++y) {
-						utl_write_bit_stream(&data_array, chunk->sections[i].blocks[(x << 8) + (z << 4) + y].state, bits_per_block);
-					}
-				}
-			}
-			packet->cursor += 960 * 8;
+			// TODO palette
+			pck_write_var_int(packet, data_array_length); // data array length
+			
+			packet->cursor += sizeof(int64_t) * UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 16 * 16 * 16, bits_per_block, pck_cursor(packet));
 		}
 	}
 
@@ -847,7 +846,7 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 			// subscribe to the chunk if it is in render distance
 			if (distance <= client->render_distance) {
 				phd_send_update_light(client, v_c);
-				// TODO phd_send_chunk_data(client, v_c);
+				phd_send_chunk_data(client, v_c);
 				wld_subscribe_chunk(v_c, client->id);
 			}
 		}

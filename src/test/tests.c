@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include "../io/logger/logger.h"
 #include "../util/util.h"
-#include "../util/bit_stream.h"
 #include "../world/material/material.h"
 
-bool_t test_materials() {
+bool test_materials() {
 
 	// test that protocol map is correct
 	uint16_t protocolID = 0;
@@ -78,33 +77,6 @@ bool_t test_materials() {
 
 }
 
-extern bool_t test_bit_streams() {
-
-	utl_bit_stream_t stream = {
-		.cursor = 0,
-		.quads = calloc(1, sizeof(uint64_t) * 4)
-	};
-	utl_write_bit_stream(&stream, 1234, 14);
-	utl_write_bit_stream(&stream, 5678, 14);
-	utl_write_bit_stream(&stream, 9101, 14);
-	utl_write_bit_stream(&stream, 1121, 14);
-	utl_write_bit_stream(&stream, 3141, 14);
-	utl_write_bit_stream(&stream, 5161, 14);
-
-	stream.cursor = 0;
-	if (utl_read_bit_stream(&stream, 14) != 1234) return false;
-	if (utl_read_bit_stream(&stream, 14) != 5678) return false;
-	if (utl_read_bit_stream(&stream, 14) != 9101) return false;
-	if (utl_read_bit_stream(&stream, 14) != 1121) return false;
-	if (utl_read_bit_stream(&stream, 14) != 3141) return false;
-	if (utl_read_bit_stream(&stream, 14) != 5161) return false;
-
-	free(stream.quads);
-
-	return true;
-
-}
-
 int test_run_all() {
 
 	log_info("Running materials test...");
@@ -112,13 +84,6 @@ int test_run_all() {
 		log_info("Material test passed.");
 	} else {
 		return 1;
-	}
-
-	log_info("Running bit streams test...");
-	if (test_bit_streams()) {
-		log_info("Bit streams test passed.");
-	} else {
-		return 2;
 	}
 
 	log_info("All tests passed.");

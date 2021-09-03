@@ -470,7 +470,7 @@ string_t cht_get_text(cht_component_t* component) {
 	return component->text;
 }
 
-void cht_set_bold(cht_component_t* component, bool_t bold) {
+void cht_set_bold(cht_component_t* component, bool bold) {
 	component->bold = bold;
 }
 
@@ -478,11 +478,11 @@ void cht_unset_bold(cht_component_t* component) {
 	component->bold = UNSET;
 }
 
-bool_t cht_get_bold(cht_component_t* component) {
+bool cht_get_bold(cht_component_t* component) {
 	return component->bold;
 }
 
-void cht_set_italic(cht_component_t* component, bool_t italic) {
+void cht_set_italic(cht_component_t* component, bool italic) {
 	component->italic = italic;
 }
 
@@ -490,11 +490,11 @@ void cht_unset_italic(cht_component_t* component) {
 	component->italic = UNSET;
 }
 
-bool_t cht_get_italic(cht_component_t* component) {
+bool cht_get_italic(cht_component_t* component) {
 	return component->italic;
 }
 
-void cht_set_underlined(cht_component_t* component, bool_t underlined) {
+void cht_set_underlined(cht_component_t* component, bool underlined) {
 	component->underlined = underlined;
 }
 
@@ -502,11 +502,11 @@ void cht_unset_underlined(cht_component_t* component) {
 	component->underlined = UNSET;
 }
 
-bool_t cht_get_underlined(cht_component_t* component) {
+bool cht_get_underlined(cht_component_t* component) {
 	return component->underlined;
 }
 
-void cht_set_strikethrough(cht_component_t* component, bool_t strikethrough) {
+void cht_set_strikethrough(cht_component_t* component, bool strikethrough) {
 	component->strikethrough = strikethrough;
 }
 
@@ -514,11 +514,11 @@ void cht_unset_strikethrough(cht_component_t* component) {
 	component->strikethrough = UNSET;
 }
 
-bool_t cht_get_strikethrough(cht_component_t* component) {
+bool cht_get_strikethrough(cht_component_t* component) {
 	return component->strikethrough;
 }
 
-void cht_set_obfuscated(cht_component_t* component, bool_t obfuscated) {
+void cht_set_obfuscated(cht_component_t* component, bool obfuscated) {
 	component->obfuscated = obfuscated;
 }
 
@@ -526,7 +526,7 @@ void cht_unset_obfuscated(cht_component_t* component) {
 	component->obfuscated = UNSET;
 }
 
-bool_t cht_get_obfuscated(cht_component_t* component) {
+bool cht_get_obfuscated(cht_component_t* component) {
 	return component->obfuscated;
 }
 

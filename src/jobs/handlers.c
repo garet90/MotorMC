@@ -5,7 +5,7 @@
 #include "../io/logger/logger.h"
 #include "../motor.h"
 
-bool_t job_handle_keep_alive(job_keep_alive_t* work) {
+bool job_handle_keep_alive(job_keep_alive_t* work) {
 
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
@@ -21,7 +21,7 @@ bool_t job_handle_keep_alive(job_keep_alive_t* work) {
 
 }
 
-bool_t job_handle_global_chat_message(job_global_chat_message_t* work) {
+bool job_handle_global_chat_message(job_global_chat_message_t* work) {
 
 	log_info("<%s> %s", work->sender->username.value, work->message.value);
 
@@ -52,7 +52,7 @@ bool_t job_handle_global_chat_message(job_global_chat_message_t* work) {
 
 }
 
-bool_t job_handle_player_join(job_player_join_t* work) {
+bool job_handle_player_join(job_player_join_t* work) {
 
 	log_info("%s joined the game", work->player->username.value);
 
@@ -82,7 +82,7 @@ bool_t job_handle_player_join(job_player_join_t* work) {
 
 }
 
-bool_t job_handle_player_leave(job_player_leave_t* work) {
+bool job_handle_player_leave(job_player_leave_t* work) {
 
 	log_info("%s left the game", work->username.value);
 
@@ -114,7 +114,7 @@ bool_t job_handle_player_leave(job_player_leave_t* work) {
 
 }
 
-bool_t job_handle_send_update_pings(__attribute__((unused)) job_send_update_pings_t* work) {
+bool job_handle_send_update_pings(__attribute__((unused)) job_send_update_pings_t* work) {
 
 	with_lock (&sky_main.listener.online.lock) {
 		utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
@@ -129,15 +129,27 @@ bool_t job_handle_send_update_pings(__attribute__((unused)) job_send_update_ping
 
 }
 
-bool_t job_handle_tick_chunk(__attribute__((unused)) job_tick_chunk_t* work) {
+bool job_handle_tick_chunk(job_tick_chunk_t* work) {
 
-	// TODO
+	wld_chunk_t* chunk = work->chunk;
+	
+	if (chunk->ticket <= WLD_TICKET_TICK_ENTITIES) {
+		// entities and chunk ticks
+	}
+
+	if (chunk->ticket <= WLD_TICKET_TICK) {
+		// tick
+	}
+
+	if (chunk->ticket <= WLD_TICKET_BORDER) {
+		// border
+	}
 
 	return true;
 
 }
 
-bool_t job_handle_unload_region(__attribute__((unused)) job_unload_region_t* work) {
+bool job_handle_unload_region(__attribute__((unused)) job_unload_region_t* work) {
 
 	// TODO
 

@@ -150,7 +150,7 @@ ltg_client_t* ltg_get_client_by_id(uint32_t id) {
  * Handle packets
  * If return is false, disconnect the client
  */
-bool_t ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
+bool ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 
 	do {
 		switch (client->state) {

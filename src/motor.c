@@ -501,7 +501,7 @@ void* t_sky_worker(__attribute__((unused)) void* input) {
 
 }
 
-void __attribute__((noreturn)) sky_term() {
+noreturn void sky_term() {
 
 	sky_main.status = sky_stopping;
 

@@ -59,7 +59,7 @@ utl_vector_t job_tick_chunk_handlers_vector = {
 };
 
 job_handler_t job_unload_region_handlers[] = {
-	(job_handler_t) job_unload_region
+	(job_handler_t) job_handle_unload_region
 };
 utl_vector_t job_unload_region_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),

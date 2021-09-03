@@ -16,7 +16,7 @@
 #endif
 
 
-bool_t fs_mkdir(const char* path) {
+bool fs_mkdir(const char* path) {
 
 #ifdef __WINDOWS__
 	return CreateDirectoryA((LPCSTR) path, NULL) ? true : false;
@@ -26,7 +26,7 @@ bool_t fs_mkdir(const char* path) {
 
 }
 
-bool_t fs_dir_exists(const char* path) {
+bool fs_dir_exists(const char* path) {
 
 #ifdef __WINDOWS__
 	DWORD dwAttrib = GetFileAttributes((LPCSTR) path);
@@ -40,7 +40,7 @@ bool_t fs_dir_exists(const char* path) {
 
 }
 
-bool_t fs_get_dir_contents(const char* path, const char* extension, void (*handler) (const char*)) {
+bool fs_get_dir_contents(const char* path, const char* extension, void (*handler) (const char*)) {
 
 #ifdef __WINDOWS__
 	WIN32_FIND_DATA find;
@@ -83,7 +83,7 @@ bool_t fs_get_dir_contents(const char* path, const char* extension, void (*handl
 
 }
 
-bool_t fs_file_exists(const char* path) {
+bool fs_file_exists(const char* path) {
 
 	FILE* file = fopen(path, "r");
 

@@ -18,8 +18,8 @@ struct cmd_node {
 
 	int32_t idx;
 	cmd_node_type_t type : 2;
-	bool_t is_executable : 1;
-	bool_t has_redirect_node : 1;
+	bool is_executable : 1;
+	bool has_redirect_node : 1;
 	utl_vector_t children;
 	int32_t redirect_node;
 

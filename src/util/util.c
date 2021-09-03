@@ -30,7 +30,7 @@ size_t utl_to_minecraft_hex(char* str, const byte_t* val, size_t size) {
 
 	}
 
-	bool_t begin = true;
+	bool begin = true;
 	for (size_t i = 0; i < size; ++i) {
 
 		if (begin) {

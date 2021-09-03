@@ -40,7 +40,7 @@ typedef struct {
 	const string_t usage;
 	const string_t permission;
 	const string_t permission_message;
-	bool_t (*const handler) (char*, const cmd_sender_t*);
+	bool (*const handler) (char*, const cmd_sender_t*);
 	const size_t alias_count;
 	const string_t aliases[];
 
@@ -53,7 +53,7 @@ extern void cmd_add_defaults();
 extern void cmd_add_command(const cmd_command_t*);
 extern void cmd_handle(char*, const cmd_sender_t*);
 
-extern bool_t cmd_has_permission(const cmd_command_t*, const cmd_sender_t*);
+extern bool cmd_has_permission(const cmd_command_t*, const cmd_sender_t*);
 
 extern uint32_t cmd_hash(const char*);
 extern char* cmd_hash_arg(char*, uint32_t*);
@@ -67,10 +67,10 @@ extern cmd_sender_type_t cmd_get_sender_type(const cmd_sender_t*);
 extern ltg_client_t* cmd_get_player(const cmd_sender_t*);
 
 /* COMMANDS */
-extern bool_t cmd_stop(char*, const cmd_sender_t*);
-extern bool_t cmd_help(char*, const cmd_sender_t*);
-extern bool_t cmd_plugins(char*, const cmd_sender_t*);
-extern bool_t cmd_jb(char*, const cmd_sender_t*);
+extern bool cmd_stop(char*, const cmd_sender_t*);
+extern bool cmd_help(char*, const cmd_sender_t*);
+extern bool cmd_plugins(char*, const cmd_sender_t*);
+extern bool cmd_jb(char*, const cmd_sender_t*);
 
 static const cmd_command_t cmd_stop_h = {
 	.label = UTL_CSTRTOSTR("stop"),

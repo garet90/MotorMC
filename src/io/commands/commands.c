@@ -132,7 +132,7 @@ void cmd_handle(char* cmd, const cmd_sender_t* sender) {
 
 }
 
-bool_t cmd_has_permission(const cmd_command_t* command, const cmd_sender_t* sender) {
+bool cmd_has_permission(const cmd_command_t* command, const cmd_sender_t* sender) {
 
 	if (sender->op) return true;
 	if (UTL_STRTOCSTR(command->permission) == NULL) return true;
@@ -237,7 +237,7 @@ ltg_client_t* cmd_get_player(const cmd_sender_t* sender) {
 
 }
 
-bool_t cmd_stop(char* args, const cmd_sender_t* sender) {
+bool cmd_stop(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
 		return false;
@@ -252,7 +252,7 @@ bool_t cmd_stop(char* args, const cmd_sender_t* sender) {
 
 }
 
-bool_t cmd_help(char* args, const cmd_sender_t* sender) {
+bool cmd_help(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
 		return false;
@@ -303,7 +303,7 @@ bool_t cmd_help(char* args, const cmd_sender_t* sender) {
 
 }
 
-bool_t cmd_plugins(char* args, const cmd_sender_t* sender) {
+bool cmd_plugins(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
 		return false;
@@ -345,7 +345,7 @@ bool_t cmd_plugins(char* args, const cmd_sender_t* sender) {
 
 }
 
-bool_t cmd_jb(char* args, const cmd_sender_t* sender) {
+bool cmd_jb(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
 		return false;
