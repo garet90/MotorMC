@@ -383,6 +383,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	// CHUNK MASK
 
+	// tested, correct
 	const uint16_t chunk_mask_length = ((chunk_height - 1) >> 6) + 1;
 	pck_write_var_int(packet, chunk_mask_length);
 	int64_t primary_chunk_mask[chunk_mask_length];
@@ -410,21 +411,21 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	const uint32_t heightmap_size = 37;
 	int64_t motion_blocking[heightmap_size];
-	int64_t world_surface[heightmap_size];
+	//int64_t world_surface[heightmap_size];
 
 	UTL_ENCODE_TO_LONGS(chunk->highest.motion_blocking, 16 * 16, 9, motion_blocking);
-	UTL_ENCODE_TO_LONGS(chunk->highest.world_surface, 16 * 16, 9, world_surface);
+	//UTL_ENCODE_TO_LONGS(chunk->highest.world_surface, 16 * 16, 9, world_surface);
 
 	// create heightmap
 	mnbt_doc* doc = mnbt_new();
 	mnbt_tag* tag = mnbt_new_tag(doc, UTL_CSTRTOARG(""), MNBT_COMPOUND, mnbt_val_compound());
 	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("MOTION_BLOCKING"), MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, heightmap_size)));
-	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("WORLD_SURFACE"), MNBT_LONG_ARRAY, mnbt_val_long_array(world_surface, heightmap_size)));
+	//mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("WORLD_SURFACE"), MNBT_LONG_ARRAY, mnbt_val_long_array(world_surface, heightmap_size)));
 	mnbt_set_root(doc, tag);
 
-	mnbt_write_file(doc, "test.nbt", 1024, MNBT_NONE);
-
 	pck_write_nbt(packet, doc);
+
+	mnbt_write_file(doc, "test.nbt", 1024, MNBT_NONE);
 
 	mnbt_free(doc);
 
