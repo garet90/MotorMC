@@ -71,10 +71,6 @@ void sky_handle_signal_terminate(__attribute__((unused)) int signal) {
 	sky_term();
 }
 
-void sky_handle_signal_nothing(__attribute__((unused)) int signal) {
-	// do absolutely nothing
-}
-
 void sky_handle_signal_crash(int signal) {
 	log_error("!!!!THE SERVER HAS CRASHED FATALLY!!!!");
 	log_error("BEGIN CRASH REPORT");
@@ -137,7 +133,7 @@ int main(int argc, char* argv[]) {
 	signal(SIGSEGV, sky_handle_signal_crash);
 	signal(SIGTERM, sky_handle_signal_terminate);
 #ifndef __WINDOWS__
-	signal(SIGPIPE, sky_handle_signal_nothing);
+	signal(SIGPIPE, SIG_IGN);
 #endif
 
 	sky_main.console_thread = pthread_self();

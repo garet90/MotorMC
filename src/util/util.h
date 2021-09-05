@@ -1,4 +1,5 @@
 #pragma once
+#include <math.h>
 #include "../main.h"
 
 #define UTL_MIN(a, b) _Generic((a), float32_t: utl_minf, float64_t: utl_mind, default: utl_min) (a, b)
@@ -35,22 +36,7 @@ static inline int64_t utl_max(int64_t a, int64_t b) {
 	return b;
 }
 
-#define UTL_ABS(a) _Generic((a), float32_t: utl_absf, float64_t: utl_absd, default: utl_abs) (a)
-
-static inline float32_t utl_absf(float32_t a) {
-	if (a < 0) return -a;
-	return a;
-}
-
-static inline float64_t utl_absd(float64_t a) {
-	if (a < 0) return -a;
-	return a;
-}
-
-static inline int64_t utl_abs(int64_t a) {
-	if (a < 0) return -a;
-	return a;
-}
+#define UTL_ABS(a) _Generic((a), float32_t: fabs, float64_t: fabs, default: labs) (a)
 
 static const char utl_hexmap[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 

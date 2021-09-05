@@ -167,7 +167,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		.tick = sch_schedule_repeating(&tick_job->header, 1, 1)
 	};
 	for (uint32_t i = 0; i < 256; ++i) {
-		chunk_init.highest.motion_blocking[i] = 127;
+		chunk_init.highest.motion_blocking[i] = 2;
 		chunk_init.highest.world_surface[i] = 3;
 	}
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t));

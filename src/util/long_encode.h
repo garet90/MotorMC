@@ -10,8 +10,9 @@ static inline size_t utl_encode_ints_to_longs(int32_t* values, size_t values_len
 
 	for (size_t i = 0; i < values_length; ++i) {
 		const int64_t value = values[i];
-		const size_t cell = i / (size_t) values_per_long;
-		const size_t bit = i % (size_t) values_per_long;
+		const ldiv_t cell_bit = ldiv(i, values_per_long);
+		const size_t cell = cell_bit.quot;
+		const size_t bit = cell_bit.rem;
 		if (bit == 0)
 			data[cell] = 0;
 		data[cell] |= value << (bit * bits_per_entry + (64 - values_per_long * bits_per_entry));
@@ -28,8 +29,9 @@ static inline size_t utl_encode_shorts_to_longs(int16_t* values, size_t values_l
 
 	for (size_t i = 0; i < values_length; ++i) {
 		const int64_t value = values[i];
-		const size_t cell = i / (size_t) values_per_long;
-		const size_t bit = i % (size_t) values_per_long;
+		const ldiv_t cell_bit = ldiv(i, values_per_long);
+		const size_t cell = cell_bit.quot;
+		const size_t bit = cell_bit.rem;
 		if (bit == 0)
 			data[cell] = 0;
 		data[cell] |= value << (bit * bits_per_entry + (64 - values_per_long * bits_per_entry));
@@ -46,8 +48,9 @@ static inline size_t utl_encode_bytes_to_longs(int8_t* values, size_t values_len
 
 	for (size_t i = 0; i < values_length; ++i) {
 		const int64_t value = values[i];
-		const size_t cell = i / (size_t) values_per_long;
-		const size_t bit = i % (size_t) values_per_long;
+		const ldiv_t cell_bit = ldiv(i, values_per_long);
+		const size_t cell = cell_bit.quot;
+		const size_t bit = cell_bit.rem;
 		if (bit == 0)
 			data[cell] = 0;
 		data[cell] |= value << (bit * bits_per_entry + (64 - values_per_long * bits_per_entry));
