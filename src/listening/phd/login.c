@@ -359,11 +359,7 @@ void phd_send_encryption_request(ltg_client_t* client) {
 	pck_write_var_int(response, 0x01);
 
 	// server id
-	if (sky_main.listener.online_mode) {
-		pck_write_string(response, UTL_CSTRTOARG(""));
-	} else {
-		pck_write_string(response, UTL_CSTRTOARG("-"));
-	}
+	pck_write_string(response, UTL_CSTRTOARG(""));
 
 	// the public auth_key
 	pck_write_var_int(response, sky_main.listener.keypair.ASN1.length);

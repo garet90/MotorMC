@@ -139,15 +139,10 @@ mnbt_tag* mnbt_new_tag(mnbt_doc* document, const char* label, uint16_t label_len
 
 	tag->type = type;
 
-	if (label != NULL) {
-		tag->label_length = label_length;
-		tag->label = malloc(label_length + 1);
-		memcpy(tag->label, label, label_length);
-		tag->label[label_length] = 0;
-	} else {
-		tag->label_length = 0;
-		tag->label = NULL;
-	}
+	tag->label_length = label_length;
+	tag->label = malloc(label_length + 1);
+	memcpy(tag->label, label, label_length);
+	tag->label[label_length] = 0;
 
 	tag->value = value;
 
@@ -336,26 +331,16 @@ size_t _mnbt_write_tag(mnbt_tag* tag, uint8_t* bytes) {
 		return 1;
 	}
 
-	if (tag->label != NULL) {
-		
-		// write length of label
-		*((uint16_t*) bytes) = _mnbt_reverse_short(tag->label_length);
-		bytes += 2;
+	// write length of label
+	*((uint16_t*) bytes) = _mnbt_reverse_short(tag->label_length);
+	bytes += 2;
 
-		memcpy(bytes, tag->label, tag->label_length);
-		bytes += tag->label_length;
+	memcpy(bytes, tag->label, tag->label_length);
+	bytes += tag->label_length;
 
-		const size_t val_len = _mnbt_write_val(tag->type, tag->value, bytes);
+	const size_t val_len = _mnbt_write_val(tag->type, tag->value, bytes);
 
-		return val_len + 3 + tag->label_length;
-
-	} else {
-
-		const size_t val_len = _mnbt_write_val(tag->type, tag->value, bytes);
-
-		return val_len + 1;
-
-	}
+	return val_len + 3 + tag->label_length;
 
 }
 

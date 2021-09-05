@@ -23,7 +23,7 @@ bool job_handle_keep_alive(job_keep_alive_t* work) {
 
 bool job_handle_global_chat_message(job_global_chat_message_t* work) {
 
-	log_info("<%s> %s", work->sender->username.value, work->message.value);
+	log_info("<%s> %s", UTL_STRTOCSTR(work->sender->username), UTL_STRTOCSTR(work->message));
 
 	cht_translation_t translation = cht_translation_new;
 	translation.translate = cht_translation_chat_type_text;
@@ -54,7 +54,7 @@ bool job_handle_global_chat_message(job_global_chat_message_t* work) {
 
 bool job_handle_player_join(job_player_join_t* work) {
 
-	log_info("%s joined the game", work->player->username.value);
+	log_info("%s joined the game", UTL_STRTOCSTR(work->player->username));
 
 	cht_translation_t translation = cht_translation_new;
 	translation.translate = cht_translation_multiplayer_player_joined;
@@ -84,7 +84,7 @@ bool job_handle_player_join(job_player_join_t* work) {
 
 bool job_handle_player_leave(job_player_leave_t* work) {
 
-	log_info("%s left the game", work->username.value);
+	log_info("%s left the game", UTL_STRTOCSTR(work->username));
 
 	cht_translation_t translation = cht_translation_new;
 	translation.translate = cht_translation_multiplayer_player_left;
