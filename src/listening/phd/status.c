@@ -44,6 +44,8 @@ bool phd_handle_ping(ltg_client_t* client, pck_packet_t* packet) {
 
 void phd_send_response(ltg_client_t* client) {
 
+	// TODO cache SLP
+
 	char slp[2048];
 	int32_t slp_length = cht_server_list_ping(slp);
 

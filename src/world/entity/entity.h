@@ -139,6 +139,14 @@ static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, floa
 
 }
 
+static inline void ent_look(ent_living_entity_t* entity, float32_t pitch, float32_t yaw, bool on_ground) {
+	
+	entity->entity.on_ground = on_ground;
+	entity->rotation.pitch = pitch;
+	entity->rotation.yaw = yaw;
+
+}
+
 static inline void ent_move_look(ent_living_entity_t* entity, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool on_ground) {
 
 	if (((uint64_t) entity->entity.position.x >> 4) != ((uint64_t) x >> 4) || ((uint64_t) entity->entity.position.z >> 4) != ((uint64_t) z >> 4)) {
@@ -156,9 +164,7 @@ static inline void ent_move_look(ent_living_entity_t* entity, float64_t x, float
 
 	}
 
-	entity->entity.on_ground = on_ground;
-	entity->rotation.pitch = pitch;
-	entity->rotation.yaw = yaw;
+	ent_look(entity, pitch, yaw, on_ground);
 
 }
 

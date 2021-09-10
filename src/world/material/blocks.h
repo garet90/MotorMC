@@ -927,10 +927,15 @@ typedef struct {
 
 	mat_block_entity_type_t entity : 5;
 
+	uint8_t encouragement : 6;
+	uint8_t flammability : 7;
+
+	// motor: tags that help with certain calculations
 	bool catches_fire_from_lava : 1;
 	bool light_filtering : 1;
 	bool transparent : 1;
 
+	// vanilla tags
 	bool mineable_axe : 1;
 	bool mineable_hoe : 1;
 	bool mineable_pickaxe : 1;
@@ -1031,7 +1036,7 @@ typedef struct {
 	bool tall_flowers : 1;
 	bool trapdoors : 1;
 	bool underwater_bonemeals : 1;
-	bool unstable_boottom_center : 1;
+	bool unstable_bottom_center : 1;
 	bool valid_spawn : 1;
 	bool walls : 1;
 	bool wall_corals : 1;
@@ -1049,7 +1054,6 @@ typedef struct {
 	bool wooden_stairs : 1;
 	bool wooden_trapdoors : 1;
 	bool wool : 1;
-	bool unstable_bottom_center : 1;
 
 	bool water : 1;
 	bool lava : 1;

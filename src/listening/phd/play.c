@@ -35,6 +35,8 @@ bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		return phd_handle_player_position(client, packet);
 	case 0x12:
 		return phd_handle_player_position_and_look(client, packet);
+	case 0x13:
+		return phd_handle_player_rotation(client, packet);
 	case 0x1b:
 		return phd_handle_entity_action(client, packet);
 	case 0x25:
@@ -211,6 +213,21 @@ bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* pac
 
 	}
 	
+	return true;
+
+}
+
+bool phd_handle_player_rotation(ltg_client_t* client, pck_packet_t* packet) {
+
+	ent_player_t* player = client->entity;
+
+	const float32_t yaw = pck_read_float32(packet);
+	const float32_t pitch = pck_read_float32(packet);
+
+	const bool on_ground = pck_read_int8(packet);
+
+	ent_look(&player->living_entity, yaw, pitch, on_ground);
+
 	return true;
 
 }
@@ -599,8 +616,8 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_server_difficulty(client);
 	phd_send_plugin_message(client, UTL_CSTRTOARG("minecraft:brand"), (const byte_t*) UTL_CSTRTOARG("\x07MotorMC"));
 	phd_send_held_item_change(client);
-	phd_send_declare_recipes(client);
-	phd_send_tags(client);
+	phd_send_declare_recipes(client); // TODO should be cached
+	phd_send_tags(client); // TODO should be cached
 	phd_send_entity_status(client, player->living_entity.entity.id, 24); // TODO actual op level
 	phd_send_declare_commands(client);
 	phd_send_unlock_recipes(client);
@@ -864,25 +881,65 @@ void phd_send_declare_recipes(ltg_client_t* client) {
 
 void phd_send_tags(ltg_client_t* client) {
 
-	PCK_INLINE(packet, 1024, io_big_endian);
+	PCK_INLINE(packet, 16384, io_big_endian);
 
 	pck_write_var_int(packet, 0x66);
 	pck_write_var_int(packet, 5);
 
 	pck_write_string(packet, UTL_CSTRTOARG("minecraft:block"));
-	pck_write_var_int(packet, 0);
+	pck_write_var_int(packet, mat_block_tag_count);
+
+	for (int32_t i = 0; i < mat_block_tag_count; ++i) {
+		pck_write_string(packet, UTL_STRTOARG(mat_block_tags[i]->identifier));
+		pck_write_var_int(packet, mat_block_tags[i]->count);
+		for (int32_t j = 0; j < mat_block_tags[i]->count; ++j) {
+			pck_write_var_int(packet, mat_get_block_base_protocol_id_by_id(mat_block_tags[i]->entries[j]));
+		}
+	}
 
 	pck_write_string(packet, UTL_CSTRTOARG("minecraft:item"));
-	pck_write_var_int(packet, 0);
+	pck_write_var_int(packet, mat_item_tag_count);
+
+	for (int32_t i = 0; i < mat_item_tag_count; ++i) {
+		pck_write_string(packet, UTL_STRTOARG(mat_item_tags[i]->identifier));
+		pck_write_var_int(packet, mat_item_tags[i]->count);
+		for (int32_t j = 0; j < mat_item_tags[i]->count; ++j) {
+			pck_write_var_int(packet, mat_item_tags[i]->entries[j]);
+		}
+	}
 
 	pck_write_string(packet, UTL_CSTRTOARG("minecraft:fluid"));
-	pck_write_var_int(packet, 0);
+	pck_write_var_int(packet, mat_fluid_tag_count);
+
+	for (int32_t i = 0; i < mat_fluid_tag_count; ++i) {
+		pck_write_string(packet, UTL_STRTOARG(mat_fluid_tags[i]->identifier));
+		pck_write_var_int(packet, mat_fluid_tags[i]->count);
+		for (int32_t j = 0; j < mat_fluid_tags[i]->count; ++j) {
+			pck_write_var_int(packet, mat_get_block_base_protocol_id_by_id(mat_fluid_tags[i]->entries[j]));
+		}
+	}
 
 	pck_write_string(packet, UTL_CSTRTOARG("minecraft:entity_type"));
-	pck_write_var_int(packet, 0);
+	pck_write_var_int(packet, mat_entity_type_tag_count);
+
+	for (int32_t i = 0; i < mat_entity_type_tag_count; ++i) {
+		pck_write_string(packet, UTL_STRTOARG(mat_entity_type_tags[i]->identifier));
+		pck_write_var_int(packet, mat_entity_type_tags[i]->count);
+		for (int32_t j = 0; j < mat_entity_type_tags[i]->count; ++j) {
+			pck_write_var_int(packet, mat_entity_type_tags[i]->entries[j]);
+		}
+	}
 
 	pck_write_string(packet, UTL_CSTRTOARG("minecraft:game_event"));
-	pck_write_var_int(packet, 0);
+	pck_write_var_int(packet, mat_game_event_tag_count);
+
+	for (int32_t i = 0; i < mat_game_event_tag_count; ++i) {
+		pck_write_string(packet, UTL_STRTOARG(mat_game_event_tags[i]->identifier));
+		pck_write_var_int(packet, mat_game_event_tags[i]->count);
+		for (int32_t j = 0; j < mat_game_event_tags[i]->count; ++j) {
+			pck_write_var_int(packet, mat_game_event_tags[i]->entries[j]);
+		}
+	}
 
 	ltg_send(client, packet);
 

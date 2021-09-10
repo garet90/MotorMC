@@ -7,3 +7,4 @@
 #include "dimensions.h"
 #include "items.h"
 #include "state_modifiers.h"
+#include "tags/tags.h"

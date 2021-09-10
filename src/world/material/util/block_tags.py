@@ -35,16 +35,22 @@ def get_all_blocks_with_tag(tag):
 for tag in tags:
 	tag_blocks = get_all_blocks_with_tag(tag)
 	tag = tag.replace("/", "_")
+	if len(tag_blocks) == 0:
+		print("Something went wrong at " + tag + "!")
+		exit()
 	for tag_block in tag_blocks:
-		p = re.compile("const mat_block_t mat_block_" + tag_block + "_d = \{\s?\r?\n[\s\S]*?\r?\n\};")
-		for m in p.finditer(blocks):
-			block = m.group()
-			if tag not in block:
-				pre = blocks[:m.end() - 3]
-				post = blocks[m.end() - 3:]
-				if pre.endswith(","):
-					blocks = pre + "\n\t." + tag + " = true," + post
-				else:
-					blocks = pre + ",\n\t." + tag + " = true," + post
+		p = re.compile("const mat_block_t mat_block_" + tag_block + "_d = \{\s?\r?\n([\s\S]*?)\r?\n\};")
+		i = list(p.finditer(blocks))
+		if len(i) == 0:
+			print("Couldn't find source for " + tag + "!")
+			exit()
+		block = i[0].group(1)
+		if tag not in block:
+			pre = blocks[:i[0].end() - 3]
+			post = blocks[i[0].end() - 3:]
+			if pre.endswith(","):
+				blocks = pre + "\n\t." + tag + " = true," + post
+			else:
+				blocks = pre + ",\n\t." + tag + " = true," + post
 
 print(blocks)
