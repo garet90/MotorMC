@@ -27,9 +27,10 @@ def get_all_blocks_with_tag(tag):
 			ret += get_all_blocks_with_tag(block[1:])
 		else:
 			ret.append(block)
-	
 	res = []
-	[res.append(x) for x in ret if x not in res]
+	for x in ret:
+		if x not in res:
+			res.append(x)
 	return res
 
 for tag in tags:
