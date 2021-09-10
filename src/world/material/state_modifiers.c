@@ -1,4 +1,4 @@
-#include "material.h"
+#include "state_modifiers.h"
 
 const mat_state_modifier_t mat_state_modifier_facing_cardinal_d = { 
 	.count = 4

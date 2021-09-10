@@ -107,6 +107,8 @@ bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 	__attribute__((unused)) bool disable_text_filtering = pck_read_int8(packet);
 
+	phd_send_player_position_and_look(client);
+
 	return true;
 
 }
@@ -358,6 +360,25 @@ void phd_send_entity_status(ltg_client_t* client, int32_t entity_id, uint8_t sta
 
 }
 
+void phd_send_initialize_world_border(ltg_client_t* client, __attribute__((unused)) wld_world_t* world) {
+
+	PCK_INLINE(packet, 57, io_big_endian);
+
+	pck_write_var_int(packet, 0x20);
+	// TODO verify these fields, make them change by world
+	pck_write_float64(packet, 0);
+	pck_write_float64(packet, 0);
+	pck_write_float64(packet, 59999968);
+	pck_write_float64(packet, 59999968);
+	pck_write_var_long(packet, 0);
+	pck_write_var_int(packet, 29999984);
+	pck_write_var_int(packet, 10);
+	pck_write_var_int(packet, 5);
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_keep_alive(ltg_client_t* client, uint64_t id) {
 
 	PCK_INLINE(packet, 9, io_big_endian);
@@ -457,7 +478,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 			// TODO palette
 			pck_write_var_int(packet, data_array_length); // data array length
 			
-			packet->cursor += sizeof(int64_t) * UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 16 * 16 * 16, bits_per_block, pck_cursor(packet));
+			UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 16 * 16 * 16, bits_per_block, pck_cursor(packet));
+			packet->cursor += 8 * data_array_length;
 		}
 	}
 
@@ -578,7 +600,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_plugin_message(client, UTL_CSTRTOARG("minecraft:brand"), (const byte_t*) UTL_CSTRTOARG("\x07MotorMC"));
 	phd_send_held_item_change(client);
 	phd_send_declare_recipes(client);
-	// TODO send tags
+	phd_send_tags(client);
 	phd_send_entity_status(client, player->living_entity.entity.id, 24); // TODO actual op level
 	phd_send_declare_commands(client);
 	phd_send_unlock_recipes(client);
@@ -587,6 +609,9 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	phd_send_update_view_position(client);
 	phd_update_sent_chunks(client);
+
+	phd_send_initialize_world_border(client, player_world);
+	phd_send_spawn_position(client);
 
 	// add to online players
 	client->online_node = utl_dllist_push(&sky_main.listener.online.list, client);
@@ -807,6 +832,19 @@ void phd_send_update_view_position_to(ltg_client_t* client, int32_t x, int32_t z
 
 }
 
+void phd_send_spawn_position(ltg_client_t* client) {
+
+	PCK_INLINE(packet, 10, io_big_endian);
+
+	pck_write_var_int(packet, 0x4b);
+	// TODO actual spawn position
+	pck_write_int64(packet, 0); // position
+	pck_write_float32(packet, 0); // angle
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_declare_recipes(ltg_client_t* client) {
 
 	PCK_INLINE(packet, 6 + rec_recipes.size * 128, io_big_endian);
@@ -819,6 +857,32 @@ void phd_send_declare_recipes(ltg_client_t* client) {
 		rec_serialize(packet, UTL_VECTOR_GET_AS(rec_recipe_t*, &rec_recipes, i));
 
 	}
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_tags(ltg_client_t* client) {
+
+	PCK_INLINE(packet, 1024, io_big_endian);
+
+	pck_write_var_int(packet, 0x66);
+	pck_write_var_int(packet, 5);
+
+	pck_write_string(packet, UTL_CSTRTOARG("minecraft:block"));
+	pck_write_var_int(packet, 0);
+
+	pck_write_string(packet, UTL_CSTRTOARG("minecraft:item"));
+	pck_write_var_int(packet, 0);
+
+	pck_write_string(packet, UTL_CSTRTOARG("minecraft:fluid"));
+	pck_write_var_int(packet, 0);
+
+	pck_write_string(packet, UTL_CSTRTOARG("minecraft:entity_type"));
+	pck_write_var_int(packet, 0);
+
+	pck_write_string(packet, UTL_CSTRTOARG("minecraft:game_event"));
+	pck_write_var_int(packet, 0);
 
 	ltg_send(client, packet);
 
@@ -868,6 +932,8 @@ void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_dis
 				if (x < -client->render_distance || x > client->render_distance || z < -client->render_distance || z > client->render_distance) {
 					wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
 					wld_subscribe_chunk(v_c, client->id);
+					phd_send_update_light(client, v_c);
+					phd_send_chunk_data(client, v_c);
 				}
 			}
 		}
@@ -891,7 +957,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 
 			for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
 				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
-				wld_subscribe_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id);
+				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, n_x, c_z);
+				wld_subscribe_chunk(new_chunk, client->id);
+				phd_send_update_light(client, new_chunk);
+				phd_send_chunk_data(client, new_chunk);
 			}
 		}
 
@@ -917,7 +986,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 
 			for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
 				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
-				wld_subscribe_chunk(wld_relative_chunk(old_chunk, n_x, c_z), client->id);
+				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, n_x, c_z);
+				wld_subscribe_chunk(new_chunk, client->id);
+				phd_send_update_light(client, new_chunk);
+				phd_send_chunk_data(client, new_chunk);
 			}
 		}
 
@@ -945,7 +1017,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 			
 			for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
 				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
-				wld_subscribe_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id);
+				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, c_x, n_z);
+				wld_subscribe_chunk(new_chunk, client->id);
+				phd_send_update_light(client, new_chunk);
+				phd_send_chunk_data(client, new_chunk);
 			}
 		}
 
@@ -971,7 +1046,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 			
 			for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
 				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
-				wld_subscribe_chunk(wld_relative_chunk(old_chunk, c_x, n_z), client->id);
+				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, c_x, n_z);
+				wld_subscribe_chunk(new_chunk, client->id);
+				phd_send_update_light(client, new_chunk);
+				phd_send_chunk_data(client, new_chunk);
 			}
 		}
 

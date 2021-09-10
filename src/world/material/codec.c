@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include "../../util/str_util.h"
 #include "../../main.h"
-#include "material.h"
 #include "../../io/nbt/mnbt.h"
+#include "codec.h"
+#include "biomes.h"
 
 mat_codec_t* mat_codec = NULL;
 

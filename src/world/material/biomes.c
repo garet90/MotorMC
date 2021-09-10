@@ -1,4 +1,4 @@
-#include "material.h"
+#include "biomes.h"
 #include "../../util/str_util.h"
 
 const mat_biome_t mat_biome_badlands_d = {
