@@ -68,7 +68,7 @@ sky_main_t sky_main = {
 
 // signal handlers
 void sky_handle_signal_terminate(__attribute__((unused)) int signal) {
-	sky_term();
+	exit(0);
 }
 
 void sky_handle_signal_crash(int signal) {
@@ -135,6 +135,8 @@ int main(int argc, char* argv[]) {
 #ifndef __WINDOWS__
 	signal(SIGPIPE, SIG_IGN);
 #endif
+
+	atexit(sky_term);
 
 	sky_main.console_thread = pthread_self();
 

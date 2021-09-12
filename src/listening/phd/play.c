@@ -495,8 +495,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 			// TODO palette
 			pck_write_var_int(packet, data_array_length); // data array length
 			
-			UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 16 * 16 * 16, bits_per_block, true, pck_cursor(packet));
-			packet->cursor += 8 * data_array_length;
+			UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 4096, bits_per_block, true, pck_cursor(packet));
+			packet->cursor += data_array_length << 3;
 		}
 	}
 
@@ -617,7 +617,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_server_difficulty(client);
 	phd_send_held_item_change(client);
 	phd_send_declare_recipes(client); // TODO should be cached
-	phd_send_tags(client); // TODO should be cached
+	//phd_send_tags(client); // TODO should be cached
 	phd_send_entity_status(client, player->living_entity.entity.id, 24); // TODO actual op level
 	phd_send_declare_commands(client);
 	phd_send_unlock_recipes(client);

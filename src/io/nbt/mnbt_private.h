@@ -11,138 +11,74 @@ size_t _mnbt_write_val(mnbt_type type, mnbt_val val, uint8_t* bytes);
 
 void _mnbt_free_val(mnbt_type type, mnbt_val val);
 
-static inline int16_t _mnbt_reverse_short(int16_t val) {
-	const uint8_t e[2] = { 0xAA, 0xBB };
-	if (*((uint16_t*) e) == 0xAABB) {
-		return val;
-	}
-
-	union {
-		int16_t v;
-		int8_t b[2];
-	} i = {
-		.v = val
-	};
-
-	union {
-		int16_t v;
-		int8_t b[2];
-	} o;
-
-	o.b[0] = i.b[1];
-	o.b[1] = i.b[0];
-
-	return o.v;
+static inline uint16_t _mnbt_reverse_short(uint16_t num) {
+#if BIG_ENDIAN
+	return num;
+#else
+	return ((num & 0xff00) >> 8) | (num << 8);
+#endif
 }
 
-static inline int32_t _mnbt_reverse_int(int32_t val) {
-	const uint8_t e[2] = { 0xAA, 0xBB };
-	if (*((uint16_t*) e) == 0xAABB) {
-		return val;
-	}
-
-	union {
-		int32_t v;
-		int8_t b[4];
-	} i = {
-		.v = val
-	};
-
-	union {
-		int32_t v;
-		int8_t b[4];
-	} o;
-
-	o.b[0] = i.b[3];
-	o.b[1] = i.b[2];
-	o.b[2] = i.b[1];
-	o.b[3] = i.b[0];
-
-	return o.v;
+static inline uint32_t _mnbt_reverse_int(uint32_t num) {
+#if BIG_ENDIAN
+	return num;
+#else
+	return ((num & 0xff000000) >> 24) | ((num & 0x00ff0000) >> 8) | ((num & 0x0000ff00) << 8) | (num << 24);
+#endif
 }
 
-static inline int64_t _mnbt_reverse_long(int64_t val) {
-	const uint8_t e[2] = { 0xAA, 0xBB };
-	if (*((uint16_t*) e) == 0xAABB) {
-		return val;
-	}
-
-	union {
-		int64_t v;
-		int8_t b[8];
-	} i = {
-		.v = val
-	};
-
-	union {
-		int64_t v;
-		int8_t b[8];
-	} o;
-
-	o.b[0] = i.b[7];
-	o.b[1] = i.b[6];
-	o.b[2] = i.b[5];
-	o.b[3] = i.b[4];
-	o.b[4] = i.b[3];
-	o.b[5] = i.b[2];
-	o.b[6] = i.b[1];
-	o.b[7] = i.b[0];
-
-	return o.v;
+static inline uint64_t _mnbt_reverse_long(uint64_t num) {
+#if BIG_ENDIAN
+	return num;
+#else
+	return
+		((num & 0xff00000000000000L) >> 56) |
+		((num & 0x00ff000000000000L) >> 48) |
+		((num & 0x0000ff0000000000L) >> 24) |
+		((num & 0x000000ff00000000L) >> 8) |
+		((num & 0x00000000ff000000L) << 8) |
+		((num & 0x0000000000ff0000L) << 24) |
+		((num & 0x000000000000ff00L) << 48) |
+		(num << 56);
+#endif
 }
 
 static inline float _mnbt_reverse_float(float val) {
-	const uint8_t e[2] = { 0xAA, 0xBB };
-	if (*((uint16_t*) e) == 0xAABB) {
-		return val;
-	}
+#if BIG_ENDIAN
+	return val;
+#else
+	char* val_b = (char*) &val;
 
-	union {
-		float v;
-		int8_t b[4];
-	} i = {
-		.v = val
-	};
+	float out;
+	char* out_b = (char*) &out;
 
-	union {
-		float v;
-		int8_t b[4];
-	} o;
+	out_b[0] = val_b[3];
+	out_b[1] = val_b[2];
+	out_b[2] = val_b[1];
+	out_b[3] = val_b[0];
 
-	o.b[0] = i.b[3];
-	o.b[1] = i.b[2];
-	o.b[2] = i.b[1];
-	o.b[3] = i.b[0];
-
-	return o.v;
+	return out;
+#endif
 }
 
 static inline double _mnbt_reverse_double(double val) {
-	const uint8_t e[2] = { 0xAA, 0xBB };
-	if (*((uint16_t*) e) == 0xAABB) {
-		return val;
-	}
+#if BIG_ENDIAN
+	return val;
+#else
+	char* val_b = (char*) &val;
 
-	union {
-		double v;
-		int8_t b[8];
-	} i = {
-		.v = val
-	};
+	double out;
+	char* out_b = (char*) &out;
 
-	union {
-		double v;
-		int8_t b[8];
-	} o;
+	out_b[0] = val_b[7];
+	out_b[1] = val_b[6];
+	out_b[2] = val_b[5];
+	out_b[3] = val_b[4];
+	out_b[4] = val_b[3];
+	out_b[5] = val_b[2];
+	out_b[6] = val_b[1];
+	out_b[7] = val_b[0];
 
-	o.b[0] = i.b[7];
-	o.b[1] = i.b[6];
-	o.b[2] = i.b[5];
-	o.b[3] = i.b[4];
-	o.b[4] = i.b[3];
-	o.b[5] = i.b[2];
-	o.b[6] = i.b[1];
-	o.b[7] = i.b[0];
-
-	return o.v;
+	return out;
+#endif
 }

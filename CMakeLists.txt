@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 
+enable_language(C)
+include(TestBigEndian)
+test_big_endian(BIG_ENDIAN)
+
 project(MotorMC)
 
 # Fix linking on 10.14+. See https://stackoverflow.com/questions/54068035
@@ -9,8 +13,13 @@ include_directories(/usr/local/include)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-set(CMAKE_C_FLAGS "-O3 -Wall -Wextra")
-set(CMAKE_C_FLAGS_DEBUG "-g3 -Wall -Wextra")
+if(BIG_ENDIAN)
+     set(CMAKE_C_FLAGS "-O3 -Wall -Wextra -DBIG_ENDIAN=1")
+     set(CMAKE_C_FLAGS_DEBUG "-g3 -Wall -Wextra -DBIG_ENDIAN=1")
+else()
+     set(CMAKE_C_FLAGS "-O3 -Wall -Wextra")
+     set(CMAKE_C_FLAGS_DEBUG "-g3 -Wall -Wextra")
+endif()
 
 file(GLOB_RECURSE src
      "src/*.c"

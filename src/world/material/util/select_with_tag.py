@@ -1,7 +1,4 @@
 import sys
-import json
-import glob
-from os import path
 
 if len(sys.argv) != 3:
     print("Usage: " + sys.argv[0] + " <block file> <tag>")

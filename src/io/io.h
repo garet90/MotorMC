@@ -1,21 +1,33 @@
 #pragma once
 #include "../main.h"
 
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN 0
+#endif
+
 typedef enum io_endianness {
 	io_little_endian = 0,
 	io_big_endian = 1
 } io_endianness_t;
 
-static inline io_endianness_t io_get_endianness() {
-	
-	const uint8_t array[] = { 0xAA, 0xBB };
+static inline uint16_t io_switch_int16(uint16_t num) {
+	return ((num & 0xff00) >> 8) | (num << 8);
+}
 
-	if (*((uint16_t*) array) == 0xAABB) {
-		return io_big_endian;
-	} else {
-		return io_little_endian;
-	}
+static inline uint32_t io_switch_int32(uint32_t num) {
+	return ((num & 0xff000000) >> 24) | ((num & 0x00ff0000) >> 8) | ((num & 0x0000ff00) << 8) | (num << 24);
+}
 
+static inline uint64_t io_switch_int64(uint64_t num) {
+	return
+		((num & 0xff00000000000000L) >> 56) |
+		((num & 0x00ff000000000000L) >> 40) |
+		((num & 0x0000ff0000000000L) >> 24) |
+		((num & 0x000000ff00000000L) >> 8) |
+		((num & 0x00000000ff000000L) << 8) |
+		((num & 0x0000000000ff0000L) << 24) |
+		((num & 0x000000000000ff00L) << 40) |
+		(num << 56);
 }
 
 static inline int8_t io_read_int8(const byte_t* buffer) {
@@ -24,21 +36,13 @@ static inline int8_t io_read_int8(const byte_t* buffer) {
 
 static inline int16_t io_read_int16(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 
 		return *((int16_t*) buffer);
 
 	} else {
 
-		union {
-			int16_t v;
-			byte_t b[2];
-		} u;
-
-		u.b[1] = buffer[0];
-		u.b[0] = buffer[1];
-
-		return u.v;
+		return io_switch_int16(*((int16_t*) buffer));
 
 	}
 
@@ -46,23 +50,13 @@ static inline int16_t io_read_int16(const byte_t* buffer, io_endianness_t endian
 
 static inline int32_t io_read_int32(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 
 		return *((int32_t*) buffer);
 
 	} else {
 
-		union {
-			int32_t v;
-			byte_t b[4];
-		} u;
-
-		u.b[3] = buffer[0];
-		u.b[2] = buffer[1];
-		u.b[1] = buffer[2];
-		u.b[0] = buffer[3];
-
-		return u.v;
+		return io_switch_int32(*((int32_t*) buffer));
 
 	}
 
@@ -70,27 +64,13 @@ static inline int32_t io_read_int32(const byte_t* buffer, io_endianness_t endian
 
 static inline int64_t io_read_int64(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 		
 		return *((int64_t*) buffer);
 
 	} else {
 
-		union {
-			int64_t v;
-			byte_t b[8];
-		} u;
-
-		u.b[7] = buffer[0];
-		u.b[6] = buffer[1];
-		u.b[5] = buffer[2];
-		u.b[4] = buffer[3];
-		u.b[3] = buffer[4];
-		u.b[2] = buffer[5];
-		u.b[1] = buffer[6];
-		u.b[0] = buffer[7];
-
-		return u.v;
+		return io_switch_int64(*((int64_t*) buffer));
 
 	}
 
@@ -98,23 +78,20 @@ static inline int64_t io_read_int64(const byte_t* buffer, io_endianness_t endian
 
 static inline float32_t io_read_float32(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 
 		return *((float32_t*) buffer);
 
 	} else {
 
-		union {
-			float32_t v;
-			byte_t b[4];
-		} u;
+		float32_t out;
+		byte_t* out_b = (byte_t*) &out;
+		out_b[3] = buffer[0];
+		out_b[2] = buffer[1];
+		out_b[1] = buffer[2];
+		out_b[0] = buffer[3];
 
-		u.b[3] = buffer[0];
-		u.b[2] = buffer[1];
-		u.b[1] = buffer[2];
-		u.b[0] = buffer[3];
-
-		return u.v;
+		return out;
 
 	}
 
@@ -122,27 +99,24 @@ static inline float32_t io_read_float32(const byte_t* buffer, io_endianness_t en
 
 static inline float64_t io_read_float64(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 		
 		return *((float64_t*) buffer);
 
 	} else {
 
-		union {
-			float64_t v;
-			byte_t b[8];
-		} u;
+		float64_t out;
+		byte_t* out_b = (byte_t*) &out;
+		out_b[7] = buffer[0];
+		out_b[6] = buffer[1];
+		out_b[5] = buffer[2];
+		out_b[4] = buffer[3];
+		out_b[3] = buffer[4];
+		out_b[2] = buffer[5];
+		out_b[1] = buffer[6];
+		out_b[0] = buffer[7];
 
-		u.b[7] = buffer[0];
-		u.b[6] = buffer[1];
-		u.b[5] = buffer[2];
-		u.b[4] = buffer[3];
-		u.b[3] = buffer[4];
-		u.b[2] = buffer[5];
-		u.b[1] = buffer[6];
-		u.b[0] = buffer[7];
-
-		return u.v;
+		return out;
 
 	}
 
@@ -155,7 +129,7 @@ static inline int32_t io_read_var_int(const byte_t* buffer, size_t max_length, s
 
 	if (max_length > 5) max_length = 5;
 
-	if (io_get_endianness() == io_little_endian) {
+	if (BIG_ENDIAN == io_little_endian) {
 
 		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
@@ -182,7 +156,7 @@ static inline int64_t io_read_var_long(const byte_t* buffer, size_t max_length, 
 
 	if (max_length > 10) max_length = 10;
 
-	if (io_get_endianness() == io_little_endian) {
+	if (BIG_ENDIAN == io_little_endian) {
 
 		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
@@ -210,21 +184,13 @@ static inline void io_write_int8(byte_t* buffer, int8_t value) {
 
 static inline void io_write_int16(byte_t* buffer, int16_t value, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 
 		*((int16_t*) buffer) = value;
 		
 	} else {
 
-		union {
-			int16_t v;
-			byte_t b[2];
-		} u = {
-			.v = value
-		};
-		
-		buffer[0] = u.b[1];
-		buffer[1] = u.b[0];
+		*((int16_t*) buffer) = io_switch_int16(value);
 
 	}
 
@@ -232,23 +198,13 @@ static inline void io_write_int16(byte_t* buffer, int16_t value, io_endianness_t
 
 static inline void io_write_int32(byte_t* buffer, int32_t value, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 
 		*((int32_t*) buffer) = value;
 
 	} else {
 
-		union {
-			int32_t v;
-			byte_t b[4];
-		} u = {
-			.v = value
-		};
-
-		buffer[0] = u.b[3];
-		buffer[1] = u.b[2];
-		buffer[2] = u.b[1];
-		buffer[3] = u.b[0];
+		*((int32_t*) buffer) = io_switch_int32(value);
 
 	}
 
@@ -256,27 +212,13 @@ static inline void io_write_int32(byte_t* buffer, int32_t value, io_endianness_t
 
 static inline void io_write_int64(byte_t* buffer, int64_t value, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 
 		*((int64_t*) buffer) = value;
 
 	} else {
 
-		union {
-			int64_t v;
-			byte_t b[8];
-		} u = {
-			.v = value
-		};
-
-		buffer[0] = u.b[7];
-		buffer[1] = u.b[6];
-		buffer[2] = u.b[5];
-		buffer[3] = u.b[4];
-		buffer[4] = u.b[3];
-		buffer[5] = u.b[2];
-		buffer[6] = u.b[1];
-		buffer[7] = u.b[0];
+		*((int64_t*) buffer) = io_switch_int64(value);
 
 	}
 
@@ -284,23 +226,18 @@ static inline void io_write_int64(byte_t* buffer, int64_t value, io_endianness_t
 
 static inline void io_write_float32(byte_t* buffer, float32_t value, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 
 		*((float32_t*) buffer) = value;
 
 	} else {
 
-		union {
-			float32_t v;
-			byte_t b[4];
-		} u = {
-			.v = value
-		};
+		byte_t* in = (byte_t*) &value;
 
-		buffer[0] = u.b[3];
-		buffer[1] = u.b[2];
-		buffer[2] = u.b[1];
-		buffer[3] = u.b[0];
+		buffer[0] = in[3];
+		buffer[1] = in[2];
+		buffer[2] = in[1];
+		buffer[3] = in[0];
 
 	}
 
@@ -308,27 +245,22 @@ static inline void io_write_float32(byte_t* buffer, float32_t value, io_endianne
 
 static inline void io_write_float64(byte_t* buffer, float64_t value, io_endianness_t endianness) {
 
-	if (io_get_endianness() == endianness) {
+	if (BIG_ENDIAN == endianness) {
 
 		*((float64_t*) buffer) = value;
 
 	} else {
 
-		union {
-			float64_t v;
-			byte_t b[8];
-		} u = {
-			.v = value
-		};
+		byte_t* in = (byte_t*) &value;
 
-		buffer[0] = u.b[7];
-		buffer[1] = u.b[6];
-		buffer[2] = u.b[5];
-		buffer[3] = u.b[4];
-		buffer[4] = u.b[3];
-		buffer[5] = u.b[2];
-		buffer[6] = u.b[1];
-		buffer[7] = u.b[0];
+		buffer[0] = in[7];
+		buffer[1] = in[6];
+		buffer[2] = in[5];
+		buffer[3] = in[4];
+		buffer[4] = in[3];
+		buffer[5] = in[2];
+		buffer[6] = in[1];
+		buffer[7] = in[0];
 
 	}
 
@@ -400,24 +332,9 @@ static inline size_t io_write_var_long(byte_t* buffer, uint64_t value) {
 
 static inline uint16_t io_htons(uint16_t n) {
 
-	if (io_get_endianness() == io_little_endian) {
+	if (BIG_ENDIAN == io_little_endian) {
 
-		union {
-			int16_t v;
-			byte_t b[2];
-		} i = {
-			.v = n
-		};
-
-		union {
-			int16_t v;
-			byte_t b[2];
-		} o;
-
-		o.b[0] = i.b[1];
-		o.b[1] = i.b[0];
-
-		return o.v;
+		return io_switch_int16(n);
 
 	}
 
