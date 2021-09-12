@@ -101,7 +101,7 @@ void cry_gen_prime(fp_int* prime, size_t size) {
 	}
 
 }
-void cry_rsa_decript(byte_t* out, const byte_t* message, size_t size, cry_rsa_keypair_t* keypair) {
+void cry_rsa_decrypt(byte_t* out, const byte_t* message, size_t size, cry_rsa_keypair_t* keypair) {
 
 	fp_int c;
 	fp_read_unsigned_bin(&c, message, size);

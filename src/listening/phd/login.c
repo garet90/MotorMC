@@ -119,7 +119,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 	pck_read_bytes(packet, secret.bytes, secret.length);
 
 	// decrypt shared secret
-	cry_rsa_decript(secret.bytes, secret.bytes, secret.length, &sky_main.listener.keypair);
+	cry_rsa_decrypt(secret.bytes, secret.bytes, secret.length, &sky_main.listener.keypair);
 	utl_reverse_bytes(secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH);
 	
 	// start encryption cypher
@@ -148,7 +148,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 	pck_read_bytes(packet, verify.bytes, verify.length);
 
 	// decrypt and check verify
-	cry_rsa_decript(verify.bytes, verify.bytes, verify.length, &sky_main.listener.keypair);
+	cry_rsa_decrypt(verify.bytes, verify.bytes, verify.length, &sky_main.listener.keypair);
 	if (verify.key != client->verify) {
 
 		return false;

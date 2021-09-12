@@ -20,4 +20,4 @@ extern void cry_rsa_gen_key_pair(cry_rsa_keypair_t*);
 
 extern void cry_gen_prime(fp_int*, size_t);
 
-extern void cry_rsa_decript(byte_t*, const byte_t*, size_t, cry_rsa_keypair_t*);
+extern void cry_rsa_decrypt(byte_t*, const byte_t*, size_t, cry_rsa_keypair_t*);

@@ -851,7 +851,7 @@ void phd_send_update_view_position_to(ltg_client_t* client, int32_t x, int32_t z
 
 void phd_send_spawn_position(ltg_client_t* client) {
 
-	PCK_INLINE(packet, 10, io_big_endian);
+	PCK_INLINE(packet, 11, io_big_endian);
 
 	pck_write_var_int(packet, 0x4b);
 	// TODO actual spawn position
