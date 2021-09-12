@@ -449,8 +449,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 	int64_t motion_blocking[heightmap_size];
 	int64_t world_surface[heightmap_size];
 
-	UTL_ENCODE_TO_LONGS(chunk->highest.motion_blocking, 16 * 16, 9, motion_blocking);
-	UTL_ENCODE_TO_LONGS(chunk->highest.world_surface, 16 * 16, 9, world_surface);
+	UTL_ENCODE_TO_LONGS(chunk->highest.motion_blocking, 16 * 16, 9, false, motion_blocking);
+	UTL_ENCODE_TO_LONGS(chunk->highest.world_surface, 16 * 16, 9, false, world_surface);
 
 	// create heightmap
 	mnbt_doc* doc = mnbt_new();
@@ -495,7 +495,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 			// TODO palette
 			pck_write_var_int(packet, data_array_length); // data array length
 			
-			UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 16 * 16 * 16, bits_per_block, pck_cursor(packet));
+			UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 16 * 16 * 16, bits_per_block, true, pck_cursor(packet));
 			packet->cursor += 8 * data_array_length;
 		}
 	}
@@ -613,8 +613,8 @@ void phd_send_join_game(ltg_client_t* client) {
 	ltg_send(client, packet);
 
 	// NORMAL LOGIN SEQUENCE
-	phd_send_server_difficulty(client);
 	phd_send_plugin_message(client, UTL_CSTRTOARG("minecraft:brand"), (const byte_t*) UTL_CSTRTOARG("\x07MotorMC"));
+	phd_send_server_difficulty(client);
 	phd_send_held_item_change(client);
 	phd_send_declare_recipes(client); // TODO should be cached
 	phd_send_tags(client); // TODO should be cached
