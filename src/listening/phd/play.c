@@ -617,7 +617,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_server_difficulty(client);
 	phd_send_held_item_change(client);
 	phd_send_declare_recipes(client); // TODO should be cached
-	//phd_send_tags(client); // TODO should be cached
+	phd_send_tags(client); // TODO should be cached
 	phd_send_entity_status(client, player->living_entity.entity.id, 24); // TODO actual op level
 	phd_send_declare_commands(client);
 	phd_send_unlock_recipes(client);
@@ -893,7 +893,7 @@ void phd_send_tags(ltg_client_t* client) {
 		pck_write_string(packet, UTL_STRTOARG(mat_block_tags[i]->identifier));
 		pck_write_var_int(packet, mat_block_tags[i]->count);
 		for (int32_t j = 0; j < mat_block_tags[i]->count; ++j) {
-			pck_write_var_int(packet, mat_get_block_default_protocol_id_by_type(mat_block_tags[i]->entries[j]));
+			pck_write_var_int(packet, mat_block_tags[i]->entries[j]);
 		}
 	}
 
@@ -915,7 +915,7 @@ void phd_send_tags(ltg_client_t* client) {
 		pck_write_string(packet, UTL_STRTOARG(mat_fluid_tags[i]->identifier));
 		pck_write_long_var_int(packet, mat_fluid_tags[i]->count);
 		for (int32_t j = 0; j < mat_fluid_tags[i]->count; ++j) {
-			pck_write_var_int(packet, mat_get_block_default_protocol_id_by_type(mat_fluid_tags[i]->entries[j]));
+			pck_write_var_int(packet, mat_fluid_tags[i]->entries[j]);
 		}
 	}
 

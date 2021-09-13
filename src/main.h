@@ -27,3 +27,7 @@ typedef struct {
 	char* value;
 	size_t length;
 } string_t;
+
+#ifndef __ENDIANNESS__
+#define __ENDIANNESS__ 0
+#endif

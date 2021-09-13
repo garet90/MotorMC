@@ -278,7 +278,7 @@ static inline size_t io_var_int_length(uint32_t value) {
 
 }
 
-static inline size_t io_write_var_int(byte_t* buffer, uint32_t value, size_t max_length) {
+static inline size_t io_write_var_int(byte_t* buffer, uint32_t value, __attribute__((unused)) size_t max_length) {
 
 	size_t i = 0;
 	do {
