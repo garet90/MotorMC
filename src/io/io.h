@@ -2,10 +2,6 @@
 #include <assert.h>
 #include "../main.h"
 
-#ifndef BIG_ENDIAN
-#define BIG_ENDIAN 0
-#endif
-
 typedef enum io_endianness {
 	io_little_endian = 0,
 	io_big_endian = 1
@@ -37,7 +33,7 @@ static inline int8_t io_read_int8(const byte_t* buffer) {
 
 static inline int16_t io_read_int16(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 
 		return *((int16_t*) buffer);
 
@@ -51,7 +47,7 @@ static inline int16_t io_read_int16(const byte_t* buffer, io_endianness_t endian
 
 static inline int32_t io_read_int32(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 
 		return *((int32_t*) buffer);
 
@@ -65,7 +61,7 @@ static inline int32_t io_read_int32(const byte_t* buffer, io_endianness_t endian
 
 static inline int64_t io_read_int64(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 		
 		return *((int64_t*) buffer);
 
@@ -79,7 +75,7 @@ static inline int64_t io_read_int64(const byte_t* buffer, io_endianness_t endian
 
 static inline float32_t io_read_float32(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 
 		return *((float32_t*) buffer);
 
@@ -100,7 +96,7 @@ static inline float32_t io_read_float32(const byte_t* buffer, io_endianness_t en
 
 static inline float64_t io_read_float64(const byte_t* buffer, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 		
 		return *((float64_t*) buffer);
 
@@ -130,7 +126,7 @@ static inline int32_t io_read_var_int(const byte_t* buffer, size_t max_length, s
 
 	if (max_length > 5) max_length = 5;
 
-	if (BIG_ENDIAN == io_little_endian) {
+	if (__ENDIANNESS__ == io_little_endian) {
 
 		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
@@ -157,7 +153,7 @@ static inline int64_t io_read_var_long(const byte_t* buffer, size_t max_length, 
 
 	if (max_length > 10) max_length = 10;
 
-	if (BIG_ENDIAN == io_little_endian) {
+	if (__ENDIANNESS__ == io_little_endian) {
 
 		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
@@ -185,7 +181,7 @@ static inline void io_write_int8(byte_t* buffer, int8_t value) {
 
 static inline void io_write_int16(byte_t* buffer, int16_t value, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 
 		*((int16_t*) buffer) = value;
 		
@@ -199,7 +195,7 @@ static inline void io_write_int16(byte_t* buffer, int16_t value, io_endianness_t
 
 static inline void io_write_int32(byte_t* buffer, int32_t value, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 
 		*((int32_t*) buffer) = value;
 
@@ -213,7 +209,7 @@ static inline void io_write_int32(byte_t* buffer, int32_t value, io_endianness_t
 
 static inline void io_write_int64(byte_t* buffer, int64_t value, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 
 		*((int64_t*) buffer) = value;
 
@@ -227,7 +223,7 @@ static inline void io_write_int64(byte_t* buffer, int64_t value, io_endianness_t
 
 static inline void io_write_float32(byte_t* buffer, float32_t value, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 
 		*((float32_t*) buffer) = value;
 
@@ -246,7 +242,7 @@ static inline void io_write_float32(byte_t* buffer, float32_t value, io_endianne
 
 static inline void io_write_float64(byte_t* buffer, float64_t value, io_endianness_t endianness) {
 
-	if (BIG_ENDIAN == endianness) {
+	if (__ENDIANNESS__ == endianness) {
 
 		*((float64_t*) buffer) = value;
 
@@ -334,7 +330,7 @@ static inline size_t io_write_var_long(byte_t* buffer, uint64_t value) {
 
 static inline uint16_t io_htons(uint16_t n) {
 
-	if (BIG_ENDIAN == io_little_endian) {
+	if (__ENDIANNESS__ == io_little_endian) {
 
 		return io_switch_int16(n);
 

@@ -1,6 +1,5 @@
 #pragma once
 #include <pthread.h>
-#include <stdnoreturn.h>
 #include "main.h"
 #include "listening/listening.h"
 #include "io/commands/commands.h"
@@ -85,7 +84,7 @@ int main(int, char*[]);
 extern void* t_sky_main(void*);
 extern void* t_sky_worker(void*);
 
-extern noreturn void sky_term();
+extern void sky_term();
 
 static inline uint64_t sky_to_nanos(const struct timespec time) {
 	return (time.tv_sec * SKY_NANOS_PER_SECOND) + time.tv_nsec;

@@ -136,8 +136,6 @@ int main(int argc, char* argv[]) {
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	atexit(sky_term);
-
 	sky_main.console_thread = pthread_self();
 
 	struct timespec start;
@@ -167,6 +165,16 @@ int main(int argc, char* argv[]) {
 
 	// register aes cipher
 	register_cipher(&aes_enc_desc);
+
+	if (argc != 0) {
+		for (int i = 0; i < argc; ++i) {
+			if (utl_hash(argv[i]) == 0x7c9e6865) {
+				return test_run_all();
+			}
+		}
+	}
+
+	atexit(sky_term);
 
 	if (fs_file_exists("server.json")) {
 
@@ -381,14 +389,6 @@ int main(int argc, char* argv[]) {
 		sky_main.motd = cht_alloc();
 		sky_main.motd->text = UTL_CSTRTOSTR("A Minecraft server");
 	}
-	
-	if (argc != 0) {
-		for (int i = 0; i < argc; ++i) {
-			if (utl_hash(argv[i]) == 0x7c9e6865) {
-				return test_run_all();
-			}
-		}
-	}
 
 	// load startup plugins
 	plg_on_startup();
@@ -499,7 +499,7 @@ void* t_sky_worker(__attribute__((unused)) void* input) {
 
 }
 
-noreturn void sky_term() {
+void sky_term() {
 
 	sky_main.status = sky_stopping;
 
@@ -536,7 +536,5 @@ noreturn void sky_term() {
 	curl_global_cleanup();
 
 	utl_restore_console();
-
-	exit(0);
 
 }
