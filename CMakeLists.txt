@@ -14,11 +14,11 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 if(BIG_ENDIAN)
-     set(CMAKE_C_FLAGS "-O3 -Wall -Wextra -DBIG_ENDIAN=1")
-     set(CMAKE_C_FLAGS_DEBUG "-g3 -Wall -Wextra -DBIG_ENDIAN=1")
+     set(CMAKE_C_FLAGS "-O3 -Wall -Wextra -D__ENDIANNESS__=1")
+     set(CMAKE_C_FLAGS_DEBUG "-g3 -Wall -Wextra -D__ENDIANNESS__=1")
 else()
-     set(CMAKE_C_FLAGS "-O3 -Wall -Wextra")
-     set(CMAKE_C_FLAGS_DEBUG "-g3 -Wall -Wextra")
+     set(CMAKE_C_FLAGS "-O3 -Wall -Wextra -D__ENDIANNESS__=0")
+     set(CMAKE_C_FLAGS_DEBUG "-g3 -Wall -Wextra -D__ENDIANNESS__=0")
 endif()
 
 file(GLOB_RECURSE src

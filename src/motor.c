@@ -499,7 +499,7 @@ void* t_sky_worker(__attribute__((unused)) void* input) {
 
 }
 
-noreturn void sky_term() {
+void sky_term() {
 
 	sky_main.status = sky_stopping;
 
@@ -536,7 +536,5 @@ noreturn void sky_term() {
 	curl_global_cleanup();
 
 	utl_restore_console();
-
-	exit(0);
 
 }

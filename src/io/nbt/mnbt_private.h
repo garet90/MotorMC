@@ -12,7 +12,7 @@ size_t _mnbt_write_val(mnbt_type type, mnbt_val val, uint8_t* bytes);
 void _mnbt_free_val(mnbt_type type, mnbt_val val);
 
 static inline uint16_t _mnbt_reverse_short(uint16_t num) {
-#if BIG_ENDIAN
+#if __ENDIANNESS__
 	return num;
 #else
 	return ((num & 0xff00) >> 8) | (num << 8);
@@ -20,7 +20,7 @@ static inline uint16_t _mnbt_reverse_short(uint16_t num) {
 }
 
 static inline uint32_t _mnbt_reverse_int(uint32_t num) {
-#if BIG_ENDIAN
+#if __ENDIANNESS__
 	return num;
 #else
 	return ((num & 0xff000000) >> 24) | ((num & 0x00ff0000) >> 8) | ((num & 0x0000ff00) << 8) | (num << 24);
@@ -28,7 +28,7 @@ static inline uint32_t _mnbt_reverse_int(uint32_t num) {
 }
 
 static inline uint64_t _mnbt_reverse_long(uint64_t num) {
-#if BIG_ENDIAN
+#if __ENDIANNESS__
 	return num;
 #else
 	return
@@ -44,7 +44,7 @@ static inline uint64_t _mnbt_reverse_long(uint64_t num) {
 }
 
 static inline float _mnbt_reverse_float(float val) {
-#if BIG_ENDIAN
+#if __ENDIANNESS__
 	return val;
 #else
 	char* val_b = (char*) &val;
@@ -62,7 +62,7 @@ static inline float _mnbt_reverse_float(float val) {
 }
 
 static inline double _mnbt_reverse_double(double val) {
-#if BIG_ENDIAN
+#if __ENDIANNESS__
 	return val;
 #else
 	char* val_b = (char*) &val;

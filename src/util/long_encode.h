@@ -17,7 +17,7 @@ static inline size_t utl_encode_ints_to_longs(int32_t* values, size_t values_len
 			data[cell] = 0;
 		if (right) {
 			data[cell] |= value << (bit * bits_per_entry);
-			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && BIG_ENDIAN == io_little_endian) {
+			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && __ENDIANNESS__ == io_little_endian) {
 				// flip cell
 				data[cell] = io_switch_int64(data[cell]);
 			}
@@ -44,7 +44,7 @@ static inline size_t utl_encode_shorts_to_longs(int16_t* values, size_t values_l
 			data[cell] = 0;
 		if (right) {
 			data[cell] |= value << (bit * bits_per_entry);
-			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && BIG_ENDIAN == io_little_endian) {
+			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && __ENDIANNESS__ == io_little_endian) {
 				// flip cell
 				data[cell] = io_switch_int64(data[cell]);
 			}
@@ -71,7 +71,7 @@ static inline size_t utl_encode_bytes_to_longs(int8_t* values, size_t values_len
 			data[cell] = 0;
 		if (right) {
 			data[cell] |= value << (bit * bits_per_entry);
-			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && BIG_ENDIAN == io_little_endian) {
+			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && __ENDIANNESS__ == io_little_endian) {
 				// flip cell
 				data[cell] = io_switch_int64(data[cell]);
 			}

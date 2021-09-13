@@ -116,6 +116,12 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 	// get shared secret
 	secret.length = pck_read_var_int(packet);
+	if (secret.length > 128) {
+		packet->cursor = packet->length;
+		pck_log(packet);
+
+		return false;
+	}
 	pck_read_bytes(packet, secret.bytes, secret.length);
 
 	// decrypt shared secret
@@ -145,6 +151,12 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 	// get verify
 	verify.length = pck_read_var_int(packet);
+	if (verify.length > 128) {
+		packet->cursor = packet->length;
+		pck_log(packet);
+
+		return false;
+	}
 	pck_read_bytes(packet, verify.bytes, verify.length);
 
 	// decrypt and check verify
