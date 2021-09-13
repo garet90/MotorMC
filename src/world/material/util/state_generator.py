@@ -49,7 +49,3 @@ for i in default_protocol:
     print("\t" + str(i) + ",")
 
 print("};")
-
-for idx, val in enumerate(base_protocol):
-    if val == -1:
-        print("Unused block: " + motor_blocks[idx])

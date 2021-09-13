@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h>
+#include <string.h>
 #include "../main.h"
 
 typedef enum io_endianness {
@@ -77,7 +78,9 @@ static inline float32_t io_read_float32(const byte_t* buffer, io_endianness_t en
 
 	if (__ENDIANNESS__ == endianness) {
 
-		return *((float32_t*) buffer);
+		float32_t out;
+		memcpy(&out, buffer, sizeof(float32_t));
+		return out;
 
 	} else {
 
@@ -98,7 +101,9 @@ static inline float64_t io_read_float64(const byte_t* buffer, io_endianness_t en
 
 	if (__ENDIANNESS__ == endianness) {
 		
-		return *((float64_t*) buffer);
+		float64_t out;
+		memcpy(&out, buffer, sizeof(float64_t));
+		return out;
 
 	} else {
 
@@ -225,7 +230,7 @@ static inline void io_write_float32(byte_t* buffer, float32_t value, io_endianne
 
 	if (__ENDIANNESS__ == endianness) {
 
-		*((float32_t*) buffer) = value;
+		memcpy(buffer, &value, sizeof(value));
 
 	} else {
 
@@ -244,7 +249,7 @@ static inline void io_write_float64(byte_t* buffer, float64_t value, io_endianne
 
 	if (__ENDIANNESS__ == endianness) {
 
-		*((float64_t*) buffer) = value;
+		memcpy(buffer, &value, sizeof(value));
 
 	} else {
 

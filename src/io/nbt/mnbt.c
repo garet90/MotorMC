@@ -175,11 +175,15 @@ size_t _mnbt_read_val(mnbt_doc* document, mnbt_type type, mnbt_val* value, const
 			return 8;
 		}
 		case MNBT_FLOAT: {
-			value->Float = _mnbt_reverse_float(*((float*) bytes));
+			float temp;
+			memcpy(&temp, bytes, sizeof(temp));
+			value->Float = _mnbt_reverse_float(temp);
 			return 4;
 		}
 		case MNBT_DOUBLE: {
-			value->Double = _mnbt_reverse_double(*((double*) bytes));
+			double temp;
+			memcpy(&temp, bytes, sizeof(temp));
+			value->Double = _mnbt_reverse_double(temp);
 			return 8;
 		}
 		case MNBT_BYTE_ARRAY: {
@@ -367,11 +371,13 @@ size_t _mnbt_write_val(mnbt_type type, mnbt_val val, uint8_t* bytes) {
 			return 8;
 		}
 		case MNBT_FLOAT: {
-			*((float*) bytes) = _mnbt_reverse_float(val.Float);
+			float temp = _mnbt_reverse_float(val.Float);
+			memcpy(bytes, &temp, sizeof(temp));
 			return 4;
 		}
 		case MNBT_DOUBLE: {
-			*((double*) bytes) = _mnbt_reverse_double(val.Double);
+			double temp = _mnbt_reverse_float(val.Double);
+			memcpy(bytes, &temp, sizeof(temp));
 			return 8;
 		}
 		case MNBT_BYTE_ARRAY: {
