@@ -99,6 +99,7 @@ bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 	const uint8_t new_render_distance = UTL_MIN(sky_main.render_distance, pck_read_int8(packet));
 	phd_update_sent_chunks_view_distance(client, new_render_distance);
+	client->render_distance = new_render_distance;
 	client->chat_mode = pck_read_var_int(packet);
 	__attribute__((unused)) bool colors = pck_read_int8(packet);
 
