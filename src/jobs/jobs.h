@@ -49,9 +49,9 @@ typedef struct {
 typedef struct {
 
 	job_work_t header;
-	wld_chunk_t* chunk;
+	wld_region_t* region;
 
-} job_tick_chunk_t;
+} job_tick_region_t;
 
 typedef struct {
 

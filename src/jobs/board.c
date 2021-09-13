@@ -49,13 +49,13 @@ utl_vector_t job_send_update_pings_handlers_vector = {
 	.array = (byte_t*) job_send_update_pings_handlers
 };
 
-job_handler_t job_tick_chunk_handlers[] = {
-	(job_handler_t) job_handle_tick_chunk
+job_handler_t job_tick_region_handlers[] = {
+	(job_handler_t) job_handle_tick_region
 };
-utl_vector_t job_tick_chunk_handlers_vector = {
+utl_vector_t job_tick_region_handlers_vector = {
 	.bytes_per_element = sizeof(job_handler_t),
 	.size = 1,
-	.array = (byte_t*) job_tick_chunk_handlers
+	.array = (byte_t*) job_tick_region_handlers
 };
 
 job_handler_t job_unload_region_handlers[] = {
@@ -73,7 +73,7 @@ utl_vector_t* job_handlers[job_count] = {
 	&job_player_join_handlers_vector,
 	&job_player_leave_handlers_vector,
 	&job_send_update_pings_handlers_vector,
-	&job_tick_chunk_handlers_vector,
+	&job_tick_region_handlers_vector,
 	&job_unload_region_handlers_vector
 };
 

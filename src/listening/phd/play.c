@@ -110,8 +110,6 @@ bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 	__attribute__((unused)) bool disable_text_filtering = pck_read_int8(packet);
 
-	phd_send_player_position_and_look(client);
-
 	return true;
 
 }
@@ -487,17 +485,82 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	for (uint16_t i = 0; i < chunk_height; ++i) {
 		if (chunk->sections[i].block_count != 0) {
-			const uint8_t bits_per_block = 15;
-			const uint8_t blocks_per_long = 64 / bits_per_block;
-			const int32_t data_array_length = 1 + (4095 / blocks_per_long);
 
 			pck_write_int16(packet, chunk->sections[i].block_count);
-			pck_write_int8(packet, bits_per_block);
-			// TODO palette
-			pck_write_var_int(packet, data_array_length); // data array length
+
+			uint16_t palette[256];
+			uint8_t palette_length = 1;
 			
-			UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 4096, bits_per_block, true, pck_cursor(packet));
-			packet->cursor += data_array_length << 3;
+			int8_t block_array[4096];
+
+			uint16_t previous_block = 0;
+			uint16_t previous_palette = 0;
+
+			for (uint16_t j = 0; j < 4096; ++j) {
+				const uint16_t block = chunk->sections[i].blocks[j];
+				if (block == previous_block) {
+					block_array[j] = previous_palette;
+				} else {
+					// test if block is in palette
+					for (uint8_t k = 0; k < palette_length; ++k) {
+						if (palette[k] == block) {
+							block_array[j] = previous_palette = k;
+							previous_block = block;
+							goto end;
+						}
+					}
+
+					if (palette_length < 255) {
+						palette[palette_length] = block;
+						block_array[j] = previous_palette = palette_length;
+						previous_block = block;
+						palette_length += 1;
+					} else {
+						break;
+					}
+				}
+				end:{}
+			}
+
+			if (palette_length < 255) {
+				// use palette
+				uint8_t bits_per_block;
+				if (palette_length < 16) {
+					bits_per_block = 4;
+				} else if (palette_length < 32) {
+					bits_per_block = 5;
+				} else if (palette_length < 64) {
+					bits_per_block = 6;
+				} else if (palette_length < 128) {
+					bits_per_block = 7;
+				} else {
+					bits_per_block = 8;
+				}
+				const uint8_t blocks_per_long = 64 / bits_per_block;
+				const int32_t data_array_length = 1 + (4095 / blocks_per_long);
+
+				pck_write_int8(packet, bits_per_block);
+				pck_write_var_int(packet, palette_length);
+				for (uint8_t j = 0; j < palette_length; ++j) {
+					pck_write_var_int(packet, palette[j]);
+				}
+
+				pck_write_var_int(packet, data_array_length);
+				
+				UTL_ENCODE_TO_LONGS(block_array, 4096, bits_per_block, true, pck_cursor(packet));
+				packet->cursor += data_array_length << 5;
+			} else {
+				// direct
+				const uint8_t bits_per_block = 15;
+				const uint8_t blocks_per_long = 64 / bits_per_block;
+				const int32_t data_array_length = 1 + (4095 / blocks_per_long);
+
+				pck_write_int8(packet, bits_per_block);
+				pck_write_var_int(packet, data_array_length); // data array length
+				
+				UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 4096, bits_per_block, true, pck_cursor(packet));
+				packet->cursor += data_array_length << 3;
+			}
 		}
 	}
 

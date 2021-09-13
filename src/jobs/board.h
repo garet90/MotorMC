@@ -8,7 +8,7 @@ typedef enum {
 	job_player_join,
 	job_player_leave,
 	job_send_update_pings,
-	job_tick_chunk,
+	job_tick_region,
 	job_unload_region,
 
 	job_count

@@ -63,8 +63,6 @@ struct wld_chunk {
 	atomic_uint_least8_t ticket;
 	const uint8_t max_ticket;
 
-	void* tick;
-
 	wld_chunk_section_t sections[]; // y = section index * 16, count of sections = World.height / 16
 
 };
@@ -72,6 +70,8 @@ struct wld_chunk {
 struct wld_region {
 	
 	wld_world_t* const world; // typeof wld_world_t*
+
+	void* tick;
 
 	// chunks
 	wld_chunk_t* _Atomic chunks[32 * 32];
@@ -197,6 +197,7 @@ static inline void wld_remove_player_chunk(wld_chunk_t* chunk, uint32_t client_i
 	}
 }
 
+extern void wld_unload_region(wld_region_t* region);
 extern void wld_free_region(wld_region_t* region);
 extern void wld_unload(wld_world_t* world);
 extern void wld_unload_all();

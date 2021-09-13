@@ -95,9 +95,14 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 	wld_region_t* region = calloc(1, sizeof(wld_region_t));
 	const int64_t key = ((uint64_t) x << 16) + z;
 
+	// tick job
+	JOB_CREATE_WORK(tick_job, job_tick_region);
+	tick_job->region = region;
+
 	with_lock (&world->lock) {
 		wld_region_t region_init = (wld_region_t) {
 			.world = world,
+			.tick = sch_schedule_repeating(&tick_job->header, 1, 1),
 			.x = x,
 			.z = z,
 			.relative = {
@@ -150,10 +155,6 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 
 	wld_chunk_t* chunk = calloc(1, sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * mat_get_chunk_height(region->world->environment));
 	
-	// tick job
-	JOB_CREATE_WORK(tick_job, job_tick_chunk);
-	tick_job->chunk = chunk;
-	
 	wld_chunk_t chunk_init = {
 		.region = region,
 		.lock = PTHREAD_MUTEX_INITIALIZER,
@@ -163,8 +164,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		.x = x,
 		.z = z,
 		.max_ticket = max_ticket,
-		.ticket = max_ticket,
-		.tick = sch_schedule_repeating(&tick_job->header, 1, 1)
+		.ticket = max_ticket
 	};
 	for (uint32_t i = 0; i < 256; ++i) {
 		chunk_init.highest.motion_blocking[i] = 2;
@@ -350,8 +350,18 @@ void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 
 }
 
+void wld_unload_region(wld_region_t* region) {
+
+	with_lock (&region->world->lock) {
+		utl_tree_remove(&region->world->regions, ((uint64_t) region->x << 16) + region->z);
+	}
+
+	wld_free_region(region);
+
+}
+
 void wld_free_region(wld_region_t* region) {
-	
+
 	if (region->relative.north != NULL) {
 		region->relative.north->relative.south = NULL;
 	}
@@ -364,13 +374,14 @@ void wld_free_region(wld_region_t* region) {
 	if (region->relative.east != NULL) {
 		region->relative.east->relative.west = NULL;
 	}
+	
+	sch_cancel(region->tick);
 
 	for (size_t i = 0; i < 32 * 32; ++i) {
 		if (region->chunks[i] != NULL) {
 			pthread_mutex_destroy(&region->chunks[i]->lock);
 			utl_bit_vector_term(&region->chunks[i]->subscribers);
 			utl_bit_vector_term(&region->chunks[i]->players);
-			sch_cancel(region->chunks[i]->tick);
 			free(region->chunks[i]);
 		}
 	}

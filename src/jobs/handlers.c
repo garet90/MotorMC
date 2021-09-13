@@ -129,29 +129,36 @@ bool job_handle_send_update_pings(__attribute__((unused)) job_send_update_pings_
 
 }
 
-bool job_handle_tick_chunk(job_tick_chunk_t* work) {
+bool job_handle_tick_region(job_tick_region_t* work) {
 
-	wld_chunk_t* chunk = work->chunk;
+	const wld_region_t* region = work->region;
 	
-	if (chunk->ticket <= WLD_TICKET_TICK_ENTITIES) {
-		// entities and chunk ticks
-	}
+	for (uint32_t i = 0; i < 32 * 32; ++i) {
 
-	if (chunk->ticket <= WLD_TICKET_TICK) {
-		// tick
-	}
+		const wld_chunk_t* chunk = region->chunks[i];
 
-	if (chunk->ticket <= WLD_TICKET_BORDER) {
-		// border
+		if (chunk != NULL) {
+			if (chunk->ticket <= WLD_TICKET_TICK_ENTITIES) {
+				// entities and chunk ticks
+			}
+
+			if (chunk->ticket <= WLD_TICKET_TICK) {
+				// tick
+			}
+
+			if (chunk->ticket <= WLD_TICKET_BORDER) {
+				// border
+			}
+		}
 	}
 
 	return true;
 
 }
 
-bool job_handle_unload_region(__attribute__((unused)) job_unload_region_t* work) {
+bool job_handle_unload_region(job_unload_region_t* work) {
 
-	// TODO
+	wld_unload_region(work->region);
 
 	return true;
 
