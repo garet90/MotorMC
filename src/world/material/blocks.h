@@ -1066,17 +1066,22 @@ typedef struct {
 extern const mat_block_t* mat_blocks[];
 extern const uint16_t mat_blocks_protocol[];
 extern const mat_block_protocol_id_t mat_blocks_base_protocol[];
+extern const mat_block_protocol_id_t mat_blocks_default_protocol[];
 
-static inline const mat_block_t* mat_get_block_by_id(mat_block_type_t id) {
+static inline const mat_block_t* mat_get_block_by_type(mat_block_type_t id) {
 	return mat_blocks[id];
 }
 
-static inline mat_block_type_t mat_get_block_id_by_protocol_id(mat_block_protocol_id_t protocol) {
+static inline mat_block_type_t mat_get_block_type_by_protocol_id(mat_block_protocol_id_t protocol) {
 	return mat_blocks_protocol[protocol];
 }
 
-static inline mat_block_protocol_id_t mat_get_block_base_protocol_id_by_id(mat_block_type_t type) {
+static inline mat_block_protocol_id_t mat_get_block_base_protocol_id_by_type(mat_block_type_t type) {
 	return mat_blocks_base_protocol[type];
+}
+
+static inline mat_block_protocol_id_t mat_get_block_default_protocol_id_by_type(mat_block_type_t type) {
+	return mat_blocks_default_protocol[type];
 }
 
 /*
@@ -1084,9 +1089,9 @@ Read the value of a state field of a block with certain protocol
 */
 static inline uint8_t mat_get_block_state_value(mat_block_protocol_id_t block_protocol, mat_state_modifier_type_t field) {
 
-	mat_block_type_t block_id = mat_get_block_id_by_protocol_id(block_protocol);
-	mat_block_protocol_id_t block_state = block_protocol - mat_get_block_base_protocol_id_by_id(block_id);
-	const mat_block_t* block_data = mat_get_block_by_id(block_id);
+	mat_block_type_t block_id = mat_get_block_type_by_protocol_id(block_protocol);
+	mat_block_protocol_id_t block_state = block_protocol - mat_get_block_base_protocol_id_by_type(block_id);
+	const mat_block_t* block_data = mat_get_block_by_type(block_id);
 
 	for (int32_t i = block_data->modifiers_count - 1; i >= 0; --i) {
 
@@ -1111,10 +1116,10 @@ Set a state field for a particular block
 */
 static inline mat_block_protocol_id_t mat_set_block_state_value(mat_block_protocol_id_t block_protocol, mat_state_modifier_type_t field, uint8_t value) {
 
-	mat_block_type_t block_id = mat_get_block_id_by_protocol_id(block_protocol);
-	mat_block_protocol_id_t block_state = block_protocol - mat_get_block_base_protocol_id_by_id(block_id);
+	mat_block_type_t block_id = mat_get_block_type_by_protocol_id(block_protocol);
+	mat_block_protocol_id_t block_state = block_protocol - mat_get_block_base_protocol_id_by_type(block_id);
 	int32_t state_add = 1;
-	const mat_block_t* block_data = mat_get_block_by_id(block_id);
+	const mat_block_t* block_data = mat_get_block_by_type(block_id);
 
 	for (int32_t i = block_data->modifiers_count - 1; i >= 0; --i) {
 

@@ -13,8 +13,8 @@ bool test_materials() {
 	// of states is equal to state map
 	for (uint16_t i = 0; i < mat_block_count; ++i, protocolID += protocolJump) {
 
-		mat_block_type_t id = mat_get_block_id_by_protocol_id(protocolID);
-		const mat_block_t* block = mat_get_block_by_id(id);
+		mat_block_type_t id = mat_get_block_type_by_protocol_id(protocolID);
+		const mat_block_t* block = mat_get_block_by_type(id);
 
 		protocolJump = 1;
 
@@ -22,7 +22,7 @@ bool test_materials() {
 
 			protocolJump *= mat_get_state_modifier_by_type(block->modifiers[j])->count;
 
-			if (mat_get_block_id_by_protocol_id(protocolID + protocolJump - 1) != id) {
+			if (mat_get_block_type_by_protocol_id(protocolID + protocolJump - 1) != id) {
 				log_error("Failed at block ID %d", id);
 				log_error("\tProtocol jump: %d", protocolJump);
 				return false;
@@ -30,7 +30,7 @@ bool test_materials() {
 
 		}
 		
-		if (mat_get_block_id_by_protocol_id(protocolID + protocolJump) == id) {
+		if (mat_get_block_type_by_protocol_id(protocolID + protocolJump) == id) {
 			log_error("Failed at block ID %d", id);
 			log_error("\tState missing!");
 			return false;
@@ -41,9 +41,9 @@ bool test_materials() {
 	// test that base protocol is correct
 	for (uint16_t i = 0; i < mat_block_count; ++i) {
 
-		uint16_t protocol = mat_get_block_base_protocol_id_by_id(i);
+		uint16_t protocol = mat_get_block_base_protocol_id_by_type(i);
 
-		if (mat_get_block_id_by_protocol_id(protocol) != i) {
+		if (mat_get_block_type_by_protocol_id(protocol) != i) {
 			log_error("Base protocol is incorrect!");
 			log_error("\tBlock ID %d", i);
 			log_error("\tProtocol ID %d", protocol);
@@ -51,7 +51,7 @@ bool test_materials() {
 		}
 
 		if (protocol > 0) {
-			if (mat_get_block_id_by_protocol_id(protocol - 1) == i) {
+			if (mat_get_block_type_by_protocol_id(protocol - 1) == i) {
 				log_error("Base protocol is incorrect!");
 				log_error("\tBase protocol offset incorrect!");
 				log_error("\tBlock ID %d", i);
@@ -63,7 +63,7 @@ bool test_materials() {
 
 	// test material
 	mat_block_type_t block_id = mat_block_chest;
-	mat_block_protocol_id_t protocol_id = mat_get_block_base_protocol_id_by_id(block_id);
+	mat_block_protocol_id_t protocol_id = mat_get_block_base_protocol_id_by_type(block_id);
 	
 	protocol_id = mat_set_block_state_value(protocol_id, mat_state_modifier_waterlogged, 1);
 	protocol_id = mat_set_block_state_value(protocol_id, mat_state_modifier_chest_type, 2);

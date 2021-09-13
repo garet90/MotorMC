@@ -40,7 +40,7 @@ void pck_init_from_bytes(pck_packet_t* packet, byte_t* bytes, size_t length, io_
 
 void pck_read_bytes(pck_packet_t* packet, byte_t* bytes, int32_t length) {
 
-	if (packet->length - packet->cursor < (unsigned) length) return;
+	assert(packet->length - packet->cursor >= (unsigned) length);
 
 	memcpy(bytes, packet->bytes + packet->cursor, length);
 	packet->cursor += length;

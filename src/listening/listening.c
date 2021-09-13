@@ -190,7 +190,7 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 	size_t length = packet->cursor;
 	const size_t length_length = io_var_int_length(length);
 	byte_t* bytes = packet->bytes - length_length;
-	io_write_var_int(bytes, length);
+	io_write_var_int(bytes, length, 5);
 	length += length_length;
 
 	if (client->encryption.enabled) {

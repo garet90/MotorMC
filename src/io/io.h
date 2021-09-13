@@ -1,4 +1,5 @@
 #pragma once
+#include <assert.h>
 #include "../main.h"
 
 #ifndef BIG_ENDIAN
@@ -281,7 +282,7 @@ static inline size_t io_var_int_length(uint32_t value) {
 
 }
 
-static inline size_t io_write_var_int(byte_t* buffer, uint32_t value) {
+static inline size_t io_write_var_int(byte_t* buffer, uint32_t value, size_t max_length) {
 
 	size_t i = 0;
 	do {
@@ -291,6 +292,7 @@ static inline size_t io_write_var_int(byte_t* buffer, uint32_t value) {
 		if (value != 0) {
 			temp |= 0x80;
 		}
+		assert(i < max_length);
 		io_write_int8(buffer + i++, temp);
 	} while (value != 0);
 

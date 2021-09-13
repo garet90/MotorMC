@@ -2,6 +2,7 @@
 #include "../../main.h"
 #include "../io.h"
 #include "../nbt/mnbt.h"
+#include <assert.h>
 
 typedef struct {
 
@@ -27,7 +28,7 @@ extern void pck_init_from_bytes(pck_packet_t*, byte_t*, size_t, io_endianness_t)
 
 static inline int8_t pck_read_int8(pck_packet_t* packet) {
 
-	if (packet->length - packet->cursor < 1) return 0;
+	assert(packet->length - packet->cursor >= 1);
 
 	packet->cursor += 1;
 
@@ -37,7 +38,7 @@ static inline int8_t pck_read_int8(pck_packet_t* packet) {
 
 static inline int16_t pck_read_int16(pck_packet_t* packet) {
 	
-	if (packet->length - packet->cursor < 2) return 0;
+	assert(packet->length - packet->cursor >= 2);
 
 	packet->cursor += 2;
 
@@ -47,7 +48,7 @@ static inline int16_t pck_read_int16(pck_packet_t* packet) {
 
 static inline int32_t pck_read_int32(pck_packet_t* packet) {
 	
-	if (packet->length - packet->cursor < 4) return 0;
+	assert(packet->length - packet->cursor >= 4);
 
 	packet->cursor += 4;
 
@@ -57,7 +58,7 @@ static inline int32_t pck_read_int32(pck_packet_t* packet) {
 
 static inline int64_t pck_read_int64(pck_packet_t* packet) {
 	
-	if (packet->length - packet->cursor < 8) return 0;
+	assert(packet->length - packet->cursor >= 8);
 
 	packet->cursor += 8;
 
@@ -67,7 +68,7 @@ static inline int64_t pck_read_int64(pck_packet_t* packet) {
 
 static inline float32_t pck_read_float32(pck_packet_t* packet) {
 	
-	if (packet->length - packet->cursor < 4) return 0;
+	assert(packet->length - packet->cursor >= 4);
 
 	packet->cursor += 4;
 
@@ -77,7 +78,7 @@ static inline float32_t pck_read_float32(pck_packet_t* packet) {
 
 static inline float64_t pck_read_float64(pck_packet_t* packet) {
 	
-	if (packet->length - packet->cursor < 8) return 0;
+	assert(packet->length - packet->cursor >= 8);
 
 	packet->cursor += 8;
 
@@ -111,6 +112,8 @@ extern void pck_read_bytes(pck_packet_t*, byte_t*, int32_t);
 
 static inline void pck_write_int8(pck_packet_t* packet, int8_t value) {
 
+	assert(packet->length - packet->cursor >= 1);
+
 	io_write_int8(packet->bytes + packet->cursor, value);
 
 	packet->cursor += 1;
@@ -118,6 +121,8 @@ static inline void pck_write_int8(pck_packet_t* packet, int8_t value) {
 }
 
 static inline void pck_write_int16(pck_packet_t* packet, int16_t value) {
+
+	assert(packet->length - packet->cursor >= 2);
 
 	io_write_int16(packet->bytes + packet->cursor, value, packet->endianness);
 
@@ -127,6 +132,8 @@ static inline void pck_write_int16(pck_packet_t* packet, int16_t value) {
 
 static inline void pck_write_int32(pck_packet_t* packet, int32_t value) {
 
+	assert(packet->length - packet->cursor >= 4);
+
 	io_write_int32(packet->bytes + packet->cursor, value, packet->endianness);
 
 	packet->cursor += 4;
@@ -134,6 +141,8 @@ static inline void pck_write_int32(pck_packet_t* packet, int32_t value) {
 }
 
 static inline void pck_write_int64(pck_packet_t* packet, int64_t value) {
+
+	assert(packet->length - packet->cursor >= 8);
 
 	io_write_int64(packet->bytes + packet->cursor, value, packet->endianness);
 
@@ -143,6 +152,8 @@ static inline void pck_write_int64(pck_packet_t* packet, int64_t value) {
 
 static inline void pck_write_float32(pck_packet_t* packet, float32_t value) {
 
+	assert(packet->length - packet->cursor >= 4);
+
 	io_write_float32(packet->bytes + packet->cursor, value, packet->endianness);
 
 	packet->cursor += 4;
@@ -150,6 +161,8 @@ static inline void pck_write_float32(pck_packet_t* packet, float32_t value) {
 }
 
 static inline void pck_write_float64(pck_packet_t* packet, float64_t value) {
+
+	assert(packet->length - packet->cursor >= 8);
 
 	io_write_float64(packet->bytes + packet->cursor, value, packet->endianness);
 
@@ -159,12 +172,14 @@ static inline void pck_write_float64(pck_packet_t* packet, float64_t value) {
 
 static inline void pck_write_var_int(pck_packet_t* packet, int32_t value) {
 
-	packet->cursor += io_write_var_int(packet->bytes + packet->cursor, value);
+	packet->cursor += io_write_var_int(packet->bytes + packet->cursor, value, packet->length - packet->cursor);
 
 }
 
 // waste between 0-4 bytes but you can always come back to it later and change it
 static inline void pck_write_long_var_int(pck_packet_t* packet, int32_t value) {
+
+	assert(packet->length - packet->cursor >= 5);
 
 	io_write_long_var_int(packet->bytes + packet->cursor, value);
 	packet->cursor += 5;

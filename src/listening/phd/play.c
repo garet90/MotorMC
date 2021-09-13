@@ -851,7 +851,7 @@ void phd_send_update_view_position_to(ltg_client_t* client, int32_t x, int32_t z
 
 void phd_send_spawn_position(ltg_client_t* client) {
 
-	PCK_INLINE(packet, 11, io_big_endian);
+	PCK_INLINE(packet, 13, io_big_endian);
 
 	pck_write_var_int(packet, 0x4b);
 	// TODO actual spawn position
@@ -893,7 +893,7 @@ void phd_send_tags(ltg_client_t* client) {
 		pck_write_string(packet, UTL_STRTOARG(mat_block_tags[i]->identifier));
 		pck_write_var_int(packet, mat_block_tags[i]->count);
 		for (int32_t j = 0; j < mat_block_tags[i]->count; ++j) {
-			pck_write_var_int(packet, mat_get_block_base_protocol_id_by_id(mat_block_tags[i]->entries[j]));
+			pck_write_var_int(packet, mat_get_block_default_protocol_id_by_type(mat_block_tags[i]->entries[j]));
 		}
 	}
 
@@ -913,9 +913,9 @@ void phd_send_tags(ltg_client_t* client) {
 
 	for (int32_t i = 0; i < mat_fluid_tag_count; ++i) {
 		pck_write_string(packet, UTL_STRTOARG(mat_fluid_tags[i]->identifier));
-		pck_write_var_int(packet, mat_fluid_tags[i]->count);
+		pck_write_long_var_int(packet, mat_fluid_tags[i]->count);
 		for (int32_t j = 0; j < mat_fluid_tags[i]->count; ++j) {
-			pck_write_var_int(packet, mat_get_block_base_protocol_id_by_id(mat_fluid_tags[i]->entries[j]));
+			pck_write_var_int(packet, mat_get_block_default_protocol_id_by_type(mat_fluid_tags[i]->entries[j]));
 		}
 	}
 

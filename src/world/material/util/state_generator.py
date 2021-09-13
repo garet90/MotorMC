@@ -910,6 +910,7 @@ motor_blocks = """mat_block_air,
 
 items = []
 base_protocol = [-1] * len(motor_blocks)
+default_protocol = [-1] * len(motor_blocks)
 
 
 for i in data:
@@ -922,6 +923,8 @@ for i in data:
         while j["id"] >= len(items):
             items.append(None)
         items[j["id"]] = name
+        if "default" in j and j["default"]:
+            default_protocol[block_id] = j["id"]
 
 print("const uint16_t mat_blocks_protocol[] = {")
 
@@ -933,6 +936,13 @@ print("")
 print("const uint16_t mat_blocks_base_protocol[] = {")
 
 for i in base_protocol:
+    print("\t" + str(i) + ",")
+
+print("};")
+print("")
+print("const uint16_t mat_blocks_default_protocol[] = {")
+
+for i in default_protocol:
     print("\t" + str(i) + ",")
 
 print("};")
