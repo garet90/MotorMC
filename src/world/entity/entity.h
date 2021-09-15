@@ -100,7 +100,8 @@ typedef struct {
 
 	ent_gamemode_t gamemode : 2;
 
-	itm_item_t inventory[36];
+	itm_item_t inventory[27];
+	itm_item_t hotbar[9];
 	itm_item_t carried;
 
 	// for parrots

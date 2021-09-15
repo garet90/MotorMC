@@ -8,7 +8,7 @@ mnbt_doc* mnbt_new() {
 	return calloc(1, sizeof(mnbt_doc));
 }
 
-mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, mnbt_compression compression) {
+mnbt_doc* mnbt_read(const uint8_t* bytes, size_t* length, mnbt_compression compression) {
 
 	size_t i = 0;
 
@@ -18,7 +18,9 @@ mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, mnbt_compression compre
 			mnbt_doc* doc = mnbt_new();
 			do {
 			   i +=  _mnbt_read_tag(doc, NULL, bytes + i);
-			} while (i < length);
+			} while (i < *length);
+
+			*length = i;
 
 			if (doc->count != 0) {
 				doc->root = doc->tags[doc->count - 1];
@@ -28,9 +30,9 @@ mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, mnbt_compression compre
 		}
 		case MNBT_GZIP: {
 			struct libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
-			uint8_t d_bytes[length * 4];
+			uint8_t d_bytes[*length * 4];
 			
-			if (libdeflate_gzip_decompress(decompressor, bytes, length, d_bytes, length * 4, &length) != LIBDEFLATE_SUCCESS)
+			if (libdeflate_gzip_decompress(decompressor, bytes, *length, d_bytes, *length * 4, length) != LIBDEFLATE_SUCCESS)
 				return NULL;
 			
 			libdeflate_free_decompressor(decompressor);
@@ -38,7 +40,7 @@ mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, mnbt_compression compre
 			mnbt_doc* doc = mnbt_new();
 			do {
 				i += _mnbt_read_tag(doc, NULL, d_bytes + i);
-			} while (i < length);
+			} while (i < *length);
 
 			if (doc->count != 0) {
 				doc->root = doc->tags[doc->count - 1];
@@ -48,8 +50,8 @@ mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, mnbt_compression compre
 		}
 		case MNBT_ZLIB: {
 			struct libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
-			uint8_t d_bytes[length * 4];
-			if (libdeflate_zlib_decompress(decompressor, bytes, length, d_bytes, length * 4, &length) != LIBDEFLATE_SUCCESS)
+			uint8_t d_bytes[*length * 4];
+			if (libdeflate_zlib_decompress(decompressor, bytes, *length, d_bytes, *length * 4, length) != LIBDEFLATE_SUCCESS)
 				return NULL;
 			
 			libdeflate_free_decompressor(decompressor);
@@ -57,7 +59,7 @@ mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, mnbt_compression compre
 			mnbt_doc* doc = mnbt_new();
 			do {
 				i += _mnbt_read_tag(doc, NULL, d_bytes + i);
-			} while (i < length);
+			} while (i < *length);
 
 			if (doc->count != 0) {
 				doc->root = doc->tags[doc->count - 1];
@@ -66,6 +68,7 @@ mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, mnbt_compression compre
 			return doc;
 		}
 		default: {
+			*length = 0;
 			return NULL;
 		}
 	}
@@ -92,7 +95,7 @@ mnbt_doc* mnbt_read_file(const char* file, mnbt_compression compression) {
 	}
 	fclose(f);
 
-	mnbt_doc* doc = mnbt_read(bytes, fsize, compression);
+	mnbt_doc* doc = mnbt_read(bytes, &fsize, compression);
 
 	free(bytes);
 

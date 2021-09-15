@@ -122,7 +122,7 @@ mnbt_doc* mnbt_new();
 /*
 Read vlaues 'bytes' byte array until 'length' has been reached.
 */
-mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, mnbt_compression compression);
+mnbt_doc* mnbt_read(const uint8_t* bytes, size_t* length, mnbt_compression compression);
 
 /*
 Read file as NBT document for reading and editing

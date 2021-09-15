@@ -6,7 +6,7 @@
 
 typedef struct {
 
-	mat_item_type_t type: 1;
+	mat_item_type_t type: 11;
 	uint8_t count: 7;
 
 } itm_item_t;
@@ -47,6 +47,14 @@ static inline void itm_set_type(itm_item_t* item, mat_item_type_t type) {
 	} else {
 		item->type = type;
 	}
+
+}
+
+static inline bool itm_is_similar(itm_item_t* a, itm_item_t* b) {
+
+	if (a->type != b->type) return false;
+
+	return true;
 
 }
 

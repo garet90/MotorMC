@@ -130,8 +130,10 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 
 		struct {
 			itm_item_t* slot;
-			bool grabbable;
-			bool droppable;
+			itm_item_t* target;
+			uint8_t target_size;
+			bool grabbable : 1;
+			bool droppable : 1;
 		} clicked = {
 			.slot = NULL,
 			.grabbable = false,
@@ -142,6 +144,9 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 			case 0: { // player inventory
 				if (slot == -999) { // outside
 					clicked.droppable = true;
+				} else if (slot == -1) {
+					clicked.droppable = false;
+					clicked.grabbable = false;
 				} else if (slot == 0) { // crafting output
 					clicked.grabbable = true;
 				} else if (slot <= 4) { // crafting input
@@ -149,14 +154,39 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 					clicked.grabbable = true;
 				} else if (slot <= 8) { // armor
 					// TODO variable droppable and grabbable based on hand item
-				} else if (slot <= 44) { // main inventory
+					clicked.slot = &player->living_entity.armor[slot - 5];
+				} else if (slot <= 35) { // main inventory
 					clicked.droppable = true;
 					clicked.grabbable = true;
 					clicked.slot = &player->inventory[slot - 9];
+				} else if (slot <= 44) { // hotbar
+					clicked.droppable = true;
+					clicked.grabbable = true;
+					clicked.slot = &player->hotbar[slot - 36];
 				} else if (slot == 45) { // offhand
 					clicked.droppable = true;
 					clicked.grabbable = true;
 					clicked.slot = &player->living_entity.off_hand;
+				}
+
+				switch (mode) {
+					case 2: { // shift click
+						if (slot >= 9 && slot <= 35) { // inventory
+							// attempt to put it in the hotbar
+							clicked.target = player->hotbar;
+							clicked.target_size = 9;
+						} else { // not inventory
+							// attempt to put it in general inventory
+							clicked.target = player->inventory;
+							clicked.target_size = 27;
+						}
+					} break;
+					case 6: { // double click
+
+					} break;
+					default: {
+						// do absolutely nothing
+					} break;
 				}
 			} break;
 		}
@@ -165,42 +195,145 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 			case 0: { // normal clicks
 				switch (button) {
 					case 0: { // left click
-						if (player->carried.type == mat_item_air) {
-							if (clicked.grabbable) {
-								player->carried = *clicked.slot;
-								itm_set_type(clicked.slot, mat_item_air);
-								log_info("Grabbed item");
-							}
+						if (slot == -999) {
+							// TODO drop stack
+							itm_set_count(&player->carried, 0);
 						} else {
-							if (clicked.slot->type == mat_item_air) {
-								if (clicked.droppable) {
-									*clicked.slot = player->carried;
-									itm_set_type(&player->carried, mat_item_air);
-									log_info("Dropped item");
+							if (player->carried.type == mat_item_air) {
+								if (clicked.grabbable) {
+									player->carried = *clicked.slot;
+									itm_set_type(clicked.slot, mat_item_air);
 								}
 							} else {
-								if (clicked.droppable && clicked.grabbable) {
-
+								if (clicked.slot != NULL) {
+									if (clicked.slot->type == mat_item_air) {
+										if (clicked.droppable) {
+											*clicked.slot = player->carried;
+											itm_set_type(&player->carried, mat_item_air);
+										}
+									} else {
+										if (itm_is_similar(clicked.slot, &player->carried)) {
+											if (clicked.droppable) {
+												const uint8_t total = clicked.slot->count + player->carried.count;
+												if (total > 64) {
+													itm_set_count(clicked.slot, 64);
+													itm_set_count(&player->carried, total - 64);
+												} else {
+													itm_set_count(clicked.slot, total);
+													itm_set_count(&player->carried, 0);
+												}
+											}
+										} else { // swap
+											if (clicked.droppable && clicked.grabbable) {
+												itm_item_t temp = player->carried;
+												player->carried = *clicked.slot;
+												*clicked.slot = temp;
+											}
+										}
+									}
 								}
 							}
 						}
 					} break;
 					case 1: { // right click
-
+						if (slot == -999) {
+							if (player->carried.type != mat_item_air) {
+								// TODO drop one
+								itm_set_count(&player->carried, player->carried.count - 1);
+							}
+						} else {
+							if (player->carried.type == mat_item_air) { // take half
+								if (clicked.grabbable) {
+									itm_set_type(&player->carried, clicked.slot->type);
+									itm_set_count(&player->carried, (clicked.slot->count + 1) >> 1);
+									itm_set_count(clicked.slot, clicked.slot->count >> 1);
+								}
+							} else { // drop one
+								if (clicked.droppable) {
+									if (clicked.slot->type == mat_item_air) {
+										itm_set_type(clicked.slot, player->carried.type);
+										itm_set_count(&player->carried, player->carried.count - 1);
+									} else {
+										if (itm_is_similar(clicked.slot, &player->carried)) {
+											if (clicked.slot->count < 64) {
+												itm_set_count(clicked.slot, clicked.slot->count + 1);
+												itm_set_count(&player->carried, player->carried.count - 1);
+											}
+										}
+									}
+								}
+							}
+						}
 					} break;
 				}
 			} break;
 			case 1: { // shift clicks
+				if (clicked.grabbable) {
+					itm_item_t* empty = NULL;
 
+					for (uint8_t i = 0; i < clicked.target_size; ++i) {
+						if (itm_is_similar(clicked.slot, &clicked.target[i])) {
+							const uint8_t total = clicked.slot->count + clicked.target[i].count;
+							if (total <= 64) {
+								itm_set_count(&clicked.target[i], total);
+								itm_set_count(clicked.slot, 0);
+								break;
+							} else {
+								itm_set_count(&clicked.target[i], 64);
+								itm_set_count(clicked.slot, total - 64);
+							}
+						} else if (empty == NULL && clicked.target[i].type == mat_item_air) {
+							empty = &clicked.target[i];
+						}
+					}
+					if (empty != NULL && clicked.slot->count > 0) {
+						*empty = *clicked.slot;
+						itm_set_count(clicked.slot, 0);
+					}
+				}
 			} break;
 			case 2: { // number keys
-
+				if (clicked.slot != NULL) {
+					itm_item_t* target = &player->hotbar[button]; // TODO button could be higher than 8 if it is a hacked client
+					if (clicked.slot->type == mat_item_air) {
+						if (clicked.droppable) {
+							*clicked.slot = *target;
+							itm_set_count(target, 0);
+						}
+					} else {
+						if (clicked.grabbable) {
+							if (target->type == mat_item_air) {
+								*target = *clicked.slot;
+								itm_set_count(clicked.slot, 0);
+							} else {
+								if (clicked.droppable) {
+									itm_item_t temp = *target;
+									*target = *clicked.slot;
+									*clicked.slot = temp;
+								}
+							}
+						}
+					}
+				}
 			} break;
 			case 3: { // middle click
-
+				// TODO only defined by creative players
 			} break;
 			case 4: { // drop key
-
+				if (clicked.grabbable) {
+					switch (button) {
+						case 0: { // drop single item
+							if (clicked.slot->type != mat_item_air) {
+								// TODO drop item
+								itm_set_count(clicked.slot, clicked.slot->count - 1);
+							}
+						} break;
+						case 1: { // drop item stack
+							// TODO drop item stack
+							itm_set_count(clicked.slot, 0);
+						} break;
+					}
+				}
 			} break;
 			case 5: { // drag
 
@@ -221,10 +354,9 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 	}
 
 	itm_from_packet(packet, &item);
-
-	pck_log(packet);
-	packet->cursor = packet->length;
-	pck_log(packet);
+	
+	// TODO remove this
+	phd_send_player_inventory(client);
 
 	return true;
 
@@ -486,8 +618,13 @@ void phd_send_player_inventory(ltg_client_t* client) {
 		itm_serialize(packet, &player->living_entity.armor[3]);
 
 		// inventory
-		for (uint8_t i = 0; i < 36; ++i) {
+		for (uint8_t i = 0; i < 27; ++i) {
 			itm_serialize(packet, &player->inventory[i]);
+		}
+
+		// hotbar
+		for (uint8_t i = 0; i < 9; ++i) {
+			itm_serialize(packet, &player->hotbar[i]);
 		}
 
 		// offhand
@@ -856,7 +993,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_initialize_world_border(client, player_world);
 	phd_send_spawn_position(client);
 
-	itm_set_type(&player->inventory[0], mat_item_stone_block);
+	itm_set_type(&player->inventory[0], mat_item_stone);
 	itm_set_count(&player->inventory[0], 3);
 
 	phd_send_player_inventory(client);

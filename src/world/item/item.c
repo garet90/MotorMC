@@ -7,7 +7,10 @@ void itm_from_packet(pck_packet_t* packet, itm_item_t* item) {
 	if (present) {
 		mat_item_type_t type = pck_read_var_int(packet);
 		int8_t count = pck_read_int8(packet);
-		mnbt_doc* doc = mnbt_read(pck_cursor(packet), 1, MNBT_NONE);
+		size_t len = 1;
+		mnbt_doc* doc = mnbt_read(pck_cursor(packet), &len, MNBT_NONE);
+
+		packet->cursor += len;
 
 		itm_set_type(item, type);
 		itm_set_count(item, count);
