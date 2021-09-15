@@ -5,15 +5,15 @@
 
 extern bool phd_play(ltg_client_t*, pck_packet_t*);
 
-extern bool phd_handle_teleport_confirm(ltg_client_t*, pck_packet_t*);
+extern bool phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_query_block_nbt(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_set_difficulty(ltg_client_t*, pck_packet_t*);
-extern bool phd_handle_chat_message(ltg_client_t*, pck_packet_t*);
+extern bool phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_client_status(ltg_client_t*, pck_packet_t*);
-extern bool phd_handle_client_settings(ltg_client_t*, pck_packet_t*);
+extern bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_tab_complete(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_click_window_button(ltg_client_t*, pck_packet_t*);
-extern bool phd_handle_click_window(ltg_client_t*, pck_packet_t*);
+extern bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_close_window(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_plugin_message(ltg_client_t*, pck_packet_t*, int32_t);
 extern bool phd_handle_edit_book(ltg_client_t*, pck_packet_t*);
@@ -75,9 +75,10 @@ extern void phd_send_system_chat_message(ltg_client_t* client, const char* messa
 
 extern void phd_send_clear_tiles(ltg_client_t*);
 extern void phd_send_tab_complete(ltg_client_t*);
-extern void phd_send_declare_commands(ltg_client_t*);
+extern void phd_send_declare_commands(ltg_client_t* client);
 extern void phd_send_close_window(ltg_client_t*);
 extern void phd_send_window_items(ltg_client_t*);
+extern void phd_send_player_inventory(ltg_client_t* client);
 extern void phd_send_window_property(ltg_client_t*);
 extern void phd_send_set_slot(ltg_client_t*);
 extern void phd_send_set_cooldown(ltg_client_t*);

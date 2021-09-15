@@ -4,6 +4,7 @@
 #include "../../io/chat/chat.h"
 #include "../../util/lock_util.h"
 #include "../positions.h"
+#include "../item/item.h"
 
 typedef enum {
 
@@ -28,12 +29,14 @@ typedef struct {
 	wld_chunk_t* _Atomic chunk;
 	utl_doubly_linked_node_t* _Atomic chunk_node;
 
-	uint32_t id;
+	const uint32_t id;
+	const ent_type_t type;
+
+	pthread_mutex_t lock;
 
 	cht_component_t custom_name;
 	uint16_t air_ticks;
 	ent_pose_t pose : 5;
-	ent_type_t type : 1;
 	bool on_fire : 1;
 	bool crouching : 1;
 	bool sprinting : 1;
@@ -62,6 +65,10 @@ typedef struct {
 	uint8_t bee_stings;
 
 	wld_block_position_t sleeping_bed;
+
+	itm_item_t armor[4];
+	itm_item_t off_hand;
+	itm_item_t main_hand; // unused for player
 
 	uint8_t hand : 1;
 	bool hand_active : 1;
@@ -92,6 +99,9 @@ typedef struct {
 	byte_t main_hand : 1;
 
 	ent_gamemode_t gamemode : 2;
+
+	itm_item_t inventory[36];
+	itm_item_t carried;
 
 	// for parrots
 	ent_living_entity_t* left_shoulder;

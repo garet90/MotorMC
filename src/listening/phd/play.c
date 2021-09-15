@@ -25,6 +25,8 @@ bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		return phd_handle_chat_message(client, packet);
 	case 0x05:
 		return phd_handle_client_settings(client, packet);
+	case 0x08:
+		return phd_handle_click_window(client, packet);
 	case 0x09:
 		return phd_handle_close_window(client, packet);
 	case 0x0a:
@@ -109,6 +111,120 @@ bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	player->main_hand = (byte_t) pck_read_var_int(packet);
 
 	__attribute__((unused)) bool disable_text_filtering = pck_read_int8(packet);
+
+	return true;
+
+}
+
+bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
+
+	const uint8_t window_id = pck_read_int8(packet);
+	const __attribute__((unused)) int32_t state_id = pck_read_var_int(packet);
+	const int16_t slot = pck_read_int16(packet);
+	const int8_t button = pck_read_int8(packet);
+	const int32_t mode = pck_read_var_int(packet);
+
+	ent_player_t* player = client->entity;
+
+	with_lock (&player->living_entity.entity.lock) {
+
+		struct {
+			itm_item_t* slot;
+			bool grabbable;
+			bool droppable;
+		} clicked = {
+			.slot = NULL,
+			.grabbable = false,
+			.droppable = false
+		};
+
+		switch (window_id) {
+			case 0: { // player inventory
+				if (slot == -999) { // outside
+					clicked.droppable = true;
+				} else if (slot == 0) { // crafting output
+					clicked.grabbable = true;
+				} else if (slot <= 4) { // crafting input
+					clicked.droppable = true;
+					clicked.grabbable = true;
+				} else if (slot <= 8) { // armor
+					// TODO variable droppable and grabbable based on hand item
+				} else if (slot <= 44) { // main inventory
+					clicked.droppable = true;
+					clicked.grabbable = true;
+					clicked.slot = &player->inventory[slot - 9];
+				} else if (slot == 45) { // offhand
+					clicked.droppable = true;
+					clicked.grabbable = true;
+					clicked.slot = &player->living_entity.off_hand;
+				}
+			} break;
+		}
+
+		switch (mode) {
+			case 0: { // normal clicks
+				switch (button) {
+					case 0: { // left click
+						if (player->carried.type == mat_item_air) {
+							if (clicked.grabbable) {
+								player->carried = *clicked.slot;
+								itm_set_type(clicked.slot, mat_item_air);
+								log_info("Grabbed item");
+							}
+						} else {
+							if (clicked.slot->type == mat_item_air) {
+								if (clicked.droppable) {
+									*clicked.slot = player->carried;
+									itm_set_type(&player->carried, mat_item_air);
+									log_info("Dropped item");
+								}
+							} else {
+								if (clicked.droppable && clicked.grabbable) {
+
+								}
+							}
+						}
+					} break;
+					case 1: { // right click
+
+					} break;
+				}
+			} break;
+			case 1: { // shift clicks
+
+			} break;
+			case 2: { // number keys
+
+			} break;
+			case 3: { // middle click
+
+			} break;
+			case 4: { // drop key
+
+			} break;
+			case 5: { // drag
+
+			} break;
+			case 6: { // double click
+
+			} break;
+		}
+
+	}
+
+	itm_item_t item;
+
+	int32_t len = pck_read_var_int(packet);
+	for (int32_t i = 0; i < len; ++i) {
+		__attribute__((unused)) int16_t item_slot = pck_read_int16(packet);
+		itm_from_packet(packet, &item);
+	}
+
+	itm_from_packet(packet, &item);
+
+	pck_log(packet);
+	packet->cursor = packet->length;
+	pck_log(packet);
 
 	return true;
 
@@ -338,6 +454,51 @@ void phd_send_system_chat_message(ltg_client_t* client, const char* message, siz
 void phd_send_declare_commands(ltg_client_t* client) {
 
 	ltg_send(client, cmd_get_graph());
+
+}
+
+void phd_send_player_inventory(ltg_client_t* client) {
+
+	ent_player_t* player = client->entity;
+
+	with_lock (&player->living_entity.entity.lock) {
+
+		PCK_INLINE(packet, 1024, io_big_endian);
+
+		pck_write_var_int(packet, 0x14);
+
+		pck_write_int8(packet, 0); // window id = player inventory
+		pck_write_var_int(packet, 0); // state id
+
+		pck_write_var_int(packet, 46);
+		
+		// crafting slots
+		pck_write_int8(packet, false);
+		pck_write_int8(packet, false);
+		pck_write_int8(packet, false);
+		pck_write_int8(packet, false);
+		pck_write_int8(packet, false);
+
+		// armor
+		itm_serialize(packet, &player->living_entity.armor[0]);
+		itm_serialize(packet, &player->living_entity.armor[1]);
+		itm_serialize(packet, &player->living_entity.armor[2]);
+		itm_serialize(packet, &player->living_entity.armor[3]);
+
+		// inventory
+		for (uint8_t i = 0; i < 36; ++i) {
+			itm_serialize(packet, &player->inventory[i]);
+		}
+
+		// offhand
+		itm_serialize(packet, &player->living_entity.off_hand);
+
+		// carried
+		itm_serialize(packet, &player->carried);
+
+		ltg_send(client, packet);
+
+	}
 
 }
 
@@ -613,8 +774,9 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	// create an entity for the player
 	ent_player_t* player = calloc(1, sizeof(ent_player_t));
+	ent_type_t type = ent_player;
+	memcpy((ent_type_t*) &player->living_entity.entity.type, &type, sizeof(type));
 	client->entity = player;
-	player->living_entity.entity.type = ent_player;
 	player->living_entity.entity.position.world = player_world;
 	player->living_entity.entity.position.y = 256;
 	player->living_entity.entity.position.x = player_world->spawn.x;
@@ -693,6 +855,11 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	phd_send_initialize_world_border(client, player_world);
 	phd_send_spawn_position(client);
+
+	itm_set_type(&player->inventory[0], mat_item_stone_block);
+	itm_set_count(&player->inventory[0], 3);
+
+	phd_send_player_inventory(client);
 
 	// add to online players
 	client->online_node = utl_dllist_push(&sky_main.listener.online.list, client);

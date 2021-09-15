@@ -158,8 +158,11 @@ bool job_handle_tick_region(job_tick_region_t* work) {
 
 bool job_handle_unload_region(job_unload_region_t* work) {
 
-	wld_unload_region(work->region);
+	if (work->region->loaded_chunks == 0) {
+		wld_unload_region(work->region);
+		return true;
+	}
 
-	return true;
+	return false;
 
 }

@@ -11,7 +11,10 @@ utl_id_vector_t ent_entities = {
 
 uint32_t ent_register_entity(ent_entity_t* entity) {
 	
-	entity->id = utl_id_vector_add(&ent_entities, &entity);
+	uint32_t id = utl_id_vector_add(&ent_entities, &entity);
+	memcpy((uint32_t*) &entity->id, &id, sizeof(id));
+
+	pthread_mutex_init(&entity->lock, NULL);
 	
 	ent_set_chunk(entity);
 
@@ -66,6 +69,8 @@ void ent_free_entity(ent_entity_t* entity) {
 	ent_remove_chunk(entity);
 
 	utl_id_vector_remove(&ent_entities, entity->id);
+
+	pthread_mutex_destroy(&entity->lock);
 
 	free(entity);
 

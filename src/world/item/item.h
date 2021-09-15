@@ -7,28 +7,14 @@
 typedef struct {
 
 	mat_item_type_t type: 1;
-	uint8_t count: 6;
-	mnbt_doc* nbt;
+	uint8_t count: 7;
 
 } itm_item_t;
 
 static const itm_item_t itm_new = {
 	.type = mat_item_air,
-	.count = 0,
-	.nbt = NULL
+	.count = 0
 };
-
-/*
-Reset NBT for an item
-This includes enchantments, custom names, etc.
-*/
-static inline void itm_reset_nbt(itm_item_t* item) {
-
-	if (item->nbt != NULL) {
-		mnbt_free(item->nbt);
-	}
-
-}
 
 /*
 Safe method to set the count of an item
@@ -41,7 +27,6 @@ static inline void itm_set_count(itm_item_t* item, uint8_t count) {
 
 	if (count == 0) {
 		item->type = mat_item_air;
-		itm_reset_nbt(item);
 	}
 
 }
@@ -64,6 +49,8 @@ static inline void itm_set_type(itm_item_t* item, mat_item_type_t type) {
 	}
 
 }
+
+extern void itm_from_packet(pck_packet_t* packet, itm_item_t* item);
 
 /*
 Serialize an item into a packet
