@@ -104,6 +104,11 @@ typedef struct {
 	itm_item_t hotbar[9];
 	itm_item_t carried;
 
+	struct {
+		itm_item_t* elements[90];
+		uint8_t count;
+	} paint;
+
 	// for parrots
 	ent_living_entity_t* left_shoulder;
 	ent_living_entity_t* right_shoulder;

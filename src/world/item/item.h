@@ -23,7 +23,7 @@ and will reset the type to air if count is 0
 */
 static inline void itm_set_count(itm_item_t* item, uint8_t count) {
 
-	item->count = count & 0x3F;
+	item->count = (count > 64 ? count = 64 : count);
 
 	if (count == 0) {
 		item->type = mat_item_air;

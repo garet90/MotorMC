@@ -170,7 +170,7 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 				}
 
 				switch (mode) {
-					case 2: { // shift click
+					case 1: { // shift click
 						if (slot >= 9 && slot <= 35) { // inventory
 							// attempt to put it in the hotbar
 							clicked.target = player->hotbar;
@@ -193,6 +193,7 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 
 		switch (mode) {
 			case 0: { // normal clicks
+				player->paint.count = 0;
 				switch (button) {
 					case 0: { // left click
 						if (slot == -999) {
@@ -202,14 +203,14 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 							if (player->carried.type == mat_item_air) {
 								if (clicked.grabbable) {
 									player->carried = *clicked.slot;
-									itm_set_type(clicked.slot, mat_item_air);
+									itm_set_count(clicked.slot, 0);
 								}
 							} else {
 								if (clicked.slot != NULL) {
 									if (clicked.slot->type == mat_item_air) {
 										if (clicked.droppable) {
 											*clicked.slot = player->carried;
-											itm_set_type(&player->carried, mat_item_air);
+											itm_set_count(&player->carried, 0);
 										}
 									} else {
 										if (itm_is_similar(clicked.slot, &player->carried)) {
@@ -244,14 +245,15 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 						} else {
 							if (player->carried.type == mat_item_air) { // take half
 								if (clicked.grabbable) {
-									itm_set_type(&player->carried, clicked.slot->type);
+									player->carried = *clicked.slot;
 									itm_set_count(&player->carried, (clicked.slot->count + 1) >> 1);
 									itm_set_count(clicked.slot, clicked.slot->count >> 1);
 								}
 							} else { // drop one
 								if (clicked.droppable) {
 									if (clicked.slot->type == mat_item_air) {
-										itm_set_type(clicked.slot, player->carried.type);
+										*clicked.slot = player->carried;
+										itm_set_count(clicked.slot, 1);
 										itm_set_count(&player->carried, player->carried.count - 1);
 									} else {
 										if (itm_is_similar(clicked.slot, &player->carried)) {
@@ -286,6 +288,7 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 							empty = &clicked.target[i];
 						}
 					}
+
 					if (empty != NULL && clicked.slot->count > 0) {
 						*empty = *clicked.slot;
 						itm_set_count(clicked.slot, 0);
@@ -293,7 +296,7 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 				}
 			} break;
 			case 2: { // number keys
-				if (clicked.slot != NULL) {
+				if (clicked.slot != NULL && player->carried.type == mat_item_air) {
 					itm_item_t* target = &player->hotbar[button]; // TODO button could be higher than 8 if it is a hacked client
 					if (clicked.slot->type == mat_item_air) {
 						if (clicked.droppable) {
@@ -317,6 +320,7 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 				}
 			} break;
 			case 3: { // middle click
+				player->paint.count = 0;
 				// TODO only defined by creative players
 			} break;
 			case 4: { // drop key
@@ -336,7 +340,61 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 				}
 			} break;
 			case 5: { // drag
-
+				switch (button) {
+					case 0:
+					case 4:
+					case 8: { // begin drag
+						player->paint.count = 0;
+					} break;
+					case 1:
+					case 5:
+					case 9: { // add slot to drag
+						if (clicked.droppable) {
+							player->paint.elements[player->paint.count++] = clicked.slot;
+						}
+					} break;
+					case 2: {
+						const uint8_t per_slot = player->carried.count / player->paint.count;
+						for (uint8_t i = 0; i < player->paint.count; ++i) {
+							if (player->paint.elements[i]->type == mat_item_air) {
+								*player->paint.elements[i] = player->carried;
+								itm_set_count(player->paint.elements[i], per_slot);
+								itm_set_count(&player->carried, player->carried.count - per_slot);
+							} else {
+								if (itm_is_similar(player->paint.elements[i], &player->carried)) {
+									const uint8_t total = player->paint.elements[i]->count + per_slot;
+									if (total > 64) {
+										const uint8_t to_add = 64 - player->paint.elements[i]->count;
+										itm_set_count(player->paint.elements[i], 64);
+										itm_set_count(&player->carried, player->carried.count - to_add);
+									} else {
+										itm_set_count(player->paint.elements[i], player->paint.elements[i]->count + per_slot);
+										itm_set_count(&player->carried, player->carried.count - per_slot);
+									}
+								}
+							}
+						}
+					} break;
+					case 6: {
+						for (uint8_t i = 0; i < player->paint.count && player->carried.count > 0; ++i) {
+							if (player->paint.elements[i]->type == mat_item_air) {
+								*player->paint.elements[i] = player->carried;
+								itm_set_count(player->paint.elements[i], 1);
+								itm_set_count(&player->carried, player->carried.count - 1);
+							} else {
+								if (itm_is_similar(player->paint.elements[i], &player->carried)) {
+									if (player->paint.elements[i]->count != 64) {
+										itm_set_count(player->paint.elements[i], player->paint.elements[i]->count + 1);
+										itm_set_count(&player->carried, player->carried.count - 1);
+									}
+								}
+							}
+						}
+					} break;
+					case 10: { // paint clone
+						// TODO only defined for creative players
+					} break;
+				}
 			} break;
 			case 6: { // double click
 
@@ -994,7 +1052,9 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_spawn_position(client);
 
 	itm_set_type(&player->inventory[0], mat_item_stone);
-	itm_set_count(&player->inventory[0], 3);
+	itm_set_count(&player->inventory[0], 64);
+	itm_set_type(&player->inventory[1], mat_item_stone);
+	itm_set_count(&player->inventory[1], 64);
 
 	phd_send_player_inventory(client);
 
