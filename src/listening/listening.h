@@ -2,7 +2,7 @@
 #include <pthread.h>
 #include "../main.h"
 #include "../util/id_vector.h"
-#include "../util/doubly_linked_list.h"
+#include "../util/dll.h"
 #include "../util/util.h"
 #include "../io/packet/packet.h"
 #include "../crypt/rsa.h"
@@ -156,7 +156,7 @@ typedef struct {
 
 	pthread_t thread;
 	
-	utl_doubly_linked_node_t* online_node;
+	uint32_t online_node;
 	ent_player_t* _Atomic entity;
 
 	uint32_t id;
@@ -219,8 +219,8 @@ typedef struct {
 	
 	struct {
 		pthread_mutex_t lock;
-		utl_doubly_linked_list_t list;
-		size_t max : 16;
+		utl_dll_t list;
+		uint32_t max : 16;
 	} online;
 
 	uint16_t network_compression_threshold;

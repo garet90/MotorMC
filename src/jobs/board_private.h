@@ -6,7 +6,7 @@
 typedef struct {
 	pthread_mutex_t lock;
 	pthread_cond_t wait;
-	utl_linked_list_t list;
+	utl_list_t list;
 } job_board_t;
 
 extern job_board_t job_board;

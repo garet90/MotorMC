@@ -6,17 +6,14 @@ pck_packet_t* cmd_get_graph() {
 
 	if (cmd_graph == NULL) {
 
-		utl_vector_t nodes = {
-			.bytes_per_element = sizeof(cmd_node_t*)
-		};
+		utl_vector_t nodes = UTL_VECTOR_INITIALIZER(cmd_node_t*);
 
 		cmd_node_t* root = malloc(sizeof(cmd_node_t));
 		cmd_node_t root_init = {
 			.type = cmd_node_root,
 			.idx = nodes.size,
-			.children = {
-				.bytes_per_element = sizeof(int32_t)
-			}
+			.children = UTL_VECTOR_INITIALIZER(int32_t),
+			.redirect_node = 0 // throws a warning if i don't put this, i have no idea why
 		};
 		memcpy(root, &root_init, sizeof(cmd_node_t));
 
@@ -28,9 +25,7 @@ pck_packet_t* cmd_get_graph() {
 			cmd_node_t* command_node = malloc(sizeof(cmd_node_t));
 			cmd_node_t command_node_init = {
 				.type = cmd_node_literal,
-				.children = {
-					.bytes_per_element = sizeof(int32_t)
-				},
+				.children = UTL_VECTOR_INITIALIZER(int32_t),
 				.literal = {
 					.name = command->label
 				},
@@ -47,9 +42,7 @@ pck_packet_t* cmd_get_graph() {
 				cmd_node_t* command_alias = malloc(sizeof(cmd_node_t));
 				cmd_node_t command_alias_init = {
 					.type = cmd_node_literal,
-					.children = {
-						.bytes_per_element = sizeof(int32_t)
-					},
+					.children = UTL_VECTOR_INITIALIZER(int32_t),
 					.redirect_node = command_node->idx,
 					.has_redirect_node = true,
 					.literal = {
@@ -80,7 +73,7 @@ pck_packet_t* cmd_get_graph() {
 				int32_t child = UTL_VECTOR_GET_AS(int32_t, &node->children, i);
 				pck_write_var_int(cmd_graph, child);
 			}
-			utl_vector_term(&node->children);
+			utl_term_vector(&node->children);
 
 			if (node->has_redirect_node) {
 				pck_write_var_int(cmd_graph, node->redirect_node);
@@ -106,7 +99,7 @@ pck_packet_t* cmd_get_graph() {
 
 		}
 
-		utl_vector_term(&nodes);
+		utl_term_vector(&nodes);
 
 		pck_write_var_int(cmd_graph, 0);
 

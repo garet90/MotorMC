@@ -1059,7 +1059,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_player_inventory(client);
 
 	// add to online players
-	client->online_node = utl_dllist_push(&sky_main.listener.online.list, client);
+	client->online_node = utl_dll_push(&sky_main.listener.online.list, client);
 
 	JOB_CREATE_WORK(work, job_player_join);
 	work->player = client;
@@ -1080,9 +1080,9 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 	pck_write_var_int(packet, 0);
 	pck_write_var_int(packet, sky_main.listener.online.list.length);
 
-	utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
-	while (node != NULL) {
-		ltg_client_t* player = node->element;
+	utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+	ltg_client_t* player = utl_dll_iterator_next(&iterator);
+	while (player != NULL) {
 		pck_write_bytes(packet, player->uuid, 16);
 		pck_write_string(packet, player->username.value, player->username.length);
 		if (player->textures.value.value != NULL) {
@@ -1099,13 +1099,13 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 			pck_write_var_int(packet, 0);
 		}
 		
-		ent_player_t* player_ent = client->entity;
+		ent_player_t* player_ent = player->entity;
 
 		pck_write_var_int(packet, player_ent->gamemode); // game mode
 		
 		pck_write_var_int(packet, player->ping); // ping
 		pck_write_int8(packet, 0); // has display name
-		node = node->next;
+		player = utl_dll_iterator_next(&iterator);
 	}
 
 	ltg_send(client, packet);
@@ -1156,12 +1156,12 @@ void phd_send_player_info_update_latency(ltg_client_t* client) {
 	pck_write_var_int(packet, 0x36);
 	pck_write_var_int(packet, 2); // update latency
 	pck_write_var_int(packet, sky_main.listener.online.list.length);
-	utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
-	while (node != NULL) {
-		ltg_client_t* player = node->element;
+	utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+	ltg_client_t* player = utl_dll_iterator_next(&iterator);
+	while (player != NULL) {
 		pck_write_bytes(packet, player->uuid, 16);
 		pck_write_var_int(packet, player->ping);
-		node = node->next;
+		player = utl_dll_iterator_next(&iterator);
 	}
 
 	ltg_send(client, packet);

@@ -27,7 +27,7 @@ typedef struct {
 
 	wld_position_t position;
 	wld_chunk_t* _Atomic chunk;
-	utl_doubly_linked_node_t* _Atomic chunk_node;
+	uint32_t _Atomic chunk_node;
 
 	const uint32_t id;
 	const ent_type_t type;
@@ -123,9 +123,8 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 	if (entity->chunk != NULL) {
 
 		with_lock (&entity->chunk->lock) {
-			utl_dllist_remove_by_reference(&entity->chunk->entities, entity->chunk_node);
+			utl_dll_remove(&entity->chunk->entities, entity->chunk_node);
 		}
-		entity->chunk_node = NULL;
 		entity->chunk = NULL;
 
 	}

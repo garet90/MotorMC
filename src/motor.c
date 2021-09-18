@@ -28,9 +28,7 @@ sky_main_t sky_main = {
 	},
 	.workers = {
 		.count = 4,
-		.vector = {
-			.bytes_per_element = sizeof(sky_worker_t*)
-		}
+		.vector = UTL_VECTOR_INITIALIZER(sky_worker_t*)
 	},
 	.status = sky_starting,
 	
@@ -51,12 +49,11 @@ sky_main_t sky_main = {
 		},
 		.clients = {
 			.lock = PTHREAD_MUTEX_INITIALIZER,
-			.vector = {
-				.bytes_per_element = sizeof(ltg_client_t*)
-			}
+			.vector = UTL_ID_VECTOR_INITIALIZER(ltg_client_t*)
 		},
 		.online = {
 			.lock = PTHREAD_MUTEX_INITIALIZER,
+			.list = UTL_DLL_INITIALIZER,
 			.max = 20
 		},
 		.network_compression_threshold = 256,
@@ -107,7 +104,7 @@ void sky_handle_signal_crash(int signal) {
 			}
 		}
 
-		for (size_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
+		for (size_t i = 0; i < sky_main.listener.clients.vector.array.size; ++i) {
 			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 			if (client != NULL && pthread_self() == client->thread) {
 				log_error("\t\tCLIENT #%lld", i);

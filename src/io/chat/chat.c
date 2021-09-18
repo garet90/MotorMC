@@ -387,7 +387,7 @@ void cht_free(cht_component_t* component) {
 			cht_component_t* extra = UTL_VECTOR_GET_AS(cht_component_t*, &component->extra, i);
 			cht_free(extra);
 		}
-		utl_vector_term(&component->extra);
+		utl_term_vector(&component->extra);
 	}
 
 	if (component->text_heap)
@@ -430,16 +430,16 @@ size_t cht_server_list_ping(char* message) {
 		
 		if (sky_main.listener.online.list.length > 0) {
 			mjson_val* sample = mjson_arr(doc);
-			utl_doubly_linked_node_t* node = sky_main.listener.online.list.first;
-			while (node != NULL) {
-				ltg_client_t* player = node->element;
+			utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+			ltg_client_t* player = utl_dll_iterator_next(&iterator);
+			while (player != NULL) {
 				mjson_val* val = mjson_obj(doc);
 				mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, player->username.value, player->username.length));
 				char uuid[37];
 				ltg_uuid_to_string(player->uuid, uuid);
 				mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("id")), mjson_string(doc, uuid, 36));
 				mjson_arr_append(sample, val);
-				node = node->next;
+				player = utl_dll_iterator_next(&iterator);
 			}
 			mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("sample")), sample);
 		}

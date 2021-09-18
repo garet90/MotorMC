@@ -13,17 +13,12 @@ utl_tree_t cmd_handlers = {
 	.object = NULL
 };
 
-const cmd_command_t* cmd_defaults[] = {
+UTL_VECTOR_DEFAULT(cmd_list, cmd_command_t*,
 	&cmd_stop_h,
 	&cmd_help_h,
 	&cmd_plugins_h,
 	&cmd_jb_h
-};
-utl_vector_t cmd_list = {
-	.bytes_per_element = sizeof(cmd_command_t*),
-	.array = (byte_t*) cmd_defaults,
-	.size = sizeof(cmd_defaults) / sizeof(cmd_defaults[0])
-};
+);
 
 void cmd_add_defaults() {
 
@@ -311,7 +306,7 @@ bool cmd_plugins(char* args, const cmd_sender_t* sender) {
 
 	if (plg_links.size > 0) {
 		char plugin_text[17];
-		const size_t plugin_text_len = sprintf(plugin_text, "Plugins (%zu): ", plg_links.size);
+		const size_t plugin_text_len = sprintf(plugin_text, "Plugins (%u): ", plg_links.size);
 
 		cht_component_t plugins = cht_new;
 		plugins.text = UTL_ARRTOSTR(plugin_text, plugin_text_len);

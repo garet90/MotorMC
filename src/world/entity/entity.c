@@ -5,13 +5,11 @@
 #include "../../util/lock_util.h"
 #include "../../motor.h"
 
-utl_id_vector_t ent_entities = {
-	.bytes_per_element = sizeof(ent_entity_t*)
-};
+utl_id_vector_t ent_entities = UTL_ID_VECTOR_INITIALIZER(ent_entity_t*);
 
 uint32_t ent_register_entity(ent_entity_t* entity) {
 	
-	uint32_t id = utl_id_vector_add(&ent_entities, &entity);
+	uint32_t id = utl_id_vector_push(&ent_entities, &entity);
 	memcpy((uint32_t*) &entity->id, &id, sizeof(id));
 
 	pthread_mutex_init(&entity->lock, NULL);
@@ -58,7 +56,7 @@ void ent_set_chunk(ent_entity_t* entity) {
 
 	assert(chunk != NULL);
 
-	entity->chunk_node = utl_dllist_push(&chunk->entities, entity);
+	entity->chunk_node = utl_dll_push(&chunk->entities, entity);
 
 	entity->chunk = chunk;
 

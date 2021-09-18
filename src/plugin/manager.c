@@ -3,9 +3,7 @@
 #include "../io/logger/logger.h"
 #include "../io/filesystem/filesystem.h"
 
-utl_vector_t plg_links = {
-	.bytes_per_element = sizeof(plg_link_t)
-};
+utl_vector_t plg_links = UTL_VECTOR_INITIALIZER(plg_link_t);
 
 void plg_register_plugin(const char* file) {
 

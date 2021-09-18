@@ -91,7 +91,7 @@ void ltg_accept(ltg_client_t* client) {
 
 	// lock clients
 	with_lock (&sky_main.listener.clients.lock) {
-		client->id = utl_id_vector_add(&sky_main.listener.clients.vector, &client);
+		client->id = utl_id_vector_push(&sky_main.listener.clients.vector, &client);
 	}
 
 	// create client listening thread
@@ -221,10 +221,10 @@ void ltg_disconnect(ltg_client_t* client) {
 	sch_cancel(client->keep_alive);
 
 	// if we're on the online players list, remove it
-	if (client->online_node != NULL) {
+	if (client->entity != NULL) {
 
 		with_lock (&sky_main.listener.online.lock) {
-			utl_dllist_remove_by_reference(&sky_main.listener.online.list, client->online_node);
+			utl_dll_remove(&sky_main.listener.online.list, client->online_node);
 		}
 
 		JOB_CREATE_WORK(work, job_player_leave);
@@ -233,11 +233,7 @@ void ltg_disconnect(ltg_client_t* client) {
 		work->username = client->username;
 
 		job_add(&work->header);
-
-	}
-
-	// free entity
-	if (client->entity != NULL) {
+		
 		phd_update_sent_chunks_leave(client);
 		ent_free_entity((ent_entity_t*) client->entity);
 	}
@@ -282,7 +278,7 @@ void ltg_term() {
 
 	// disconnect all clients
 	with_lock (&sky_main.listener.clients.lock) {
-		for (uint32_t i = 0; i < sky_main.listener.clients.vector.size; ++i) {
+		for (uint32_t i = 0; i < sky_main.listener.clients.vector.array.size; ++i) {
 			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
 			if (client != NULL) {
 				pthread_mutex_unlock(&sky_main.listener.clients.lock);

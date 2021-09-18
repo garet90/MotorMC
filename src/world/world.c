@@ -9,15 +9,13 @@
 #include "entity/entity.h"
 #include <stdlib.h>
 
-utl_id_vector_t wld_worlds = {
-	.bytes_per_element = sizeof(wld_world_t*)
-};
+utl_id_vector_t wld_worlds = UTL_ID_VECTOR_INITIALIZER(wld_world_t*);
 
 uint16_t wld_add(wld_world_t* world) {
 	
 	uint16_t id = 0;
 
-	id = utl_id_vector_add(&wld_worlds, &world);
+	id = utl_id_vector_push(&wld_worlds, &world);
 
 	return id;
 
@@ -80,7 +78,7 @@ void wld_prepare_spawn(wld_world_t* world) {
 
 uint16_t wld_get_count() {
 
-	return wld_worlds.size;
+	return wld_worlds.array.size;
 
 }
 
@@ -158,9 +156,8 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 	wld_chunk_t chunk_init = {
 		.region = region,
 		.lock = PTHREAD_MUTEX_INITIALIZER,
-		.block_entities = {
-			.bytes_per_element = sizeof(void*) // TODO block entity struct
-		},
+		.block_entities = UTL_ID_VECTOR_INITIALIZER(void*), // TODO block entity struct
+		.entities = UTL_DLL_INITIALIZER,
 		.x = x,
 		.z = z,
 		.max_ticket = max_ticket,
@@ -410,7 +407,7 @@ void wld_unload(wld_world_t* world) {
 
 void wld_unload_all() {
 
-	for (uint32_t i = 0; i < wld_worlds.size; ++i) {
+	for (uint32_t i = 0; i < wld_worlds.array.size; ++i) {
 		wld_world_t* world = UTL_ID_VECTOR_GET_AS(wld_world_t*, &wld_worlds, i);
 		utl_id_vector_remove(&wld_worlds, i);
 

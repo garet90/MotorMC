@@ -3,95 +3,47 @@
 #include "../motor.h"
 #include "../util/vector.h"
 
-// vector of vectors that point to job handlers, the index is the job
-job_handler_t job_keep_alive_handlers[] = {
+UTL_VECTOR_DEFAULT(job_keep_alive_handlers, job_handler_t, 
 	(job_handler_t) job_handle_keep_alive
-};
-utl_vector_t job_keep_alive_handlers_vector = {
-	.bytes_per_element = sizeof(job_handler_t),
-	.size = 1,
-	.array = (byte_t*) job_keep_alive_handlers
-};
-
-job_handler_t job_global_chat_message_handlers[] = {
+);
+UTL_VECTOR_DEFAULT(job_global_chat_message_handlers, job_handler_t,
 	(job_handler_t) job_handle_global_chat_message
-};
-utl_vector_t job_global_chat_message_handlers_vector = {
-	.bytes_per_element = sizeof(job_handler_t),
-	.size = 1,
-	.array = (byte_t*) job_global_chat_message_handlers
-};
-
-job_handler_t job_player_join_handlers[] = {
+);
+UTL_VECTOR_DEFAULT(job_player_join_handlers, job_handler_t,
 	(job_handler_t) job_handle_player_join
-};
-utl_vector_t job_player_join_handlers_vector = {
-	.bytes_per_element = sizeof(job_handler_t),
-	.size = 1,
-	.array = (byte_t*) job_player_join_handlers
-};
-
-job_handler_t job_player_leave_handlers[] = {
+);
+UTL_VECTOR_DEFAULT(job_player_leave_handlers, job_handler_t,
 	(job_handler_t) job_handle_player_leave
-};
-utl_vector_t job_player_leave_handlers_vector = {
-	.bytes_per_element = sizeof(job_handler_t),
-	.size = 1,
-	.array = (byte_t*) job_player_leave_handlers
-};
-
-job_handler_t job_send_update_pings_handlers[] = {
+);
+UTL_VECTOR_DEFAULT(job_send_update_pings_handlers, job_handler_t,
 	(job_handler_t) job_handle_send_update_pings
-};
-utl_vector_t job_send_update_pings_handlers_vector = {
-	.bytes_per_element = sizeof(job_handler_t),
-	.size = 1,
-	.array = (byte_t*) job_send_update_pings_handlers
-};
-
-job_handler_t job_tick_region_handlers[] = {
+);
+UTL_VECTOR_DEFAULT(job_tick_region_handlers, job_handler_t,
 	(job_handler_t) job_handle_tick_region
-};
-utl_vector_t job_tick_region_handlers_vector = {
-	.bytes_per_element = sizeof(job_handler_t),
-	.size = 1,
-	.array = (byte_t*) job_tick_region_handlers
-};
+);
+UTL_VECTOR_DEFAULT(job_unload_region_handlers, job_handler_t,
+	(job_handler_t) job_handle_unload_region,
+);
 
-job_handler_t job_unload_region_handlers[] = {
-	(job_handler_t) job_handle_unload_region
-};
-utl_vector_t job_unload_region_handlers_vector = {
-	.bytes_per_element = sizeof(job_handler_t),
-	.size = 1,
-	.array = (byte_t*) job_unload_region_handlers
-};
-
-utl_vector_t* job_handlers[job_count] = {
-	&job_keep_alive_handlers_vector,
-	&job_global_chat_message_handlers_vector,
-	&job_player_join_handlers_vector,
-	&job_player_leave_handlers_vector,
-	&job_send_update_pings_handlers_vector,
-	&job_tick_region_handlers_vector,
-	&job_unload_region_handlers_vector
-};
+UTL_VECTOR_DEFAULT(job_handlers, utl_vector_t*,
+	&job_keep_alive_handlers,
+	&job_global_chat_message_handlers,
+	&job_player_join_handlers,
+	&job_player_leave_handlers,
+	&job_send_update_pings_handlers,
+	&job_tick_region_handlers,
+	&job_unload_region_handlers
+);
 
 job_board_t job_board = {
 	.lock = PTHREAD_MUTEX_INITIALIZER,
 	.wait = PTHREAD_COND_INITIALIZER,
-	.list = {
-		.length = 0
-	}
+	.list = UTL_LIST_INITIALIZER
 };
 
 void job_add_handler(job_type_t job, job_handler_t handler) {
 	
-	if (job_handlers[job] == NULL) {
-		job_handlers[job] = utl_create_vector(sizeof(job_handler_t), 2);
-	}
-
-	utl_vector_push(job_handlers[job], &handler);
+	utl_vector_push(utl_vector_get(&job_handlers, job), &handler);
 
 }
 
@@ -99,7 +51,7 @@ void job_handle(job_work_t* work) {
 
 	if (work == NULL) return;
 
-	utl_vector_t* work_handlers = job_handlers[work->type];
+	utl_vector_t* work_handlers = UTL_VECTOR_GET_AS(utl_vector_t*, &job_handlers, work->type);
 
 	if (work_handlers != NULL) {
 
@@ -161,7 +113,7 @@ job_work_t* job_get() {
 	// wait for jobs
 	with_lock (&job_board.lock) {
 	
-		while (job_board.list.first == NULL) {
+		while (job_board.list.length == 0) {
 		
 			if (sky_main.status == sky_stopping) {
 

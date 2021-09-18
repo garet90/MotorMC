@@ -11,18 +11,14 @@ struct {
 	utl_vector_t tape;
 
 } sch_scheduler = {
-	.tape = {
-		.bytes_per_element = sizeof(utl_vector_t)
-	}
+	.tape = UTL_VECTOR_INITIALIZER(utl_vector_t)
 };
 
 void sch_push_l(job_work_t* work, uint32_t delay) {
 
 	if (delay >= sch_scheduler.tape.size) { // fill up to the delay with empty vectors
 
-		utl_vector_t empty = {
-			.bytes_per_element = sizeof(job_work_t*)
-		};
+		utl_vector_t empty = UTL_VECTOR_INITIALIZER(job_work_t*);
 
 		while (delay >= sch_scheduler.tape.size) {
 			utl_vector_push(&sch_scheduler.tape, &empty);
@@ -36,7 +32,7 @@ void sch_push_l(job_work_t* work, uint32_t delay) {
 
 }
 
-inline void sch_push(job_work_t* work, uint32_t delay) {
+static inline void sch_push(job_work_t* work, uint32_t delay) {
 
 	with_lock (&sch_scheduler.lock) {
 
@@ -118,7 +114,7 @@ void sch_tick() {
 
 		}
 
-		utl_vector_term(vector);
+		utl_term_vector(vector);
 		utl_vector_shift(&sch_scheduler.tape);
 
 	}

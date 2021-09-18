@@ -1,9 +1,7 @@
 #include "../../../util/str_util.h"
 #include "recipe.h"
 
-utl_vector_t rec_recipes = {
-	.bytes_per_element = sizeof(rec_recipe_t*)
-};
+utl_vector_t rec_recipes = UTL_VECTOR_INITIALIZER(rec_recipe_t*);
 
 void rec_serialize(pck_packet_t* packet, const rec_recipe_t* recipe) {
 

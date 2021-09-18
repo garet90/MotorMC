@@ -82,9 +82,7 @@ static /*in-plugin*/ const cht_component_t cht_new = {
 	.obfuscated = UNSET,
 	.heap = false,
 	.color = cht_no_color,
-	.extra = {
-		.bytes_per_element = sizeof(cht_component_t*)
-	}
+	.extra = UTL_VECTOR_INITIALIZER(cht_component_t*)
 };
 
 extern cht_component_t* cht_alloc();

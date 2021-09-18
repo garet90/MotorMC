@@ -1,7 +1,7 @@
 #pragma once
 #include <pthread.h>
 #include "../main.h"
-#include "../util/doubly_linked_list.h"
+#include "../util/dll.h"
 #include "../util/id_vector.h"
 #include "../util/bit_vector.h"
 #include "../util/tree.h"
@@ -47,7 +47,7 @@ struct wld_chunk {
 	utl_bit_vector_t players;
 
 	utl_id_vector_t block_entities;
-	utl_doubly_linked_list_t entities;
+	utl_dll_t entities;
 
 	// highest blocks
 	struct {
