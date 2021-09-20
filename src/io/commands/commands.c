@@ -9,9 +9,7 @@
 #include "../../jobs/board.h"
 #include "../logger/logger.h"
 
-utl_tree_t cmd_handlers = {
-	.object = NULL
-};
+utl_tree_t cmd_handlers = UTL_TREE_INITIALIZER;
 
 UTL_VECTOR_DEFAULT(cmd_list, cmd_command_t*,
 	&cmd_stop_h,
@@ -47,7 +45,7 @@ void cmd_add_command(const cmd_command_t* command) {
 
 	cmd_reset_graph();
 
-	if (cmd_list.size != 0 && cmd_handlers.object == NULL) {
+	if (cmd_list.size != 0 && cmd_handlers.length == 0) {
 		cmd_add_defaults();
 	}
 
@@ -69,7 +67,7 @@ void cmd_add_command(const cmd_command_t* command) {
 
 void cmd_handle(char* cmd, const cmd_sender_t* sender) {
 
-	if (cmd_list.size != 0 && cmd_handlers.object == NULL) {
+	if (cmd_list.size != 0 && cmd_handlers.length == 0) {
 		cmd_add_defaults();
 	}
 

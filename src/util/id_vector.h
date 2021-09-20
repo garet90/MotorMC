@@ -52,7 +52,7 @@ static inline uint32_t utl_id_vector_push(utl_id_vector_t* id_vector, const void
 
 }
 
-static inline void* utl_id_vector_get(const utl_id_vector_t* id_vector, size_t id) {
+static inline void* utl_id_vector_get(const utl_id_vector_t* id_vector, uint32_t id) {
 	
 	if (id_vector == NULL) return NULL;
 

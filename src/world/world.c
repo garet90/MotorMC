@@ -30,6 +30,7 @@ wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t env
 		.seed = seed,
 		.environment = environment,
 		.name = name,
+		.regions = UTL_TREE_INITIALIZER,
 		.id = wld_add(world),
 		.spawn = {
 			.x = (rand() % 254) - 254,
@@ -50,6 +51,7 @@ wld_world_t* wld_load(const string_t name) {
 	wld_world_t world_init = {
 		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.name = name,
+		.regions = UTL_TREE_INITIALIZER,
 		.id = wld_add(world)
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
@@ -396,7 +398,7 @@ void wld_unload(wld_world_t* world) {
 		while ((region = utl_tree_shift(&world->regions)) != NULL) {
 			wld_free_region(region);
 		}
-		utl_tree_term(&world->regions);
+		utl_term_tree(&world->regions);
 	}
 	
 	pthread_mutex_destroy(&world->lock);
@@ -416,7 +418,7 @@ void wld_unload_all() {
 			while ((region = utl_tree_shift(&world->regions)) != NULL) {
 				wld_free_region(region);
 			}
-			utl_tree_term(&world->regions);
+			utl_term_tree(&world->regions);
 		}
 
 		pthread_mutex_destroy(&world->lock);

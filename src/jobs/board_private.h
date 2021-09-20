@@ -1,7 +1,7 @@
 #pragma once
 #include <pthread.h>
 #include "board.h"
-#include "../util/linked_list.h"
+#include "../util/list.h"
 
 typedef struct {
 	pthread_mutex_t lock;
