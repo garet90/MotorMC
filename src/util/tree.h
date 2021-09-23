@@ -55,6 +55,7 @@ static inline void utl_tree_put(utl_tree_t* tree, uint32_t key, void* value) {
 			.parent = UTL_TREE_NULL
 		};
 
+		tree->length++;
 		tree->root = utl_id_vector_push(&tree->nodes, &branch);
 
 	} else {
@@ -77,9 +78,10 @@ static inline void utl_tree_put(utl_tree_t* tree, uint32_t key, void* value) {
 						.parent = look_idx
 					};
 					
+					tree->length++;
 					look->right = utl_id_vector_push(&tree->nodes, &branch);
 					
-					break;
+					return;
 
 				} else {
 					look_idx = look->right;
@@ -100,9 +102,10 @@ static inline void utl_tree_put(utl_tree_t* tree, uint32_t key, void* value) {
 						.parent = look_idx
 					};
 					
+					tree->length++;
 					look->left = utl_id_vector_push(&tree->nodes, &branch);
 
-					break;
+					return;
 
 				} else {
 					look_idx = look->left;
@@ -112,13 +115,11 @@ static inline void utl_tree_put(utl_tree_t* tree, uint32_t key, void* value) {
 
 			} else {
 				look->value = value;
-				break;
+				return;
 			}
 
 		} while (true);
 	}
-
-	tree->length++;
 
 }
 static inline void* utl_tree_get(const utl_tree_t* tree, uint32_t key) {
@@ -170,6 +171,7 @@ static inline void* utl_tree_get(const utl_tree_t* tree, uint32_t key) {
 	}
 
 }
+
 static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 
 	if (tree->length == 0) {
@@ -240,6 +242,7 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 					int64_t new_key = successor->key;
 					void* new_value = successor->value;
 
+					// has to be an empty or right only
 					utl_tree_remove(tree, new_key);
 
 					look->key = new_key;

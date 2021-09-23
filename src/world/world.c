@@ -158,6 +158,8 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.block_entities = UTL_ID_VECTOR_INITIALIZER(void*), // TODO block entity struct
 		.entities = UTL_DLL_INITIALIZER,
+		.players = UTL_BIT_VECTOR_INITIALIZER,
+		.subscribers = UTL_BIT_VECTOR_INITIALIZER,
 		.x = x,
 		.z = z,
 		.max_ticket = max_ticket,
@@ -375,8 +377,8 @@ void wld_free_region(wld_region_t* region) {
 	for (size_t i = 0; i < 32 * 32; ++i) {
 		if (region->chunks[i] != NULL) {
 			pthread_mutex_destroy(&region->chunks[i]->lock);
-			utl_bit_vector_term(&region->chunks[i]->subscribers);
-			utl_bit_vector_term(&region->chunks[i]->players);
+			utl_term_bit_vector(&region->chunks[i]->subscribers);
+			utl_term_bit_vector(&region->chunks[i]->players);
 			free(region->chunks[i]);
 		}
 	}

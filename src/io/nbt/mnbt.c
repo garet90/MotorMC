@@ -297,14 +297,14 @@ size_t mnbt_write(mnbt_doc* document, uint8_t* bytes, mnbt_compression compressi
 			return length;
 		}
 		case MNBT_GZIP: {
-			struct libdeflate_compressor* compressor = libdeflate_alloc_compressor(12);
+			struct libdeflate_compressor* compressor = libdeflate_alloc_compressor(6);
 			length = libdeflate_gzip_compress(compressor, bytes, length, bytes, length * 4);
 			libdeflate_free_compressor(compressor);
 
 			return length;
 		}
 		case MNBT_ZLIB: {
-			struct libdeflate_compressor* compressor = libdeflate_alloc_compressor(12);
+			struct libdeflate_compressor* compressor = libdeflate_alloc_compressor(6);
 			length = libdeflate_zlib_compress(compressor, bytes, length, bytes, length * 4);
 			libdeflate_free_compressor(compressor);
 
