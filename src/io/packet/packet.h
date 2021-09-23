@@ -8,10 +8,12 @@ typedef struct {
 
 	size_t cursor;
 	size_t length;
+
+	int32_t sub_length;
 	
 	io_endianness_t endianness : 1;
 	
-	byte_t length_prefix[5]; // the length of the packet
+	byte_t length_prefix[6]; // the length of the packet
 	byte_t bytes[];
 
 } pck_packet_t;

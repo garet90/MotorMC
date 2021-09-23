@@ -32,8 +32,10 @@ mnbt_doc* mnbt_read(const uint8_t* bytes, size_t* length, mnbt_compression compr
 			struct libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
 			uint8_t d_bytes[*length * 4];
 			
-			if (libdeflate_gzip_decompress(decompressor, bytes, *length, d_bytes, *length * 4, length) != LIBDEFLATE_SUCCESS)
+			if (libdeflate_gzip_decompress(decompressor, bytes, *length, d_bytes, *length * 4, length) != LIBDEFLATE_SUCCESS) {
+				libdeflate_free_decompressor(decompressor);
 				return NULL;
+			}
 			
 			libdeflate_free_decompressor(decompressor);
 
@@ -51,8 +53,10 @@ mnbt_doc* mnbt_read(const uint8_t* bytes, size_t* length, mnbt_compression compr
 		case MNBT_ZLIB: {
 			struct libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
 			uint8_t d_bytes[*length * 4];
-			if (libdeflate_zlib_decompress(decompressor, bytes, *length, d_bytes, *length * 4, length) != LIBDEFLATE_SUCCESS)
+			if (libdeflate_zlib_decompress(decompressor, bytes, *length, d_bytes, *length * 4, length) != LIBDEFLATE_SUCCESS) {
+				libdeflate_free_decompressor(decompressor);
 				return NULL;
+			}
 			
 			libdeflate_free_decompressor(decompressor);
 

@@ -14,7 +14,6 @@
 
 bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 
-	const int32_t length = pck_read_var_int(packet); // packet length
 	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
@@ -29,7 +28,7 @@ bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 	case 0x09:
 		return phd_handle_close_window(client, packet);
 	case 0x0a:
-		return phd_handle_plugin_message(client, packet, length);
+		return phd_handle_plugin_message(client, packet);
 	case 0x0f:
 		return phd_handle_keep_alive(client, packet);
 	case 0x11:
@@ -423,11 +422,11 @@ bool phd_handle_close_window(__attribute__((unused)) ltg_client_t* client, pck_p
 
 }
 
-bool phd_handle_plugin_message(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet, int32_t length) {
+bool phd_handle_plugin_message(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
 
 	PCK_READ_STRING(channel, packet);
 
-	int32_t payload_length = length - (1 + io_var_int_length(channel_length) + channel_length);
+	int32_t payload_length = packet->sub_length - (1 + io_var_int_length(channel_length) + channel_length);
 	byte_t payload[payload_length];
 	pck_read_bytes(packet, payload, payload_length);
 

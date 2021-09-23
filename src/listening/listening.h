@@ -183,21 +183,23 @@ typedef struct {
 	atomic_int_least64_t ping;
 
 	struct {
-		symmetric_CFB8 encrypt;
-		symmetric_CFB8 decrypt;
-		bool enabled;
-	} encryption;
-
-	struct {
 		struct sockaddr_in addr;
 		int size;
 	} address;
 
 	uint32_t keep_alive;
 
+	struct {
+		symmetric_CFB8 encrypt;
+		symmetric_CFB8 decrypt;
+		bool enabled : 1;
+	} encryption;
+
 	uint16_t protocol : 10;
 	uint8_t render_distance : 6;
 	ltg_chat_mode_t chat_mode : 2;
+
+	bool compression_enabled : 1;
 
 	ltg_state_t state : 2;
 

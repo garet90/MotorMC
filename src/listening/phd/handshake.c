@@ -5,12 +5,10 @@
 bool phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
 
 	// legacy server list ping
-	if (packet->length >= 3 && packet->bytes[0] == 0xFE && packet->bytes[1] == 0x01 && packet->bytes[2] == 0xFA) {
-		packet->cursor = packet->length;
+	if (packet->sub_length == 0x3F01) {
 		return phd_handle_legacy_slp(client, packet);
 	}
 
-	__attribute__((unused)) const int32_t length = pck_read_var_int(packet); // packet length
 	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {

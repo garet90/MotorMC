@@ -54,7 +54,7 @@ uint32_t job_new(job_type_t type, const job_payload_t payload) {
 		.payload = payload
 	};
 
-	uint32_t id;
+	uint32_t id = 0;
 
 	with_lock (&job_board.heap.lock) {
 
@@ -137,7 +137,7 @@ void job_free(uint32_t id) {
 
 uint32_t job_get() {
 
-	uint32_t job;
+	uint32_t job = 0;
 
 	// wait for jobs
 	with_lock (&job_board.queue.lock) {

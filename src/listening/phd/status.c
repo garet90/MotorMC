@@ -4,7 +4,6 @@
 
 bool phd_status(ltg_client_t* client, pck_packet_t* packet) {
 
-	__attribute__((unused)) const int32_t length = pck_read_var_int(packet); // packet length
 	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {

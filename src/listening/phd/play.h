@@ -15,7 +15,7 @@ extern bool phd_handle_tab_complete(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_click_window_button(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_close_window(ltg_client_t*, pck_packet_t*);
-extern bool phd_handle_plugin_message(ltg_client_t*, pck_packet_t*, int32_t);
+extern bool phd_handle_plugin_message(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_edit_book(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_query_entity_nbt(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_interact_entity(ltg_client_t*, pck_packet_t*);

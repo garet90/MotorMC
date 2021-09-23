@@ -33,7 +33,6 @@ size_t phd_auth_response_write(void* ptr, size_t size, size_t nmemb, string_t* r
 
 bool phd_login(ltg_client_t* client, pck_packet_t* packet) {
 
-	__attribute__((unused)) const int32_t length = pck_read_var_int(packet); // packet length
 	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
@@ -232,6 +231,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 	if (http_code != 200) {
 		
+		log_info("User attempted to login with an invalid session! (Server returned %ld)", http_code);
 		return false;
 
 	}
@@ -407,6 +407,8 @@ void phd_send_set_compression(ltg_client_t* client) {
 
 	ltg_send(client, packet);
 
+	client->compression_enabled = true;
+
 }
 
 void phd_send_login_plugin_request(ltg_client_t* client, const char* identifier, size_t identifier_length, const byte_t* data, size_t data_length) {
@@ -424,6 +426,8 @@ void phd_send_login_plugin_request(ltg_client_t* client, const char* identifier,
 }
 
 void phd_update_login_success(ltg_client_t* client) {
+
+	phd_send_set_compression(client);
 
 	// send login success packet
 	phd_send_login_success(client);
