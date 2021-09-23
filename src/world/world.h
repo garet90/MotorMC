@@ -71,7 +71,7 @@ struct wld_region {
 	
 	wld_world_t* const world; // typeof wld_world_t*
 
-	void* tick;
+	uint32_t tick;
 
 	// chunks
 	wld_chunk_t* _Atomic chunks[32 * 32];

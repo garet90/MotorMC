@@ -1,5 +1,5 @@
 #include "scheduler.h"
-#include "../board_private.h"
+#include "../board.h"
 #include "../../motor.h"
 #include "../../util/id_vector.h"
 #include "../../util/vector.h"
@@ -11,61 +11,64 @@ struct {
 	utl_vector_t tape;
 
 } sch_scheduler = {
+	.lock = PTHREAD_MUTEX_INITIALIZER,
 	.tape = UTL_VECTOR_INITIALIZER(utl_vector_t)
 };
 
-void sch_push_l(job_work_t* work, uint32_t delay) {
+static inline void sch_push_l(uint32_t id, uint32_t delay) {
 
-	if (delay >= sch_scheduler.tape.size) { // fill up to the delay with empty vectors
+	const utl_vector_t empty = UTL_VECTOR_INITIALIZER(uint32_t);
 
-		utl_vector_t empty = UTL_VECTOR_INITIALIZER(job_work_t*);
+	while (delay >= sch_scheduler.tape.size) { // fill up to the delay with empty vectors
 
-		while (delay >= sch_scheduler.tape.size) {
-			utl_vector_push(&sch_scheduler.tape, &empty);
-		}
+		utl_vector_push(&sch_scheduler.tape, &empty);
 	
 	}
 
 	utl_vector_t* vector = utl_vector_get(&sch_scheduler.tape, delay);
 
-	utl_vector_push(vector, &work);
+	utl_vector_push(vector, &id);
 
 }
 
-static inline void sch_push(job_work_t* work, uint32_t delay) {
+static inline void sch_push(uint32_t id, uint32_t delay) {
 
 	with_lock (&sch_scheduler.lock) {
 
-		sch_push_l(work, delay);
+		sch_push_l(id, delay);
 		
 	}
 
 }
 
-job_work_t* sch_schedule(job_work_t* job, uint32_t delay) {
+uint32_t sch_schedule(uint32_t id, uint32_t delay) {
 
 	assert(delay != 0);
 
-	sch_push(job, delay - 1);
+	sch_push(id, delay - 1);
 
-	return job;
+	return id;
 
 }
 
-job_work_t* sch_schedule_repeating(job_work_t* job, uint32_t delay, uint32_t interval) {
+uint32_t sch_schedule_repeating(uint32_t id, uint32_t delay, uint32_t interval) {
 
 	assert(delay != 0);
 	assert(interval != 0);
 
-	job->repeat = interval;
-	
-	sch_push(job, delay - 1);
+	job_work_t* job = utl_id_vector_get(&job_board.heap.jobs, id);
 
-	return job;
+	job->repeat = interval;
+
+	sch_push(id, delay - 1);
+
+	return id;
 
 }
 
-void sch_cancel(job_work_t* work) {
+void sch_cancel(uint32_t id) {
+
+	job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
 
 	if (work == NULL) return;
 
@@ -85,32 +88,38 @@ void sch_tick() {
 
 		utl_vector_t* vector = utl_vector_get(&sch_scheduler.tape, 0);
 
-		with_lock (&job_board.lock) {
+		if (vector->size > 0) {
 
-			for (uint32_t i = 0; i < vector->size; ++i) {
+			with_lock (&job_board.queue.lock) {
 
-				job_work_t* scheduled = UTL_VECTOR_GET_AS(job_work_t*, vector, i);
+				for (uint32_t i = 0; i < vector->size; ++i) {
 
-				if (!scheduled->canceled) {
+					uint32_t id = UTL_VECTOR_GET_AS(uint32_t, vector, i);
 
-					utl_list_push(&job_board.list, scheduled);
+					job_work_t* scheduled = utl_id_vector_get(&job_board.heap.jobs, id);
 
-					if (scheduled->repeat) {
+					if (!scheduled->canceled) {
 
-						sch_push_l(scheduled, scheduled->repeat);
+						utl_list_push(&job_board.queue.list, &id);
+
+						if (scheduled->repeat) {
+
+							sch_push_l(id, scheduled->repeat);
+
+						}
+
+					} else {
+
+						scheduled->repeat = 0;
+						job_free(id);
 
 					}
-
-				} else {
-
-					scheduled->repeat = 0;
-					job_free(scheduled);
 
 				}
 
 			}
 
-			pthread_cond_broadcast(&job_board.wait);
+			job_resume();
 
 		}
 

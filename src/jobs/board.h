@@ -1,5 +1,26 @@
 #pragma once
+#include <assert.h>
+#include <pthread.h>
 #include "../main.h"
+#include "../util/list.h"
+#include "../listening/listening.h"
+
+typedef struct {
+
+	struct {
+		pthread_mutex_t lock;
+		pthread_cond_t wait;
+		utl_list_t list;
+	} queue;
+
+	struct {
+		pthread_mutex_t lock;
+		utl_id_vector_t jobs;
+	} heap;
+
+} job_board_t;
+
+extern job_board_t job_board;
 
 typedef enum {
 
@@ -15,23 +36,51 @@ typedef enum {
 
 } job_type_t;
 
+typedef union {
+
+	ltg_client_t* client;
+
+	struct {
+
+		ltg_client_t* client;
+		string_t message;
+
+	} global_chat_message;
+
+	struct {
+
+		ltg_uuid_t uuid;
+		string_t username;
+
+	} player_leave;
+
+	wld_region_t* region;
+
+} job_payload_t;
+
 typedef struct {
 
-	const job_type_t type : 8;
-	atomic_uint_least8_t repeat;
-	atomic_uint_least8_t on_board;
-	atomic_uint_least8_t canceled;
+	const job_type_t type : 3;
+	uint8_t repeat;
+	uint8_t on_board;
+	bool canceled;
+
+	job_payload_t payload;
 
 } job_work_t;
 
-typedef bool (*job_handler_t) (job_work_t*);
+extern uint32_t job_new(job_type_t type, job_payload_t payload);
 
-extern void job_add_handler(job_type_t, job_handler_t);
-extern void job_handle(job_work_t*);
-extern void job_add(job_work_t*);
-extern void job_free(job_work_t*);
+typedef bool (*job_handler_t) (job_payload_t* payload);
 
-extern job_work_t* job_get();
+extern void job_add_handler(job_type_t type, job_handler_t handler);
+extern void job_handle(uint32_t id);
+extern void job_add(uint32_t id);
+extern void job_resume();
+
+extern void job_free(uint32_t id);
+
+extern uint32_t job_get();
 
 extern size_t job_get_count();
 

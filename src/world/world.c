@@ -4,7 +4,6 @@
 #include "../listening/listening.h"
 #include "../io/logger/logger.h"
 #include "../motor.h"
-#include "../jobs/jobs.h"
 #include "../jobs/scheduler/scheduler.h"
 #include "entity/entity.h"
 #include <stdlib.h>
@@ -96,13 +95,12 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 	const int64_t key = ((uint64_t) x << 16) + z;
 
 	// tick job
-	JOB_CREATE_WORK(tick_job, job_tick_region);
-	tick_job->region = region;
+	uint32_t tick_job = job_new(job_tick_region, (job_payload_t) { .region = region });
 
 	with_lock (&world->lock) {
 		wld_region_t region_init = (wld_region_t) {
 			.world = world,
-			.tick = sch_schedule_repeating(&tick_job->header, 1, 1),
+			.tick = sch_schedule_repeating(tick_job, 1, 1),
 			.x = x,
 			.z = z,
 			.relative = {
@@ -321,9 +319,7 @@ void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
 		// unloading chunk
 		chunk->region->loaded_chunks -= 1;
 		if (chunk->region->loaded_chunks == 0) {
-			JOB_CREATE_WORK(unload_job, job_unload_region);
-			unload_job->region = chunk->region;
-			sch_schedule(&unload_job->header, 100); // set to try unload in 5 seconds
+			sch_schedule(job_new(job_unload_region, (job_payload_t) { .region = chunk->region }), 100); // set to try unload in 5 seconds
 		}
 	}
 	chunk->ticket = ticket;

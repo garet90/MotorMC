@@ -8,7 +8,6 @@
 #include "../../world/entity/entity.h"
 #include "../../world/item/recipe/recipe.h"
 #include "../../jobs/board.h"
-#include "../../jobs/jobs.h"
 #include "../../jobs/scheduler/scheduler.h"
 #include "../../util/util.h"
 #include "../../util/long_encode.h"
@@ -82,12 +81,7 @@ bool phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 		cmd_handle(UTL_STRTOCSTR(message) + 1, &sender);
 		free(UTL_STRTOCSTR(message));
 	} else {
-		JOB_CREATE_WORK(job, job_global_chat_message);
-
-		job->sender = client;
-		job->message = message;
-
-		job_add(&job->header);
+		job_add(job_new(job_global_chat_message, (job_payload_t) { .global_chat_message = { .client = client, .message = message } }));
 	}
 
 	return true;
@@ -983,9 +977,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	clock_gettime(CLOCK_REALTIME, &time);
 	client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
 
-	JOB_CREATE_WORK(keep_alive, job_keep_alive);
-	keep_alive->client = client;
-	client->keep_alive = sch_schedule_repeating(&keep_alive->header, 200, 200);
+	client->keep_alive = sch_schedule_repeating(job_new(job_keep_alive, (job_payload_t) { .client = client }), 200, 200);
 
 	const mat_codec_t* codec = mat_get_codec();
 	const mat_codec_t* dimension_codec = mat_get_dimension_codec(player_world->environment);
@@ -1061,10 +1053,9 @@ void phd_send_join_game(ltg_client_t* client) {
 	// add to online players
 	client->online_node = utl_dll_push(&sky_main.listener.online.list, client);
 
-	JOB_CREATE_WORK(work, job_player_join);
-	work->player = client;
+	uint32_t work = job_new(job_player_join, (job_payload_t) { .client = client });
 
-	job_add(&work->header);
+	job_add(work);
 
 }
 

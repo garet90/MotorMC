@@ -1,7 +1,6 @@
 #include "listening.h"
 #include "../motor.h"
 #include "../jobs/board.h"
-#include "../jobs/jobs.h"
 #include "../jobs/scheduler/scheduler.h"
 #include "../util/util.h"
 #include "../io/logger/logger.h"
@@ -75,7 +74,6 @@ void* t_ltg_run(void* input) {
 			client->address.addr = address;
 			client->address.size = address_size;
 			client->state = ltg_handshake;
-			client->keep_alive = NULL;
 
 			// accept the client
 			ltg_accept(client);
@@ -227,12 +225,15 @@ void ltg_disconnect(ltg_client_t* client) {
 			utl_dll_remove(&sky_main.listener.online.list, client->online_node);
 		}
 
-		JOB_CREATE_WORK(work, job_player_leave);
-		memcpy(work->uuid, client->uuid, sizeof(ltg_uuid_t));
+		job_payload_t payload = {
+			.player_leave = {
+				.username = client->username
+			}
+		};
+		memcpy(payload.player_leave.uuid, client->uuid, sizeof(ltg_uuid_t));
+		uint32_t work = job_new(job_player_leave, payload);
 		
-		work->username = client->username;
-
-		job_add(&work->header);
+		job_add(work);
 		
 		phd_update_sent_chunks_leave(client);
 		ent_free_entity((ent_entity_t*) client->entity);

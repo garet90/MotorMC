@@ -1,28 +1,28 @@
-#include "board_private.h"
+#include "board.h"
 #include "handlers.h"
 #include "../motor.h"
 #include "../util/vector.h"
 
 UTL_VECTOR_DEFAULT(job_keep_alive_handlers, job_handler_t, 
-	(job_handler_t) job_handle_keep_alive
+	job_handle_keep_alive
 );
 UTL_VECTOR_DEFAULT(job_global_chat_message_handlers, job_handler_t,
-	(job_handler_t) job_handle_global_chat_message
+	job_handle_global_chat_message
 );
 UTL_VECTOR_DEFAULT(job_player_join_handlers, job_handler_t,
-	(job_handler_t) job_handle_player_join
+	job_handle_player_join
 );
 UTL_VECTOR_DEFAULT(job_player_leave_handlers, job_handler_t,
-	(job_handler_t) job_handle_player_leave
+	job_handle_player_leave
 );
 UTL_VECTOR_DEFAULT(job_send_update_pings_handlers, job_handler_t,
-	(job_handler_t) job_handle_send_update_pings
+	job_handle_send_update_pings
 );
 UTL_VECTOR_DEFAULT(job_tick_region_handlers, job_handler_t,
-	(job_handler_t) job_handle_tick_region
+	job_handle_tick_region
 );
 UTL_VECTOR_DEFAULT(job_unload_region_handlers, job_handler_t,
-	(job_handler_t) job_handle_unload_region,
+	job_handle_unload_region,
 );
 
 UTL_VECTOR_DEFAULT(job_handlers, utl_vector_t*,
@@ -36,10 +36,35 @@ UTL_VECTOR_DEFAULT(job_handlers, utl_vector_t*,
 );
 
 job_board_t job_board = {
-	.lock = PTHREAD_MUTEX_INITIALIZER,
-	.wait = PTHREAD_COND_INITIALIZER,
-	.list = UTL_LIST_INITIALIZER
+	.queue = {
+		.lock = PTHREAD_MUTEX_INITIALIZER,
+		.wait = PTHREAD_COND_INITIALIZER,
+		.list = UTL_LIST_INITIALIZER(uint32_t)
+	},
+	.heap = {
+		.lock = PTHREAD_MUTEX_INITIALIZER,
+		.jobs = UTL_ID_VECTOR_INITIALIZER(job_work_t)
+	}
 };
+
+uint32_t job_new(job_type_t type, const job_payload_t payload) {
+
+	const job_work_t init = {
+		.type = type,
+		.payload = payload
+	};
+
+	uint32_t id;
+
+	with_lock (&job_board.heap.lock) {
+
+		id = utl_id_vector_push(&job_board.heap.jobs, &init);
+
+	}
+
+	return id;
+
+}
 
 void job_add_handler(job_type_t job, job_handler_t handler) {
 	
@@ -47,7 +72,9 @@ void job_add_handler(job_type_t job, job_handler_t handler) {
 
 }
 
-void job_handle(job_work_t* work) {
+void job_handle(uint32_t id) {
+
+	job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
 
 	if (work == NULL) return;
 
@@ -58,7 +85,7 @@ void job_handle(job_work_t* work) {
 		for (size_t i = 0; i < work_handlers->size; ++i) {
 
 			job_handler_t handler = UTL_VECTOR_GET_AS(job_handler_t, work_handlers, i);
-			if (!handler(work)) {
+			if (!handler(&work->payload)) {
 				break;
 			}
 
@@ -68,31 +95,33 @@ void job_handle(job_work_t* work) {
 
 	work->on_board--;
 
-	job_free(work);
+	job_free(id);
 
 }
 
-void job_add(job_work_t* work) {
-
-	if (work != NULL) {
-
-		work->on_board++;
-
-		with_lock (&job_board.lock) {
-			utl_list_push(&job_board.list, work);
-		}
-
-		pthread_cond_signal(&job_board.wait);
-		
-	} else {
-
-		pthread_cond_broadcast(&job_board.wait);
+void job_add(uint32_t id) {
 	
+	job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
+
+	work->on_board++;
+
+	with_lock (&job_board.queue.lock) {
+		utl_list_push(&job_board.queue.list, &id);
 	}
 
+	pthread_cond_signal(&job_board.queue.wait);
+
 }
 
-void job_free(job_work_t* work) {
+void job_resume() {
+
+	pthread_cond_broadcast(&job_board.queue.wait);
+
+}
+
+void job_free(uint32_t id) {
+
+	job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
 
 	if (work->repeat) {
 		return;
@@ -102,32 +131,33 @@ void job_free(job_work_t* work) {
 		return;
 	}
 
-	free(work);
+	utl_id_vector_remove(&job_board.heap.jobs, id);
 
 }
 
-job_work_t* job_get() {
+uint32_t job_get() {
 
-	job_work_t* job = NULL;
+	uint32_t job;
 
 	// wait for jobs
-	with_lock (&job_board.lock) {
+	with_lock (&job_board.queue.lock) {
 	
-		while (job_board.list.length == 0) {
+		while (job_board.queue.list.length == 0) {
 		
 			if (sky_main.status == sky_stopping) {
 
-				pthread_mutex_unlock(&job_board.lock);
+				pthread_mutex_unlock(&job_board.queue.lock);
 
-				return NULL;
+				return 0;
 
 			}
 
-			pthread_cond_wait(&job_board.wait, &job_board.lock);
+			pthread_cond_wait(&job_board.queue.wait, &job_board.queue.lock);
 		
 		}
-
-		job = utl_list_shift(&job_board.list);
+		
+		memcpy(&job, utl_list_first(&job_board.queue.list), sizeof(uint32_t));
+		utl_list_shift(&job_board.queue.list);
 
 	}
 
@@ -139,8 +169,8 @@ size_t job_get_count() {
 
 	size_t length = 0;
 
-	with_lock (&job_board.lock) {
-		length = job_board.list.length;
+	with_lock (&job_board.queue.lock) {
+		length = job_board.queue.list.length;
 	}
 
 	return length;

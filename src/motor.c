@@ -439,8 +439,7 @@ int main(int argc, char* argv[]) {
 
 void* t_sky_main(__attribute__((unused)) void* input) {
 
-	JOB_CREATE_WORK(update_pings, job_send_update_pings);
-	sch_schedule_repeating(&update_pings->header, 200, 200);
+	sch_schedule_repeating(job_new(job_send_update_pings, (job_payload_t) {}), 200, 200);
 
 	struct timespec nextTick, currentTime, sleepTime;
 
@@ -511,7 +510,7 @@ void sky_term() {
 	// join to each worker
 
 	// resume workers waiting for jobs
-	job_add(NULL);
+	job_resume();
 
 	for (size_t i = 0; i < sky_main.workers.vector.size; ++i) {
 
