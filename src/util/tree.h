@@ -61,9 +61,10 @@ static inline void utl_tree_put(utl_tree_t* tree, uint32_t key, void* value) {
 	} else {
 		// find where to put this branch
 		uint32_t look_idx = tree->root;
-		utl_tree_branch_t* look = utl_id_vector_get(&tree->nodes, look_idx);
 
-		do {
+		for (;;) {
+
+			utl_tree_branch_t* look = utl_id_vector_get(&tree->nodes, look_idx);
 
 			if (key > look->key) {
 
@@ -79,13 +80,15 @@ static inline void utl_tree_put(utl_tree_t* tree, uint32_t key, void* value) {
 					};
 					
 					tree->length++;
-					look->right = utl_id_vector_push(&tree->nodes, &branch);
+					const uint32_t idx = utl_id_vector_push(&tree->nodes, &branch);
+					// get look again because realloc can change the pointer
+					look = utl_id_vector_get(&tree->nodes, look_idx);
+					look->right = idx;
 					
 					return;
 
 				} else {
 					look_idx = look->right;
-					look = utl_id_vector_get(&tree->nodes, look_idx);
 					continue;
 				}
 
@@ -103,13 +106,15 @@ static inline void utl_tree_put(utl_tree_t* tree, uint32_t key, void* value) {
 					};
 					
 					tree->length++;
-					look->left = utl_id_vector_push(&tree->nodes, &branch);
+					const uint32_t idx = utl_id_vector_push(&tree->nodes, &branch);
+					// get look again because realloc can change the pointer
+					look = utl_id_vector_get(&tree->nodes, look_idx);
+					look->left = idx;
 
 					return;
 
 				} else {
 					look_idx = look->left;
-					look = utl_id_vector_get(&tree->nodes, look_idx);
 					continue;
 				}
 
@@ -118,7 +123,7 @@ static inline void utl_tree_put(utl_tree_t* tree, uint32_t key, void* value) {
 				return;
 			}
 
-		} while (true);
+		}
 	}
 
 }
@@ -132,7 +137,7 @@ static inline void* utl_tree_get(const utl_tree_t* tree, uint32_t key) {
 
 		utl_tree_branch_t* look = utl_id_vector_get(&tree->nodes, tree->root);
 
-		do {
+		for (;;) {
 
 			if (key > look->key) {
 
@@ -166,7 +171,7 @@ static inline void* utl_tree_get(const utl_tree_t* tree, uint32_t key) {
 
 			}
 
-		} while (true);
+		}
 
 	}
 
@@ -181,9 +186,10 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 	} else {
 
 		uint32_t look_idx = tree->root;
-		utl_tree_branch_t* look = utl_id_vector_get(&tree->nodes, look_idx);
 
-		do {
+		for (;;) {
+
+			utl_tree_branch_t* look = utl_id_vector_get(&tree->nodes, look_idx);
 
 			if (key > look->key) {
 
@@ -194,7 +200,6 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 				} else {
 
 					look_idx = look->right;
-					look = utl_id_vector_get(&tree->nodes, look_idx);
 					continue;
 
 				}
@@ -208,7 +213,6 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 				} else {
 
 					look_idx = look->left;
-					look = utl_id_vector_get(&tree->nodes, look_idx);
 					continue;
 
 				}
@@ -217,7 +221,7 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 
 				if (look->left == UTL_TREE_NULL && look->right == UTL_TREE_NULL) {
 					
-					if (look_idx != tree->root) {
+					if (look->parent != UTL_TREE_NULL) {
 						utl_tree_branch_t* parent = utl_id_vector_get(&tree->nodes, look->parent);
 
 						if (parent->left == look_idx) {
@@ -229,6 +233,7 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 						tree->root = UTL_TREE_NULL;
 					}
 
+					tree->length--;
 					utl_id_vector_remove(&tree->nodes, look_idx);
 
 				} else if (look->left != UTL_TREE_NULL && look->right != UTL_TREE_NULL) {
@@ -248,11 +253,9 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 					look->key = new_key;
 					look->value = new_value;
 
-					return;
-
 				} else if (look->left != UTL_TREE_NULL) {
 
-					if (look_idx != tree->root) {
+					if (look->parent != UTL_TREE_NULL) {
 						utl_tree_branch_t* parent = utl_id_vector_get(&tree->nodes, look->parent);
 
 						if (parent->left == look_idx) {
@@ -264,11 +267,12 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 						tree->root = look->left;
 					}
 					
+					tree->length--;
 					utl_id_vector_remove(&tree->nodes, look_idx);
 
 				} else if (look->right != UTL_TREE_NULL) {
 
-					if (look_idx != tree->root) {
+					if (look->parent != UTL_TREE_NULL) {
 						utl_tree_branch_t* parent = utl_id_vector_get(&tree->nodes, look->parent);
 
 						if (parent->left == look_idx) {
@@ -280,6 +284,7 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 						tree->root = look->right;
 					}
 					
+					tree->length--;
 					utl_id_vector_remove(&tree->nodes, look_idx);
 
 				}
@@ -288,11 +293,9 @@ static inline void utl_tree_remove(utl_tree_t* tree, uint32_t key) {
 
 			}
 
-		} while (true);
+		}
 
 	}
-
-	tree->length--;
 
 }
 
@@ -306,7 +309,7 @@ static inline void* utl_tree_shift(utl_tree_t* tree) {
 
 		utl_tree_branch_t* look = utl_id_vector_get(&tree->nodes, tree->root);
 
-		do {
+		for (;;) {
 
 			if (look->left != UTL_TREE_NULL) {
 
@@ -318,13 +321,14 @@ static inline void* utl_tree_shift(utl_tree_t* tree) {
 
 			} else {
 
+				// TODO optimize remove (because it is a free branch)
 				void* value = look->value;
 				utl_tree_remove(tree, look->key);
 				return value;
 
 			}
 
-		} while (true);
+		}
 
 	}
 
