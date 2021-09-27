@@ -392,7 +392,8 @@ void phd_send_set_compression(ltg_client_t* client) {
 
 	ltg_send(client, packet);
 
-	client->compression_enabled = true;
+	if (sky_main.listener.network_compression_threshold > 0)
+		client->compression_enabled = true;
 
 }
 
