@@ -20,7 +20,7 @@ void log_command(const cht_component_t* chat) {
 
 }
 
-void log_info(const char* format, ...) {
+static inline void log_put(const char* prefix, const char* format, va_list args) {
 
 	with_lock (&log_lock) {
 
@@ -33,14 +33,10 @@ void log_info(const char* format, ...) {
 #else
 		localtime_r(&now, &tm_struct);
 #endif
-		fprintf(stdout, LOG_P1 "0" LOG_P2 "INFO" LOG_P3, tm_struct.tm_hour, tm_struct.tm_min, tm_struct.tm_sec);
+		fprintf(stdout, prefix, tm_struct.tm_hour, tm_struct.tm_min, tm_struct.tm_sec);
 
 		// body
-		va_list args;
-		va_start(args, format);
-
 		vfprintf(stdout, format, args);
-		va_end(args);
 
 		// suffix
 		fprintf(stdout, LOG_S1);
@@ -54,69 +50,36 @@ void log_info(const char* format, ...) {
 
 }
 
+void log_info(const char* format, ...) {
+
+	va_list args;
+	va_start(args, format);
+
+	log_put(LOG_P1 "0" LOG_P2 "INFO" LOG_P3, format, args);
+	
+	va_end(args);
+
+}
+
 void log_warn(const char* format, ...) {
+	
+	va_list args;
+	va_start(args, format);
 
-	with_lock(&log_lock) {
-
-		// prefix
-		const time_t now = time(NULL);
-		struct tm tm_struct;
-#ifdef __WINDOWS__
-		localtime_s(&tm_struct, &now);
-#else
-		localtime_r(&now, &tm_struct);
-#endif
-		fprintf(stdout, LOG_P1 "93" LOG_P2 "WARN" LOG_P3, tm_struct.tm_hour, tm_struct.tm_min, tm_struct.tm_sec);
-
-		// body
-		va_list args;
-		va_start(args, format);
-
-		vfprintf(stdout, format, args);
-		va_end(args);
-
-		// suffix
-		fprintf(stdout, LOG_S1);
-
-		if (sky_main.status == sky_running)
-			fprintf(stdout, "> ");
-
-		fflush(stdout);
-
-	}
+	log_put(LOG_P1 "93" LOG_P2 "WARN" LOG_P3, format, args);
+	
+	va_end(args);
 
 }
 
 void log_error(const char* format, ...) {
 
-	with_lock (&log_lock) {
+	va_list args;
+	va_start(args, format);
 
-		// prefix
-		const time_t now = time(NULL);
-		struct tm tm_struct;
-#ifdef __WINDOWS__
-		localtime_s(&tm_struct, &now);
-#else
-		localtime_r(&now, &tm_struct);
-#endif
-		fprintf(stdout, LOG_P1 "91" LOG_P2 "ERROR" LOG_P3, tm_struct.tm_hour, tm_struct.tm_min, tm_struct.tm_sec);
-
-		// body
-		va_list args;
-		va_start(args, format);
-
-		vfprintf(stdout, format, args);
-		va_end(args);
-
-		// suffix
-		fprintf(stdout, LOG_S1);
-
-		if (sky_main.status == sky_running)
-			fprintf(stdout, "> ");
-
-		fflush(stdout);
-
-	}
+	log_put(LOG_P1 "91" LOG_P2 "ERROR" LOG_P3, format, args);
+	
+	va_end(args);
 
 }
 

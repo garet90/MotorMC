@@ -20,30 +20,6 @@ typedef struct {
 
 #define UTL_LIST_INITIALIZER(type) { .nodes = { .array = { .array = NULL, .size = 0, .capacity = 0, .bytes_per_element = (sizeof(utl_list_node_t) + sizeof(type)) }, .next_id = UTL_VECTOR_INITIALIZER(uint32_t) }, .first = 0, .last = 0, .length = 0 }
 
-static inline utl_list_t* utl_create_list(uint32_t bytes_per_element) {
-
-	utl_list_t init = {
-		.nodes = {
-			.array = {
-				.array = NULL,
-				.size = 0,
-				.capacity = 0,
-				.bytes_per_element = (sizeof(utl_list_node_t) + bytes_per_element)
-			},
-			.next_id = UTL_VECTOR_INITIALIZER(uint32_t)
-		},
-		.first = 0,
-		.last = 0,
-		.length = 0
-	};
-
-	utl_list_t* list = malloc(sizeof(utl_list_t));
-	memcpy(list, &init, sizeof(utl_list_t));
-
-	return list;
-
-}
-
 static inline void utl_init_list(utl_list_t* list, uint32_t bytes_per_element) {
 
 	utl_list_t init = {
@@ -62,6 +38,15 @@ static inline void utl_init_list(utl_list_t* list, uint32_t bytes_per_element) {
 	};
 
 	memcpy(list, &init, sizeof(utl_list_t));
+
+}
+
+static inline utl_list_t* utl_create_list(uint32_t bytes_per_element) {
+
+	utl_list_t* list = malloc(sizeof(utl_list_t));
+	utl_init_list(list, bytes_per_element);
+
+	return list;
 
 }
 

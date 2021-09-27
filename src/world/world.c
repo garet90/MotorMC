@@ -212,55 +212,7 @@ wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
 
 wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z) {
 
-	x += chunk->x;
-	z += chunk->z;
-
-	int16_t r_x = x >> 5;
-	int16_t r_z = z >> 5;
-
-	x &= 0x1F;
-	z &= 0x1F;
-
-	wld_region_t* region = chunk->region;
-
-	while (r_x < 0) {
-		if (region->relative.west == NULL) {
-			region = wld_get_region(region->world, region->x - 1, region->z);
-		} else {
-			region = region->relative.west;
-		}
-		r_x++;
-	}
-	while (r_x > 0) {
-		if (region->relative.east == NULL) {
-			region = wld_get_region(region->world, region->x + 1, region->z);
-		} else {
-			region = region->relative.east;
-		}
-		r_x--;
-	}
-
-	while (r_z < 0) {
-		if (region->relative.north == NULL) {
-			region = wld_get_region(region->world, region->x, region->z - 1);
-		} else {
-			region = region->relative.north;
-		}
-		r_z++;
-	}
-	while (r_z > 0) {
-		if (region->relative.south == NULL) {
-			region = wld_get_region(region->world, region->x, region->z + 1);
-		} else {
-			region = region->relative.south;
-		}
-		r_z--;
-	}
-
-	if (region->chunks[(x << 5) + z] == NULL) {
-		wld_gen_chunk(region, x, z, WLD_TICKET_MAX);
-	}
-	return region->chunks[(x << 5) + z];
+	return wld_gen_relative_chunk(chunk, x, z, WLD_TICKET_MAX);
 
 }
 
@@ -411,19 +363,7 @@ void wld_unload_all() {
 
 	for (uint32_t i = 0; i < wld_worlds.array.size; ++i) {
 		wld_world_t* world = UTL_ID_VECTOR_GET_AS(wld_world_t*, &wld_worlds, i);
-		utl_id_vector_remove(&wld_worlds, i);
-
-		with_lock (&world->lock) {
-			wld_region_t* region;
-			while ((region = utl_tree_shift(&world->regions)) != NULL) {
-				wld_free_region(region);
-			}
-			utl_term_tree(&world->regions);
-		}
-
-		pthread_mutex_destroy(&world->lock);
-
-		free(world);
+		wld_unload(world);
 	}
 
 }

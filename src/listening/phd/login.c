@@ -58,39 +58,25 @@ bool phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 
 	if (client->protocol != sky_main.protocol) {
 
+		cht_translation_t translation = cht_translation_new;
+
 		if (client->protocol < sky_main.protocol) {
-
-			cht_translation_t translation = cht_translation_new;
 			translation.translate = cht_translation_multiplayer_disconnect_outdated_client;
-			cht_component_t version = cht_new;
-			version.text = UTL_CSTRTOSTR(__MC_VER__);
-			
-			cht_add_with(&translation, &version);
-
-			char message[128];
-			const size_t message_len = cht_write_translation(&translation, message);
-
-			phd_send_disconnect_login(client, message, message_len);
-
-			cht_term_translation(&translation);
-
 		} else {
-
-			cht_translation_t translation = cht_translation_new;
 			translation.translate = cht_translation_multiplayer_disconnect_outdated_server;
-			cht_component_t version = cht_new;
-			version.text = UTL_CSTRTOSTR(__MC_VER__);
-			
-			cht_add_with(&translation, &version);
-
-			char message[128];
-			const size_t message_len = cht_write_translation(&translation, message);
-
-			phd_send_disconnect_login(client, message, message_len);
-
-			cht_term_translation(&translation);
-
 		}
+
+		cht_component_t version = cht_new;
+		version.text = UTL_CSTRTOSTR(__MC_VER__);
+		
+		cht_add_with(&translation, &version);
+
+		char message[128];
+		const size_t message_len = cht_write_translation(&translation, message);
+
+		phd_send_disconnect_login(client, message, message_len);
+
+		cht_term_translation(&translation);
 
 		return false;
 	}

@@ -252,6 +252,24 @@ bool ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 
 }
 
+// send encryption step (used in compressed and uncompressed)
+static inline void ltg_send_e(ltg_client_t* client, byte_t* bytes, size_t length) {
+	
+	if (client->encryption.enabled) {
+
+		// encrypt packet
+		byte_t encrypted[length];
+
+		cfb8_encrypt(bytes, encrypted, length, &client->encryption.encrypt);
+
+		sck_send(client->socket, (char*) encrypted, length);
+
+	} else {
+		sck_send(client->socket, (char*) bytes, length);
+	}
+
+}
+
 // sends the packet to the client specified
 void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
@@ -283,18 +301,7 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 				io_write_var_int(bytes + packet_length_length, length, 5);
 				length = compressed_length + data_length_length + packet_length_length;
 
-				if (client->encryption.enabled) {
-
-					// encrypt packet
-					byte_t encrypted[length];
-
-					cfb8_encrypt(bytes, encrypted, length, &client->encryption.encrypt);
-
-					sck_send(client->socket, (char*) encrypted, length);
-
-				} else {
-					sck_send(client->socket, (char*) bytes, length);
-				}
+				ltg_send_e(client, bytes, length);
 
 				return;
 
@@ -318,18 +325,7 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 	}
 
-	if (client->encryption.enabled) {
-
-		// encrypt packet
-		byte_t encrypted[length];
-
-		cfb8_encrypt(bytes, encrypted, length, &client->encryption.encrypt);
-
-		sck_send(client->socket, (char*) encrypted, length);
-
-	} else {
-		sck_send(client->socket, (char*) bytes, length);
-	}
+	ltg_send_e(client, bytes, length);
 
 }
 
