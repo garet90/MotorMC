@@ -156,16 +156,13 @@ typedef byte_t ltg_uuid_t[16];
 
 typedef struct {
 
+	// client's thread
 	pthread_t thread;
 	
-	uint32_t online_node;
-	ent_player_t* _Atomic entity;
+	// player entity (only non-null when in PLAY state)
+	ent_player_t* entity;
 
-	uint32_t id;
-
-	// address
-	int32_t socket;
-
+	// textures (only non-null after auth)
 	struct {
 		string_t value;
 		string_t signature;
@@ -173,19 +170,26 @@ typedef struct {
 
 	string_t username;
 
-	ltg_locale_t locale;
+	// last recieved packet
+	atomic_int_least64_t last_recv;
+
+	atomic_int_least64_t ping;
 
 	ltg_uuid_t uuid;
-
-	uint32_t verify;
-
-	atomic_int_least64_t last_recv;
-	atomic_int_least64_t ping;
 
 	struct {
 		struct sockaddr_in addr;
 		int size;
 	} address;
+
+	uint32_t online_node;
+
+	uint32_t id;
+
+	// address
+	int32_t socket;
+
+	ltg_locale_t locale;
 
 	uint32_t keep_alive;
 

@@ -7,3 +7,5 @@
 
 #define UTL_STRTOARG(str) str.value, str.length
 #define UTL_CSTRTOARG(str) str, sizeof(str) - 1 
+
+#define UTL_FREESTR(str) if (str.value != NULL) free(str.value)

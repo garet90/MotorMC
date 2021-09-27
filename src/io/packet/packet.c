@@ -54,6 +54,7 @@ void pck_write_bytes(pck_packet_t* packet, const byte_t* bytes, int32_t length) 
 
 }
 
+// i know, terribly written function, it's debug, not production don't worry
 #if NDEBUG
 #else
 void pck_log(pck_packet_t* packet) {

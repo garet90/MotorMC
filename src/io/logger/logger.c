@@ -27,6 +27,7 @@ void log_info(const char* format, ...) {
 		// prefix
 		const time_t now = time(NULL);
 		struct tm tm_struct;
+		// i have no idea why, but windows and *nix use different localtime secure functions
 #ifdef __WINDOWS__
 		localtime_s(&tm_struct, &now);
 #else

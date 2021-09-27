@@ -342,44 +342,50 @@ void ltg_disconnect(ltg_client_t* client) {
 		
 	sck_shutdown(client->socket);
 
-	// cancel keep alive
-	sch_cancel(client->keep_alive);
+	switch (client->state) {
+		case ltg_play: {
+			// cancel keep alive
+			sch_cancel(client->keep_alive);
 
-	// if we're on the online players list, remove it
-	if (client->entity != NULL) {
-
-		with_lock (&sky_main.listener.online.lock) {
-			utl_dll_remove(&sky_main.listener.online.list, client->online_node);
-		}
-
-		job_payload_t payload = {
-			.player_leave = {
-				.username = client->username
+			// remove from online player list
+			with_lock (&sky_main.listener.online.lock) {
+				utl_dll_remove(&sky_main.listener.online.list, client->online_node);
 			}
-		};
-		memcpy(payload.player_leave.uuid, client->uuid, sizeof(ltg_uuid_t));
-		uint32_t work = job_new(job_player_leave, payload);
-		
-		job_add(work);
-		
-		phd_update_sent_chunks_leave(client);
-		ent_free_entity((ent_entity_t*) client->entity);
+
+			// create player leave job
+			job_payload_t payload = {
+				.player_leave = {
+					.username_length = client->username.length
+				}
+			};
+			payload.player_leave.username[payload.player_leave.username_length] = 0;
+			memcpy(payload.player_leave.username, client->username.value, client->username.length);
+			memcpy(payload.player_leave.uuid, client->uuid, sizeof(ltg_uuid_t));
+			uint32_t work = job_new(job_player_leave, payload);
+			
+			job_add(work);
+			
+			phd_update_sent_chunks_leave(client);
+			ent_free_entity((ent_entity_t*) client->entity);
+		} break;
+		default: {
+			// do nothing extra
+		} break;
 	}
 
 	sck_close(client->socket);
 
-	// lock clients
+	// remove from client list
 	with_lock (&sky_main.listener.clients.lock) {
 		utl_id_vector_remove(&sky_main.listener.clients.vector, client->id);
 	}
 
+	// free username
+	UTL_FREESTR(client->username);
+
 	// free skin
-	if (client->textures.value.value != NULL) {
-		free(client->textures.value.value);
-	}
-	if (client->textures.signature.value != NULL) {
-		free(client->textures.signature.value);
-	}
+	UTL_FREESTR(client->textures.value);
+	UTL_FREESTR(client->textures.signature);
 
 	// free encryption key
 	if (client->encryption.enabled) {

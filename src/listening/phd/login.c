@@ -160,7 +160,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 	// decrypt and check verify
 	cry_rsa_decrypt(verify.bytes, verify.bytes, verify.length, &sky_main.listener.keypair);
-	if (verify.key != client->verify) {
+	if (verify.key != client->id) {
 
 		return false;
 
@@ -337,7 +337,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 bool phd_handle_login_plugin_response(ltg_client_t* client, pck_packet_t* packet) {
 
-	if ((uint32_t) pck_read_var_int(packet) != client->verify) {
+	if ((uint32_t) pck_read_var_int(packet) != client->id) {
 		return false;
 	}
 
@@ -378,9 +378,8 @@ void phd_send_encryption_request(ltg_client_t* client) {
 	pck_write_bytes(response, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
 
 	// our verify token
-	cry_random_bytes((uint8_t*) &client->verify, 4);
 	pck_write_var_int(response, 4);
-	pck_write_int32(response, client->verify);
+	pck_write_int32(response, client->id);
 
 	ltg_send(client, response);
 
@@ -416,7 +415,7 @@ void phd_send_login_plugin_request(ltg_client_t* client, const char* identifier,
 	PCK_INLINE(packet, identifier_length + data_length + 20, io_big_endian);
 
 	pck_write_var_int(packet, 0x04);
-	pck_write_var_int(packet, client->verify);
+	pck_write_var_int(packet, client->id);
 	pck_write_string(packet, identifier, identifier_length);
 
 	pck_write_bytes(packet, data, data_length);

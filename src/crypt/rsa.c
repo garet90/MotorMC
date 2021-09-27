@@ -23,9 +23,7 @@ void cry_rsa_gen_key_pair(cry_rsa_keypair_t* keypair) {
 	char str[512];
 	fp_toradix(&p, str, 16);
 	log_info("p: 0x%s", str);
-#endif
-
-#ifdef CRY_DEBUG
+	
 	fp_toradix(&q, str, 16);
 	log_info("q: 0x%s", str);
 #endif

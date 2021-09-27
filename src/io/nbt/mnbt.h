@@ -120,9 +120,10 @@ Create a fresh NBT document for reading and writing
 mnbt_doc* mnbt_new();
 
 /*
-Read vlaues 'bytes' byte array until 'length' has been reached.
+Read vlaues 'bytes' byte array until 'length' has been reached
+'length_read' will return the length of the uncompressed document
 */
-mnbt_doc* mnbt_read(const uint8_t* bytes, size_t* length, mnbt_compression compression);
+mnbt_doc* mnbt_read(const uint8_t* bytes, size_t length, size_t* length_read, mnbt_compression compression);
 
 /*
 Read file as NBT document for reading and editing

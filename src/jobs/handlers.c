@@ -84,13 +84,16 @@ bool job_handle_player_join(job_payload_t* payload) {
 
 bool job_handle_player_leave(job_payload_t* payload) {
 
-	log_info("%s left the game", UTL_STRTOCSTR(payload->player_leave.username));
+	log_info("%s left the game", payload->player_leave.username);
 
 	cht_translation_t translation = cht_translation_new;
 	translation.translate = cht_translation_multiplayer_player_left;
 	translation.color = cht_yellow;
 	cht_component_t name = cht_new;
-	name.text = payload->player_leave.username;
+	name.text = (string_t) {
+		.value = payload->player_leave.username,
+		.length = payload->player_leave.username_length
+	};
 	cht_add_with(&translation, &name);
 
 	char out[128];
@@ -107,8 +110,6 @@ bool job_handle_player_leave(job_payload_t* payload) {
 	}
 
 	cht_term_translation(&translation);
-
-	free(payload->player_leave.username.value);
 
 	return true;
 

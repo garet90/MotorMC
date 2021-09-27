@@ -50,7 +50,8 @@ typedef union {
 	struct {
 
 		ltg_uuid_t uuid;
-		string_t username;
+		char username[17];
+		uint8_t username_length: 5;
 
 	} player_leave;
 

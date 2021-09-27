@@ -3,6 +3,9 @@
 #include "../io/logger/logger.h"
 #include "../io/filesystem/filesystem.h"
 
+// this file is a mess because windows and *nix use different linking methods
+// TODO put library linking in a seperate file
+
 utl_vector_t plg_links = UTL_VECTOR_INITIALIZER(plg_link_t);
 
 void plg_register_plugin(const char* file) {

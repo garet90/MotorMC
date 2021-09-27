@@ -84,6 +84,9 @@ int main(int, char*[]);
 extern void* t_sky_main(void*);
 extern void* t_sky_worker(void*);
 
+extern void sky_load_server_json();
+extern void sky_gen_server_json();
+
 extern void sky_term();
 
 static inline uint64_t sky_to_nanos(const struct timespec time) {

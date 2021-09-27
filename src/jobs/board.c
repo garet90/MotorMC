@@ -3,6 +3,7 @@
 #include "../motor.h"
 #include "../util/vector.h"
 
+// default handler vectors
 UTL_VECTOR_DEFAULT(job_keep_alive_handlers, job_handler_t, 
 	job_handle_keep_alive
 );

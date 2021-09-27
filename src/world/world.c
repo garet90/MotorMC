@@ -8,6 +8,7 @@
 #include "entity/entity.h"
 #include <stdlib.h>
 
+// worlds global vector
 utl_id_vector_t wld_worlds = UTL_ID_VECTOR_INITIALIZER(wld_world_t*);
 
 uint16_t wld_add(wld_world_t* world) {
@@ -23,7 +24,7 @@ uint16_t wld_add(wld_world_t* world) {
 wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t environment) {
 
 	wld_world_t* world = calloc(1, sizeof(wld_world_t));
-	srand(seed);
+	srand(seed); // seed the random with the world seed (to choose spawn position)
 	wld_world_t world_init = {
 		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.seed = seed,
@@ -32,8 +33,8 @@ wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t env
 		.regions = UTL_TREE_INITIALIZER,
 		.id = wld_add(world),
 		.spawn = {
-			.x = (rand() % 254) - 254,
-			.z = (rand() % 254) - 254
+			.x = (rand() % 512) - 256,
+			.z = (rand() % 512) - 256
 		}
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
@@ -55,7 +56,7 @@ wld_world_t* wld_load(const string_t name) {
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
 
-	// TODO
+	// TODO load world
 
 	wld_prepare_spawn(world);
 
@@ -151,7 +152,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 
 	assert(x < 32 && z < 32);
 
-	wld_chunk_t* chunk = calloc(1, sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * mat_get_chunk_height(region->world->environment));
+	wld_chunk_t* chunk = malloc(sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * mat_get_chunk_height(region->world->environment));
 	
 	wld_chunk_t chunk_init = {
 		.region = region,
@@ -165,11 +166,11 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		.max_ticket = max_ticket,
 		.ticket = max_ticket
 	};
-	for (uint32_t i = 0; i < 256; ++i) {
+	for (uint32_t i = 0; i < 256; ++i) { // TODO highest blocks
 		chunk_init.highest.motion_blocking[i] = 2;
 		chunk_init.highest.world_surface[i] = 2;
 	}
-	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t));
+	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t)); // coppy init to chunk
 
 	region->chunks[(x << 5) + z] = chunk;
 
@@ -181,6 +182,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		}
 	}
 
+	// add region
 	if (max_ticket < WLD_TICKET_INACCESSIBLE) {
 		region->loaded_chunks += 1;
 	}

@@ -1,6 +1,7 @@
 #include "socket.h"
 #include "../../io/logger/logger.h"
 
+// everything is different between *nix and windows again, so much preprocessor, good luck (shouldn't need to be changed though, it's pretty bare-bones)
 
 #ifdef __WINDOWS__
 	WSADATA sck_wsa;
