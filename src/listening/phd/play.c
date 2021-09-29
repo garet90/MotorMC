@@ -37,6 +37,8 @@ bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		return phd_handle_player_position_and_look(client, packet);
 	case 0x13:
 		return phd_handle_player_rotation(client, packet);
+	case 0x1a:
+		return phd_handle_player_digging(client, packet);
 	case 0x1b:
 		return phd_handle_entity_action(client, packet);
 	case 0x25:
@@ -525,6 +527,48 @@ bool phd_handle_player_rotation(ltg_client_t* client, pck_packet_t* packet) {
 	const bool on_ground = pck_read_int8(packet);
 
 	ent_look(&player->living_entity, yaw, pitch, on_ground);
+
+	return true;
+
+}
+
+bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
+
+	const int32_t status = pck_read_var_int(packet);
+	const pck_position_t position =  pck_read_position(packet);
+	const enum {
+		bottom,
+		top,
+		north,
+		south,
+		west,
+		east
+	} face = pck_read_int8(packet);
+
+	switch (status) {
+		case 0: { // start digging
+			log_info("Start digging at %d, %d, %d, face %d", position.x, position.y, position.z, face);
+			log_info("Breaking speed: %d ticks", ent_player_get_break_speed(client->entity, mat_block_stone));
+		} break;
+		case 1: { // cancel digging
+			log_info("Cancel digging");
+		} break;
+		case 2: { // finished digging
+			log_info("Finish digging");
+		} break;
+		case 3: { // drop item stack
+
+		} break;
+		case 4: { // drop item
+
+		} break;
+		case 5: { // shoot arrow / finish eating
+
+		} break;
+		case 6: { // swap item in hands
+
+		} break;
+	}
 
 	return true;
 

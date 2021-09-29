@@ -38,22 +38,6 @@ void pck_init_from_bytes(pck_packet_t* packet, byte_t* bytes, size_t length, io_
 
 }
 
-void pck_read_bytes(pck_packet_t* packet, byte_t* bytes, int32_t length) {
-
-	assert(packet->length - packet->cursor >= (unsigned) length);
-
-	memcpy(bytes, packet->bytes + packet->cursor, length);
-	packet->cursor += length;
-
-}
-
-void pck_write_bytes(pck_packet_t* packet, const byte_t* bytes, int32_t length) {
-
-	memcpy(packet->bytes + packet->cursor, bytes, length);
-	packet->cursor += length;
-
-}
-
 // i know, terribly written function, it's debug, not production don't worry
 #if NDEBUG
 #else

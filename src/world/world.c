@@ -152,7 +152,8 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 
 	assert(x < 32 && z < 32);
 
-	wld_chunk_t* chunk = malloc(sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * mat_get_chunk_height(region->world->environment));
+	const uint16_t chunk_height = mat_get_chunk_height(region->world->environment);
+	wld_chunk_t* chunk = malloc(sizeof(wld_chunk_t) + sizeof(wld_chunk_section_t) * chunk_height);
 	
 	wld_chunk_t chunk_init = {
 		.region = region,
@@ -171,6 +172,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		chunk_init.highest.world_surface[i] = 2;
 	}
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t)); // coppy init to chunk
+	memset(chunk->sections, 0, sizeof(wld_chunk_section_t) * chunk_height); // set chunk sections to 0
 
 	region->chunks[(x << 5) + z] = chunk;
 

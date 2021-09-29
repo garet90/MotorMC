@@ -946,6 +946,9 @@ typedef struct {
 	bool catches_fire_from_lava : 1;
 	bool light_filtering : 1;
 	bool transparent : 1;
+	bool mineable : 1;
+	bool needs : 1;
+	bool needs_wooden_tool : 1;
 
 	// vanilla tags
 	bool mineable_axe : 1;

@@ -18,6 +18,15 @@ typedef struct {
 
 } pck_packet_t;
 
+// can't think of a good place to put this
+typedef struct {
+
+	int32_t x;
+	int32_t z;
+	int16_t y;
+
+} pck_position_t;
+
 #define PCK_INLINE(name, len, end) byte_t name ##_r[sizeof(pck_packet_t) + len]; pck_packet_t* name = (pck_packet_t*) name ##_r; name->cursor = 0; name->length = len; name->endianness = end;
 
 #define PCK_READ_STRING(name, packet) int32_t name ##_length = pck_read_var_int(packet); char name [name ##_length + 1]; pck_read_bytes(packet, (uint8_t*) name, name ##_length); if (name ##_length + 1 != 0) { name [name ##_length] = '\0'; }
@@ -110,7 +119,31 @@ static inline int64_t pck_read_var_long(pck_packet_t* packet) {
 
 }
 
-extern void pck_read_bytes(pck_packet_t*, byte_t*, int32_t);
+static inline void pck_read_bytes(pck_packet_t* packet, byte_t* bytes, int32_t length) {
+
+	assert(packet->length - packet->cursor >= (unsigned) length);
+
+	memcpy(bytes, packet->bytes + packet->cursor, length);
+	packet->cursor += length;
+
+}
+
+static inline pck_position_t pck_read_position(pck_packet_t* packet) {
+
+	pck_position_t result;
+
+	uint64_t val = pck_read_int64(packet);
+	result.x = val >> 38;
+	result.y = val & 0xFFF;
+	result.z = ((val << 26) >> 38);
+
+	if (result.x >= 0x2000000) result.x -= 0x4000000;
+	if (result.y >= 0x800) result.y -= 0x1000;
+	if (result.z >= 0x2000000) result.z -= 0x4000000;
+
+	return result;
+
+}
 
 static inline void pck_write_int8(pck_packet_t* packet, int8_t value) {
 
@@ -194,7 +227,12 @@ static inline void pck_write_var_long(pck_packet_t* packet, int64_t value) {
 
 }
 
-extern void pck_write_bytes(pck_packet_t*, const byte_t*, int32_t);
+static inline void pck_write_bytes(pck_packet_t* packet, const byte_t* bytes, int32_t length) {
+
+	memcpy(packet->bytes + packet->cursor, bytes, length);
+	packet->cursor += length;
+
+}
 
 static inline void pck_write_string(pck_packet_t* packet, const char* string, size_t length) {
 
@@ -206,6 +244,12 @@ static inline void pck_write_string(pck_packet_t* packet, const char* string, si
 static inline void pck_write_nbt(pck_packet_t* packet, mnbt_doc* doc) {
 
 	packet->cursor += mnbt_write(doc, packet->bytes + packet->cursor, MNBT_NONE);
+
+}
+
+static inline void pck_write_position(pck_packet_t* packet, pck_position_t position) {
+
+	pck_write_int64(packet, ((uint64_t) (position.x & 0x3FFFFFF) << 38) | ((uint64_t) (position.z & 0x3FFFFFF) << 12) | ((uint64_t) position.y & 0xFF));
 
 }
 

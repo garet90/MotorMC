@@ -1113,6 +1113,17 @@ typedef enum {
 } mat_item_type_t;
 
 typedef struct {
+
+	bool tool : 1;
+	bool tool_axe : 1;
+	bool tool_hoe : 1;
+	bool tool_pickaxe : 1;
+	bool tool_shovel : 1;
+	bool least_diamond_tool : 1;
+	bool least_iron_tool : 1;
+	bool least_stone_tool : 1;
+	bool least_wooden_tool : 1;
+
 	bool acacia_logs : 1;
 	bool anvil : 1;
 	bool arrows : 1;
@@ -1183,3 +1194,9 @@ typedef struct {
 	bool wooden_trapdoors : 1;
 	bool wool : 1;
 } mat_item_t;
+
+extern const mat_item_t* mat_items[];
+
+static inline const mat_item_t* mat_get_item_by_type(mat_item_type_t type) {
+	return mat_items[type];
+}

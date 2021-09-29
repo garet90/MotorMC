@@ -207,4 +207,91 @@ static inline void ent_teleport_look(ent_living_entity_t* entity, wld_world_t* w
 
 }
 
+static inline bool ent_player_is_best_tool(const mat_block_t* block, const mat_item_t* item) {
+
+	if (block->mineable) {
+
+		if (item->tool) {
+
+			if (
+				(block->mineable_axe && item->tool_axe) ||
+				(block->mineable_hoe && item->tool_hoe) ||
+				(block->mineable_pickaxe && item->tool_pickaxe) ||
+				(block->mineable_shovel && item->tool_shovel)
+			) {
+				return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	return true;
+
+}
+
+static inline bool ent_player_can_harvest(const mat_block_t* block, const mat_item_t* item) {
+
+	if (block->needs) {
+
+		if (item->tool) {
+
+			if (
+				(block->needs_wooden_tool && item->least_wooden_tool) ||
+				(block->needs_stone_tool && item->least_stone_tool) ||
+				(block->needs_iron_tool && item->least_iron_tool) ||
+				(block->needs_diamond_tool && item->least_diamond_tool)
+			) {
+				return true;
+			}
+
+		}
+
+		return false;
+
+	}
+
+	return true;
+
+}
+
+// player specific functions
+static inline uint16_t ent_player_get_break_speed(ent_player_t* player, mat_block_type_t block) {
+
+	float32_t speed_multiplier = 1;
+
+	const mat_block_t* block_data = mat_get_block_by_type(block);
+
+	itm_item_t* held = &player->hotbar[player->held_item];
+	const mat_item_t* held_data = mat_get_item_by_type(held->type);
+
+	const bool is_best_tool = ent_player_is_best_tool(block_data, held_data);
+	const bool can_harvest = ent_player_can_harvest(block_data, held_data);
+	
+	if (is_best_tool) {
+		// TODO speed_multiplier = tool_power;
+		if (!can_harvest) {
+			speed_multiplier = 1;
+		}
+		// TODO efficiency
+	}
+
+	float32_t damage = speed_multiplier / block_data->hardness;
+
+	if (can_harvest) {
+		damage /= 30;
+	} else {
+		damage /= 100;
+	}
+
+	// instant break
+	if (damage > 1) {
+		return 0;
+	}
+
+	return ceil(1 / damage);
+
+}
+
 extern void ent_free_entity(ent_entity_t* entity);
