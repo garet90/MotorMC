@@ -9,6 +9,8 @@ typedef struct {
 
 } mat_tag_t;
 
+#define MAT_TAG_INITIALIZER(name, ...) { .identifier = name, .count = sizeof((int32_t[]) { __VA_ARGS__ }) / sizeof(int32_t), .entries = { __VA_ARGS__ } }
+
 typedef enum {
 
 	mat_fluid_tag_water,
