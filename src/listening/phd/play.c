@@ -1119,13 +1119,13 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 	while (player != NULL) {
 		pck_write_bytes(packet, player->uuid, 16);
 		pck_write_string(packet, player->username.value, player->username.length);
-		if (player->textures.value.value != NULL) {
+		if (UTL_STRTOCSTR(player->textures.value) != NULL) {
 			pck_write_var_int(packet, 1);
 			pck_write_string(packet, UTL_CSTRTOARG("textures"));
-			pck_write_string(packet, player->textures.value.value, player->textures.value.length);
-			if (player->textures.signature.value != NULL) {
+			pck_write_string(packet, UTL_STRTOARG(player->textures.value));
+			if (UTL_STRTOCSTR(player->textures.signature) != NULL) {
 				pck_write_int8(packet, 1);
-				pck_write_string(packet, player->textures.signature.value, player->textures.signature.length);
+				pck_write_string(packet, UTL_STRTOARG(player->textures.signature));
 			} else {
 				pck_write_int8(packet, 0);
 			}
@@ -1157,10 +1157,10 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 	if (player->textures.value.value != NULL) {
 		pck_write_var_int(packet, 1);
 		pck_write_string(packet, UTL_CSTRTOARG("textures"));
-		pck_write_string(packet, player->textures.value.value, player->textures.value.length);
+		pck_write_string(packet, UTL_STRTOARG(player->textures.value));
 		if (player->textures.signature.value != NULL) {
 			pck_write_int8(packet, 1);
-			pck_write_string(packet, player->textures.signature.value, player->textures.signature.length);
+			pck_write_string(packet, UTL_STRTOARG(player->textures.signature));
 		} else {
 			pck_write_int8(packet, 0);
 		}
