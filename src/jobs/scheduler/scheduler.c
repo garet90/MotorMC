@@ -43,10 +43,11 @@ static inline void sch_push(uint32_t id, uint32_t delay) {
 
 uint32_t sch_schedule(uint32_t id, uint32_t delay) {
 
-	assert(delay != 0);
-
-	sch_push(id, delay - 1);
-
+	if (delay == 0) {
+		job_add(id);
+	} else {
+		sch_push(id, delay - 1);
+	}
 	return id;
 
 }

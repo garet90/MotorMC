@@ -4,6 +4,7 @@
 
 typedef struct {
 
+	wld_world_t* _Atomic world;
 	atomic_int_least32_t x;
 	atomic_int_least32_t y;
 	atomic_int_least32_t z;

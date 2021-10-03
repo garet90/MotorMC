@@ -949,6 +949,7 @@ typedef struct {
 	bool mineable : 1;
 	bool needs : 1;
 	bool needs_wooden_tool : 1;
+	bool air : 1;
 
 	// vanilla tags
 	bool mineable_axe : 1;

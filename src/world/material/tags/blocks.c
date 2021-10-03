@@ -233,6 +233,7 @@ UTL_CSTRTOSTR("motor:light_filtering"),
 );
 const mat_tag_t mat_block_tag_transparent_d = MAT_TAG_INITIALIZER(
 	UTL_CSTRTOSTR("motor:transparent"),
+	mat_block_air,
 	mat_block_acacia_button,
 	mat_block_acacia_door,
 	mat_block_acacia_fence,
@@ -3167,6 +3168,16 @@ const mat_tag_t mat_block_tag_mineable_d = MAT_TAG_INITIALIZER(
 	MAT_BLOCK_TAG_MINEABLE
 );
 
+#define MAT_BLOCK_TAG_AIR \
+	mat_block_air,\
+	mat_block_cave_air,\
+	mat_block_void_air
+
+const mat_tag_t mat_block_tag_air_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("motor:air"),
+	MAT_BLOCK_TAG_AIR
+);
+
 const mat_tag_t* mat_block_tags[] = {
 
 	&mat_block_tag_catches_fire_from_lava_d,
@@ -3175,6 +3186,7 @@ const mat_tag_t* mat_block_tags[] = {
 	&mat_block_tag_mineable_d,
 	&mat_block_tag_needs_d,
 	&mat_block_tag_needs_wooden_tool_d,
+	&mat_block_tag_air_d,
 	&mat_block_tag_mineable_axe_d,
 	&mat_block_tag_mineable_hoe_d,
 	&mat_block_tag_mineable_pickaxe_d,

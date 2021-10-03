@@ -23,7 +23,10 @@ UTL_VECTOR_DEFAULT(job_tick_region_handlers, job_handler_t,
 	job_handle_tick_region
 );
 UTL_VECTOR_DEFAULT(job_unload_region_handlers, job_handler_t,
-	job_handle_unload_region,
+	job_handle_unload_region
+);
+UTL_VECTOR_DEFAULT(job_dig_block_handlers, job_handler_t,
+	job_handle_dig_block
 );
 
 UTL_VECTOR_DEFAULT(job_handlers, utl_vector_t*,
@@ -33,7 +36,8 @@ UTL_VECTOR_DEFAULT(job_handlers, utl_vector_t*,
 	&job_player_leave_handlers,
 	&job_send_update_pings_handlers,
 	&job_tick_region_handlers,
-	&job_unload_region_handlers
+	&job_unload_region_handlers,
+	&job_dig_block_handlers
 );
 
 job_board_t job_board = {

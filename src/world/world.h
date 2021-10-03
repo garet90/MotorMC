@@ -17,7 +17,7 @@ typedef struct wld_chunk_section wld_chunk_section_t;
 struct wld_chunk_section {
 
 	// block map
-	int16_t blocks[16 * 16 * 16];
+	mat_block_protocol_id_t blocks[16 * 16 * 16];
 	int16_t entity_idx[16 * 16 * 16];
 
 	uint16_t block_count;
@@ -195,6 +195,51 @@ static inline void wld_remove_player_chunk(wld_chunk_t* chunk, uint32_t client_i
 		utl_bit_vector_reset_bit(&chunk->players, client_id);
 		wld_recalc_chunk_ticket_l(chunk);
 	}
+}
+
+static inline mat_block_protocol_id_t wld_get_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z) {
+
+	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, x >> 4, z >> 4);
+	const uint16_t sub_chunk = y >> 4;
+
+	mat_block_protocol_id_t ret = mat_block_air;
+	with_lock (&block_chunk->lock) {
+		ret = block_chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | ((z & 0xF) << 4) | (x & 0xF)];
+	}
+
+	return ret;
+
+}
+
+static inline mat_block_type_t wld_get_block_type_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z) {
+
+	return mat_get_block_type_by_protocol_id(wld_get_block_at(chunk, x, y, z));
+
+}
+
+static inline void wld_set_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_protocol_id_t type) {
+
+	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, x >> 4, z >> 4);
+	const uint16_t sub_chunk = y >> 4;
+
+	with_lock (&block_chunk->lock) {
+		const mat_block_protocol_id_t old_type = block_chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | ((z & 0xF) << 4) | (x & 0xF)];
+		const bool old_type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(old_type))->air;
+		const bool type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(type))->air;
+		if (old_type_air && !type_air) {
+			block_chunk->sections[sub_chunk].block_count++;
+		} else if (!old_type_air && type_air) {
+			block_chunk->sections[sub_chunk].block_count--;
+		}
+		block_chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | ((z & 0xF) << 4) | (x & 0xF)] = type;
+	}
+
+}
+
+static inline void wld_set_block_type_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_type_t type) {
+
+	wld_set_block_at(chunk, x, y, z, mat_get_block_default_protocol_id_by_type(type));
+
 }
 
 extern void wld_unload_region(wld_region_t* region);

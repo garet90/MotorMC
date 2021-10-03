@@ -4,6 +4,7 @@
 #include "../../util/id_vector.h"
 #include "../../util/lock_util.h"
 #include "../../motor.h"
+#include "../../jobs/scheduler/scheduler.h"
 
 utl_id_vector_t ent_entities = UTL_ID_VECTOR_INITIALIZER(ent_entity_t*);
 
@@ -59,6 +60,16 @@ void ent_set_chunk(ent_entity_t* entity) {
 	entity->chunk_node = utl_dll_push(&chunk->entities, entity);
 
 	entity->chunk = chunk;
+
+}
+
+void ent_free_player(ent_player_t* entity) {
+
+	if (entity->digging_block) {
+		sch_cancel(entity->digging);
+	}
+
+	ent_free_entity((ent_entity_t*) entity);
 
 }
 

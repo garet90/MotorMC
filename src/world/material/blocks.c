@@ -2,7 +2,9 @@
 
 const mat_block_t mat_block_air_d = {
 	.resistance = 0,
-	.hardness = 0
+	.hardness = 0,
+	.transparent = true,
+	.air = true,
 };
 const mat_block_t mat_block_acacia_button_d = { 
 	.resistance = 0.5,
@@ -10341,11 +10343,13 @@ const mat_block_t mat_block_void_air_d = {
 	.resistance = 0,
 	.hardness = 0,
 	.transparent = true,
+	.air = true,
 };
 const mat_block_t mat_block_cave_air_d = { 
 	.resistance = 0,
 	.hardness = 0,
 	.transparent = true,
+	.air = true,
 };
 const mat_block_t mat_block_weeping_vines_plant_d = { 
 	.resistance = 0,

@@ -100,6 +100,9 @@ typedef struct {
 
 	ent_gamemode_t gamemode : 2;
 
+	bool digging_block : 1;
+	uint32_t digging;
+
 	itm_item_t inventory[27];
 	itm_item_t hotbar[9];
 	itm_item_t carried;
@@ -294,4 +297,5 @@ static inline uint16_t ent_player_get_break_speed(ent_player_t* player, mat_bloc
 
 }
 
+extern void ent_free_player(ent_player_t* entity);
 extern void ent_free_entity(ent_entity_t* entity);

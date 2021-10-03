@@ -362,7 +362,7 @@ void ltg_disconnect(ltg_client_t* client) {
 			job_add(work);
 			
 			phd_update_sent_chunks_leave(client);
-			ent_free_entity((ent_entity_t*) client->entity);
+			ent_free_player(client->entity);
 		} break;
 		default: {
 			// do nothing extra

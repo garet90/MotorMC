@@ -31,6 +31,7 @@ typedef enum {
 	job_send_update_pings,
 	job_tick_region,
 	job_unload_region,
+	job_dig_block,
 
 	job_count
 
@@ -55,13 +56,21 @@ typedef union {
 
 	} player_leave;
 
+	struct {
+
+		ltg_client_t* client;
+		wld_chunk_t* chunk;
+		wld_block_position_t location;
+
+	} dig_block;
+
 	wld_region_t* region;
 
 } job_payload_t;
 
 typedef struct {
 
-	const job_type_t type : 3;
+	const job_type_t type : 4;
 	uint8_t repeat;
 	uint8_t on_board;
 	bool canceled;

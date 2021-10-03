@@ -108,6 +108,7 @@ typedef enum {
 	mat_block_tag_mineable,
 	mat_block_tag_needs,
 	mat_block_tag_needs_wooden_tool,
+	mat_block_tag_air,
 	mat_block_tag_mineable_axe,
 	mat_block_tag_mineable_hoe,
 	mat_block_tag_mineable_pickaxe,

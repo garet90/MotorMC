@@ -545,29 +545,65 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 		east
 	} face = pck_read_int8(packet);
 
-	switch (status) {
-		case 0: { // start digging
-			log_info("Start digging at %d, %d, %d, face %d", position.x, position.y, position.z, face);
-			log_info("Breaking speed: %d ticks", ent_player_get_break_speed(client->entity, mat_block_stone));
-		} break;
-		case 1: { // cancel digging
-			log_info("Cancel digging");
-		} break;
-		case 2: { // finished digging
-			log_info("Finish digging");
-		} break;
-		case 3: { // drop item stack
+	ent_player_t* player = client->entity;
+	wld_chunk_t* chunk = player->living_entity.entity.chunk;
+	wld_world_t* world = player->living_entity.entity.position.world;
 
-		} break;
-		case 4: { // drop item
+	with_lock (&player->living_entity.entity.lock) {
+		switch (status) {
+			case 0: { // start digging
+				if (!player->digging_block) {
+					player->digging_block = true;
+					player->digging = sch_schedule(
+						job_new(
+							job_dig_block,
+							(job_payload_t) {
+								.dig_block = {
+									.client = client,
+									.chunk = chunk,
+									.location = (wld_block_position_t) {
+											.world = world,
+											.x = position.x,
+											.y = position.y,
+											.z = position.z
+										}
+									}
+								}
+							),
+						ent_player_get_break_speed(
+							player,
+							wld_get_block_type_at(chunk, position.x, position.y, position.z)
+						)
+					);
+			} else {
+					pthread_mutex_unlock(&player->living_entity.entity.lock);
+					return false;
+				}
+			} break;
+			case 1: { // cancel digging
+				if (player->digging_block) {
+					sch_cancel(player->digging);
 
-		} break;
-		case 5: { // shoot arrow / finish eating
+					player->digging_block = false;
+				}
+			} break;
+			case 2: { // finished digging
+				// not really much to do, it's the server that determines when this is done
+				// (unless were not digging then we gotta send that it was bad to resynchronize client)
+			} break;
+			case 3: { // drop item stack
 
-		} break;
-		case 6: { // swap item in hands
+			} break;
+			case 4: { // drop item
 
-		} break;
+			} break;
+			case 5: { // shoot arrow / finish eating
+
+			} break;
+			case 6: { // swap item in hands
+
+			} break;
+		}
 	}
 
 	return true;
@@ -810,161 +846,165 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	const uint16_t chunk_height = mat_get_chunk_height(chunk->region->world->environment);
 
-	// CHUNK MASK
+	with_lock (&chunk->lock) {
 
-	const uint16_t chunk_mask_length = ((chunk_height - 1) >> 6) + 1;
-	pck_write_var_int(packet, chunk_mask_length);
-	int64_t primary_chunk_mask[chunk_mask_length];
-	memset(primary_chunk_mask, 0, sizeof(primary_chunk_mask));
-	for (uint16_t i = 0; i < chunk_height; ++i) {
-		if (chunk->sections[i].block_count != 0) {
-			primary_chunk_mask[i >> 6] |= (1 << (i & 0x3f));
+		// CHUNK MASK
+
+		const uint16_t chunk_mask_length = ((chunk_height - 1) >> 6) + 1;
+		pck_write_var_int(packet, chunk_mask_length);
+		int64_t primary_chunk_mask[chunk_mask_length];
+		memset(primary_chunk_mask, 0, sizeof(primary_chunk_mask));
+		for (uint16_t i = 0; i < chunk_height; ++i) {
+			if (chunk->sections[i].block_count != 0) {
+				primary_chunk_mask[i >> 6] |= (1 << (i & 0x3f));
+			}
 		}
-	}
-	for (uint16_t i = 0; i < chunk_mask_length; ++i) {
-		pck_write_int64(packet, primary_chunk_mask[i]);
-	}
-
-	/*
-	int32_t primary_chunk_mask = 0;
-	for (uint16_t i = 0; i < chunk_height; ++i) {
-		if (chunk->sections[i].block_count != 0) {
-			primary_chunk_mask |= (1 << i);
+		for (uint16_t i = 0; i < chunk_mask_length; ++i) {
+			pck_write_int64(packet, primary_chunk_mask[i]);
 		}
-	}
-	pck_write_var_int(packet, primary_chunk_mask);
-	*/
 
-	// HEIGHTMAP
+		/*
+		int32_t primary_chunk_mask = 0;
+		for (uint16_t i = 0; i < chunk_height; ++i) {
+			if (chunk->sections[i].block_count != 0) {
+				primary_chunk_mask |= (1 << i);
+			}
+		}
+		pck_write_var_int(packet, primary_chunk_mask);
+		*/
 
-	const uint32_t heightmap_size = 37;
-	int64_t motion_blocking[heightmap_size];
-	int64_t world_surface[heightmap_size];
+		// HEIGHTMAP
 
-	UTL_ENCODE_TO_LONGS(chunk->highest.motion_blocking, 16 * 16, 9, false, motion_blocking);
-	UTL_ENCODE_TO_LONGS(chunk->highest.world_surface, 16 * 16, 9, false, world_surface);
+		const uint32_t heightmap_size = 37;
+		int64_t motion_blocking[heightmap_size];
+		int64_t world_surface[heightmap_size];
 
-	// create heightmap
-	mnbt_doc* doc = mnbt_new();
-	mnbt_tag* tag = mnbt_new_tag(doc, UTL_CSTRTOARG(""), MNBT_COMPOUND, mnbt_val_compound());
-	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("MOTION_BLOCKING"), MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, heightmap_size)));
-	mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("WORLD_SURFACE"), MNBT_LONG_ARRAY, mnbt_val_long_array(world_surface, heightmap_size)));
-	mnbt_set_root(doc, tag);
+		UTL_ENCODE_TO_LONGS(chunk->highest.motion_blocking, 256, 9, false, motion_blocking);
+		UTL_ENCODE_TO_LONGS(chunk->highest.world_surface, 256, 9, false, world_surface);
 
-	pck_write_nbt(packet, doc);
+		// create heightmap
+		mnbt_doc* doc = mnbt_new();
+		mnbt_tag* tag = mnbt_new_tag(doc, UTL_CSTRTOARG(""), MNBT_COMPOUND, mnbt_val_compound());
+		mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("MOTION_BLOCKING"), MNBT_LONG_ARRAY, mnbt_val_long_array(motion_blocking, heightmap_size)));
+		mnbt_push_tag(tag, mnbt_new_tag(doc, UTL_CSTRTOARG("WORLD_SURFACE"), MNBT_LONG_ARRAY, mnbt_val_long_array(world_surface, heightmap_size)));
+		mnbt_set_root(doc, tag);
 
-	mnbt_free(doc);
+		pck_write_nbt(packet, doc);
 
-	// BIOMES
+		mnbt_free(doc);
 
-	pck_write_var_int(packet, chunk_height << 6);
+		// BIOMES
 
-	for (uint16_t i = 0; i < chunk_height; ++i) {
-		for (uint8_t x = 0; x < 4; ++x) {
-			for (uint8_t z = 0; z < 4; ++z) {
-				for (uint8_t y = 0; y < 4; ++y) {
-					pck_write_var_int(packet, chunk->sections[i].biome[(x << 4) + (z << 2) + y]);
+		pck_write_var_int(packet, chunk_height << 6);
+
+		for (uint16_t i = 0; i < chunk_height; ++i) {
+			for (uint8_t x = 0; x < 4; ++x) {
+				for (uint8_t z = 0; z < 4; ++z) {
+					for (uint8_t y = 0; y < 4; ++y) {
+						pck_write_var_int(packet, chunk->sections[i].biome[(x << 4) + (z << 2) + y]);
+					}
 				}
 			}
 		}
-	}
 
-	// CHUNK DATA
+		// CHUNK DATA
 
-	// am i really gonna waste time copying data from one stream to another or am i gonna just waste 4 bytes?
-	// you're damn right i'm gonna waste 4 bytes, speed is key
-	const size_t data_len = packet->cursor;
-	packet->cursor += 5;
+		// am i really gonna waste time copying data from one stream to another or am i gonna just waste 4 bytes?
+		// you're damn right i'm gonna waste 4 bytes, speed is key
+		const size_t data_len = packet->cursor;
+		packet->cursor += 5;
 
-	for (uint16_t i = 0; i < chunk_height; ++i) {
-		if (chunk->sections[i].block_count != 0) {
+		for (uint16_t i = 0; i < chunk_height; ++i) {
+			if (chunk->sections[i].block_count != 0) {
 
-			pck_write_int16(packet, chunk->sections[i].block_count);
+				pck_write_int16(packet, chunk->sections[i].block_count);
 
-			uint16_t palette[256];
-			uint8_t palette_length = 1;
-			
-			int8_t block_array[4096];
+				mat_block_protocol_id_t palette[256];
+				uint8_t palette_length = 1;
+				
+				int8_t block_array[4096];
 
-			uint16_t previous_block = 0;
-			uint16_t previous_palette = 0;
+				uint16_t previous_block = 0;
+				uint16_t previous_palette = 0;
 
-			for (uint16_t j = 0; j < 4096; ++j) {
-				const uint16_t block = chunk->sections[i].blocks[j];
-				if (block == previous_block) {
-					block_array[j] = previous_palette;
-				} else {
-					// test if block is in palette
-					for (uint8_t k = 0; k < palette_length; ++k) {
-						if (palette[k] == block) {
-							block_array[j] = previous_palette = k;
+				for (uint16_t j = 0; j < 4096; ++j) {
+					const mat_block_protocol_id_t block = chunk->sections[i].blocks[j];
+					if (block == previous_block) {
+						block_array[j] = previous_palette;
+					} else {
+						// test if block is in palette
+						for (uint8_t k = 0; k < palette_length; ++k) {
+							if (palette[k] == block) {
+								block_array[j] = previous_palette = k;
+								previous_block = block;
+								goto end;
+							}
+						}
+
+						if (palette_length < 255) {
+							palette[palette_length] = block;
+							block_array[j] = previous_palette = palette_length;
 							previous_block = block;
-							goto end;
+							palette_length += 1;
+						} else {
+							break;
 						}
 					}
+					end:{}
+				}
 
-					if (palette_length < 255) {
-						palette[palette_length] = block;
-						block_array[j] = previous_palette = palette_length;
-						previous_block = block;
-						palette_length += 1;
+				if (palette_length < 255) {
+					// use palette
+					uint8_t bits_per_block;
+					if (palette_length < 16) {
+						bits_per_block = 4;
+					} else if (palette_length < 32) {
+						bits_per_block = 5;
+					} else if (palette_length < 64) {
+						bits_per_block = 6;
+					} else if (palette_length < 128) {
+						bits_per_block = 7;
 					} else {
-						break;
+						bits_per_block = 8;
 					}
-				}
-				end:{}
-			}
+					const uint8_t blocks_per_long = 64 / bits_per_block;
+					const int32_t data_array_length = 1 + (4095 / blocks_per_long);
 
-			if (palette_length < 255) {
-				// use palette
-				uint8_t bits_per_block;
-				if (palette_length < 16) {
-					bits_per_block = 4;
-				} else if (palette_length < 32) {
-					bits_per_block = 5;
-				} else if (palette_length < 64) {
-					bits_per_block = 6;
-				} else if (palette_length < 128) {
-					bits_per_block = 7;
+					pck_write_int8(packet, bits_per_block);
+					pck_write_var_int(packet, palette_length);
+					for (uint8_t j = 0; j < palette_length; ++j) {
+						pck_write_var_int(packet, palette[j]);
+					}
+
+					pck_write_var_int(packet, data_array_length);
+					
+					UTL_ENCODE_TO_LONGS(block_array, 4096, bits_per_block, true, pck_cursor(packet));
+					packet->cursor += data_array_length << 5;
 				} else {
-					bits_per_block = 8;
+					// direct
+					const uint8_t bits_per_block = 15;
+					const uint8_t blocks_per_long = 64 / bits_per_block;
+					const int32_t data_array_length = 1 + (4095 / blocks_per_long);
+
+					pck_write_int8(packet, bits_per_block);
+					pck_write_var_int(packet, data_array_length); // data array length
+					
+					UTL_ENCODE_TO_LONGS((int16_t*) chunk->sections[i].blocks, 4096, bits_per_block, true, pck_cursor(packet));
+					packet->cursor += data_array_length << 3;
 				}
-				const uint8_t blocks_per_long = 64 / bits_per_block;
-				const int32_t data_array_length = 1 + (4095 / blocks_per_long);
-
-				pck_write_int8(packet, bits_per_block);
-				pck_write_var_int(packet, palette_length);
-				for (uint8_t j = 0; j < palette_length; ++j) {
-					pck_write_var_int(packet, palette[j]);
-				}
-
-				pck_write_var_int(packet, data_array_length);
-				
-				UTL_ENCODE_TO_LONGS(block_array, 4096, bits_per_block, true, pck_cursor(packet));
-				packet->cursor += data_array_length << 5;
-			} else {
-				// direct
-				const uint8_t bits_per_block = 15;
-				const uint8_t blocks_per_long = 64 / bits_per_block;
-				const int32_t data_array_length = 1 + (4095 / blocks_per_long);
-
-				pck_write_int8(packet, bits_per_block);
-				pck_write_var_int(packet, data_array_length); // data array length
-				
-				UTL_ENCODE_TO_LONGS(chunk->sections[i].blocks, 4096, bits_per_block, true, pck_cursor(packet));
-				packet->cursor += data_array_length << 3;
 			}
 		}
-	}
 
-	const size_t current = packet->cursor;
-	packet->cursor = data_len;
-	pck_write_long_var_int(packet, current - data_len - 5);
-	packet->cursor = current;
-	
-	// BLOCK ENTITIES
-	// TODO block entities
-	pck_write_var_int(packet, 0);
+		const size_t current = packet->cursor;
+		packet->cursor = data_len;
+		pck_write_long_var_int(packet, current - data_len - 5);
+		packet->cursor = current;
+
+		// BLOCK ENTITIES
+		// TODO block entities
+		pck_write_var_int(packet, 0);
+
+	}
 
 	ltg_send(client, packet);
 
