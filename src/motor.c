@@ -335,17 +335,26 @@ void sky_load_server_json() {
 				sky_main.max_tick_time = mjson_get_int(key_val.value);
 				break;
 			case 0xfdabc3d: // "level"
-				// TODO
+				sky_main.world.name.length = mjson_get_size(key_val.value);
+				sky_main.world.name.value = malloc(sky_main.world.name.length + 1);
+				memcpy(sky_main.world.name.value, mjson_get_string(key_val.value), sky_main.world.name.length);
+				sky_main.world.name.value[sky_main.world.name.length] = 0;
 				break;
-			case 0xbaa497e4: // "gamemode"
-				// TODO
-				break;
+			case 0xbaa497e4: { // "gamemode"
+				const char* gamemode = mjson_get_string(key_val.value);
+				const int32_t g_hash = utl_hash(gamemode);
+				switch (g_hash) {
+					default: {
+						log_warn("Unknown gamemode '%s' in server.json! (%x)", gamemode, g_hash);
+					} break;
+				}
+			} break;
 			case 0x5af71738: { // "difficulty"
 				const uint32_t key_val_size = mjson_get_size(key_val.value);
 				for (uint32_t j = 0; j < key_val_size; ++j) {
 					mjson_property difficulty = mjson_obj_get(key_val.value, j);
 					const char* d_key = mjson_get_string(difficulty.label);
-					int32_t d_hash = utl_hash(d_key);
+					const int32_t d_hash = utl_hash(d_key);
 					switch (d_hash) {
 						case 0xfdabc3d: { // level
 							const char* l_key = mjson_get_string(difficulty.value);

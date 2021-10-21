@@ -425,35 +425,3 @@ void ltg_term() {
 	sck_term();
 
 }
-
-string_t ltg_get_username(const ltg_client_t* client) {
-	return client->username;
-}
-
-const byte_t* ltg_get_uuid(const ltg_client_t* client) {
-	return client->uuid;
-}
-
-uint16_t ltg_get_protocol(const ltg_client_t* client) {
-	return client->protocol;
-}
-
-uint8_t ltg_get_render_distance(const ltg_client_t* client) {
-	return client->render_distance;
-}
-
-int64_t ltg_get_ping(const ltg_client_t* client) {
-	return client->ping;
-}
-
-string_t ltg_get_textures(const ltg_client_t* client) {
-	return client->textures.value;
-}
-
-ltg_locale_t ltg_get_locale(const ltg_client_t* client) {
-	return client->locale;
-}
-
-ent_player_t* ltg_get_entity(const ltg_client_t* client) {
-	return client->entity;
-}

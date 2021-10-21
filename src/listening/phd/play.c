@@ -924,7 +924,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 				
 				int8_t block_array[4096];
 
-				uint16_t previous_block = 0;
+				mat_block_protocol_id_t previous_block = 0;
 				uint16_t previous_palette = 0;
 
 				for (uint16_t j = 0; j < 4096; ++j) {
@@ -982,7 +982,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 					packet->cursor += data_array_length << 5;
 				} else {
 					// direct
-					const uint8_t bits_per_block = 15;
+					const uint8_t bits_per_block = 15; // log2(block_state_count)
 					const uint8_t blocks_per_long = 64 / bits_per_block;
 					const int32_t data_array_length = 1 + (4095 / blocks_per_long);
 

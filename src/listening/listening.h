@@ -298,11 +298,34 @@ static inline void ltg_uuid_to_string(ltg_uuid_t uuid, char* out) {
 
 // API
 
-extern string_t ltg_get_username(const ltg_client_t*);
-extern const byte_t* ltg_get_uuid(const ltg_client_t*);
-extern uint16_t ltg_get_protocol(const ltg_client_t*);
-extern uint8_t ltg_get_render_distance(const ltg_client_t*);
-extern int64_t ltg_get_ping(const ltg_client_t*);
-extern string_t ltg_get_textures(const ltg_client_t*);
-extern ltg_locale_t ltg_get_locale(const ltg_client_t*);
-extern ent_player_t* ltg_get_entity(const ltg_client_t*);
+static inline string_t ltg_get_username(const ltg_client_t* client) {
+	return client->username;
+}
+
+static inline const byte_t* ltg_get_uuid(const ltg_client_t* client) {
+	return client->uuid;
+}
+
+static inline uint16_t ltg_get_protocol(const ltg_client_t* client) {
+	return client->protocol;
+}
+
+static inline uint8_t ltg_get_render_distance(const ltg_client_t* client) {
+	return client->render_distance;
+}
+
+static inline int64_t ltg_get_ping(const ltg_client_t* client) {
+	return client->ping;
+}
+
+static inline string_t ltg_get_textures(const ltg_client_t* client) {
+	return client->textures.value;
+}
+
+static inline ltg_locale_t ltg_get_locale(const ltg_client_t* client) {
+	return client->locale;
+}
+
+static inline ent_player_t* ltg_get_entity(const ltg_client_t* client) {
+	return client->entity;
+}

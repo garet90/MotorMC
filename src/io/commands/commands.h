@@ -62,9 +62,23 @@ extern void cmd_message(const cmd_sender_t*, const cht_component_t*);
 
 // API
 
-extern cmd_op_level_t cmd_get_op_level(const cmd_sender_t*);
-extern cmd_sender_type_t cmd_get_sender_type(const cmd_sender_t*);
-extern ltg_client_t* cmd_get_player(const cmd_sender_t*);
+static inline cmd_op_level_t cmd_get_op_level(const cmd_sender_t* sender) {
+	return sender->op;
+}
+
+static inline cmd_sender_type_t cmd_get_sender_type(const cmd_sender_t* sender) {
+	return sender->type;
+}
+
+static inline ltg_client_t* cmd_get_player(const cmd_sender_t* sender) {
+	
+	if (sender->type == cmd_player) {
+		return sender->player;
+	}
+
+	return NULL;
+
+}
 
 /* COMMANDS */
 extern bool cmd_stop(char*, const cmd_sender_t*);

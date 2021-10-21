@@ -179,7 +179,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 	// TODO generate actual chunk
 	for (uint32_t g_x  = 0; g_x < 16; ++g_x) {
 		for (uint32_t g_z = 0; g_z < 16; ++g_z) {
-			chunk->sections[0].blocks[(g_z << 4) + g_x] = mat_get_block_default_protocol_id_by_type(mat_block_stone);
+			chunk->sections[0].blocks[(g_z << 4) + g_x] = mat_get_block_default_protocol_id_by_type(mat_block_dirt);
 			chunk->sections[0].block_count += 1;
 		}
 	}

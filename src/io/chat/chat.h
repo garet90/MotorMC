@@ -104,29 +104,82 @@ extern size_t cht_server_list_ping(char*);
 
 // API functions
 
-extern void cht_set_text(cht_component_t*, const string_t);
-extern string_t cht_get_text(cht_component_t*);
+static inline void cht_set_text(cht_component_t* component, string_t text) {
+	component->text = text;
+}
 
-extern void cht_set_bold(cht_component_t*, bool);
-extern void cht_unset_bold(cht_component_t*);
-extern bool cht_get_bold(cht_component_t*);
+static inline string_t cht_get_text(cht_component_t* component) {
+	return component->text;
+}
 
-extern void cht_set_italic(cht_component_t*, bool);
-extern void cht_unset_italic(cht_component_t*);
-extern bool cht_get_italic(cht_component_t*);
+static inline void cht_set_bold(cht_component_t* component, bool bold) {
+	component->bold = bold;
+}
 
-extern void cht_set_underlined(cht_component_t*, bool);
-extern void cht_unset_underlined(cht_component_t*);
-extern bool cht_get_underlined(cht_component_t*);
+static inline void cht_unset_bold(cht_component_t* component) {
+	component->bold = UNSET;
+}
 
-extern void cht_set_strikethrough(cht_component_t*, bool);
-extern void cht_unset_strikethrough(cht_component_t*);
-extern bool cht_get_strikethrough(cht_component_t*);
+static inline bool cht_get_bold(cht_component_t* component) {
+	return component->bold;
+}
 
-extern void cht_set_obfuscated(cht_component_t*, bool);
-extern void cht_unset_obfuscated(cht_component_t*);
-extern bool cht_get_obfuscated(cht_component_t*);
+static inline void cht_set_italic(cht_component_t* component, bool italic) {
+	component->italic = italic;
+}
 
-extern void cht_set_color(cht_component_t*, cht_color_t);
-extern void cht_unset_color(cht_component_t*);
-extern cht_color_t cht_get_color(cht_component_t*);
+static inline void cht_unset_italic(cht_component_t* component) {
+	component->italic = UNSET;
+}
+
+static inline bool cht_get_italic(cht_component_t* component) {
+	return component->italic;
+}
+
+static inline void cht_set_underlined(cht_component_t* component, bool underlined) {
+	component->underlined = underlined;
+}
+
+static inline void cht_unset_underlined(cht_component_t* component) {
+	component->underlined = UNSET;
+}
+
+static inline bool cht_get_underlined(cht_component_t* component) {
+	return component->underlined;
+}
+
+static inline void cht_set_strikethrough(cht_component_t* component, bool strikethrough) {
+	component->strikethrough = strikethrough;
+}
+
+static inline void cht_unset_strikethrough(cht_component_t* component) {
+	component->strikethrough = UNSET;
+}
+
+static inline bool cht_get_strikethrough(cht_component_t* component) {
+	return component->strikethrough;
+}
+
+static inline void cht_set_obfuscated(cht_component_t* component, bool obfuscated) {
+	component->obfuscated = obfuscated;
+}
+
+static inline void cht_unset_obfuscated(cht_component_t* component) {
+	component->obfuscated = UNSET;
+}
+
+static inline bool cht_get_obfuscated(cht_component_t* component) {
+	return component->obfuscated;
+}
+
+static inline void cht_set_color(cht_component_t* component, cht_color_t color) {
+	component->color = color;
+}
+
+static inline void cht_unset_color(cht_component_t* component) {
+	component->color = cht_no_color;
+}
+
+static inline cht_color_t cht_get_color(cht_component_t* component) {
+	return component->color;
+}

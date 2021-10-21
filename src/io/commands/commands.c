@@ -212,24 +212,6 @@ void cmd_message(const cmd_sender_t* sender, const cht_component_t* component) {
 
 }
 
-cmd_op_level_t cmd_get_op_level(const cmd_sender_t* sender) {
-	return sender->op;
-}
-
-cmd_sender_type_t cmd_get_sender_type(const cmd_sender_t* sender) {
-	return sender->type;
-}
-
-ltg_client_t* cmd_get_player(const cmd_sender_t* sender) {
-
-	if (sender->type == cmd_player) {
-		return sender->player;
-	}
-
-	return NULL;
-
-}
-
 bool cmd_stop(char* args, const cmd_sender_t* sender) {
 
 	if (args != NULL) {
