@@ -341,12 +341,40 @@ void sky_load_server_json() {
 				sky_main.world.name.value[sky_main.world.name.length] = 0;
 				break;
 			case 0xbaa497e4: { // "gamemode"
-				const char* gamemode = mjson_get_string(key_val.value);
-				const int32_t g_hash = utl_hash(gamemode);
-				switch (g_hash) {
-					default: {
-						log_warn("Unknown gamemode '%s' in server.json! (%x)", gamemode, g_hash);
-					} break;
+				const uint32_t key_val_size = mjson_get_size(key_val.value);
+				for (uint32_t j = 0; j < key_val_size; ++j) {
+					mjson_property gamemode = mjson_obj_get(key_val.value, j);
+					const char* g_key = mjson_get_string(gamemode.label);
+					const int32_t g_hash = utl_hash(g_key);
+					switch (g_hash) {
+						case 0x885548a: {
+							const char* gamemode_val = mjson_get_string(gamemode.value);
+							const int32_t gamemode_hash = utl_hash(gamemode_val);
+							switch (gamemode_hash) {
+								case 0xde22a921: {
+									sky_main.gamemode = ent_survival;
+								} break;
+								case 0x134d6598: {
+									sky_main.gamemode = ent_creative;
+								} break;
+								case 0xcdf3b093: {
+									sky_main.gamemode = ent_adventure;
+								} break;
+								case 0xf0e3665a: {
+									sky_main.gamemode = ent_spectator;
+								} break;
+								default:
+									log_warn("Unknown value '%s' in server.json! (%x)", gamemode_val, gamemode_hash);
+									break;
+							}
+						} break;
+						case 0xf7393b4: {
+							sky_main.force_gamemode = mjson_get_boolean(gamemode.value);
+						} break;
+						default:
+							log_warn("Unknown value '%s' in server.json! (%x)", g_key, g_hash);
+							break;
+					}
 				}
 			} break;
 			case 0x5af71738: { // "difficulty"

@@ -979,7 +979,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 					pck_write_var_int(packet, data_array_length);
 					
 					UTL_ENCODE_TO_LONGS(block_array, 4096, bits_per_block, true, pck_cursor(packet));
-					packet->cursor += data_array_length << 5;
+					packet->cursor += data_array_length << 3;
 				} else {
 					// direct
 					const uint8_t bits_per_block = 15; // log2(block_state_count)

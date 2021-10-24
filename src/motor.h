@@ -69,6 +69,7 @@ typedef struct {
 	bool enable_command_block : 1;
 	bool pvp : 1;
 	bool reduced_debug_info : 1;
+	bool force_gamemode : 1;
 	
 	ent_gamemode_t gamemode : 2;
 
