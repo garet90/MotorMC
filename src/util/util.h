@@ -92,11 +92,13 @@ static inline uint32_t utl_hash(const char* string) {
 	
 	for (;;) {
 		switch (*string) {
-			case '\0':
+			case '\0': {
 				return hash;
-			default:
+			}
+			default: {
 				hash = ((hash << 5) + hash) + *string;
 				++string;
+			}
 		}
 	}
 

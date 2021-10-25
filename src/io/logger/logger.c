@@ -90,56 +90,57 @@ size_t log_to_string(char* message, const cht_component_t* chat) {
 	if (chat->color <= 0xF) {
 		// if we change this to an array it doesn't work anymore
 		switch (chat->color) {
-		case cht_black:
-			offset += sprintf(message + offset, UTL_CONSOLE_BLACK);
-			break;
-		case cht_dark_blue:
-			offset += sprintf(message + offset, UTL_CONSOLE_BLUE);
-			break;
-		case cht_dark_green:
-			offset += sprintf(message + offset, UTL_CONSOLE_GREEN);
-			break;
-		case cht_dark_cyan:
-			offset += sprintf(message + offset, UTL_CONSOLE_CYAN);
-			break;
-		case cht_dark_red:
-			offset += sprintf(message + offset, UTL_CONSOLE_RED);
-			break;
-		case cht_purple:
-			offset += sprintf(message + offset, UTL_CONSOLE_MAGENTA);
-			break;
-		case cht_gold:
-			offset += sprintf(message + offset, UTL_CONSOLE_YELLOW);
-			break;
-		case cht_gray:
-			offset += sprintf(message + offset, UTL_CONSOLE_WHITE);
-			break;
-		case cht_dark_gray:
-			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_BLACK);
-			break;
-		case cht_blue:
-			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_BLUE);
-			break;
-		case cht_bright_green:
-			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_GREEN);
-			break;
-		case cht_cyan:
-			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_CYAN);
-			break;
-		case cht_red:
-			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_RED);
-			break;
-		case cht_pink:
-			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_MAGENTA);
-			break;
-		case cht_yellow:
-			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_YELLOW);
-			break;
-		case cht_white:
-			offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_WHITE);
-			break;
-		case cht_no_color:
-			break;
+			case cht_black: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BLACK);
+			} break;
+			case cht_dark_blue: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BLUE);
+			} break;
+			case cht_dark_green: {
+				offset += sprintf(message + offset, UTL_CONSOLE_GREEN);
+			} break;
+			case cht_dark_cyan: {
+				offset += sprintf(message + offset, UTL_CONSOLE_CYAN);
+			} break;
+			case cht_dark_red: {
+				offset += sprintf(message + offset, UTL_CONSOLE_RED);
+			} break;
+			case cht_purple: {
+				offset += sprintf(message + offset, UTL_CONSOLE_MAGENTA);
+			} break;
+			case cht_gold: {
+				offset += sprintf(message + offset, UTL_CONSOLE_YELLOW);
+			} break;
+			case cht_gray: {
+				offset += sprintf(message + offset, UTL_CONSOLE_WHITE);
+			} break;
+			case cht_dark_gray: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_BLACK);
+			} break;
+			case cht_blue: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_BLUE);
+			} break;
+			case cht_bright_green: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_GREEN);
+			} break;
+			case cht_cyan: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_CYAN);
+			} break;
+			case cht_red: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_RED);
+			} break;
+			case cht_pink: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_MAGENTA);
+			} break;
+			case cht_yellow: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_YELLOW);
+			} break;
+			case cht_white: {
+				offset += sprintf(message + offset, UTL_CONSOLE_BRIGHT_WHITE);
+			} break;
+			case cht_no_color: {
+				// do nothing
+			} break;
 		}
 	}
 

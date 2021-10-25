@@ -142,9 +142,9 @@ size_t _mjson_read_val(mjson_doc* doc, const char* bytes, mjson_val** val_out) {
 
 			for (;; ++i) {
 				switch (bytes[i]) {
-					case '-':
+					case '-': {
 						negative = 1;
-						break;
+					} break;
 					case '0':
 					case '1':
 					case '2':
@@ -154,7 +154,7 @@ size_t _mjson_read_val(mjson_doc* doc, const char* bytes, mjson_val** val_out) {
 					case '6':
 					case '7':
 					case '8':
-					case '9':
+					case '9': {
 						if (fraction != 0) {
 							d += (bytes[i] - '0') * fraction;
 							fraction /= 10;
@@ -162,17 +162,18 @@ size_t _mjson_read_val(mjson_doc* doc, const char* bytes, mjson_val** val_out) {
 							w = (w * 10) + (bytes[i] - '0');
 							d = (d * 10) + (bytes[i] - '0');
 						}
-						break;
-					case '.':
+					} break;
+					case '.': {
 						fraction = 0.1;
-						break;
-					default:
+					} break;
+					default: {
 						if (fraction != 0) {
 							val = mjson_double(doc, negative ? -d : d);
 						} else {
 							val = mjson_int(doc, negative ? -w : w);
 						}
 						goto done;
+					}
 				}
 			}
 
@@ -239,41 +240,41 @@ size_t _mjson_write_val(mjson_val* val, char* bytes) {
 			bytes[i++] = '"';
 			for (uint32_t j = 0; j < val->value.String.length; ++j) {
 				switch (val->value.String.value[j]) {
-					case '"':
+					case '"': {
 						bytes[i++] = '\\';
 						bytes[i++] = '"';
-						break;
-					case '\\':
+					} break;
+					case '\\': {
 						bytes[i++] = '\\';
 						bytes[i++] = '\\';
-						break;
-					case '/':
+					} break;
+					case '/': {
 						bytes[i++] = '\\';
 						bytes[i++] = '/';
-						break;
-					case '\b':
+					} break;
+					case '\b': {
 						bytes[i++] = '\\';
 						bytes[i++] = 'b';
-						break;
-					case '\f':
+					} break;
+					case '\f': {
 						bytes[i++] = '\\';
 						bytes[i++] = 'f';
-						break;
-					case '\n':
+					} break;
+					case '\n': {
 						bytes[i++] = '\\';
 						bytes[i++] = 'n';
-						break;
-					case '\r':
+					} break;
+					case '\r': {
 						bytes[i++] = '\\';
 						bytes[i++] = 'r';
-						break;
-					case '\t':
+					} break;
+					case '\t': {
 						bytes[i++] = '\\';
 						bytes[i++] = 't';
-						break;
-					default:
+					} break;
+					default: {
 						bytes[i++] = val->value.String.value[j];
-						break;
+					} break;
 				}
 			}
 			bytes[i++] = '"';
@@ -445,17 +446,18 @@ void mjson_free(mjson_doc* doc) {
 void _mjson_free_val(mjson_val* val) {
 
 	switch (val->type) {
-		case MJSON_OBJECT:
+		case MJSON_OBJECT: {
 			free(val->value.Object.properties);
-			break;
-		case MJSON_ARRAY:
+		} break;
+		case MJSON_ARRAY: {
 			free(val->value.Array.values);
-			break;
-		case MJSON_STRING:
+		} break;
+		case MJSON_STRING: {
 			free(val->value.String.value);
-			break;
-		default:
-			break;
+		} break;
+		default: {
+			// do nothing
+		} break;
 	}
 
 	free(val);

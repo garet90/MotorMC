@@ -57,68 +57,69 @@ void pck_log(pck_packet_t* packet) {
 		len -= 16;
 	}
 	switch (len) {
-	case 15:
-		log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x",
-			cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
-			cursor[8], cursor[9], cursor[10], cursor[11], cursor[12], cursor[13], cursor[14]);
-		break;
-	case 14:
-		log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x",
-			cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
-			cursor[8], cursor[9], cursor[10], cursor[11], cursor[12], cursor[13]);
-		break;
-	case 13:
-		log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x",
-			cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
-			cursor[8], cursor[9], cursor[10], cursor[11], cursor[12]);
-		break;
-	case 12:
-		log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x",
-			cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
-			cursor[8], cursor[9], cursor[10], cursor[11]);
-		break;
-	case 11:
-		log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x",
-			cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
-			cursor[8], cursor[9], cursor[10]);
-		break;
-	case 10:
-		log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x",
-			cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
-			cursor[8], cursor[9]);
-		break;
-	case 9:
-		log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x",
-			cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
-			cursor[8]);
-		break;
-	case 8:
-		log_info("%02x%02x %02x%02x %02x%02x %02x%02x",
-			cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7]);
-		break;
-	case 7:
-		log_info("%02x%02x %02x%02x %02x%02x %02x", cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6]);
-		break;
-	case 6:
-		log_info("%02x%02x %02x%02x %02x%02x", cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5]);
-		break;
-	case 5:
-		log_info("%02x%02x %02x%02x %02x", cursor[0], cursor[1], cursor[2], cursor[3], cursor[4]);
-		break;
-	case 4:
-		log_info("%02x%02x %02x%02x", cursor[0], cursor[1], cursor[2], cursor[3]);
-		break;
-	case 3:
-		log_info("%02x%02x %02x", cursor[0], cursor[1], cursor[2]);
-		break;
-	case 2:
-		log_info("%02x%02x", cursor[0], cursor[1]);
-		break;
-	case 1:
-		log_info("%02x", cursor[0]);
-		break;
-	default:
-		break;
+		case 15: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x",
+				cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
+				cursor[8], cursor[9], cursor[10], cursor[11], cursor[12], cursor[13], cursor[14]);
+		} break;
+		case 14: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x",
+				cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
+				cursor[8], cursor[9], cursor[10], cursor[11], cursor[12], cursor[13]);
+		} break;
+		case 13: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x",
+				cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
+				cursor[8], cursor[9], cursor[10], cursor[11], cursor[12]);
+		} break;
+		case 12: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x",
+				cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
+				cursor[8], cursor[9], cursor[10], cursor[11]);
+		} break;
+		case 11: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x",
+				cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
+				cursor[8], cursor[9], cursor[10]);
+		} break;
+		case 10: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x",
+				cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
+				cursor[8], cursor[9]);
+		} break;
+		case 9: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x%02x %02x",
+				cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7],
+				cursor[8]);
+		} break;
+		case 8: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x%02x",
+				cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6], cursor[7]);
+		} break;
+		case 7: {
+			log_info("%02x%02x %02x%02x %02x%02x %02x", cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5], cursor[6]);
+		} break;
+		case 6: {
+			log_info("%02x%02x %02x%02x %02x%02x", cursor[0], cursor[1], cursor[2], cursor[3], cursor[4], cursor[5]);
+		} break;
+		case 5: {
+			log_info("%02x%02x %02x%02x %02x", cursor[0], cursor[1], cursor[2], cursor[3], cursor[4]);
+		} break;
+		case 4: {
+			log_info("%02x%02x %02x%02x", cursor[0], cursor[1], cursor[2], cursor[3]);
+		} break;
+		case 3: {
+			log_info("%02x%02x %02x", cursor[0], cursor[1], cursor[2]);
+		} break;
+		case 2: {
+			log_info("%02x%02x", cursor[0], cursor[1]);
+		} break;
+		case 1: {
+			log_info("%02x", cursor[0]);
+		} break;
+		default: {
+			// Do nothing
+		} break;
 	}
 	log_info("End packet payload");
 }

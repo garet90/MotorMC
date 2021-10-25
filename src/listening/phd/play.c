@@ -17,37 +17,52 @@ bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
-	case 0x00:
-		return phd_handle_teleport_confirm(client, packet);
-	case 0x03:
-		return phd_handle_chat_message(client, packet);
-	case 0x05:
-		return phd_handle_client_settings(client, packet);
-	case 0x08:
-		return phd_handle_click_window(client, packet);
-	case 0x09:
-		return phd_handle_close_window(client, packet);
-	case 0x0a:
-		return phd_handle_plugin_message(client, packet);
-	case 0x0f:
-		return phd_handle_keep_alive(client, packet);
-	case 0x11:
-		return phd_handle_player_position(client, packet);
-	case 0x12:
-		return phd_handle_player_position_and_look(client, packet);
-	case 0x13:
-		return phd_handle_player_rotation(client, packet);
-	case 0x1a:
-		return phd_handle_player_digging(client, packet);
-	case 0x1b:
-		return phd_handle_entity_action(client, packet);
-	case 0x25:
-		return phd_handle_held_item_change(client, packet);
-	case 0x2c:
-		return phd_handle_animation(client, packet);
-	default:
-		log_warn("Unknown packet %02x received in play state!", id);
-		return false;
+		case 0x00: {
+			return phd_handle_teleport_confirm(client, packet);
+		}
+		case 0x03: {
+			return phd_handle_chat_message(client, packet);
+		}
+		case 0x05: {
+			return phd_handle_client_settings(client, packet);
+		}
+		case 0x08: {
+			return phd_handle_click_window(client, packet);
+		}
+		case 0x09: {
+			return phd_handle_close_window(client, packet);
+		}
+		case 0x0a: {
+			return phd_handle_plugin_message(client, packet);
+		}
+		case 0x0f: {
+			return phd_handle_keep_alive(client, packet);
+		}
+		case 0x11: {
+			return phd_handle_player_position(client, packet);
+		}
+		case 0x12: {
+			return phd_handle_player_position_and_look(client, packet);
+		}
+		case 0x13: {
+			return phd_handle_player_rotation(client, packet);
+		}
+		case 0x1a: {
+			return phd_handle_player_digging(client, packet);
+		}
+		case 0x1b: {
+			return phd_handle_entity_action(client, packet);
+		}
+		case 0x25: {
+			return phd_handle_held_item_change(client, packet);
+		}
+		case 0x2c: {
+			return phd_handle_animation(client, packet);
+		}
+		default: {
+			log_warn("Unknown packet %02x received in play state!", id);
+			return false;
+		}
 	}
 
 }
@@ -624,29 +639,33 @@ bool phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 	__attribute__((unused)) int32_t jump_boost = pck_read_var_int(packet); // for jumping with horses
 
 	switch (action) {
-	case 0: // start sneaking
-		player->living_entity.entity.crouching = true;
-		break;
-	case 1: // stop sneaking
-		player->living_entity.entity.crouching = false;
-		break;
-	case 2: // leave bed
-		break;
-	case 3: // start sprinting
-		player->living_entity.entity.sprinting = true;
-		break;
-	case 4: // stop sprinting
-		player->living_entity.entity.sprinting = false;
-		break;
-	case 5: // start jump with horse
-		break;
-	case 6: // stop jump with horse
-		break;
-	case 7: // open horse inventory
-		break;
-	case 8: // start flying with elytra
-		player->living_entity.entity.flying_with_elytra = true;
-		break;
+		case 0: { // start sneaking
+			player->living_entity.entity.crouching = true;
+		} break;
+		case 1: { // stop sneaking
+			player->living_entity.entity.crouching = false;
+		} break;
+		case 2: { // leave bed
+		
+		} break;
+		case 3: { // start sprinting
+			player->living_entity.entity.sprinting = true;
+		} break;
+		case 4: { // stop sprinting
+			player->living_entity.entity.sprinting = false;
+		} break;
+		case 5: { // start jump with horse
+		
+		} break;
+		case 6: { // stop jump with horse
+		
+		} break;
+		case 7: { // open horse inventory
+		
+		} break;
+		case 8: { // start flying with elytra
+			player->living_entity.entity.flying_with_elytra = true;
+		} break;
 	}
 
 	return true;

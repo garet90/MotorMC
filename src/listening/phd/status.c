@@ -7,13 +7,16 @@ bool phd_status(ltg_client_t* client, pck_packet_t* packet) {
 	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
-	case 0x00:
-		return phd_handle_request(client, packet);
-	case 0x01:
-		return phd_handle_ping(client, packet);
-	default:
-		log_warn("Received unknown packet %02x in status state!", id);
-		return false;
+		case 0x00: {
+			return phd_handle_request(client, packet);
+		}
+		case 0x01: {
+			return phd_handle_ping(client, packet);
+		}
+		default: {
+			log_warn("Received unknown packet %02x in status state!", id);
+			return false;
+		}
 	}
 
 }

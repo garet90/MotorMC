@@ -31,120 +31,120 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 				UTL_STRTOCSTR(component->text)[text_len] = '\0';
 				component->text.length = text_len;
 			} break;
-			case 0x7c94b326: // "bold"
+			case 0x7c94b326: { // "bold"
 				if (mjson_get_boolean(obj_property.value)) {
 					component->bold = true;
 				} else {
 					component->bold = false;
 				}
-				break;
-			case 0x0536d35b: // "italic"
+			} break;
+			case 0x0536d35b: { // "italic"
 				if (mjson_get_boolean(obj_property.value)) {
 					component->italic = true;
 				} else {
 					component->italic = false;
 				}
-				break;
-			case 0xd635c50f: // "underlined"
+			} break;
+			case 0xd635c50f: { // "underlined"
 				if (mjson_get_boolean(obj_property.value)) {
 					component->underlined = true;
 				} else {
 					component->underlined = false;
 				}
-				break;
-			case 0x10d72f78: // "strikethrough"
+			} break;
+			case 0x10d72f78: { // "strikethrough"
 				if (mjson_get_boolean(obj_property.value)) {
 					component->strikethrough = true;
 				} else {
 					component->strikethrough = false;
 				}
-				break;
-			case 0xf1f68aa5: // "obfuscated"
+			} break;
+			case 0xf1f68aa5: { // "obfuscated"
 				if (mjson_get_boolean(obj_property.value)) {
 					component->obfuscated = true;
 				} else {
 					component->obfuscated = false;
 				}
-				break;
-			case 0x0f3d3244: // "color"
+			} break;
+			case 0x0f3d3244: { // "color"
 				switch (utl_hash(mjson_get_string(obj_property.value))) {
-					case 0x0f294442: // "black"
+					case 0x0f294442: { // "black"
 						component->color = cht_black;
-						break;
-					case 0x3fa0116e: // "dark_blue"
+					} break;
+					case 0x3fa0116e: { // "dark_blue"
 						component->color = cht_dark_blue;
-						break;
-					case 0x33ffc057: // "dark_green"
+					} break;
+					case 0x33ffc057: { // "dark_green"
 						component->color = cht_dark_green;
-						break;
-					case 0x3f9f9a4e: // "dark_aqua"
+					} break;
+					case 0x3f9f9a4e: { // "dark_aqua"
 						component->color = cht_dark_cyan;
-						break;
-					case 0x01edd701: // "dark_red"
+					} break;
+					case 0x01edd701: { // "dark_red"
 						component->color = cht_dark_red;
-						break;
-					case 0xc933d23e: // "dark_purple"
+					} break;
+					case 0xc933d23e: { // "dark_purple"
 						component->color = cht_purple;
-						break;
-					case 0x7c97710b: // "gold"
+					} break;
+					case 0x7c97710b: { // "gold"
 						component->color = cht_gold;
-						break;
-					case 0x7c977c78: // "gray"
+					} break;
+					case 0x7c977c78: { // "gray"
 						component->color = cht_gray;
-						break;
-					case 0x3fa2e659: // "dark_gray"
+					} break;
+					case 0x3fa2e659: { // "dark_gray"
 						component->color = cht_dark_gray;
-						break;
-					case 0x7c94a78d: // "blue"
+					} break;
+					case 0x7c94a78d: { // "blue"
 						component->color = cht_blue;
-						break;
-					case 0x0f871a56: // "green"
-						component->color = cht_bright_green;
-						break;
-					case 0x7c94306d: // "aqua"
+					} break;
+					case 0x0f871a56: { // "green"
+						component->color = cht_bright_green;	
+					} break;
+					case 0x7c94306d: { // "aqua"
 						component->color = cht_cyan;
-						break;
-					case 0x0b88a540: // "red"
+					} break;
+					case 0x0b88a540: { // "red"
 						component->color = cht_red;
-						break;
-					case 0x519b36b4: // "light_purple"
+					} break;
+					case 0x519b36b4: { // "light_purple"
 						component->color = cht_pink;
-						break;
-					case 0x297ff6e1: // "yellow"
+					} break;
+					case 0x297ff6e1: { // "yellow"
 						component->color = cht_yellow;
-						break;
-					case 0x10a33986: // "white"
+					} break;
+					case 0x10a33986: { // "white"
 						component->color = cht_white;
-						break;
-					default:
+					} break;
+					default: {
 						utl_read_hex_bytes((byte_t*) &component->color, mjson_get_string(obj_property.value), mjson_get_size(obj_property.value) >> 1);
-						break;
+					} break;
 				}
-				break;
+			} break;
 			case 0x94c4816d: { // "clickEvent"
 				const uint32_t obj_property_size = mjson_get_size(obj_property.value);
 				for (uint32_t j = 0; j < obj_property_size; ++j) {
 					mjson_property click_event = mjson_obj_get(obj_property.value, j);
 					switch (utl_hash(mjson_get_string(click_event.label))) {
-						case 0xf1644d03: // "action"
+						case 0xf1644d03: { // "action"
 							switch (utl_hash(mjson_get_string(click_event.value))) {
-								case 0x8d4ed3c9: // "open_url"
+								case 0x8d4ed3c9: { // "open_url"
 									component->click_event.action = cht_open_url;
-									break;
-								case 0xb1115cb8: // "run_command"
+								} break;
+								case 0xb1115cb8: { // "run_command"
 									component->click_event.action = cht_run_command;
-									break;
-								case 0x5a851fe5: // "suggest_command"
+								} break;
+								case 0x5a851fe5: { // "suggest_command"
 									component->click_event.action = cht_suggest_command;
-									break;
-								case 0xb53cc547: // "change_page"
+								} break;
+								case 0xb53cc547: { // "change_page"
 									component->click_event.action = cht_change_page;
-									break;
-								case 0x49c3dc71: // "copy_to_clipboard"
+								} break;
+								case 0x49c3dc71: { // "copy_to_clipboard"
 									component->click_event.action = cht_copy_to_clipboard;
-									break;
+								} break;
 							}
-							break;
+						} break;
 						case 0x108d5742: { // "value"
 							const size_t value_len = mjson_get_size(click_event.value);
 							UTL_STRTOCSTR(component->click_event.value) = malloc(value_len + 1);
@@ -161,19 +161,19 @@ cht_component_t* cht_from_json(mjson_val* obj) {
 				for (uint32_t j = 0; j < obj_property_size; ++j) {
 					mjson_property hover_event = mjson_obj_get(obj_property.value, j);
 					switch (utl_hash(mjson_get_string(hover_event.label))) {
-						case 0xf1644d03: // "action"
+						case 0xf1644d03: { // "action"
 							switch (utl_hash(mjson_get_string(hover_event.value))) {
-								case 0xbdd0756a: // "show_text"
+								case 0xbdd0756a: { // "show_text"
 									component->hover_event.action = cht_show_text;
-									break;
-								case 0xbdcaaa94: // "show_item"
+								} break;
+								case 0xbdcaaa94: { // "show_item"
 									component->hover_event.action = cht_show_item;
-									break;
-								case 0x5166a222: // "show_entity"
+								} break;
+								case 0x5166a222: { // "show_entity"
 									component->hover_event.action = cht_show_entity;
-									break;
+								} break;
 							}
-							break;
+						} break;
 						case 0x108d5742: { // "value"
 							size_t value_len = mjson_get_size(hover_event.value);
 							UTL_STRTOCSTR(component->hover_event.value) = malloc(value_len + 1);

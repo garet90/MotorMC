@@ -188,29 +188,30 @@ bool ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 				decompressed->sub_length = decompressed->length =  actual_length;
 
 				switch (client->state) {
-				case ltg_handshake:
-					if (!phd_handshake(client, decompressed)) {
+					case ltg_handshake: {
+						if (!phd_handshake(client, decompressed)) {
+							return false;
+						}
+					} break;
+					case ltg_status: {
+						if (!phd_status(client, decompressed)) {
+							return false;
+						}
+					} break;
+					case ltg_login: {
+						if (!phd_login(client, decompressed)) {
+							return false;
+						}
+					} break;
+					case ltg_play: {
+						if (!phd_play(client, decompressed)) {
+							return false;
+						}
+					} break;
+					default: {
+						log_warn("Client is in an unknown state! (%d)", client->state);
 						return false;
 					}
-					break;
-				case ltg_status:
-					if (!phd_status(client, decompressed)) {
-						return false;
-					}
-					break;
-				case ltg_login:
-					if (!phd_login(client, decompressed)) {
-						return false;
-					}
-					break;
-				case ltg_play:
-					if (!phd_play(client, decompressed)) {
-						return false;
-					}
-					break;
-				default:
-					log_warn("Client is in an unknown state! (%d)", client->state);
-					return false;
 				}
 
 				continue;
@@ -222,29 +223,30 @@ bool ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 		}
 
 		switch (client->state) {
-		case ltg_handshake:
-			if (!phd_handshake(client, packet)) {
+			case ltg_handshake: {
+				if (!phd_handshake(client, packet)) {
+					return false;
+				}
+			} break;
+			case ltg_status: {
+				if (!phd_status(client, packet)) {
+					return false;
+				}
+			} break;
+			case ltg_login: {
+				if (!phd_login(client, packet)) {
+					return false;
+				}
+			} break;
+			case ltg_play: {
+				if (!phd_play(client, packet)) {
+					return false;
+				}
+			} break;
+			default: {
+				log_warn("Client is in an unknown state! (%d)", client->state);
 				return false;
 			}
-			break;
-		case ltg_status:
-			if (!phd_status(client, packet)) {
-				return false;
-			}
-			break;
-		case ltg_login:
-			if (!phd_login(client, packet)) {
-				return false;
-			}
-			break;
-		case ltg_play:
-			if (!phd_play(client, packet)) {
-				return false;
-			}
-			break;
-		default:
-			log_warn("Client is in an unknown state! (%d)", client->state);
-			return false;
 		}
 	} while (next_packet < packet->length);
 

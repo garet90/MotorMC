@@ -12,11 +12,13 @@ bool phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
 	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
-	case 0x00:
-		return phd_handle_handshake(client, packet);
-	default:
-		log_warn("Received unknown packet %x in handhsake state!", id);
-		return false;
+		case 0x00: {
+			return phd_handle_handshake(client, packet);
+		}
+		default: {
+			log_warn("Received unknown packet %x in handhsake state!", id);
+			return false;
+		}
 	}
 
 }

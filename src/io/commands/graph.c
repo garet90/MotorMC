@@ -80,15 +80,16 @@ pck_packet_t* cmd_get_graph() {
 			}
 
 			switch (node->type) {
-				case cmd_node_root:
-					break;
-				case cmd_node_literal:
+				case cmd_node_root: {
+					// Do nothing
+				} break;
+				case cmd_node_literal: {
 					pck_write_string(cmd_graph, UTL_STRTOARG(node->literal.name));
-					break;
-				case cmd_node_argument:
+				} break;
+				case cmd_node_argument: {
 					pck_write_string(cmd_graph, UTL_STRTOARG(node->argument.name));
 					pck_write_string(cmd_graph, UTL_STRTOARG(node->argument.parser));
-					break;
+				} break;
 			}
 
 			if (UTL_STRTOCSTR(node->suggestions_type) != NULL) {

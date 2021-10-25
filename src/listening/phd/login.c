@@ -36,15 +36,19 @@ bool phd_login(ltg_client_t* client, pck_packet_t* packet) {
 	const int32_t id = pck_read_var_int(packet);
 
 	switch (id) {
-	case 0x00:
-		return phd_handle_login_start(client, packet);
-	case 0x01:
-		return phd_handle_encryption_response(client, packet);
-	case 0x02:
-		return phd_handle_login_plugin_response(client, packet);
-	default:
-		log_warn("Received unknown packet %x in login state!", id);
-		return false;
+		case 0x00: {
+			return phd_handle_login_start(client, packet);
+		}
+		case 0x01: {
+			return phd_handle_encryption_response(client, packet);
+		}
+		case 0x02: {
+			return phd_handle_login_plugin_response(client, packet);
+		}
+		default: {
+			log_warn("Received unknown packet %x in login state!", id);
+			return false;
+		}
 	}
 
 }

@@ -148,17 +148,19 @@ uint32_t cmd_hash(const char* string) {
 
 	for (;;) {
 		switch (*string) {
-		case '\0':
-		case '\n':
-		case ' ':
-		case '\r':
-		case '\t':
-		case '\v':
-		case '\f':
-			goto done;
-		default:
-			hash = ((hash << 5) + hash) + *string;
-			++string;
+			case '\0':
+			case '\n':
+			case ' ':
+			case '\r':
+			case '\t':
+			case '\v':
+			case '\f': {
+				goto done;
+			}
+			default: {
+				hash = ((hash << 5) + hash) + *string;
+				++string;
+			}
 		}
 	}
 
@@ -173,18 +175,21 @@ char* cmd_hash_arg(char* string, uint32_t* hash) {
 
 	for (;;) {
 		switch (*string) {
-		case '\0':
-		case '\n':
-		case '\r':
-		case '\t':
-		case '\v':
-		case '\f':
-			goto final;
-		case ' ':
-			goto done;
-		default:
-			*hash = ((*hash << 5) + *hash) + *string;
-			++string;
+			case '\0':
+			case '\n':
+			case '\r':
+			case '\t':
+			case '\v':
+			case '\f': {
+				goto final;
+			}
+			case ' ': {
+				goto done;
+			}
+			default: {
+				*hash = ((*hash << 5) + *hash) + *string;
+				++string;
+			}
 		}
 	}
 
@@ -198,16 +203,17 @@ char* cmd_hash_arg(char* string, uint32_t* hash) {
 void cmd_message(const cmd_sender_t* sender, const cht_component_t* component) {
 
 	switch (sender->type) {
-		case cmd_console:
+		case cmd_console: {
 			log_command(component);
-			break;
+		} break;
 		case cmd_player: {
 			char message[4096];
 			const size_t message_length = cht_write(component, message);
 			phd_send_system_chat_message(sender->player, message, message_length);
 		} break;
-		case cmd_command_block:
-			break;
+		case cmd_command_block: {
+			// Do something maybe	
+		} break;
 	}
 
 }

@@ -76,17 +76,18 @@ void sky_handle_signal_crash(int signal) {
 	log_error("\tCOMPILED " __DATE__ " " __TIME__);
 	log_error("\tCODE 0x%04x", signal);
 	switch (signal) {
-		case SIGFPE:
+		case SIGFPE: {
 			log_error("\t\tFLOATING POINT EXCEPTION");
-			break;
-		case SIGILL:
+		} break;
+		case SIGILL: {
 			log_error("\t\tILLEGAL INSTRUCTION");
-			break;
-		case SIGSEGV:
+		} break;
+		case SIGSEGV: {
 			log_error("\t\tSEGMENTATION FAULT");
-			break;
-		default:
-			break;
+		} break;
+		default: {
+			// Do nothing
+		} break;
 	}
 	log_error("\tTHREAD #%llx", pthread_self());
 	if (pthread_self() == sky_main.console_thread) {
@@ -328,137 +329,137 @@ void sky_load_server_json() {
 			const char* key = mjson_get_string(key_val.label);
 			uint32_t hash = utl_hash(key);
 			switch (hash) {
-			case 0x574c2735: // "worker_count"
-				sky_main.workers.count = mjson_get_int(key_val.value);
-				break;
-			case 0x6f29f27f: // "max-tick-time"
-				sky_main.max_tick_time = mjson_get_int(key_val.value);
-				break;
-			case 0xfdabc3d: // "level"
-				sky_main.world.name.length = mjson_get_size(key_val.value);
-				sky_main.world.name.value = malloc(sky_main.world.name.length + 1);
-				memcpy(sky_main.world.name.value, mjson_get_string(key_val.value), sky_main.world.name.length);
-				sky_main.world.name.value[sky_main.world.name.length] = 0;
-				break;
-			case 0xbaa497e4: { // "gamemode"
-				const uint32_t key_val_size = mjson_get_size(key_val.value);
-				for (uint32_t j = 0; j < key_val_size; ++j) {
-					mjson_property gamemode = mjson_obj_get(key_val.value, j);
-					const char* g_key = mjson_get_string(gamemode.label);
-					const int32_t g_hash = utl_hash(g_key);
-					switch (g_hash) {
-						case 0x885548a: {
-							const char* gamemode_val = mjson_get_string(gamemode.value);
-							const int32_t gamemode_hash = utl_hash(gamemode_val);
-							switch (gamemode_hash) {
-								case 0xde22a921: {
-									sky_main.gamemode = ent_survival;
-								} break;
-								case 0x134d6598: {
-									sky_main.gamemode = ent_creative;
-								} break;
-								case 0xcdf3b093: {
-									sky_main.gamemode = ent_adventure;
-								} break;
-								case 0xf0e3665a: {
-									sky_main.gamemode = ent_spectator;
-								} break;
-								default:
-									log_warn("Unknown value '%s' in server.json! (%x)", gamemode_val, gamemode_hash);
-									break;
-							}
-						} break;
-						case 0xf7393b4: {
-							sky_main.force_gamemode = mjson_get_boolean(gamemode.value);
-						} break;
-						default:
-							log_warn("Unknown value '%s' in server.json! (%x)", g_key, g_hash);
-							break;
+				case 0x574c2735: { // "worker_count"
+					sky_main.workers.count = mjson_get_int(key_val.value);
+				} break;
+				case 0x6f29f27f: { // "max-tick-time"
+					sky_main.max_tick_time = mjson_get_int(key_val.value);
+				} break;
+				case 0xfdabc3d: { // "level"
+					sky_main.world.name.length = mjson_get_size(key_val.value);
+					sky_main.world.name.value = malloc(sky_main.world.name.length + 1);
+					memcpy(sky_main.world.name.value, mjson_get_string(key_val.value), sky_main.world.name.length);
+					sky_main.world.name.value[sky_main.world.name.length] = 0;
+				} break;
+				case 0xbaa497e4: { // "gamemode"
+					const uint32_t key_val_size = mjson_get_size(key_val.value);
+					for (uint32_t j = 0; j < key_val_size; ++j) {
+						mjson_property gamemode = mjson_obj_get(key_val.value, j);
+						const char* g_key = mjson_get_string(gamemode.label);
+						const int32_t g_hash = utl_hash(g_key);
+						switch (g_hash) {
+							case 0x885548a: {
+								const char* gamemode_val = mjson_get_string(gamemode.value);
+								const int32_t gamemode_hash = utl_hash(gamemode_val);
+								switch (gamemode_hash) {
+									case 0xde22a921: {
+										sky_main.gamemode = ent_survival;
+									} break;
+									case 0x134d6598: {
+										sky_main.gamemode = ent_creative;
+									} break;
+									case 0xcdf3b093: {
+										sky_main.gamemode = ent_adventure;
+									} break;
+									case 0xf0e3665a: {
+										sky_main.gamemode = ent_spectator;
+									} break;
+									default: {
+										log_warn("Unknown value '%s' in server.json! (%x)", gamemode_val, gamemode_hash);
+									} break;
+								}
+							} break;
+							case 0xf7393b4: {
+								sky_main.force_gamemode = mjson_get_boolean(gamemode.value);
+							} break;
+							default: {
+								log_warn("Unknown value '%s' in server.json! (%x)", g_key, g_hash);
+							} break;
+						}
 					}
-				}
-			} break;
-			case 0x5af71738: { // "difficulty"
-				const uint32_t key_val_size = mjson_get_size(key_val.value);
-				for (uint32_t j = 0; j < key_val_size; ++j) {
-					mjson_property difficulty = mjson_obj_get(key_val.value, j);
-					const char* d_key = mjson_get_string(difficulty.label);
-					const int32_t d_hash = utl_hash(d_key);
-					switch (d_hash) {
-						case 0xfdabc3d: { // level
-							const char* l_key = mjson_get_string(difficulty.value);
-							int32_t l_hash = utl_hash(l_key);
-							switch (l_hash) {
-								case 0x20b7672a:
-									sky_main.difficulty = sky_peaceful;
-									break;
-								case 0x7c961db7:
-									sky_main.difficulty = sky_easy;
-									break;
-								case 0x108f79ae:
-									sky_main.difficulty = sky_normal;
-									break;
-								case 0x7c97c2a4:
-									sky_main.difficulty = sky_hard;
-									break;
-								default:
-									log_warn("Unknown difficulty level '%s'! (%x)", l_key, l_hash);
-									break;
-							}
-						} break;
-						case 0xb278a56d: // hardcore
-							sky_main.hardcore = mjson_get_boolean(difficulty.value);
-							break;
-						default:
-							log_warn("Unknown value '%s' in server.json! (%x)", d_key, d_hash);
-							break;
+				} break;
+				case 0x5af71738: { // "difficulty"
+					const uint32_t key_val_size = mjson_get_size(key_val.value);
+					for (uint32_t j = 0; j < key_val_size; ++j) {
+						mjson_property difficulty = mjson_obj_get(key_val.value, j);
+						const char* d_key = mjson_get_string(difficulty.label);
+						const int32_t d_hash = utl_hash(d_key);
+						switch (d_hash) {
+							case 0xfdabc3d: { // level
+								const char* l_key = mjson_get_string(difficulty.value);
+								int32_t l_hash = utl_hash(l_key);
+								switch (l_hash) {
+									case 0x20b7672a: {
+										sky_main.difficulty = sky_peaceful;
+									} break;
+									case 0x7c961db7: {
+										sky_main.difficulty = sky_easy;
+									} break;
+									case 0x108f79ae: {
+										sky_main.difficulty = sky_normal;
+									} break;
+									case 0x7c97c2a4: {
+										sky_main.difficulty = sky_hard;
+									} break;
+									default: {
+										log_warn("Unknown difficulty level '%s'! (%x)", l_key, l_hash);
+									} break;
+								}
+							} break;
+							case 0xb278a56d: { // hardcore
+								sky_main.hardcore = mjson_get_boolean(difficulty.value);
+							} break;
+							default: {
+								log_warn("Unknown value '%s' in server.json! (%x)", d_key, d_hash);
+							} break;
+						}
 					}
-				}
-			} break;
-			case 0xc865ee91: // "enforce-whitelist"
-				sky_main.enforce_whitelist = mjson_get_boolean(key_val.value);
-				break;
-			case 0x2e5c5d10: // "enable-command-block"
-				sky_main.enable_command_block = mjson_get_boolean(key_val.value);
-				break;
-			case 0xe526df8: // "max-players"
-				sky_main.listener.online.max = mjson_get_int(key_val.value);
-				break;
-			case 0x105f18ee: // "spawn"
-				// TODO
-				break;
-			case 0xbe5ede5d: // "render-distance"
-				sky_main.render_distance = mjson_get_int(key_val.value);
-				break;
-			case 0x55e4fdff: // "op-permission-level"
-				sky_main.op_permission_level = mjson_get_int(key_val.value);
-				break;
-			case 0xb889efb: // "pvp"
-				sky_main.pvp = mjson_get_boolean(key_val.value);
-				break;
-			case 0x1b84769c: // "server"
-				// TODO
-				break;
-			case 0x4e682648: // "prevent-proxy-connections"
-				sky_main.listener.prevent_proxy_connections = mjson_get_boolean(key_val.value);
-				break;
-			case 0xbb97de68: // "network-compression-threshold"
-				sky_main.listener.network_compression_threshold = mjson_get_int(key_val.value);
-				break;
-			case 0xa009ab4e: // "reduced-debug-info"
-				sky_main.reduced_debug_info = mjson_get_boolean(key_val.value);
-				break;
-			case 0x7c9c614a: // "port"
-				sky_main.listener.address.port = mjson_get_int(key_val.value);
-				break;
-			case 0x8931d3dc: // "online-mode"
-				sky_main.listener.online_mode = mjson_get_boolean(key_val.value);
-				break;
-			case 0x7c9abc59: // "motd"
-				sky_main.motd = cht_from_json(key_val.value);
-				break;
-			default:
-				log_warn("Unknown value '%s' in server.json! (%x)", key, hash);
-				break;
+				} break;
+				case 0xc865ee91: { // "enforce-whitelist"
+					sky_main.enforce_whitelist = mjson_get_boolean(key_val.value);
+				} break;
+				case 0x2e5c5d10: { // "enable-command-block"
+					sky_main.enable_command_block = mjson_get_boolean(key_val.value);
+				} break;
+				case 0xe526df8: { // "max-players"
+					sky_main.listener.online.max = mjson_get_int(key_val.value);
+				} break;
+				case 0x105f18ee: { // "spawn"
+					// TODO
+				} break;
+				case 0xbe5ede5d: { // "render-distance"
+					sky_main.render_distance = mjson_get_int(key_val.value);
+				} break;
+				case 0x55e4fdff: { // "op-permission-level"
+					sky_main.op_permission_level = mjson_get_int(key_val.value);
+				} break;
+				case 0xb889efb: { // "pvp"
+					sky_main.pvp = mjson_get_boolean(key_val.value);
+				} break;
+				case 0x1b84769c: { // "server"
+					// TODO
+				} break;
+				case 0x4e682648: { // "prevent-proxy-connections"
+					sky_main.listener.prevent_proxy_connections = mjson_get_boolean(key_val.value);
+				} break;
+				case 0xbb97de68: { // "network-compression-threshold"
+					sky_main.listener.network_compression_threshold = mjson_get_int(key_val.value);
+				} break;
+				case 0xa009ab4e: { // "reduced-debug-info"
+					sky_main.reduced_debug_info = mjson_get_boolean(key_val.value);
+				} break;
+				case 0x7c9c614a: { // "port"
+					sky_main.listener.address.port = mjson_get_int(key_val.value);
+				} break;
+				case 0x8931d3dc: { // "online-mode"
+					sky_main.listener.online_mode = mjson_get_boolean(key_val.value);
+				} break;
+				case 0x7c9abc59: { // "motd"
+					sky_main.motd = cht_from_json(key_val.value);
+				} break;
+				default: {
+					log_warn("Unknown value '%s' in server.json! (%x)", key, hash);
+				} break;
 			}
 		}
 
