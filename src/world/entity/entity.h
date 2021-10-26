@@ -138,7 +138,7 @@ extern void ent_set_chunk(ent_entity_t* entity);
 
 static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool on_ground) {
 
-	if (((uint64_t) entity->position.x >> 4) != ((uint64_t) x >> 4) || ((uint64_t) entity->position.z >> 4) != ((uint64_t) z >> 4)) {
+	if (((uint64_t) floor(entity->position.x) >> 4) != ((uint64_t) floor(x) >> 4) || ((uint64_t) floor(entity->position.z) >> 4) != ((uint64_t) floor(z) >> 4)) {
 
 		entity->position.x = x;
 		entity->position.y = y;
@@ -167,21 +167,7 @@ static inline void ent_look(ent_living_entity_t* entity, float32_t pitch, float3
 
 static inline void ent_move_look(ent_living_entity_t* entity, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool on_ground) {
 
-	if (((uint64_t) entity->entity.position.x >> 4) != ((uint64_t) x >> 4) || ((uint64_t) entity->entity.position.z >> 4) != ((uint64_t) z >> 4)) {
-
-		entity->entity.position.x = x;
-		entity->entity.position.y = y;
-		entity->entity.position.z = z;
-		ent_set_chunk(&entity->entity);
-
-	} else {
-
-		entity->entity.position.x = x;
-		entity->entity.position.y = y;
-		entity->entity.position.z = z;
-
-	}
-
+	ent_move(&entity->entity, x, y, z, on_ground);
 	ent_look(entity, pitch, yaw, on_ground);
 
 }
@@ -207,6 +193,12 @@ static inline void ent_teleport_look(ent_living_entity_t* entity, wld_world_t* w
 	entity->rotation.yaw = yaw;
 
 	ent_set_chunk(&entity->entity);
+
+}
+
+static inline void ent_on_ground(ent_entity_t* entity, bool on_ground) {
+	
+	entity->on_ground = on_ground;
 
 }
 

@@ -209,10 +209,10 @@ int main(int argc, char* argv[]) {
 
 	// load main world
 	if (fs_dir_exists(UTL_STRTOCSTR(sky_main.world.name))) {
-		log_info("Loading world %s...", UTL_STRTOCSTR(sky_main.world.name));
+		log_info("Loading world \"%s\"...", UTL_STRTOCSTR(sky_main.world.name));
 		wld_load(sky_main.world.name);
 	} else {
-		log_info("Generating world %s...", UTL_STRTOCSTR(sky_main.world.name));
+		log_info("Generating world \"%s\"...", UTL_STRTOCSTR(sky_main.world.name));
 		wld_new(sky_main.world.name, (sky_main.world.seed == 0 ? time(NULL) : sky_main.world.seed), mat_dimension_overworld);
 	}
 
@@ -336,10 +336,31 @@ void sky_load_server_json() {
 					sky_main.max_tick_time = mjson_get_int(key_val.value);
 				} break;
 				case 0xfdabc3d: { // "level"
-					sky_main.world.name.length = mjson_get_size(key_val.value);
-					sky_main.world.name.value = malloc(sky_main.world.name.length + 1);
-					memcpy(sky_main.world.name.value, mjson_get_string(key_val.value), sky_main.world.name.length);
-					sky_main.world.name.value[sky_main.world.name.length] = 0;
+					const uint32_t key_val_size = mjson_get_size(key_val.value);
+					for (uint32_t j = 0; j < key_val_size; ++j) {
+						mjson_property level = mjson_obj_get(key_val.value, j);
+						const char* l_key = mjson_get_string(level.label);
+						const int32_t l_hash = utl_hash(l_key);
+						switch (l_hash) {
+							case 0x7c9b0c46: { // "name"
+								sky_main.world.name.length = mjson_get_size(level.value);
+								sky_main.world.name.value = malloc(sky_main.world.name.length + 1);
+								memcpy(sky_main.world.name.value, mjson_get_string(level.value), sky_main.world.name.length + 1);
+							} break;
+							case 0x59e62b73: { // "max-size"
+								// TODO
+							} break;
+							case 0x641f5542: { // "spawn-protection"
+								// TODO
+							} break;
+							case 0xd8c37ac: { // "generator"
+								// TODO
+							} break;
+							default: {
+								log_warn("Unknown value '%s' in server.json! (%x)", l_key, l_hash);
+							} break;
+						}
+					}
 				} break;
 				case 0xbaa497e4: { // "gamemode"
 					const uint32_t key_val_size = mjson_get_size(key_val.value);
@@ -365,7 +386,7 @@ void sky_load_server_json() {
 										sky_main.gamemode = ent_spectator;
 									} break;
 									default: {
-										log_warn("Unknown value '%s' in server.json! (%x)", gamemode_val, gamemode_hash);
+										log_warn("Unknown gamemode '%s' in server.json! (%x)", gamemode_val, gamemode_hash);
 									} break;
 								}
 							} break;

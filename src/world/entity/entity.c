@@ -38,8 +38,8 @@ void ent_set_chunk(ent_entity_t* entity) {
 		// try relative
 		int32_t o_x = wld_get_chunk_x(entity->chunk);
 		int32_t o_z = wld_get_chunk_z(entity->chunk);
-		int32_t n_x = ((int64_t) entity->position.x) >> 4;
-		int32_t n_z = ((int64_t) entity->position.z) >> 4;
+		int32_t n_x = ((int64_t) floor(entity->position.x)) >> 4;
+		int32_t n_z = ((int64_t) floor(entity->position.z)) >> 4;
 
 		if (UTL_ABS(n_x - o_x) < sky_main.render_distance && UTL_ABS(n_z - o_z) < sky_main.render_distance) {
 			

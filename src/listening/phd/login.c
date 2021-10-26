@@ -165,17 +165,16 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 		if (phd_authRequest.curl == NULL) {
 			phd_authRequest.curl = curl_easy_init();
+			if (!phd_authRequest.curl) {
+				pthread_mutex_unlock(&phd_authRequest.lock);
+				log_error("Failed to initialize cURL");
+				return false;
+			}
 			curl_easy_setopt(phd_authRequest.curl, CURLOPT_TCP_FASTOPEN, 1);
 			curl_easy_setopt(phd_authRequest.curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 			curl_easy_setopt(phd_authRequest.curl, CURLOPT_WRITEFUNCTION, phd_auth_response_write);
 		}
 		CURLcode res;
-
-		if (!phd_authRequest.curl) {
-			pthread_mutex_unlock(&phd_authRequest.lock);
-			log_error("Failed to initialize cURL");
-			return false;
-		}
 
 		// create server_id hash
 		byte_t server_id_hash[sha1_desc.hashsize];
@@ -190,7 +189,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 		char server_id[(sha1_desc.hashsize << 1) + 2];
 		utl_to_minecraft_hex(server_id, server_id_hash, sha1_desc.hashsize);
 
-		char request[157];
+		char request[98 + (sha1_desc.hashsize << 1)];
 		sprintf(request, "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", client->username.value, server_id);
 		curl_easy_setopt(phd_authRequest.curl, CURLOPT_URL, request);
 

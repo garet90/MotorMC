@@ -25,7 +25,7 @@ extern bool phd_handle_lock_difficulty(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_player_rotation(ltg_client_t* client, pck_packet_t* packet);
-extern bool phd_handle_player_movement(ltg_client_t*, pck_packet_t*);
+extern bool phd_handle_player_movement(ltg_client_t* client, pck_packet_t* packet);
 extern bool phd_handle_vehicle_move(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_steer_boat(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_pick_item(ltg_client_t*, pck_packet_t*);
