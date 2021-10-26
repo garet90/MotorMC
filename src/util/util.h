@@ -1,5 +1,4 @@
 #pragma once
-#include <math.h>
 #include "../main.h"
 
 #define UTL_MIN(a, b) _Generic((a), float32_t: utl_minf, float64_t: utl_mind, default: utl_min) (a, b)
@@ -36,7 +35,34 @@ static inline int64_t utl_max(int64_t a, int64_t b) {
 	return b;
 }
 
-#define UTL_ABS(a) _Generic((a), float32_t: fabs, float64_t: fabs, default: labs) (a)
+static inline float32_t utl_fabs(float32_t a) {
+	if (a < 0) return -a;
+	return a;
+}
+
+static inline float64_t utl_dabs(float64_t a) {
+	if (a < 0) return -a;
+	return a;
+}
+
+static inline int64_t utl_labs(int64_t a) {
+	if (a < 0) return -a;
+	return a;
+}
+
+#define UTL_ABS(a) _Generic((a), float32_t: utl_fabs, float64_t: utl_dabs, default: utl_labs) (a)
+
+// faster variant of (int64_t) floor(x)
+static inline int64_t utl_int_floor(float64_t x) {
+	int64_t i = (int64_t) x;
+	return i - (i > x);
+}
+
+// faster variant of (int64_t) ceil(x)
+static inline int64_t utl_int_ceil(float64_t x) {
+	int64_t i = (int64_t) x;
+	return i + (i < x);
+}
 
 static const char utl_hexmap[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 

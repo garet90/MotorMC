@@ -1,6 +1,5 @@
 #pragma once
 #include <pthread.h>
-#include <math.h>
 #include "../../main.h"
 #include "../../io/chat/chat.h"
 #include "../../util/lock_util.h"
@@ -145,7 +144,7 @@ static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, floa
 
 	entity->on_ground = on_ground;
 	
-	if (wld_get_chunk_x(entity->chunk) != (((int64_t) floor(x)) >> 4) || wld_get_chunk_z(entity->chunk) != (((int64_t) floor(z)) >> 4)) {
+	if (wld_get_chunk_x(entity->chunk) != (utl_int_floor(x) >> 4) || wld_get_chunk_z(entity->chunk) != (utl_int_floor(z) >> 4)) {
 
 		ent_set_chunk(entity);
 
@@ -281,7 +280,7 @@ static inline uint16_t ent_player_get_break_speed(ent_player_t* player, mat_bloc
 		return 0;
 	}
 
-	return ceil(1 / damage);
+	return utl_int_ceil(1 / damage);
 
 }
 

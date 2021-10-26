@@ -1,5 +1,4 @@
 #include <tomcrypt.h>
-#include <math.h>
 #include "play.h"
 #include "../../io/logger/logger.h"
 #include "../../io/nbt/mnbt.h"
@@ -1527,8 +1526,8 @@ void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_dis
 
 void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* client) {
 
-	const int32_t x = ((int64_t) floor(client->entity->living_entity.entity.position.x)) >> 4;
-	const int32_t z = ((int64_t) floor(client->entity->living_entity.entity.position.z)) >> 4;
+	const int32_t x = utl_int_floor(client->entity->living_entity.entity.position.x) >> 4;
+	const int32_t z = utl_int_floor(client->entity->living_entity.entity.position.z) >> 4;
 
 	const int32_t old_x = wld_get_chunk_x(old_chunk);
 	const int32_t old_z = wld_get_chunk_z(old_chunk);

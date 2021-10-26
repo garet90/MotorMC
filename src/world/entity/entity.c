@@ -33,13 +33,16 @@ void ent_set_chunk(ent_entity_t* entity) {
 
 	wld_chunk_t* chunk = NULL;
 
+	const int64_t f_x = utl_int_floor(entity->position.x);
+	const int64_t f_z = utl_int_floor(entity->position.z);
+
 	if (entity->chunk != NULL) {
 
 		// try relative
 		int32_t o_x = wld_get_chunk_x(entity->chunk);
 		int32_t o_z = wld_get_chunk_z(entity->chunk);
-		int32_t n_x = ((int64_t) floor(entity->position.x)) >> 4;
-		int32_t n_z = ((int64_t) floor(entity->position.z)) >> 4;
+		int32_t n_x = f_x >> 4;
+		int32_t n_z = f_z >> 4;
 
 		if (UTL_ABS(n_x - o_x) < sky_main.render_distance && UTL_ABS(n_z - o_z) < sky_main.render_distance) {
 			
@@ -47,12 +50,12 @@ void ent_set_chunk(ent_entity_t* entity) {
 			
 		} else { // set absolute (o(logn))
 
-			chunk = wld_get_chunk_at(entity->position.world, (int64_t) floor(entity->position.x), (int64_t) floor(entity->position.z));
+			chunk = wld_get_chunk_at(entity->position.world, f_x, f_z);
 		}
 		ent_remove_chunk(entity);
 	} else {
 		// set absolute (o(logn))
-		chunk = wld_get_chunk_at(entity->position.world, (int64_t) floor(entity->position.x), (int64_t) floor(entity->position.z));
+		chunk = wld_get_chunk_at(entity->position.world, f_x, f_z);
 	}
 
 	assert(chunk != NULL);
