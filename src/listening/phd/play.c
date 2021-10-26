@@ -567,6 +567,15 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
 	wld_chunk_t* chunk = player->living_entity.entity.chunk;
+
+	const int32_t c_x = wld_get_chunk_x(chunk);
+	const int32_t c_z = wld_get_chunk_z(chunk);
+
+	const int32_t b_x = position.x >> 4;
+	const int32_t b_z = position.z >> 4;
+
+	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, b_x - c_x, b_z - c_z);
+
 	wld_world_t* world = player->living_entity.entity.position.world;
 
 	with_lock (&player->living_entity.entity.lock) {
@@ -580,7 +589,7 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 							(job_payload_t) {
 								.dig_block = {
 									.client = client,
-									.chunk = chunk,
+									.chunk = block_chunk,
 									.location = (wld_block_position_t) {
 											.world = world,
 											.x = position.x,
@@ -937,6 +946,10 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		// you're damn right i'm gonna waste 4 bytes, speed is key
 		const size_t data_len = packet->cursor;
 		packet->cursor += 5;
+
+		if (chunk->sections[0].blocks[0] == mat_get_block_default_protocol_id_by_type(mat_block_air)) {
+			log_info("chunk missing 0, 0, 0 block");
+		}
 
 		for (uint16_t i = 0; i < chunk_height; ++i) {
 			if (chunk->sections[i].block_count != 0) {

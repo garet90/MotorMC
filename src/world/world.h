@@ -1,5 +1,6 @@
 #pragma once
 #include <pthread.h>
+#include <assert.h>
 #include "../main.h"
 #include "../util/dll.h"
 #include "../util/id_vector.h"
@@ -217,26 +218,27 @@ static inline mat_block_type_t wld_get_block_type_at(wld_chunk_t* chunk, int32_t
 
 }
 
-static inline void wld_set_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_protocol_id_t type) {
+static inline void wld_set_block_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_protocol_id_t type) {
 
-	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, x >> 4, z >> 4);
+	assert(z <= 0xF && x <= 0xF);
+
 	const uint16_t sub_chunk = y >> 4;
 
-	with_lock (&block_chunk->lock) {
-		const mat_block_protocol_id_t old_type = block_chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | ((z & 0xF) << 4) | (x & 0xF)];
+	with_lock (&chunk->lock) {
+		const mat_block_protocol_id_t old_type = chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x];
 		const bool old_type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(old_type))->air;
 		const bool type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(type))->air;
 		if (old_type_air && !type_air) {
-			block_chunk->sections[sub_chunk].block_count++;
+			chunk->sections[sub_chunk].block_count++;
 		} else if (!old_type_air && type_air) {
-			block_chunk->sections[sub_chunk].block_count--;
+			chunk->sections[sub_chunk].block_count--;
 		}
-		block_chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | ((z & 0xF) << 4) | (x & 0xF)] = type;
+		chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x] = type;
 	}
 
 }
 
-static inline void wld_set_block_type_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_type_t type) {
+static inline void wld_set_block_type_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_type_t type) {
 
 	wld_set_block_at(chunk, x, y, z, mat_get_block_default_protocol_id_by_type(type));
 

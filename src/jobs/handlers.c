@@ -174,12 +174,13 @@ bool job_handle_dig_block(job_payload_t* payload) {
 		if (player->digging_block) {
 			player->digging_block = false;
 		} else {
-
+			pthread_mutex_unlock(&player->living_entity.entity.lock);
+			return false;
 		}
 	}
 
 	// break block
-	wld_set_block_type_at(payload->dig_block.chunk, payload->dig_block.location.x, payload->dig_block.location.y, payload->dig_block.location.z, mat_block_air);
+	wld_set_block_type_at(payload->dig_block.chunk, payload->dig_block.location.x & 0xF, payload->dig_block.location.y & 0xF, payload->dig_block.location.z & 0xF, mat_block_air);
 
 	log_info("Dug block at %d, %d, %d (%d, %d, %d) [%d, %d, %d] to air", payload->dig_block.location.x, payload->dig_block.location.y, payload->dig_block.location.z, payload->dig_block.location.x >> 4, payload->dig_block.location.y >> 4, payload->dig_block.location.z >> 4, payload->dig_block.location.x & 0xF, payload->dig_block.location.y & 0xF, payload->dig_block.location.z & 0xF);
 
