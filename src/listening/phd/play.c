@@ -1,4 +1,5 @@
 #include <tomcrypt.h>
+#include <math.h>
 #include "play.h"
 #include "../../io/logger/logger.h"
 #include "../../io/nbt/mnbt.h"
@@ -481,19 +482,14 @@ bool phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 	const float64_t y = pck_read_float64(packet);
 	const float64_t z = pck_read_float64(packet);
 	const bool on_ground = pck_read_int8(packet);
-	
-	const uint64_t c_x = (((uint64_t) floor(x)) >> 4);
-	const uint64_t c_z = (((uint64_t) floor(z)) >> 4);
 
 	const wld_chunk_t* old_chunk = player->living_entity.entity.chunk;
-	const uint64_t o_x = wld_get_chunk_x(old_chunk);
-	const uint64_t o_z = wld_get_chunk_x(old_chunk);
 
 	ent_move(&player->living_entity.entity, x, y, z, on_ground);
 
-	if (o_x != c_x || o_z != c_z) {
+	if (old_chunk != player->living_entity.entity.chunk) {
 
-		phd_send_update_view_position_to(client, c_x, c_z);
+		phd_send_update_view_position(client);
 		phd_update_sent_chunks_move(old_chunk, client);
 
 	}
@@ -515,18 +511,13 @@ bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* pac
 
 	const bool on_ground = pck_read_int8(packet);
 
-	const uint64_t c_x = (((uint64_t) floor(x)) >> 4);
-	const uint64_t c_z = (((uint64_t) floor(z)) >> 4);
-
 	const wld_chunk_t* old_chunk = player->living_entity.entity.chunk;
-	const uint64_t o_x = wld_get_chunk_x(old_chunk);
-	const uint64_t o_z = wld_get_chunk_x(old_chunk);
 
 	ent_move_look(&player->living_entity, x, y, z, yaw, pitch, on_ground);
 
-	if (o_x != c_x || o_z != c_z) {
+	if (old_chunk != player->living_entity.entity.chunk) {
 
-		phd_send_update_view_position_to(client, c_x, c_z);
+		phd_send_update_view_position(client);
 		phd_update_sent_chunks_move(old_chunk, client);
 
 	}
@@ -877,8 +868,6 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 	pck_write_var_int(packet, 0x22);
 	pck_write_int32(packet, wld_get_chunk_x(chunk));
 	pck_write_int32(packet, wld_get_chunk_z(chunk));
-
-	log_info("Sending chunk %d, %d", wld_get_chunk_x(chunk), wld_get_chunk_z(chunk));
 
 	const uint16_t chunk_height = mat_get_chunk_height(chunk->region->world->environment);
 
@@ -1538,8 +1527,8 @@ void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_dis
 
 void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* client) {
 
-	const int32_t x = ((uint64_t) floor(client->entity->living_entity.entity.position.x)) >> 4;
-	const int32_t z = ((uint64_t) floor(client->entity->living_entity.entity.position.z)) >> 4;
+	const int32_t x = ((int64_t) floor(client->entity->living_entity.entity.position.x)) >> 4;
+	const int32_t z = ((int64_t) floor(client->entity->living_entity.entity.position.z)) >> 4;
 
 	const int32_t old_x = wld_get_chunk_x(old_chunk);
 	const int32_t old_z = wld_get_chunk_z(old_chunk);

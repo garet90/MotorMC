@@ -1,5 +1,6 @@
 #pragma once
 #include <pthread.h>
+#include <math.h>
 #include "../../main.h"
 #include "../../io/chat/chat.h"
 #include "../../util/lock_util.h"
@@ -138,22 +139,17 @@ extern void ent_set_chunk(ent_entity_t* entity);
 
 static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool on_ground) {
 
-	if (((uint64_t) floor(entity->position.x) >> 4) != ((uint64_t) floor(x) >> 4) || ((uint64_t) floor(entity->position.z) >> 4) != ((uint64_t) floor(z) >> 4)) {
-
-		entity->position.x = x;
-		entity->position.y = y;
-		entity->position.z = z;
-		ent_set_chunk(entity);
-
-	} else {
-
-		entity->position.x = x;
-		entity->position.y = y;
-		entity->position.z = z;
-
-	}
+	entity->position.x = x;
+	entity->position.y = y;
+	entity->position.z = z;
 
 	entity->on_ground = on_ground;
+	
+	if (wld_get_chunk_x(entity->chunk) != (((int64_t) floor(x)) >> 4) || wld_get_chunk_z(entity->chunk) != (((int64_t) floor(z)) >> 4)) {
+
+		ent_set_chunk(entity);
+
+	}
 
 }
 

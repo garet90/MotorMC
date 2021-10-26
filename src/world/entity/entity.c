@@ -47,12 +47,12 @@ void ent_set_chunk(ent_entity_t* entity) {
 			
 		} else { // set absolute (o(logn))
 
-			chunk = wld_get_chunk_at(entity->position.world, (int64_t) entity->position.x, (int64_t) entity->position.z);
+			chunk = wld_get_chunk_at(entity->position.world, (int64_t) floor(entity->position.x), (int64_t) floor(entity->position.z));
 		}
 		ent_remove_chunk(entity);
 	} else {
 		// set absolute (o(logn))
-		chunk = wld_get_chunk_at(entity->position.world, (int64_t) entity->position.x, (int64_t) entity->position.z);
+		chunk = wld_get_chunk_at(entity->position.world, (int64_t) floor(entity->position.x), (int64_t) floor(entity->position.z));
 	}
 
 	assert(chunk != NULL);
