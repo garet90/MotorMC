@@ -943,50 +943,63 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 				pck_write_int16(packet, chunk->sections[i].block_count);
 
-				mat_block_protocol_id_t palette[256];
-				uint8_t palette_length = 1;
+				struct {
+					mat_block_protocol_id_t array[256];
+					uint8_t length;
+				} palette = {
+					.length = 1
+				};
+				palette.array[0] = mat_get_block_default_protocol_id_by_type(mat_block_air);
 				
 				int8_t block_array[4096];
 
-				mat_block_protocol_id_t previous_block = 0;
-				uint16_t previous_palette = 0;
+				struct {
+					mat_block_protocol_id_t block;
+					uint16_t palette;
+				} previous = {
+					.block = mat_get_block_default_protocol_id_by_type(mat_block_air), // mat_block_air
+					.palette = 0
+				};
 
 				for (uint16_t j = 0; j < 4096; ++j) {
+
 					const mat_block_protocol_id_t block = chunk->sections[i].blocks[j];
-					if (block == previous_block) {
-						block_array[j] = previous_palette;
+					if (block == previous.block) {
+						block_array[j] = previous.palette;
 					} else {
 						// test if block is in palette
-						for (uint8_t k = 0; k < palette_length; ++k) {
-							if (palette[k] == block) {
-								block_array[j] = previous_palette = k;
-								previous_block = block;
+						for (uint8_t k = 0; k < palette.length; ++k) {
+							if (palette.array[k] == block) {
+								block_array[j] = previous.palette = k;
+								previous.block = block;
+
 								goto end;
 							}
 						}
 
-						if (palette_length < 255) {
-							palette[palette_length] = block;
-							block_array[j] = previous_palette = palette_length;
-							previous_block = block;
-							palette_length += 1;
+						// add to palette (it hasn't been found)
+						if (palette.length < 255) {
+							palette.array[palette.length] = block;
+							block_array[j] = previous.palette = palette.length++;
+							previous.block = block;
 						} else {
+							// palette is too big, use direct
 							break;
 						}
 					}
 					end:{}
 				}
 
-				if (palette_length < 255) {
+				if (palette.length < 255) {
 					// use palette
 					uint8_t bits_per_block;
-					if (palette_length < 16) {
+					if (palette.length < 16) {
 						bits_per_block = 4;
-					} else if (palette_length < 32) {
+					} else if (palette.length < 32) {
 						bits_per_block = 5;
-					} else if (palette_length < 64) {
+					} else if (palette.length < 64) {
 						bits_per_block = 6;
-					} else if (palette_length < 128) {
+					} else if (palette.length < 128) {
 						bits_per_block = 7;
 					} else {
 						bits_per_block = 8;
@@ -995,9 +1008,9 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 					const int32_t data_array_length = 1 + (4095 / blocks_per_long);
 
 					pck_write_int8(packet, bits_per_block);
-					pck_write_var_int(packet, palette_length);
-					for (uint8_t j = 0; j < palette_length; ++j) {
-						pck_write_var_int(packet, palette[j]);
+					pck_write_var_int(packet, palette.length);
+					for (uint8_t j = 0; j < palette.length; ++j) {
+						pck_write_var_int(packet, palette.array[j]);
 					}
 
 					pck_write_var_int(packet, data_array_length);
