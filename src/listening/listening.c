@@ -171,15 +171,14 @@ bool ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 				PCK_INLINE(decompressed, data_length, io_big_endian);
 				
 				// it's zlib compression time
-				struct libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
-
-				size_t actual_length = 0;
-				if (libdeflate_zlib_decompress(decompressor, pck_cursor(packet), packet_length - (packet->cursor - length_ptr), pck_cursor(decompressed), data_length, &actual_length) != LIBDEFLATE_SUCCESS) {
-					libdeflate_free_decompressor(decompressor);
-					return false;
+				if (client->compression.decompressor == NULL) {
+					client->compression.decompressor = libdeflate_alloc_decompressor();
 				}
 
-				libdeflate_free_decompressor(decompressor);
+				size_t actual_length = 0;
+				if (libdeflate_zlib_decompress(client->compression.decompressor, pck_cursor(packet), packet_length - (packet->cursor - length_ptr), pck_cursor(decompressed), data_length, &actual_length) != LIBDEFLATE_SUCCESS) {
+					return false;
+				}
 
 				if (actual_length != (unsigned) data_length) {
 					return false;
@@ -288,10 +287,11 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 			bytes = compressed + 10;
 			
 			// it's zlib compression time
-			struct libdeflate_compressor* compressor = libdeflate_alloc_compressor(6);
+			if (client->compression.compressor == NULL) {
+				client->compression.compressor = libdeflate_alloc_compressor(6);
+			}
 
-			compressed_length = libdeflate_zlib_compress(compressor, packet->bytes, length, bytes, length);
-			libdeflate_free_compressor(compressor);
+			compressed_length = libdeflate_zlib_compress(client->compression.compressor, packet->bytes, length, bytes, length);
 
 			if (compressed_length != 0) {
 
@@ -376,6 +376,14 @@ void ltg_disconnect(ltg_client_t* client) {
 	// remove from client list
 	with_lock (&sky_main.listener.clients.lock) {
 		utl_id_vector_remove(&sky_main.listener.clients.vector, client->id);
+	}
+
+	// free compressors
+	if (client->compression.compressor != NULL) {
+		libdeflate_free_compressor(client->compression.compressor);
+	}
+	if (client->compression.decompressor != NULL) {
+		libdeflate_free_decompressor(client->compression.decompressor);
 	}
 
 	// free username

@@ -162,6 +162,12 @@ typedef struct {
 	// player entity (only non-null when in PLAY state)
 	ent_player_t* entity;
 
+	// compressors and decompressors
+	struct {
+		struct libdeflate_compressor* compressor;
+		struct libdeflate_decompressor* decompressor;
+	} compression;
+
 	// textures (only non-null after auth)
 	struct {
 		string_t value;
