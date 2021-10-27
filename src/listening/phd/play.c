@@ -62,6 +62,9 @@ bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		case 0x2c: {
 			return phd_handle_animation(client, packet);
 		}
+		case 0x2e: {
+			return phd_handle_player_block_placement(client, packet);
+		}
 		default: {
 			log_warn("Unknown packet %02x received in play state!", id);
 			return false;
@@ -556,14 +559,7 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 
 	const int32_t status = pck_read_var_int(packet);
 	const pck_position_t position =  pck_read_position(packet);
-	const enum {
-		bottom,
-		top,
-		north,
-		south,
-		west,
-		east
-	} face = pck_read_int8(packet);
+	__attribute__((unused)) const wld_face_t face = pck_read_int8(packet);
 
 	ent_player_t* player = client->entity;
 	wld_chunk_t* chunk = player->living_entity.entity.chunk;
@@ -575,8 +571,6 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 	const int32_t b_z = position.z >> 4;
 
 	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, b_x - c_x, b_z - c_z);
-
-	wld_world_t* world = player->living_entity.entity.position.world;
 
 	with_lock (&player->living_entity.entity.lock) {
 		switch (status) {
@@ -590,15 +584,11 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 								.dig_block = {
 									.client = client,
 									.chunk = block_chunk,
-									.location = (wld_block_position_t) {
-											.world = world,
-											.x = position.x,
-											.y = position.y,
-											.z = position.z
-										}
-									}
+									.x = position.x & 0xF,
+									.y = position.y,
+									.z = position.z & 0xF,
 								}
-							),
+							}),
 						ent_player_get_break_speed(
 							player,
 							wld_get_block_type_at(chunk, position.x, position.y, position.z)
@@ -703,6 +693,94 @@ bool phd_handle_animation(__attribute__((unused)) ltg_client_t* client, pck_pack
 	__attribute__((unused)) uint8_t hand = pck_read_var_int(packet);
 
 	// TODO
+
+	return true;
+
+}
+
+bool phd_handle_player_block_placement(ltg_client_t* client, pck_packet_t* packet) {
+
+	const enum {
+		main_hand = 0,
+		off_hand = 1
+	} hand = pck_read_var_int(packet);
+	
+	pck_position_t position =  pck_read_position(packet);
+	
+	const wld_face_t face = pck_read_var_int(packet);
+
+	switch (face) {
+		case wld_face_top: {
+			position.y += 1;
+		} break;
+		case wld_face_bottom: {
+			position.y -= 1;
+		} break;
+		case wld_face_north: {
+			position.z -= 1;
+		} break;
+		case wld_face_south: {
+			position.z += 1;
+		} break;
+		case wld_face_west: {
+			position.x -= 1;
+		} break;
+		case wld_face_east: {
+			position.x += 1;
+		} break;
+		default: {
+			return false;
+		}
+	}
+
+	__attribute__((unused)) const struct {
+		float32_t x;
+		float32_t y;
+		float32_t z;
+	} cursor = {
+		.x = pck_read_float32(packet),
+		.y = pck_read_float32(packet),
+		.z = pck_read_float32(packet)
+	};
+	__attribute__((unused)) const bool inside_block = pck_read_int8(packet);
+
+	ent_player_t* player = client->entity;
+
+	itm_item_t* slot = NULL;
+
+	with_lock (&player->living_entity.entity.lock) {
+
+		switch (hand) {
+			case main_hand: {
+				slot = player->hotbar + player->held_item;
+			} break;
+			case off_hand: {
+				slot = &player->living_entity.off_hand;
+			} break;
+		}
+
+		const mat_item_t* item = mat_get_item_by_type(slot->type);
+		
+		if (item->block != mat_block_air) {
+
+			const wld_chunk_t* player_chunk = player->living_entity.entity.chunk;
+			
+			const int32_t p_x = wld_get_chunk_x(player_chunk);
+			const int32_t p_z = wld_get_chunk_z(player_chunk);
+
+			const int32_t b_x = position.x >> 4;
+			const int32_t b_z = position.z >> 4;
+
+			wld_chunk_t* block_chunk = wld_relative_chunk(player_chunk, b_x - p_x, b_z - p_z);
+			wld_set_block_type_at(block_chunk, position.x & 0xF, position.y, position.z & 0xF, item->block);
+
+			itm_set_count(slot, slot->count - 1);
+
+		} else {
+			return false;
+		}
+
+	}
 
 	return true;
 

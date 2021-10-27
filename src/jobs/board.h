@@ -60,7 +60,9 @@ typedef union {
 
 		ltg_client_t* client;
 		wld_chunk_t* chunk;
-		wld_block_position_t location;
+		int16_t y;
+		uint8_t x : 4;
+		uint8_t z : 4;
 
 	} dig_block;
 

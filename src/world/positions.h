@@ -2,6 +2,17 @@
 #include "../main.h"
 #include "world.h"
 
+typedef enum {
+
+	wld_face_bottom,
+	wld_face_top,
+	wld_face_north,
+	wld_face_south,
+	wld_face_west,
+	wld_face_east
+
+} wld_face_t;
+
 typedef struct {
 
 	wld_world_t* _Atomic world;

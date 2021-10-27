@@ -1,5 +1,6 @@
 #pragma once
 #include "../../main.h"
+#include "blocks.h"
 
 /*
 	ITEMS
@@ -1114,6 +1115,8 @@ typedef enum {
 
 typedef struct {
 
+	mat_block_type_t block : 10; // wall counterparts will be handled by block or item tags (probably block tags)
+
 	bool tool : 1;
 	bool tool_axe : 1;
 	bool tool_hoe : 1;
@@ -1193,6 +1196,7 @@ typedef struct {
 	bool wooden_stairs : 1;
 	bool wooden_trapdoors : 1;
 	bool wool : 1;
+
 } mat_item_t;
 
 extern const mat_item_t* mat_items[];
