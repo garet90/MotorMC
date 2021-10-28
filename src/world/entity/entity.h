@@ -90,8 +90,13 @@ typedef enum {
 typedef struct {
 
 	ent_living_entity_t living_entity;
+	
+	const byte_t* uuid;
+
 	float32_t additional_hearts;
 	int32_t score;
+	
+	uint32_t digging;
 
 	byte_t displayed_skin_parts;
 
@@ -101,7 +106,6 @@ typedef struct {
 	ent_gamemode_t gamemode : 2;
 
 	bool digging_block : 1;
-	uint32_t digging;
 
 	itm_item_t inventory[27];
 	itm_item_t hotbar[9];
@@ -152,18 +156,18 @@ static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, floa
 
 }
 
-static inline void ent_look(ent_living_entity_t* entity, float32_t pitch, float32_t yaw, bool on_ground) {
+static inline void ent_look(ent_living_entity_t* entity, float32_t yaw, float32_t pitch, bool on_ground) {
 	
-	entity->entity.on_ground = on_ground;
-	entity->rotation.pitch = pitch;
 	entity->rotation.yaw = yaw;
+	entity->rotation.pitch = pitch;
+	entity->entity.on_ground = on_ground;
 
 }
 
 static inline void ent_move_look(ent_living_entity_t* entity, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool on_ground) {
 
 	ent_move(&entity->entity, x, y, z, on_ground);
-	ent_look(entity, pitch, yaw, on_ground);
+	ent_look(entity, yaw, pitch, on_ground);
 
 }
 
@@ -184,8 +188,8 @@ static inline void ent_teleport_look(ent_living_entity_t* entity, wld_world_t* w
 	entity->entity.position.x = x;
 	entity->entity.position.y = y;
 	entity->entity.position.z = z;
-	entity->rotation.pitch = pitch;
 	entity->rotation.yaw = yaw;
+	entity->rotation.pitch = pitch;
 
 	ent_set_chunk(&entity->entity);
 

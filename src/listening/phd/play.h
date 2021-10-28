@@ -58,7 +58,7 @@ extern void phd_send_spawn_entity(ltg_client_t*);
 extern void phd_send_spawn_experience_orb(ltg_client_t*);
 extern void phd_send_spawn_living_entity(ltg_client_t*);
 extern void phd_send_spawn_painting(ltg_client_t*);
-extern void phd_send_spawn_player(ltg_client_t*);
+extern void phd_send_spawn_player(ltg_client_t* client, ent_player_t* player);
 extern void phd_send_sculk_vibration_signal(ltg_client_t*);
 extern void phd_send_entity_animation(ltg_client_t*);
 extern void phd_send_statistics(ltg_client_t*);
@@ -169,6 +169,30 @@ extern void phd_send_entity_properties(ltg_client_t*);
 extern void phd_send_entity_effect(ltg_client_t*);
 extern void phd_send_declare_recipes(ltg_client_t* client);
 extern void phd_send_tags(ltg_client_t* client);
+
+static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t* chunk) {
+	phd_send_update_light(client, chunk);
+	phd_send_chunk_data(client, chunk);
+	wld_subscribe_chunk(chunk, client->id);
+
+	// send chunk entities
+	with_lock (&chunk->lock) {
+		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&chunk->entities);
+		ent_entity_t* entity = utl_dll_iterator_next(&iterator);
+		while (entity != NULL) {
+
+			if (entity != (ent_entity_t*) client->entity) {
+				switch (entity->type) {
+					case ent_player: {
+						phd_send_spawn_player(client, (ent_player_t*) entity);
+					} break;
+				}
+			}
+
+			entity = utl_dll_iterator_next(&iterator);
+		}
+	}
+}
 
 extern void phd_update_sent_chunks(ltg_client_t* client);
 extern void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_distance);

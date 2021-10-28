@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 #include "../main.h"
 
 typedef enum io_endianness {
@@ -342,5 +343,17 @@ static inline uint16_t io_htons(uint16_t n) {
 	}
 
 	return n;
+
+}
+
+static inline uint8_t io_angle_to_byte(float32_t angle) {
+
+	angle = fmodf(angle, 360.f);
+
+	if (angle < 0.f) {
+		angle += 360.f;
+	}
+
+	return (uint8_t) ((angle / 360.f) * 256.f);
 
 }
