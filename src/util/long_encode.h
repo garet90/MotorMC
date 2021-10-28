@@ -99,11 +99,20 @@ static inline size_t utl_encode_shorts_to_longs(int16_t* values, size_t values_l
 				goto done;
 			}
 		}
+		
+		if (__ENDIANNESS__ == io_little_endian) {
+			data[i] = io_switch_int64(data[i]);
+		}
 
 		i++;
 	}
 
 	done:
+	
+	if (__ENDIANNESS__ == io_little_endian) {
+		data[i] = io_switch_int64(data[i]);
+	}
+
 	return i + 1;
 
 }
