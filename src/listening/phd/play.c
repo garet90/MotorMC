@@ -572,7 +572,7 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 
 	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, b_x - c_x, b_z - c_z);
 
-	with_lock (&player->living_entity.entity.lock) {
+	with_lock (&player->living_entity.entity.lock){
 		switch (status) {
 			case 0: { // start digging
 				if (!player->digging_block) {
@@ -990,8 +990,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		int64_t motion_blocking[heightmap_size];
 		int64_t world_surface[heightmap_size];
 
-		UTL_ENCODE_TO_LONGS(chunk->highest.motion_blocking, 256, 9, false, motion_blocking);
-		UTL_ENCODE_TO_LONGS(chunk->highest.world_surface, 256, 9, false, world_surface);
+		utl_encode_shorts_to_longs(chunk->highest.motion_blocking, 256, 9, motion_blocking);
+		utl_encode_shorts_to_longs(chunk->highest.world_surface, 256, 9, world_surface);
 
 		// create heightmap
 		mnbt_doc* doc = mnbt_new();
@@ -1106,7 +1106,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 					pck_write_var_int(packet, data_array_length);
 					
-					UTL_ENCODE_TO_LONGS(block_array, 4096, bits_per_block, true, pck_cursor(packet));
+					utl_encode_bytes_to_longs_r(block_array, 4096, bits_per_block, (int64_t*) pck_cursor(packet));
 					packet->cursor += data_array_length << 3;
 				} else {
 					// direct
@@ -1117,7 +1117,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 					pck_write_int8(packet, bits_per_block);
 					pck_write_var_int(packet, data_array_length); // data array length
 					
-					UTL_ENCODE_TO_LONGS((int16_t*) chunk->sections[i].blocks, 4096, bits_per_block, true, pck_cursor(packet));
+					utl_encode_shorts_to_longs_r((int16_t*) chunk->sections[i].blocks, 4096, bits_per_block, (int64_t*) pck_cursor(packet));
 					packet->cursor += data_array_length << 3;
 				}
 			}

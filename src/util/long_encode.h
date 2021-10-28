@@ -1,85 +1,109 @@
 #pragma once
 #include "../main.h"
 
-#define UTL_ENCODE_TO_LONGS(blocks, blocks_length, bits_per_entry, right, data) _Generic((blocks), int32_t*: utl_encode_ints_to_longs, int16_t*: utl_encode_shorts_to_longs, int8_t*: utl_encode_bytes_to_longs) (blocks, blocks_length, bits_per_entry, right, (int64_t*) data)
+const uint8_t utl_values_per_long[] = {
+	0, 64, 32, 21, 16, 12, 10, 9,
+	8, 7, 6, 5, 5, 4, 4, 4,
+	4, 3, 3, 3, 3, 3, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2,
+	2, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1,
+	1
+};
 
-static inline size_t utl_encode_ints_to_longs(int32_t* values, size_t values_length, int8_t bits_per_entry, bool right, int64_t* data) {
-	
-	const int8_t values_per_long = 64 / bits_per_entry;
-	const size_t size = 1 + ((values_length - 1) / values_per_long);
+static inline size_t utl_encode_bytes_to_longs_r(int8_t* values, size_t values_length, uint8_t bits_per_entry, int64_t* data) {
 
-	for (size_t i = 0; i < values_length; ++i) {
-		const int64_t value = values[i];
-		const ldiv_t cell_bit = ldiv(i, values_per_long);
-		const size_t cell = cell_bit.quot;
-		const size_t bit = cell_bit.rem;
-		if (bit == 0)
-			data[cell] = 0;
-		if (right) {
-			data[cell] |= value << (bit * bits_per_entry);
-			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && __ENDIANNESS__ == io_little_endian) {
-				// flip cell
-				data[cell] = io_switch_int64(data[cell]);
+	assert(bits_per_entry > 0);
+
+	const uint8_t values_per_long = utl_values_per_long[bits_per_entry];
+
+	size_t i = 0, j = 0;
+	while (true) {
+		data[i] = 0;
+		
+		for (int8_t k = 0; k < values_per_long; ++k) {
+			if (j < values_length) {
+				data[i] |= ((int64_t) values[j++]) << (k * bits_per_entry);
+			} else {
+				goto done;
 			}
-		} else {
-			data[cell] |= value << (bit * bits_per_entry + (64 - values_per_long * bits_per_entry));
 		}
+
+		if (__ENDIANNESS__ == io_little_endian) {
+			data[i] = io_switch_int64(data[i]);
+		}
+
+		i++;
 	}
 
-	return size;
+	done:
+	if (__ENDIANNESS__ == io_little_endian) {
+		data[i] = io_switch_int64(data[i]);
+	}
+
+	return i + 1;
 
 }
 
-static inline size_t utl_encode_shorts_to_longs(int16_t* values, size_t values_length, int8_t bits_per_entry, bool right, int64_t* data) {
-	
-	const int8_t values_per_long = 64 / bits_per_entry;
-	const size_t size = 1 + ((values_length - 1) / values_per_long);
+static inline size_t utl_encode_shorts_to_longs_r(int16_t* values, size_t values_length, uint8_t bits_per_entry, int64_t* data) {
 
-	for (size_t i = 0; i < values_length; ++i) {
-		const int64_t value = values[i];
-		const ldiv_t cell_bit = ldiv(i, values_per_long);
-		const size_t cell = cell_bit.quot;
-		const size_t bit = cell_bit.rem;
-		if (bit == 0)
-			data[cell] = 0;
-		if (right) {
-			data[cell] |= value << (bit * bits_per_entry);
-			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && __ENDIANNESS__ == io_little_endian) {
-				// flip cell
-				data[cell] = io_switch_int64(data[cell]);
+	assert(bits_per_entry > 0);
+
+	const uint8_t values_per_long = utl_values_per_long[bits_per_entry];
+
+	size_t i = 0, j = 0;
+	while (true) {
+		data[i] = 0;
+		
+		for (int8_t k = 0; k < values_per_long; ++k) {
+			if (j < values_length) {
+				data[i] |= ((int64_t) values[j++]) << (k * bits_per_entry);
+			} else {
+				goto done;
 			}
-		} else {
-			data[cell] |= value << (bit * bits_per_entry + (64 - values_per_long * bits_per_entry));
 		}
+		
+		if (__ENDIANNESS__ == io_little_endian) {
+			data[i] = io_switch_int64(data[i]);
+		}
+
+		i++;
 	}
 
-	return size;
+	done:
+
+	if (__ENDIANNESS__ == io_little_endian) {
+		data[i] = io_switch_int64(data[i]);
+	}
+
+	return i + 1;
 
 }
 
-static inline size_t utl_encode_bytes_to_longs(int8_t* values, size_t values_length, int8_t bits_per_entry, bool right, int64_t* data) {
-	
-	const int8_t values_per_long = 64 / bits_per_entry;
-	const size_t size = 1 + ((values_length - 1) / values_per_long);
+static inline size_t utl_encode_shorts_to_longs(int16_t* values, size_t values_length, uint8_t bits_per_entry, int64_t* data) {
 
-	for (size_t i = 0; i < values_length; ++i) {
-		const int64_t value = values[i];
-		const ldiv_t cell_bit = ldiv(i, values_per_long);
-		const size_t cell = cell_bit.quot;
-		const size_t bit = cell_bit.rem;
-		if (bit == 0)
-			data[cell] = 0;
-		if (right) {
-			data[cell] |= value << (bit * bits_per_entry);
-			if ((bit == (unsigned) values_per_long - 1 || i == values_length - 1) && __ENDIANNESS__ == io_little_endian) {
-				// flip cell
-				data[cell] = io_switch_int64(data[cell]);
+	assert(bits_per_entry > 0);
+
+	const uint8_t values_per_long = utl_values_per_long[bits_per_entry];
+
+	size_t i = 0, j = 0;
+	while (true) {
+		data[i] = 0;
+		
+		for (int8_t k = 0; k < values_per_long; ++k) {
+			if (j < values_length) {
+				data[i] |= ((int64_t) values[j++]) << (k * bits_per_entry + (64 - values_per_long * bits_per_entry));
+			} else {
+				goto done;
 			}
-		} else {
-			data[cell] |= value << (bit * bits_per_entry + (64 - values_per_long * bits_per_entry));
 		}
+
+		i++;
 	}
 
-	return size;
+	done:
+	return i + 1;
 
 }
