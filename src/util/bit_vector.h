@@ -76,7 +76,7 @@ static inline void utl_bit_vector_reset_bit(utl_bit_vector_t* vector, uint32_t b
 
 }
 
-static inline void utl_bit_vector_foreach(utl_bit_vector_t* vector, void (*function) (uint32_t, void*), void* input) {
+static inline void utl_bit_vector_foreach(utl_bit_vector_t* vector, void (*const function) (uint32_t, void*), void* input) {
 	
 	const byte_t ffs[] = {
 		0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2,

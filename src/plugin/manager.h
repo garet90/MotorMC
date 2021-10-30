@@ -50,7 +50,7 @@ typedef struct {
 
 		void (*const add) (const cmd_command_t*);
 		void (*const message) (const cmd_sender_t*, const cht_component_t*);
-		cmd_op_level_t (*const get_op_level) (const cmd_sender_t*);
+		uint8_t (*const get_op_level) (const cmd_sender_t*);
 		cmd_sender_type_t (*const get_sender_type) (const cmd_sender_t*);
 		ltg_client_t* (*const get_player) (const cmd_sender_t*);
 

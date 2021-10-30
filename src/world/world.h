@@ -218,25 +218,7 @@ static inline mat_block_type_t wld_get_block_type_at(wld_chunk_t* chunk, int32_t
 
 }
 
-static inline void wld_set_block_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_protocol_id_t type) {
-
-	assert(z <= 0xF && x <= 0xF);
-
-	const uint16_t sub_chunk = y >> 4;
-
-	with_lock (&chunk->lock) {
-		const mat_block_protocol_id_t old_type = chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x];
-		const bool old_type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(old_type))->air;
-		const bool type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(type))->air;
-		if (old_type_air && !type_air) {
-			chunk->sections[sub_chunk].block_count++;
-		} else if (!old_type_air && type_air) {
-			chunk->sections[sub_chunk].block_count--;
-		}
-		chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x] = type;
-	}
-
-}
+extern void wld_set_block_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_protocol_id_t type);
 
 static inline void wld_set_block_type_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_type_t type) {
 

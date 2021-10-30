@@ -24,7 +24,7 @@ sky_main_t sky_main = {
 	.mcver = UTL_CSTRTOSTR(__MC_VER__),
 	.console = {
 		.type = cmd_console,
-		.op = cmd_op_4
+		.op = 4
 	},
 	.workers = {
 		.count = 4,

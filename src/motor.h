@@ -4,6 +4,7 @@
 #include "listening/listening.h"
 #include "io/commands/commands.h"
 
+// Workers do all the dirty work, all the things on the job board and the scheduler, but are not guaranteed any time to happen
 typedef struct {
 
 	pthread_t thread;
@@ -11,20 +12,9 @@ typedef struct {
 
 } sky_worker_t;
 
-typedef enum {
-	sky_starting = 0,
-	sky_running = 1,
-	sky_stopping = 2,
-	sky_stopped = 3
-} sky_status_t;
-
-typedef enum {
-	sky_peaceful = 0,
-	sky_easy = 1,
-	sky_normal = 2,
-	sky_hard = 3
-} sky_difficulty_t;
-
+/*
+	Where we hold all the big bad information
+*/
 typedef struct {
 
 	pthread_t console_thread;
@@ -58,10 +48,28 @@ typedef struct {
 	
 	const uint16_t protocol : 10;
 
-	sky_status_t status : 2;
-	cmd_op_level_t op_permission_level : 3;
+	/*
+		Starting = before done message
+		Running  = after done message, before stop command
+		Stopping = after stop command or failure
+		Stopped  = after the server has been completely stopped
+	*/
+	enum {
+		sky_starting,
+		sky_running,
+		sky_stopping,
+		sky_stopped
+	} status : 2;
 
-	sky_difficulty_t difficulty : 2;
+	uint8_t op_permission_level : 3;
+
+	enum {
+		sky_peaceful,
+		sky_easy,
+		sky_normal,
+		sky_hard
+	} difficulty : 2;
+	
 	bool hardcore : 1;
 
 	bool enable_respawn_screen : 1;

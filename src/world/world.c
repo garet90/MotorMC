@@ -302,6 +302,26 @@ void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 
 }
 
+void wld_set_block_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_protocol_id_t type) {
+
+	assert(z <= 0xF && x <= 0xF);
+
+	const uint16_t sub_chunk = y >> 4;
+
+	with_lock (&chunk->lock) {
+		const mat_block_protocol_id_t old_type = chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x];
+		const bool old_type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(old_type))->air;
+		const bool type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(type))->air;
+		if (old_type_air && !type_air) {
+			chunk->sections[sub_chunk].block_count++;
+		} else if (!old_type_air && type_air) {
+			chunk->sections[sub_chunk].block_count--;
+		}
+		chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x] = type;
+	}
+
+}
+
 void wld_unload_region(wld_region_t* region) {
 
 	with_lock (&region->world->lock) {

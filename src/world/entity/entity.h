@@ -140,14 +140,14 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 
 extern void ent_set_chunk(ent_entity_t* entity);
 
-static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool on_ground) {
+static inline void ent_move_i(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool on_ground) {
 
 	entity->position.x = x;
 	entity->position.y = y;
 	entity->position.z = z;
 
 	entity->on_ground = on_ground;
-	
+
 	if (wld_get_chunk_x(entity->chunk) != (utl_int_floor(x) >> 4) || wld_get_chunk_z(entity->chunk) != (utl_int_floor(z) >> 4)) {
 
 		ent_set_chunk(entity);
@@ -156,18 +156,39 @@ static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, floa
 
 }
 
-static inline void ent_look(ent_living_entity_t* entity, float32_t yaw, float32_t pitch, bool on_ground) {
-	
+extern void ent_move_update(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool on_ground);
+
+static inline void ent_move(ent_entity_t* entity, float64_t x, float64_t y, float64_t z, bool on_ground) {
+
+	//ent_move_update(entity, x, y, z, on_ground);
+	ent_move_i(entity, x, y, z, on_ground);
+
+}
+
+static inline void ent_look_i(ent_living_entity_t* entity, float32_t yaw, float32_t pitch, bool on_ground) {
+
 	entity->rotation.yaw = yaw;
 	entity->rotation.pitch = pitch;
 	entity->entity.on_ground = on_ground;
 
 }
 
+extern void ent_look_update(ent_living_entity_t* entity, float32_t yaw, float32_t pitch, bool on_ground);
+
+static inline void ent_look(ent_living_entity_t* entity, float32_t yaw, float32_t pitch, bool on_ground) {
+
+	//ent_look_update(entity, yaw, pitch, on_ground);
+	ent_look_i(entity, yaw, pitch, on_ground);
+
+}
+
+extern void ent_move_look_update(ent_living_entity_t* entity, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool on_ground);
+
 static inline void ent_move_look(ent_living_entity_t* entity, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool on_ground) {
 
-	ent_move(&entity->entity, x, y, z, on_ground);
-	ent_look(entity, yaw, pitch, on_ground);
+	//ent_move_look_update(entity, x, y, z, yaw, pitch, on_ground);
+	ent_move_i(&entity->entity, x, y, z, on_ground);
+	ent_look_i(entity, yaw, pitch, on_ground);
 
 }
 
@@ -201,6 +222,7 @@ static inline void ent_on_ground(ent_entity_t* entity, bool on_ground) {
 
 }
 
+// player specific functions
 static inline bool ent_player_is_best_tool(const mat_block_t* block, const mat_item_t* item) {
 
 	if (block->mineable) {
@@ -250,43 +272,7 @@ static inline bool ent_player_can_harvest(const mat_block_t* block, const mat_it
 
 }
 
-// player specific functions
-static inline uint16_t ent_player_get_break_speed(ent_player_t* player, mat_block_type_t block) {
-
-	float32_t speed_multiplier = 1;
-
-	const mat_block_t* block_data = mat_get_block_by_type(block);
-
-	itm_item_t* held = &player->hotbar[player->held_item];
-	const mat_item_t* held_data = mat_get_item_by_type(held->type);
-
-	const bool is_best_tool = ent_player_is_best_tool(block_data, held_data);
-	const bool can_harvest = ent_player_can_harvest(block_data, held_data);
-	
-	if (is_best_tool) {
-		// TODO speed_multiplier = tool_power;
-		if (!can_harvest) {
-			speed_multiplier = 1;
-		}
-		// TODO efficiency
-	}
-
-	float32_t damage = speed_multiplier / block_data->hardness;
-
-	if (can_harvest) {
-		damage /= 30;
-	} else {
-		damage /= 100;
-	}
-
-	// instant break
-	if (damage > 1) {
-		return 0;
-	}
-
-	return utl_int_ceil(1 / damage);
-
-}
+extern uint16_t ent_player_get_break_speed(ent_player_t* player, mat_block_type_t block);
 
 extern void ent_free_player(ent_player_t* entity);
 extern void ent_free_entity(ent_entity_t* entity);

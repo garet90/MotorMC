@@ -20,7 +20,7 @@ static inline size_t utl_encode_bytes_to_longs_r(int8_t* values, size_t values_l
 	const uint8_t values_per_long = utl_values_per_long[bits_per_entry];
 
 	size_t i = 0, j = 0;
-	while (true) {
+	for (;;) {
 		data[i] = 0;
 		
 		for (int8_t k = 0; k < values_per_long; ++k) {
@@ -54,7 +54,7 @@ static inline size_t utl_encode_shorts_to_longs_r(int16_t* values, size_t values
 	const uint8_t values_per_long = utl_values_per_long[bits_per_entry];
 
 	size_t i = 0, j = 0;
-	while (true) {
+	for (;;) {
 		data[i] = 0;
 		
 		for (int8_t k = 0; k < values_per_long; ++k) {
@@ -89,7 +89,7 @@ static inline size_t utl_encode_shorts_to_longs(int16_t* values, size_t values_l
 	const uint8_t values_per_long = utl_values_per_long[bits_per_entry];
 
 	size_t i = 0, j = 0;
-	while (true) {
+	for (;;) {
 		data[i] = 0;
 		
 		for (int8_t k = 0; k < values_per_long; ++k) {

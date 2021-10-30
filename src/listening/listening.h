@@ -10,23 +10,6 @@
 #include "../world/entity/entity.h"
 #include "socket/socket.h"
 
-#define LTG_MAX_RECIEVE 32767
-
-typedef enum {
-	ltg_handshake = 0,
-	ltg_status = 1,
-	ltg_login = 2,
-	ltg_play = 3
-} ltg_state_t;
-
-typedef enum {
-
-	ltg_chat_enabled = 0,
-	ltg_chat_commands_only = 1,
-	ltg_chat_hidden = 2
-
-} ltg_chat_mode_t;
-
 typedef enum {
 
 	ltg_af_za = 0x0f13dbe6,
@@ -148,7 +131,8 @@ typedef enum {
 
 } ltg_locale_t;
 
-#define LTG_AES_KEY_LENGTH 16
+#define LTG_MAX_RECIEVE 3276 // max amount of bytes client can send
+#define LTG_AES_KEY_LENGTH 16 // length of AES key
 
 typedef byte_t ltg_uuid_t[16];
 
@@ -207,11 +191,22 @@ typedef struct {
 
 	uint16_t protocol : 10;
 	uint8_t render_distance : 6;
-	ltg_chat_mode_t chat_mode : 2;
+	enum {
+
+		ltg_chat_enabled = 0,
+		ltg_chat_commands_only = 1,
+		ltg_chat_hidden = 2
+
+	} chat_mode : 2;
 
 	bool compression_enabled : 1;
 
-	ltg_state_t state : 2;
+	enum {
+		ltg_handshake = 0,
+		ltg_status = 1,
+		ltg_login = 2,
+		ltg_play = 3
+	} state : 2;
 
 } ltg_client_t;
 

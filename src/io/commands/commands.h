@@ -6,16 +6,6 @@
 
 typedef enum {
 
-	cmd_not_op = 0,
-	cmd_op_1 = 1,
-	cmd_op_2 = 2,
-	cmd_op_3 = 3,
-	cmd_op_4 = 4
-
-} cmd_op_level_t;
-
-typedef enum {
-
 	cmd_console = 0,
 	cmd_player = 1,
 	cmd_command_block = 2
@@ -24,8 +14,8 @@ typedef enum {
 
 typedef struct {
 
-	cmd_sender_type_t type;
-	cmd_op_level_t op;
+	cmd_sender_type_t type : 2;
+	uint8_t op : 3;
 
 	union {
 		ltg_client_t* player;
@@ -62,7 +52,7 @@ extern void cmd_message(const cmd_sender_t*, const cht_component_t*);
 
 // API
 
-static inline cmd_op_level_t cmd_get_op_level(const cmd_sender_t* sender) {
+static inline uint8_t cmd_get_op_level(const cmd_sender_t* sender) {
 	return sender->op;
 }
 
