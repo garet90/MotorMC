@@ -796,7 +796,7 @@ void phd_send_spawn_player(ltg_client_t* client, ent_player_t* player) {
 	pck_write_float64(packet, player->living_entity.entity.position.x);
 	pck_write_float64(packet, player->living_entity.entity.position.y);
 	pck_write_float64(packet, player->living_entity.entity.position.z);
-	pck_write_int8(packet, io_angle_to_byte(player->living_entity.rotation.yaw));
+	pck_write_int8(packet, 0);
 	pck_write_int8(packet, io_angle_to_byte(player->living_entity.rotation.pitch));
 
 	ltg_send(client, packet);
@@ -1447,6 +1447,18 @@ void phd_send_unlock_recipes(ltg_client_t* client) {
 	pck_write_var_int(packet, 0); // array 1
 
 	pck_write_var_int(packet, 0); // array 2
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_entity_head_look(ltg_client_t* client, ent_living_entity_t* entity) {
+
+	PCK_INLINE(packet, 7, io_big_endian);
+
+	pck_write_var_int(packet, 0x3e);
+	pck_write_var_int(packet, entity->entity.id);
+	pck_write_int8(packet, io_angle_to_byte(entity->rotation.yaw));
 
 	ltg_send(client, packet);
 

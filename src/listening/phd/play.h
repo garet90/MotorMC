@@ -127,7 +127,7 @@ extern void phd_send_destroy_entities(ltg_client_t*);
 extern void phd_send_remove_entity_effect(ltg_client_t*);
 extern void phd_send_resource_pack_send(ltg_client_t*);
 extern void phd_send_respawn(ltg_client_t*);
-extern void phd_send_entity_head_look(ltg_client_t*);
+extern void phd_send_entity_head_look(ltg_client_t* client, ent_living_entity_t* entity);
 extern void phd_send_multi_block_change(ltg_client_t*);
 extern void phd_send_select_advancement_tab(ltg_client_t*);
 extern void phd_send_action_bar(ltg_client_t*);
@@ -185,6 +185,7 @@ static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t*
 				switch (entity->type) {
 					case ent_player: {
 						phd_send_spawn_player(client, (ent_player_t*) entity);
+						phd_send_entity_head_look(client, (ent_living_entity_t*) entity);
 					} break;
 				}
 			}
