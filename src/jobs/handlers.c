@@ -190,9 +190,12 @@ bool job_handle_entity_move(job_payload_t* payload) {
 
 	ent_entity_t* entity = payload->entity_move.entity;
 
-	entity->position.x += payload->entity_move.d_x;
-	entity->position.y += payload->entity_move.d_y;
-	entity->position.z += payload->entity_move.d_z;
+	// why not +=?
+	// well, Atomic implementations vary from PC to PC and operating system to operating system,
+	// and additions on floats are not very commonly implemented, but set usually is
+	entity->position.x = entity->position.x + payload->entity_move.d_x;
+	entity->position.y = entity->position.y + payload->entity_move.d_y;
+	entity->position.z = entity->position.z + payload->entity_move.d_z;
 
 	entity->on_ground = payload->entity_move.on_ground;
 
@@ -238,9 +241,9 @@ bool job_handle_living_entity_move_look(job_payload_t* payload) {
 
 	ent_living_entity_t* entity = payload->living_entity_move_look.entity;
 
-	entity->entity.position.x += payload->living_entity_move_look.d_x;
-	entity->entity.position.y += payload->living_entity_move_look.d_y;
-	entity->entity.position.z += payload->living_entity_move_look.d_z;
+	entity->entity.position.x = entity->entity.position.x + payload->living_entity_move_look.d_x;
+	entity->entity.position.y = entity->entity.position.y + payload->living_entity_move_look.d_y;
+	entity->entity.position.z = entity->entity.position.z + payload->living_entity_move_look.d_z;
 
 	entity->rotation.yaw = payload->living_entity_move_look.yaw;
 	entity->rotation.pitch = payload->living_entity_move_look.pitch;
