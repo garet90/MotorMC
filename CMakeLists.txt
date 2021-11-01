@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 enable_language(C)
+
 include(TestBigEndian)
 test_big_endian(BIG_ENDIAN)
 

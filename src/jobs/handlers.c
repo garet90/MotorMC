@@ -185,3 +185,91 @@ bool job_handle_dig_block(job_payload_t* payload) {
 	return true;
 
 }
+
+bool job_handle_entity_move(job_payload_t* payload) {
+
+	ent_entity_t* entity = payload->entity_move.entity;
+
+	entity->position.x += payload->entity_move.d_x;
+	entity->position.y += payload->entity_move.d_y;
+	entity->position.z += payload->entity_move.d_z;
+
+	entity->on_ground = payload->entity_move.on_ground;
+
+	// TODO physics, chunk changes
+
+	return true;
+
+}
+
+bool job_handle_entity_teleport(job_payload_t* payload) {
+
+	ent_entity_t* entity = payload->entity_teleport.entity;
+
+	entity->position.world = payload->entity_teleport.world;
+	entity->position.x = payload->entity_teleport.x;
+	entity->position.y = payload->entity_teleport.y;
+	entity->position.z = payload->entity_teleport.z;
+
+	entity->on_ground = false;
+
+	// TODO physics, chunk changes
+
+	return true;
+
+}
+
+bool job_handle_living_entity_look(job_payload_t* payload) {
+
+	ent_living_entity_t* entity = payload->living_entity_look.entity;
+
+	entity->rotation.yaw = payload->living_entity_look.yaw;
+	entity->rotation.pitch = payload->living_entity_look.pitch;
+
+	entity->entity.on_ground = payload->living_entity_look.on_ground;
+
+	// TODO send to watchers
+
+	return true;
+
+}
+
+bool job_handle_living_entity_move_look(job_payload_t* payload) {
+
+	ent_living_entity_t* entity = payload->living_entity_move_look.entity;
+
+	entity->entity.position.x += payload->living_entity_move_look.d_x;
+	entity->entity.position.y += payload->living_entity_move_look.d_y;
+	entity->entity.position.z += payload->living_entity_move_look.d_z;
+
+	entity->rotation.yaw = payload->living_entity_move_look.yaw;
+	entity->rotation.pitch = payload->living_entity_move_look.pitch;
+
+	entity->entity.on_ground = payload->living_entity_move_look.on_ground;
+
+	// TODO a bunch of stuff
+
+	return true;
+
+}
+
+bool job_handle_living_entity_teleport_look(job_payload_t* payload) {
+
+	ent_living_entity_t* entity = payload->living_entity_teleport_look.entity;
+
+	entity->entity.position.world = payload->living_entity_teleport_look.world;
+
+	entity->entity.position.x = payload->living_entity_teleport_look.x;
+	entity->entity.position.y = payload->living_entity_teleport_look.y;
+	entity->entity.position.z = payload->living_entity_teleport_look.z;
+
+	entity->rotation.yaw = payload->living_entity_teleport_look.yaw;
+	entity->rotation.pitch = payload->living_entity_teleport_look.pitch;
+
+	entity->entity.on_ground = false;
+
+	// TODO a bunch of stuff
+
+	return true;
+
+}

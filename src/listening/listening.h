@@ -7,7 +7,7 @@
 #include "../io/packet/packet.h"
 #include "../crypt/rsa.h"
 #include "../crypt/cfb8.h"
-#include "../world/entity/entity.h"
+#include "../world/entity/living/player/player.h"
 #include "socket/socket.h"
 
 typedef enum {

@@ -487,7 +487,11 @@ bool phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 	const wld_chunk_t* old_chunk = player->living_entity.entity.chunk;
 
-	ent_move(&player->living_entity.entity, x, y, z, on_ground);
+	const float64_t d_x = x - player->living_entity.entity.position.x;
+	const float64_t d_y = y - player->living_entity.entity.position.y;
+	const float64_t d_z = z - player->living_entity.entity.position.z;
+
+	job_add(job_new(job_entity_move, (job_payload_t) { .entity_move = { .entity = &player->living_entity.entity, .d_x = d_x, .d_y = d_y, .d_z = d_z, .on_ground = on_ground } }));
 
 	if (old_chunk != player->living_entity.entity.chunk) {
 
@@ -514,8 +518,12 @@ bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* pac
 	const bool on_ground = pck_read_int8(packet);
 
 	const wld_chunk_t* old_chunk = player->living_entity.entity.chunk;
+	
+	const float64_t d_x = x - player->living_entity.entity.position.x;
+	const float64_t d_y = y - player->living_entity.entity.position.y;
+	const float64_t d_z = z - player->living_entity.entity.position.z;
 
-	ent_move_look(&player->living_entity, x, y, z, yaw, pitch, on_ground);
+	job_add(job_new(job_living_entity_move_look, (job_payload_t) { .living_entity_move_look = { .entity = &player->living_entity, .d_x = d_x, .d_y = d_y, .d_z = d_z, .yaw = yaw, .pitch = pitch, .on_ground = on_ground } }));
 
 	if (old_chunk != player->living_entity.entity.chunk) {
 
@@ -537,7 +545,8 @@ bool phd_handle_player_rotation(ltg_client_t* client, pck_packet_t* packet) {
 
 	const bool on_ground = pck_read_int8(packet);
 
-	ent_look(&player->living_entity, yaw, pitch, on_ground);
+
+	job_add(job_new(job_living_entity_look, (job_payload_t) { .living_entity_look = { .entity = &player->living_entity, .yaw = yaw, .pitch = pitch, .on_ground = on_ground } }));
 
 	return true;
 

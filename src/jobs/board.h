@@ -32,6 +32,11 @@ typedef enum {
 	job_tick_region,
 	job_unload_region,
 	job_dig_block,
+	job_entity_move,
+	job_entity_teleport,
+	job_living_entity_look,
+	job_living_entity_move_look,
+	job_living_entity_teleport_look,
 
 	job_count
 
@@ -67,6 +72,71 @@ typedef union {
 	} dig_block;
 
 	wld_region_t* region;
+
+	struct {
+
+		ent_entity_t* entity;
+		
+		float64_t d_x;
+		float64_t d_y;
+		float64_t d_z;
+
+		bool on_ground;
+
+	} entity_move;
+
+	struct {
+
+		ent_entity_t* entity;
+
+		wld_world_t* world;
+
+		float64_t x;
+		float64_t y;
+		float64_t z;
+
+	} entity_teleport;
+
+	struct {
+
+		ent_living_entity_t* entity;
+
+		float32_t yaw;
+		float32_t pitch;
+
+		bool on_ground;
+
+	} living_entity_look;
+
+	struct {
+
+		ent_living_entity_t* entity;
+
+		float64_t d_x;
+		float64_t d_y;
+		float64_t d_z;
+
+		float32_t yaw;
+		float32_t pitch;
+
+		bool on_ground;
+
+	} living_entity_move_look;
+
+	struct {
+
+		ent_living_entity_t* entity;
+
+		wld_world_t* world;
+
+		float64_t x;
+		float64_t y;
+		float64_t z;
+
+		float32_t yaw;
+		float32_t pitch;
+
+	} living_entity_teleport_look;
 
 } job_payload_t;
 
