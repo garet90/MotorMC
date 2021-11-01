@@ -152,6 +152,10 @@ static inline int32_t wld_get_chunk_z(const wld_chunk_t* chunk) {
 	return (chunk->region->z << 5) + chunk->z;
 }
 
+static inline bool wld_in_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z) {
+	return (wld_get_chunk_x(chunk) == (x >> 4) && wld_get_chunk_z(chunk) == (z >> 4));
+}
+
 static inline void wld_subscribe_chunk(wld_chunk_t* chunk, uint32_t client_id) {
 	with_lock (&chunk->lock) {
 		utl_bit_vector_set_bit(&chunk->subscribers, client_id);

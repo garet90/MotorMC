@@ -99,7 +99,7 @@ extern void phd_send_update_light(ltg_client_t* client, wld_chunk_t* chunk);
 extern void phd_send_join_game(ltg_client_t* client);
 extern void phd_send_map_data(ltg_client_t*);
 extern void phd_send_trade_list(ltg_client_t*);
-extern void phd_send_entity_position(ltg_client_t*);
+extern void phd_send_entity_position(ltg_client_t* client, ent_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z, bool on_ground);
 extern void phd_send_entity_position_and_rotation(ltg_client_t*);
 extern void phd_send_vehicle_move(ltg_client_t*);
 extern void phd_send_open_book(ltg_client_t*);
@@ -198,5 +198,5 @@ static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t*
 extern void phd_update_sent_chunks(ltg_client_t* client);
 extern void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_distance);
 extern void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* client);
-extern void phd_update_sent_chunks_teleport(ltg_client_t* client, wld_world_t* world, int32_t x, int32_t z);
+extern void phd_update_sent_chunks_teleport(ltg_client_t* client);
 extern void phd_update_sent_chunks_leave(ltg_client_t* client);

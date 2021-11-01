@@ -485,20 +485,20 @@ bool phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 	const float64_t z = pck_read_float64(packet);
 	const bool on_ground = pck_read_int8(packet);
 
-	const wld_chunk_t* old_chunk = player->living_entity.entity.chunk;
-
 	const float64_t d_x = x - player->living_entity.entity.position.x;
 	const float64_t d_y = y - player->living_entity.entity.position.y;
 	const float64_t d_z = z - player->living_entity.entity.position.z;
 
-	job_add(job_new(job_entity_move, (job_payload_t) { .entity_move = { .entity = &player->living_entity.entity, .d_x = d_x, .d_y = d_y, .d_z = d_z, .on_ground = on_ground } }));
+	job_add(job_new(job_entity_move, (job_payload_t) { .entity_move = { .entity = &player->living_entity.entity, .initial_chunk = player->living_entity.entity.chunk, .d_x = d_x, .d_y = d_y, .d_z = d_z, .on_ground = on_ground } }));
 
+	/*
 	if (old_chunk != player->living_entity.entity.chunk) {
 
 		phd_send_update_view_position(client);
 		phd_update_sent_chunks_move(old_chunk, client);
 
 	}
+	*/
 
 	return true;
 
@@ -517,20 +517,18 @@ bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* pac
 
 	const bool on_ground = pck_read_int8(packet);
 
-	const wld_chunk_t* old_chunk = player->living_entity.entity.chunk;
-	
 	const float64_t d_x = x - player->living_entity.entity.position.x;
 	const float64_t d_y = y - player->living_entity.entity.position.y;
 	const float64_t d_z = z - player->living_entity.entity.position.z;
 
-	job_add(job_new(job_living_entity_move_look, (job_payload_t) { .living_entity_move_look = { .entity = &player->living_entity, .d_x = d_x, .d_y = d_y, .d_z = d_z, .yaw = yaw, .pitch = pitch, .on_ground = on_ground } }));
+	job_add(job_new(job_living_entity_move_look, (job_payload_t) { .living_entity_move_look = { .entity = &player->living_entity, .initial_chunk = player->living_entity.entity.chunk, .d_x = d_x, .d_y = d_y, .d_z = d_z, .yaw = yaw, .pitch = pitch, .on_ground = on_ground } }));
 
-	if (old_chunk != player->living_entity.entity.chunk) {
+	/*if (old_chunk != player->living_entity.entity.chunk) {
 
 		phd_send_update_view_position(client);
 		phd_update_sent_chunks_move(old_chunk, client);
 
-	}
+	}*/
 	
 	return true;
 
@@ -1664,6 +1662,8 @@ void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_dis
 }
 
 void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* client) {
+	
+	phd_send_update_view_position(client);
 
 	const int32_t x = utl_int_floor(client->entity->living_entity.entity.position.x) >> 4;
 	const int32_t z = utl_int_floor(client->entity->living_entity.entity.position.z) >> 4;

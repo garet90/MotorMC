@@ -77,6 +77,8 @@ typedef union {
 
 		ent_entity_t* entity;
 		
+		wld_chunk_t* initial_chunk;
+
 		float64_t d_x;
 		float64_t d_y;
 		float64_t d_z;
@@ -88,6 +90,8 @@ typedef union {
 	struct {
 
 		ent_entity_t* entity;
+		
+		wld_chunk_t* initial_chunk;
 
 		wld_world_t* world;
 
@@ -111,6 +115,8 @@ typedef union {
 	struct {
 
 		ent_living_entity_t* entity;
+		
+		wld_chunk_t* initial_chunk;
 
 		float64_t d_x;
 		float64_t d_y;
@@ -126,6 +132,8 @@ typedef union {
 	struct {
 
 		ent_living_entity_t* entity;
+		
+		wld_chunk_t* initial_chunk;
 
 		wld_world_t* world;
 
