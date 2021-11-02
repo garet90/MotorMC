@@ -543,7 +543,6 @@ bool phd_handle_player_rotation(ltg_client_t* client, pck_packet_t* packet) {
 
 	const bool on_ground = pck_read_int8(packet);
 
-
 	job_add(job_new(job_living_entity_look, (job_payload_t) { .living_entity_look = { .entity = &player->living_entity, .yaw = yaw, .pitch = pitch, .on_ground = on_ground } }));
 
 	return true;
@@ -1289,9 +1288,57 @@ void phd_send_join_game(ltg_client_t* client) {
 	// add to online players
 	client->online_node = utl_dll_push(&sky_main.listener.online.list, client);
 
-	uint32_t work = job_new(job_player_join, (job_payload_t) { .client = client });
+	job_add(job_new(job_player_join, (job_payload_t) { .client = client }));
 
-	job_add(work);
+}
+
+void phd_send_entity_position(ltg_client_t* client, ent_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z) {
+
+	PCK_INLINE(packet, 13, io_big_endian);
+
+	pck_write_var_int(packet, 0x29);
+
+	pck_write_var_int(packet, entity->id);
+	pck_write_int16(packet, d_x * 4096);
+	pck_write_int16(packet, d_y * 4096);
+	pck_write_int16(packet, d_z * 4096);
+	pck_write_int8(packet, entity->on_ground);
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_entity_position_and_rotation(ltg_client_t* client, ent_living_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z) {
+
+	PCK_INLINE(packet, 15, io_big_endian);
+
+	pck_write_var_int(packet, 0x2a);
+
+	pck_write_var_int(packet, entity->entity.id);
+	pck_write_int16(packet, d_x * 4096);
+	pck_write_int16(packet, d_y * 4096);
+	pck_write_int16(packet, d_z * 4096);
+	pck_write_int8(packet, io_angle_to_byte(entity->rotation.yaw));
+	pck_write_int8(packet, io_angle_to_byte(entity->rotation.pitch));
+	pck_write_int8(packet, entity->entity.on_ground);
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_entity_rotation(ltg_client_t* client, ent_living_entity_t* entity) {
+	
+	PCK_INLINE(packet, 9, io_big_endian);
+
+	pck_write_var_int(packet, 0x2b);
+
+	pck_write_var_int(packet, entity->entity.id);
+
+	pck_write_int8(packet, io_angle_to_byte(entity->rotation.yaw));
+	pck_write_int8(packet, io_angle_to_byte(entity->rotation.pitch));
+	pck_write_int8(packet, entity->entity.on_ground);
+
+	ltg_send(client, packet);
 
 }
 
@@ -1454,6 +1501,19 @@ void phd_send_unlock_recipes(ltg_client_t* client) {
 	pck_write_var_int(packet, 0); // array 1
 
 	pck_write_var_int(packet, 0); // array 2
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_destroy_entity(ltg_client_t* client, ent_entity_t* entity) {
+
+	PCK_INLINE(packet, 7, io_big_endian);
+
+	pck_write_var_int(packet, 0x3a);
+	pck_write_var_int(packet, 1);
+
+	pck_write_var_int(packet, entity->id);
 
 	ltg_send(client, packet);
 

@@ -67,6 +67,9 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 
 }
 
+extern void ent_destroy_entity(uint32_t client_id, void* entity);
+extern void ent_send_entity(uint32_t client_id, void* entity);
+
 extern void ent_set_chunk(ent_entity_t* entity);
 
 static inline void ent_on_ground(ent_entity_t* entity, bool on_ground) {

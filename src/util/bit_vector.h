@@ -1,5 +1,6 @@
 #pragma once
 #include "../main.h"
+#include "util.h"
 #include "vector.h"
 
 typedef struct {
@@ -76,37 +77,87 @@ static inline void utl_bit_vector_reset_bit(utl_bit_vector_t* vector, uint32_t b
 
 }
 
-static inline void utl_bit_vector_foreach(utl_bit_vector_t* vector, void (*const function) (uint32_t, void*), void* input) {
-	
-	const byte_t ffs[] = {
-		0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2,
-		0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0,
-		1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1,
-		0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0,
-		2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6,
-		0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0,
-		1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1,
-		0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0,
-		3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2,
-		0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 7, 0,
-		1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1,
-		0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0,
-		2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3,
-		0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0,
-		1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1,
-		0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-		4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2,
-		0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0,
-		1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1,
-		0, 3, 0, 1, 0, 2, 0, 1, 0
-	};
+static const byte_t utl_ffs[] = {
+	0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2,
+	0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0,
+	1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1,
+	0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0,
+	2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6,
+	0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0,
+	1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1,
+	0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0,
+	3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2,
+	0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 7, 0,
+	1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1,
+	0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0,
+	2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3,
+	0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0,
+	1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 6, 0, 1,
+	0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+	4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2,
+	0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0,
+	1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1,
+	0, 3, 0, 1, 0, 2, 0, 1, 0
+};
 
-	for (uint32_t i = 0; i < vector->vector.size; ++i) {
+static inline void utl_bit_vector_foreach(utl_bit_vector_t* vector, void (*const function) (uint32_t, void*), void* input) {
+
+	const uint32_t size = vector->vector.size;
+
+	for (uint32_t i = 0; i < size; ++i) {
 		
 		byte_t byte = UTL_VECTOR_GET_AS(byte_t, &vector->vector, i);
 
 		while (byte) {
-			function((i << 3) + ffs[byte], input);
+			function((i << 3) + utl_ffs[byte], input);
+			byte &= byte - 1;
+		}
+
+	}
+
+}
+
+static inline void utl_bit_vector_or_foreach(utl_bit_vector_t* v1, utl_bit_vector_t* v2, void (*const function) (uint32_t, void*), void* input) {
+	
+	const uint32_t size = UTL_MAX(v1->vector.size, v2->vector.size);
+
+	for (uint32_t i = 0; i < size; ++i) {
+		
+		byte_t byte = 0;
+
+		if (i < v1->vector.size) {
+			byte |= UTL_VECTOR_GET_AS(byte_t, &v1->vector, i);
+		}
+		if (i < v2->vector.size) {
+			byte |= UTL_VECTOR_GET_AS(byte_t, &v2->vector, i);
+		}
+
+		while (byte) {
+			function((i << 3) + utl_ffs[byte], input);
+			byte &= byte - 1;
+		}
+
+	}
+
+}
+
+static inline void utl_bit_vector_xor_foreach(utl_bit_vector_t* v1, utl_bit_vector_t* v2, void (*const function) (uint32_t, void*), void* input) {
+	
+	const uint32_t size = UTL_MAX(v1->vector.size, v2->vector.size);
+
+	for (uint32_t i = 0; i < size; ++i) {
+		
+		byte_t byte = 0;
+
+		if (i < v1->vector.size) {
+			byte ^= UTL_VECTOR_GET_AS(byte_t, &v1->vector, i);
+		}
+		if (i < v2->vector.size) {
+			byte ^= UTL_VECTOR_GET_AS(byte_t, &v2->vector, i);
+		}
+
+		while (byte) {
+			function((i << 3) + utl_ffs[byte], input);
 			byte &= byte - 1;
 		}
 

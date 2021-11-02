@@ -78,6 +78,10 @@ bool job_handle_player_join(job_payload_t* payload) {
 
 	cht_term_translation(&translation);
 
+	ent_entity_t* entity = (ent_entity_t*) payload->client->entity;
+
+	utl_bit_vector_foreach(&entity->chunk->subscribers, ent_send_entity, entity);
+
 	return true;
 
 }
@@ -199,7 +203,7 @@ void job_update_entity_move(uint32_t client_id, void* args) {
 		}
 	} else {
 		// TODO entering chunks, leaving chunks, etc
-		//phd_send_entity_position(client, entity, payload->entity_move.d_x, payload->entity_move.d_y, payload->entity_move.d_z, payload->entity_move.on_ground);
+		phd_send_entity_position(client, entity, payload->entity_move.d_x, payload->entity_move.d_y, payload->entity_move.d_z);
 	}
 
 }
@@ -286,7 +290,8 @@ void job_update_living_entity_look(uint32_t client_id, void* args) {
 		// Do nothing
 	} else {
 		// TODO entering chunks, leaving chunks, etc
-		//phd_send_entity_look(...)
+		phd_send_entity_rotation(client, entity);
+		phd_send_entity_head_look(client, entity);
 	}
 
 }
@@ -322,7 +327,8 @@ void job_update_living_entity_move_look(uint32_t client_id, void* args) {
 		}
 	} else {
 		// TODO entering chunks, leaving chunks, etc
-		//phd_send_entity_look(...)
+		phd_send_entity_position_and_rotation(client, entity, payload->living_entity_move_look.d_x, payload->living_entity_move_look.d_y, payload->living_entity_move_look.d_z);
+		phd_send_entity_head_look(client, entity);
 	}
 
 }
@@ -349,7 +355,7 @@ bool job_handle_living_entity_move_look(job_payload_t* payload) {
 
 	wld_chunk_t* chunk = entity->entity.chunk;
 	utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_move_look, payload);
-
+	
 	return true;
 
 }

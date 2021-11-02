@@ -99,8 +99,9 @@ extern void phd_send_update_light(ltg_client_t* client, wld_chunk_t* chunk);
 extern void phd_send_join_game(ltg_client_t* client);
 extern void phd_send_map_data(ltg_client_t*);
 extern void phd_send_trade_list(ltg_client_t*);
-extern void phd_send_entity_position(ltg_client_t* client, ent_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z, bool on_ground);
-extern void phd_send_entity_position_and_rotation(ltg_client_t*);
+extern void phd_send_entity_position(ltg_client_t* client, ent_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z);
+extern void phd_send_entity_position_and_rotation(ltg_client_t* client, ent_living_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z);
+extern void phd_send_entity_rotation(ltg_client_t* client, ent_living_entity_t* entity);
 extern void phd_send_vehicle_move(ltg_client_t*);
 extern void phd_send_open_book(ltg_client_t*);
 extern void phd_send_open_window(ltg_client_t*);
@@ -123,6 +124,7 @@ extern void phd_send_player_info_remove_player(ltg_client_t* client, ltg_uuid_t 
 extern void phd_send_face_player(ltg_client_t*);
 extern void phd_send_player_position_and_look(ltg_client_t* client);
 extern void phd_send_unlock_recipes(ltg_client_t* client);
+extern void phd_send_destroy_entity(ltg_client_t* client, ent_entity_t* entity);
 extern void phd_send_destroy_entities(ltg_client_t*);
 extern void phd_send_remove_entity_effect(ltg_client_t*);
 extern void phd_send_resource_pack_send(ltg_client_t*);
@@ -170,6 +172,17 @@ extern void phd_send_entity_effect(ltg_client_t*);
 extern void phd_send_declare_recipes(ltg_client_t* client);
 extern void phd_send_tags(ltg_client_t* client);
 
+static inline void phd_update_send_entity(ltg_client_t* client, ent_entity_t* entity) {
+	if (entity != (ent_entity_t*) client->entity) {
+		switch (entity->type) {
+			case ent_player: {
+				phd_send_spawn_player(client, (ent_player_t*) entity);
+				phd_send_entity_head_look(client, (ent_living_entity_t*) entity);
+			} break;
+		}
+	}
+}
+
 static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t* chunk) {
 	phd_send_update_light(client, chunk);
 	phd_send_chunk_data(client, chunk);
@@ -181,15 +194,8 @@ static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t*
 		ent_entity_t* entity = utl_dll_iterator_next(&iterator);
 		while (entity != NULL) {
 
-			if (entity != (ent_entity_t*) client->entity) {
-				switch (entity->type) {
-					case ent_player: {
-						phd_send_spawn_player(client, (ent_player_t*) entity);
-						phd_send_entity_head_look(client, (ent_living_entity_t*) entity);
-					} break;
-				}
-			}
-
+			phd_update_send_entity(client, entity);
+			
 			entity = utl_dll_iterator_next(&iterator);
 		}
 	}
