@@ -179,6 +179,9 @@ static inline void phd_update_send_entity(ltg_client_t* client, ent_entity_t* en
 				phd_send_spawn_player(client, (ent_player_t*) entity);
 				phd_send_entity_head_look(client, (ent_living_entity_t*) entity);
 			} break;
+			default: {
+				// Do something eventually
+			} break;
 		}
 	}
 }

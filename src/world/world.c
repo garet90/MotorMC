@@ -167,10 +167,6 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 		.max_ticket = max_ticket,
 		.ticket = max_ticket
 	};
-	for (uint32_t i = 0; i < 256; ++i) { // TODO highest blocks
-		chunk_init.highest.motion_blocking[i] = 2;
-		chunk_init.highest.world_surface[i] = 2;
-	}
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t)); // coppy init to chunk
 	memset(chunk->sections, 0, sizeof(wld_chunk_section_t) * chunk_height); // set chunk sections to 0
 
@@ -298,6 +294,7 @@ void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 	} else {
 		chunk->ticket = UTL_MIN(chunk->ticket, distance - sky_main.render_distance + WLD_TICKET_TICK_ENTITIES);
 		// TODO if greater should do nothing
+		// I can't remember what this means so...
 	}
 
 }
@@ -314,8 +311,16 @@ void wld_set_block_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_b
 		const bool type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(type))->air;
 		if (old_type_air && !type_air) {
 			chunk->sections[sub_chunk].block_count++;
+
+			if (chunk->highest.motion_blocking[(z << 4) | x] < y) {
+				chunk->highest.motion_blocking[(z << 4) | x] = y;
+			}
 		} else if (!old_type_air && type_air) {
 			chunk->sections[sub_chunk].block_count--;
+
+			if (chunk->highest.motion_blocking[(z << 4) | x] == y) {
+				// TODO calculate new highest motion_blocking block
+			}
 		}
 		chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x] = type;
 	}

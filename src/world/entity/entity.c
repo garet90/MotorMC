@@ -88,7 +88,7 @@ void ent_set_chunk(ent_entity_t* entity) {
 		chunk = wld_get_chunk_at(entity->position.world, f_x, f_z);
 		
 		// if its a player, we must wait until it has been added to the server list
-		if (entity->type != ent_player) { // TODO make this less jacked up so its not hard to find it
+		if (entity->type != ent_player) {
 			// spawn in chunk to listeners
 			utl_bit_vector_foreach(&chunk->subscribers, ent_send_entity, entity);
 		}

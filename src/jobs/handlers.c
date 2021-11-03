@@ -202,7 +202,6 @@ void job_update_entity_move(uint32_t client_id, void* args) {
 			phd_update_sent_chunks_move(payload->entity_move.initial_chunk, client);
 		}
 	} else {
-		// TODO entering chunks, leaving chunks, etc
 		phd_send_entity_position(client, entity, payload->entity_move.d_x, payload->entity_move.d_y, payload->entity_move.d_z);
 	}
 
@@ -221,7 +220,7 @@ bool job_handle_entity_move(job_payload_t* payload) {
 
 	entity->on_ground = payload->entity_move.on_ground;
 
-	// TODO physics, chunk changes
+	// TODO physics
 
 	if (!wld_in_chunk(entity->chunk, utl_int_floor(entity->position.x), utl_int_floor(entity->position.z))) {
 		// change chunk
@@ -265,7 +264,7 @@ bool job_handle_entity_teleport(job_payload_t* payload) {
 
 	entity->on_ground = false;
 
-	// TODO physics, send updates
+	// TODO physics
 	
 	if (!wld_in_chunk(entity->chunk, utl_int_floor(entity->position.x), utl_int_floor(entity->position.z))) {
 		// change chunk
@@ -289,7 +288,6 @@ void job_update_living_entity_look(uint32_t client_id, void* args) {
 	if ((ent_living_entity_t*) client->entity == entity) {
 		// Do nothing
 	} else {
-		// TODO entering chunks, leaving chunks, etc
 		phd_send_entity_rotation(client, entity);
 		phd_send_entity_head_look(client, entity);
 	}
@@ -326,7 +324,6 @@ void job_update_living_entity_move_look(uint32_t client_id, void* args) {
 			phd_update_sent_chunks_move(payload->entity_move.initial_chunk, client);
 		}
 	} else {
-		// TODO entering chunks, leaving chunks, etc
 		phd_send_entity_position_and_rotation(client, entity, payload->living_entity_move_look.d_x, payload->living_entity_move_look.d_y, payload->living_entity_move_look.d_z);
 		phd_send_entity_head_look(client, entity);
 	}
@@ -346,7 +343,7 @@ bool job_handle_living_entity_move_look(job_payload_t* payload) {
 
 	entity->entity.on_ground = payload->living_entity_move_look.on_ground;
 
-	// TODO physics, send updates
+	// TODO physics
 
 	if (!wld_in_chunk(entity->entity.chunk, utl_int_floor(entity->entity.position.x), utl_int_floor(entity->entity.position.z))) {
 		// change chunk
@@ -372,8 +369,7 @@ void job_update_living_entity_teleport_look(uint32_t client_id, void* args) {
 			// TODO phd_update_sent_chunks_teleport(client);
 		}
 	} else {
-		// TODO entering chunks, leaving chunks, etc
-		//phd_send_entity_teleport_look(...)
+		// TODO phd_send_entity_teleport_look(...)
 	}
 
 }
@@ -395,7 +391,7 @@ bool job_handle_living_entity_teleport_look(job_payload_t* payload) {
 	
 	ent_remove_chunk(&entity->entity);
 
-	// TODO physics, send updates
+	// TODO physics
 
 	if (!wld_in_chunk(entity->entity.chunk, utl_int_floor(entity->entity.position.x), utl_int_floor(entity->entity.position.z))) {
 		// change chunk

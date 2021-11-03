@@ -13,7 +13,7 @@
 #define __MC_PRO__ 756
 //755
 
-#define __MOTOR_VER__ "MotorMC InDev 0.0.2"
+#define __MOTOR_VER__ "MotorMC InDev 0.0.3"
 #define __MOTOR_UNSAFE__ 1
 
 #define UNSET 2

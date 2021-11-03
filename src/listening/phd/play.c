@@ -313,7 +313,11 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 			} break;
 			case 2: { // number keys
 				if (clicked.slot != NULL && player->carried.type == mat_item_air) {
-					itm_item_t* target = &player->hotbar[button]; // TODO button could be higher than 8 if it is a hacked client
+
+					// kick hacked clients trying to wreak havoc					
+					if (button > 8) return false;
+
+					itm_item_t* target = &player->hotbar[button];
 					if (clicked.slot->type == mat_item_air) {
 						if (clicked.droppable) {
 							*clicked.slot = *target;
@@ -1047,10 +1051,6 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		// you're damn right i'm gonna waste 4 bytes, speed is key
 		const size_t data_len = packet->cursor;
 		packet->cursor += 5;
-
-		if (chunk->sections[0].blocks[0] == mat_get_block_default_protocol_id_by_type(mat_block_air)) {
-			log_info("chunk missing 0, 0, 0 block");
-		}
 
 		for (uint16_t i = 0; i < chunk_height; ++i) {
 			if (chunk->sections[i].block_count != 0) {
