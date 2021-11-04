@@ -1,4 +1,5 @@
 #include <curl/curl.h>
+#include <openssl/evp.h>
 #include "login.h"
 #include "play.h"
 #include "../../util/util.h"
@@ -119,14 +120,9 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 	utl_reverse_bytes(secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH);
 	
 	// start encryption cypher
-	const int enc_res = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.encrypt);
-	if (enc_res != CRYPT_OK) {
+	const int enc_res = cfb8_init(secret.bytes, &client->encryption.encrypt, &client->encryption.decrypt);
+	if (enc_res != 0) {
 		log_error("Could not start encryption cipher! Error code: %d", enc_res);
-		return false;
-	}
-	const int dec_res = cfb8_start(0, secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH, 0, &client->encryption.decrypt);
-	if (dec_res != CRYPT_OK) {
-		log_error("Could not start decryption cipher! Error code: %d", dec_res);
 		return false;
 	}
 	client->encryption.enabled = true;
@@ -179,19 +175,21 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 		CURLcode res;
 
 		// create server_id hash
-		byte_t server_id_hash[sha1_desc.hashsize];
-		hash_state md;
-		sha1_init(&md);
-		sha1_process(&md, (byte_t*) "", 0);
-		sha1_process(&md, secret.bytes, LTG_AES_KEY_LENGTH);
-		sha1_process(&md, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
-		sha1_done(&md, server_id_hash);
+		EVP_MD_CTX* hash = EVP_MD_CTX_create();
+		EVP_DigestInit_ex(hash, EVP_sha1(), NULL);
+		EVP_DigestUpdate(hash, (byte_t*) "", 0);
+		EVP_DigestUpdate(hash, secret.bytes, LTG_AES_KEY_LENGTH);
+		EVP_DigestUpdate(hash, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
+		unsigned int digest_length = 20;
+		byte_t server_id_hash[digest_length];
+		EVP_DigestFinal_ex(hash, server_id_hash, &digest_length);
+		EVP_MD_CTX_destroy(hash);
 
 		// create server_id string
-		char server_id[(sha1_desc.hashsize << 1) + 2];
-		utl_to_minecraft_hex(server_id, server_id_hash, sha1_desc.hashsize);
+		char server_id[(digest_length << 1) + 2];
+		utl_to_minecraft_hex(server_id, server_id_hash, digest_length);
 
-		char request[98 + (sha1_desc.hashsize << 1)];
+		char request[98 + (digest_length << 1)];
 		sprintf(request, "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", client->username.value, server_id);
 		curl_easy_setopt(phd_authRequest.curl, CURLOPT_URL, request);
 

@@ -119,10 +119,11 @@ void* t_ltg_client(void* args) {
 			recvd->cursor = 0;
 
 			if (client->encryption.enabled) {
-				cfb8_decrypt(recvd->bytes, recvd->bytes, recvd->length, &client->encryption.decrypt);
+				cfb8_decrypt(client->encryption.decrypt, recvd->bytes, recvd->length, recvd->bytes);
 			}
 
 			if (!ltg_handle_packet(client, recvd)) {
+				log_info("Disconnecting client");
 				break;
 			}
 
@@ -262,7 +263,7 @@ static inline void ltg_send_e(ltg_client_t* client, byte_t* bytes, size_t length
 		// encrypt packet
 		byte_t encrypted[length];
 
-		cfb8_encrypt(bytes, encrypted, length, &client->encryption.encrypt);
+		cfb8_encrypt(client->encryption.encrypt, bytes, length, encrypted);
 
 		sck_send(client->socket, (char*) encrypted, length);
 
@@ -402,8 +403,7 @@ void ltg_disconnect(ltg_client_t* client) {
 
 	// free encryption key
 	if (client->encryption.enabled) {
-		cfb8_done(&client->encryption.encrypt);
-		cfb8_done(&client->encryption.decrypt);
+		cfb8_done(client->encryption.encrypt, client->encryption.decrypt);
 	}
 
 	free(client);

@@ -26,7 +26,7 @@ file(GLOB_RECURSE src
      "src/*.c"
 )
 
-link_libraries(tomcrypt gmp m)
+link_libraries(ssl crypto gmp m)
 
 if(DEFINED WIN32 OR DEFINED MSYS)
      # LINK CURL

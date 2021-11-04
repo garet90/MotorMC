@@ -1,4 +1,4 @@
-#include <tomcrypt.h>
+#include <openssl/evp.h>
 #include "play.h"
 #include "../../io/logger/logger.h"
 #include "../../io/nbt/mnbt.h"
@@ -1260,11 +1260,14 @@ void phd_send_join_game(ltg_client_t* client) {
 	pck_write_string(packet, player_world->name.value, player_world->name.length);
 	
 	// hash seed
-	byte_t seed_hash[sha256_desc.hashsize];
-	hash_state hash;
-	sha256_init(&hash);
-	sha256_process(&hash, (byte_t*) &player_world->seed, 8);
-	sha1_done(&hash, seed_hash);
+
+	EVP_MD_CTX* hash = EVP_MD_CTX_create();
+	EVP_DigestInit_ex(hash, EVP_sha256(), NULL);
+	EVP_DigestUpdate(hash, (byte_t*) &player_world->seed, 8);
+	unsigned int digest_length = 32;
+	byte_t seed_hash[digest_length];
+	EVP_DigestFinal_ex(hash, seed_hash, &digest_length);
+	EVP_MD_CTX_destroy(hash);
 
 	pck_write_int64(packet, *((uint64_t*) seed_hash)); // hashed seed
 	

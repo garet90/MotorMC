@@ -185,8 +185,8 @@ typedef struct {
 	uint32_t keep_alive;
 
 	struct {
-		symmetric_CFB8 encrypt;
-		symmetric_CFB8 decrypt;
+		EVP_CIPHER_CTX* encrypt;
+		EVP_CIPHER_CTX* decrypt;
 		bool enabled : 1;
 	} encryption;
 
