@@ -3,6 +3,8 @@
 #include "../motor.h"
 #include "../util/vector.h"
 
+// TODO keep track of job traffic (increases everytime jobs aren't completed, decreases everytime they are)
+
 // default handler vectors
 UTL_VECTOR_DEFAULT(job_keep_alive_handlers, job_handler_t, 
 	job_handle_keep_alive

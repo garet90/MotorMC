@@ -293,8 +293,6 @@ void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 		chunk->ticket = UTL_MIN(chunk->ticket, WLD_TICKET_TICK_ENTITIES);
 	} else {
 		chunk->ticket = UTL_MIN(chunk->ticket, distance - sky_main.render_distance + WLD_TICKET_TICK_ENTITIES);
-		// TODO if greater should do nothing
-		// I can't remember what this means so...
 	}
 
 }

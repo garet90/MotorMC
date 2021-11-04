@@ -177,6 +177,7 @@ typedef struct {
 	uint32_t id;
 
 	// address
+	pthread_mutex_t lock;
 	int32_t socket;
 
 	ltg_locale_t locale;

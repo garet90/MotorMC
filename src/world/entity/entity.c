@@ -80,9 +80,13 @@ void ent_set_chunk(ent_entity_t* entity) {
 		} else { // set absolute (o(logn))
 
 			chunk = wld_get_chunk_at(entity->position.world, f_x, f_z);
+
 		}
+
+		// update players around
 		utl_bit_vector_xor_foreach(&entity->chunk->subscribers, &chunk->subscribers, ent_send_destroy_entity, entity);
 		ent_remove_chunk(entity);
+
 	} else {
 		// set absolute (o(logn))
 		chunk = wld_get_chunk_at(entity->position.world, f_x, f_z);
@@ -97,7 +101,6 @@ void ent_set_chunk(ent_entity_t* entity) {
 	assert(chunk != NULL);
 
 	entity->chunk_node = utl_dll_push(&chunk->entities, entity);
-
 	entity->chunk = chunk;
 
 }

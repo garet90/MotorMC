@@ -72,6 +72,7 @@ void* t_ltg_run(void* input) {
 			// allocate new client and set address and socket
 			ltg_client_t* client = calloc(1, sizeof(ltg_client_t));
 			client->socket = socket;
+			pthread_mutex_init(&client->lock, NULL);
 			client->address.addr = address;
 			client->address.size = address_size;
 			client->state = ltg_handshake;
@@ -274,60 +275,65 @@ static inline void ltg_send_e(ltg_client_t* client, byte_t* bytes, size_t length
 // sends the packet to the client specified
 void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
-	size_t length = packet->cursor;
-	byte_t* bytes = NULL;
+	with_lock (&client->lock) {
 
-	if (client->compression_enabled) {
+		size_t length = packet->cursor;
+		byte_t* bytes = NULL;
 
-		if (length >= sky_main.listener.network_compression_threshold) { // compress the packet
-		
-			byte_t compressed[length + 10];
-			size_t compressed_length = 0;
+		if (client->compression_enabled) {
 
-			bytes = compressed + 10;
+			if (length >= sky_main.listener.network_compression_threshold) { // compress the packet
 			
-			// it's zlib compression time
-			if (client->compression.compressor == NULL) {
-				client->compression.compressor = libdeflate_alloc_compressor(6);
-			}
+				byte_t compressed[length + 10];
+				size_t compressed_length = 0;
 
-			compressed_length = libdeflate_zlib_compress(client->compression.compressor, packet->bytes, length, bytes, length);
-
-			if (compressed_length != 0) {
-
-				const size_t data_length_length = io_var_int_length(length);
-				const size_t packet_length_length = io_var_int_length(compressed_length + data_length_length);
+				bytes = compressed + 10;
 				
-				bytes = bytes - data_length_length - packet_length_length;
-				io_write_var_int(bytes, compressed_length + data_length_length, 5);
-				io_write_var_int(bytes + packet_length_length, length, 5);
-				length = compressed_length + data_length_length + packet_length_length;
+				// it's zlib compression time
+				if (client->compression.compressor == NULL) {
+					client->compression.compressor = libdeflate_alloc_compressor(6);
+				}
 
-				ltg_send_e(client, bytes, length);
+				compressed_length = libdeflate_zlib_compress(client->compression.compressor, packet->bytes, length, bytes, length);
 
-				return;
+				if (compressed_length != 0) {
+
+					const size_t data_length_length = io_var_int_length(length);
+					const size_t packet_length_length = io_var_int_length(compressed_length + data_length_length);
+					
+					bytes = bytes - data_length_length - packet_length_length;
+					io_write_var_int(bytes, compressed_length + data_length_length, 5);
+					io_write_var_int(bytes + packet_length_length, length, 5);
+					length = compressed_length + data_length_length + packet_length_length;
+
+					ltg_send_e(client, bytes, length);
+
+					pthread_mutex_unlock(&client->lock);
+					return;
+
+				}
 
 			}
+			
+			// do not compress the packet
+			const size_t length_length = io_var_int_length(length + 1);
+			bytes = packet->bytes - length_length - 1;
+			io_write_var_int(bytes, length + 1, 5);
+			bytes[length_length] = 0;
+			length += length_length + 1;
+
+		} else {
+
+			const size_t length_length = io_var_int_length(length);
+			bytes = packet->bytes - length_length;
+			io_write_var_int(bytes, length, 5);
+			length += length_length;
 
 		}
-		
-		// do not compress the packet
-		const size_t length_length = io_var_int_length(length + 1);
-		bytes = packet->bytes - length_length - 1;
-		io_write_var_int(bytes, length + 1, 5);
-		bytes[length_length] = 0;
-		length += length_length + 1;
 
-	} else {
-
-		const size_t length_length = io_var_int_length(length);
-		bytes = packet->bytes - length_length;
-		io_write_var_int(bytes, length, 5);
-		length += length_length;
+		ltg_send_e(client, bytes, length);
 
 	}
-
-	ltg_send_e(client, bytes, length);
 
 }
 
@@ -372,6 +378,7 @@ void ltg_disconnect(ltg_client_t* client) {
 	}
 
 	sck_close(client->socket);
+	pthread_mutex_destroy(&client->lock);
 
 	// remove from client list
 	with_lock (&sky_main.listener.clients.lock) {

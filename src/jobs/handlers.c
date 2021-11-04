@@ -227,6 +227,7 @@ bool job_handle_entity_move(job_payload_t* payload) {
 		ent_set_chunk(entity);
 	}
 
+	// maybe lock the chunk for the foreach? TODO
 	wld_chunk_t* chunk = entity->chunk;
 	utl_bit_vector_foreach(&chunk->subscribers, job_update_entity_move, payload);
 
@@ -302,8 +303,6 @@ bool job_handle_living_entity_look(job_payload_t* payload) {
 	entity->rotation.pitch = payload->living_entity_look.pitch;
 
 	entity->entity.on_ground = payload->living_entity_look.on_ground;
-
-	// TODO send to watchers
 
 	wld_chunk_t* chunk = entity->entity.chunk;
 	utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_look, payload);
