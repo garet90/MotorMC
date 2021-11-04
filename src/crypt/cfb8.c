@@ -2,12 +2,23 @@
 
 int cfb8_init(byte_t* key, EVP_CIPHER_CTX** e, EVP_CIPHER_CTX** d) {
 	
-	*e = EVP_CIPHER_CTX_new();
-	EVP_EncryptInit_ex(*e, EVP_aes_128_cfb8(), NULL, key, key);
-	*d = EVP_CIPHER_CTX_new();
-	EVP_EncryptInit_ex(*d, EVP_aes_128_cfb8(), NULL, key, key);
+	if ((*e = EVP_CIPHER_CTX_new()) == NULL) {
+		return 0;
+	}
 
-	return 0;
+	if (EVP_EncryptInit_ex(*e, EVP_aes_128_cfb8(), NULL, key, key) != 1) {
+		return 0;
+	}
+
+	if ((*d = EVP_CIPHER_CTX_new()) == NULL) {
+		return 0;
+	}
+
+	if (EVP_DecryptInit_ex(*d, EVP_aes_128_cfb8(), NULL, key, key) != 1) {
+		return 0;
+	}
+
+	return 1;
 
 }
 

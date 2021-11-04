@@ -121,7 +121,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 	
 	// start encryption cypher
 	const int enc_res = cfb8_init(secret.bytes, &client->encryption.encrypt, &client->encryption.decrypt);
-	if (enc_res != 0) {
+	if (enc_res != 1) {
 		log_error("Could not start encryption cipher! Error code: %d", enc_res);
 		return false;
 	}

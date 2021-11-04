@@ -104,12 +104,12 @@ void* t_ltg_client(void* args) {
 	ltg_client_t* client = args;
 
 	// create receive packet (on stack)
-	PCK_INLINE(recvd, LTG_MAX_RECIEVE, io_big_endian);
+	PCK_INLINE(recvd, LTG_MAX_RECEIVE, io_big_endian);
 
 	for (;;) {
 
 		// receive packet
-		recvd->length = sck_recv(client->socket, (char*) recvd->bytes, LTG_MAX_RECIEVE);
+		recvd->length = sck_recv(client->socket, (char*) recvd->bytes, LTG_MAX_RECEIVE);
 
 		if ((int32_t) recvd->length <= 0) {
 			// client disconnected
@@ -119,12 +119,20 @@ void* t_ltg_client(void* args) {
 			recvd->cursor = 0;
 
 			if (client->encryption.enabled) {
-				cfb8_decrypt(client->encryption.decrypt, recvd->bytes, recvd->length, recvd->bytes);
-			}
+				PCK_INLINE(decrypted, recvd->length, io_big_endian);
+				if (cfb8_decrypt(client->encryption.decrypt, recvd->bytes, recvd->length, decrypted->bytes) != 1) {
+					log_error("Decryption failed");
+					break;
+				}
+				decrypted->length = recvd->length;
 
-			if (!ltg_handle_packet(client, recvd)) {
-				log_info("Disconnecting client");
-				break;
+				if (!ltg_handle_packet(client, decrypted)) {
+					break;
+				}
+			} else {
+				if (!ltg_handle_packet(client, recvd)) {
+					break;
+				}
 			}
 
 		}
@@ -179,10 +187,12 @@ bool ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet) {
 
 				size_t actual_length = 0;
 				if (libdeflate_zlib_decompress(client->compression.decompressor, pck_cursor(packet), packet_length - (packet->cursor - length_ptr), pck_cursor(decompressed), data_length, &actual_length) != LIBDEFLATE_SUCCESS) {
+					log_error("Client sent a corrupt packet! (0)");
 					return false;
 				}
 
 				if (actual_length != (unsigned) data_length) {
+					log_error("Client sent a corrupt packet! (1)");
 					return false;
 				}
 
