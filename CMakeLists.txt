@@ -26,7 +26,7 @@ file(GLOB_RECURSE src
      "src/*.c"
 )
 
-link_libraries(ssl crypto gmp m)
+link_libraries(m)
 
 if(DEFINED WIN32 OR DEFINED MSYS)
      # LINK CURL
@@ -34,10 +34,18 @@ if(DEFINED WIN32 OR DEFINED MSYS)
           CURL_STATICLIB
           WITH_SSL=STATIC
      )
-     link_libraries(-l:libcurl.a advapi32 crypt32 -l:libzstd.a -l:libz.a ws2_32)
+     link_libraries(-l:libssl.a -l:libcrypto.a -l:libgmp.a -l:libcurl.a advapi32 crypt32 -l:libzstd.a -l:libz.a ws2_32)
 
      link_libraries(deflatestatic -l:libpthread.a)
 else()
+     if (DEFINED APPLE)
+          # Link OpenSSL and GMP statically
+          link_libraries(libssl.a libcrypto.a libgmp.a)
+     else()
+          # Link OpenSSL and GMP dynamically
+          link_libraries(ssl crypto gmp)
+     endif()
+
      link_libraries(deflate pthread curl)
 
      if(DEFINED UNIX)

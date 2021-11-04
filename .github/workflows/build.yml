@@ -33,6 +33,8 @@ jobs:
           libtool
           mingw-w64-x86_64-toolchain
           git
+          mingw-w64-x86_64-gmp
+          openssl-devel
 
     - name: Set Workspace
       run: |
@@ -41,18 +43,16 @@ jobs:
       env:
         github_workspace: ${{github.workspace}}
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
-    - name: Install Tom's Fast Math
+        
+    - name: Install libdeflate
       run: |
-        git clone https://github.com/libtom/tomsfastmath.git $workspace/libs/libtom/tomsfastmath
-        cd $workspace/libs/libtom/tomsfastmath
-        make install
-      
-    - name: Install Tom Crypt
-      run: |
-        git clone https://github.com/libtom/libtomcrypt.git $workspace/libs/libtom/libtomcrypt
-        cd $workspace/libs/libtom/libtomcrypt
-        make install
+        git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
+        cd $workspace/libs/ebiggers/libdeflate
+        make libdeflatestatic.lib
+        mkdir -p /usr/local/lib/
+        mkdir -p /usr/local/include/
+        cp libdeflatestatic.lib /usr/local/lib/
+        cp libdeflate.h /usr/local/include/
         
     - name: Install cURL
       run: |
@@ -61,14 +61,6 @@ jobs:
         autoreconf -fi
         ./configure --disable-shared --with-schannel --disable-ldap --disable-sspi --without-librtmp --disable-ftp --disable-file --disable-dict --disable-telnet --disable-tftp --disable-rtsp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-smb --without-libidn
         make install
-        
-    - name: Install libdeflate
-      run: |
-        git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
-        cd $workspace/libs/ebiggers/libdeflate
-        make libdeflatestatic.lib
-        cp libdeflatestatic.lib /usr/local/lib/
-        cp libdeflate.h /usr/local/include/
 
     - name: Configure CMake
       run: |
@@ -99,25 +91,23 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install Tom's Fast Math
+    - name: Install GMP
       run: |
-        git clone https://github.com/libtom/tomsfastmath.git ${{github.workspace}}/libs/libtom/tomsfastmath
-        cd ${{github.workspace}}/libs/libtom/tomsfastmath
-        sudo make install
+        brew install gmp
 
-    - name: Install Tom Crypt
+    - name: Install OpenSSL
       run: |
-        git clone https://github.com/libtom/libtomcrypt.git ${{github.workspace}}/libs/libtom/libtomcrypt
-        cd ${{github.workspace}}/libs/libtom/libtomcrypt
-        sudo make install
+        brew install openssl@3
+        cp -R /usr/local/opt/openssl@3/lib/. /usr/local/lib/
+        cp -R /usr/local/opt/openssl@3/include/. /usr/local/include/
     
     - name: Install libdeflate
       run: |
         git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
         cd ${{github.workspace}}/libs/ebiggers/libdeflate
         sudo make libdeflate.a
-        sudo mv libdeflate.a /usr/local/lib/
-        sudo mv libdeflate.h /usr/local/include/
+        sudo mv libdeflate.a /usr/local/lib/libdeflate.a
+        sudo mv libdeflate.h /usr/local/include/libdeflate.h
       
     - name: Configure CMake
       run: |
@@ -147,17 +137,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install Tom's Fast Math
+    - name: Install GMP
       run: |
-        git clone https://github.com/libtom/tomsfastmath.git ${{github.workspace}}/libs/libtom/tomsfastmath
-        cd ${{github.workspace}}/libs/libtom/tomsfastmath
-        sudo make install
+        sudo apt-get update
+        sudo apt-get install libgmp-dev
 
-    - name: Install Tom Crypt
+    - name: Install OpenSSL
       run: |
-        git clone https://github.com/libtom/libtomcrypt.git ${{github.workspace}}/libs/libtom/libtomcrypt
-        cd ${{github.workspace}}/libs/libtom/libtomcrypt
-        sudo make install
+        sudo apt-get update
+        sudo apt-get install libssl-dev
 
     - name: Install libcurl
       run: |
@@ -169,8 +157,8 @@ jobs:
         git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
         cd ${{github.workspace}}/libs/ebiggers/libdeflate
         sudo make libdeflate.a
-        sudo mv libdeflate.a /usr/local/lib/
-        sudo mv libdeflate.h /usr/local/include/
+        sudo mv libdeflate.a /usr/local/lib/libdeflate.a
+        sudo mv libdeflate.h /usr/local/include/libdeflate.h
       
     - name: Configure CMake
       run: |
