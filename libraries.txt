@@ -3,7 +3,7 @@ Here are all of the libraries MotorMC uses:
 
 ( Library    - What it's used for                       <- Why it's used )
 
-TomsFastMath - RSA encryption and math                  <- TODO replace for GMP (GMP is faster)
+GMP          - RSA encryption and math                  <- Best solution
 libTomCrypt  - cryptographic hashes, and AES encryption <- TODO replace for OpenSSL	(OpenSSL is faster)
 libcURL      - auth requests                            <- Only solution with desired functions, relys on OpenSSL
 libdeflate   - compression                              <- Best solution
