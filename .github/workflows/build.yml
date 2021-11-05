@@ -94,10 +94,13 @@ jobs:
     - name: Install GMP
       run: |
         brew install gmp
+        sudo rm /usr/local/opt/gmp/lib/libgmp.10.dylib
 
     - name: Install OpenSSL
       run: |
         brew install openssl@3
+        sudo rm /usr/local/opt/openssl@3/lib/libcrypto.3.dylib
+        sudo rm /usr/local/opt/openssl@3/lib/libssl.3.dylib
         cp -R /usr/local/opt/openssl@3/lib/. /usr/local/lib/
         cp -R /usr/local/opt/openssl@3/include/. /usr/local/include/
     
