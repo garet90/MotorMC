@@ -87,7 +87,7 @@ extern void phd_send_named_sound_effect(ltg_client_t*);
 extern void phd_send_disconnect(ltg_client_t* client, const char* message, size_t message_len);
 extern void phd_send_entity_status(ltg_client_t* client, int32_t entity_id, uint8_t status);
 extern void phd_send_explosion(ltg_client_t*);
-extern void phd_send_unload_chunk(ltg_client_t*);
+extern void phd_send_unload_chunk(ltg_client_t* client, wld_chunk_t* chunk);
 extern void phd_send_change_game_state(ltg_client_t*);
 extern void phd_send_open_horse_window(ltg_client_t*);
 extern void phd_send_initialize_world_border(ltg_client_t* client, wld_world_t* world);
@@ -202,6 +202,11 @@ static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t*
 			entity = utl_dll_iterator_next(&iterator);
 		}
 	}
+}
+
+static inline void phd_update_unsubscribe_chunk(ltg_client_t* client, wld_chunk_t* chunk) {
+	wld_unsubscribe_chunk(chunk, client->id);
+	//phd_send_unload_chunk(client, chunk);
 }
 
 extern void phd_update_sent_chunks(ltg_client_t* client);

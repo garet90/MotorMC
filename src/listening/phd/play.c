@@ -943,6 +943,18 @@ void phd_send_entity_status(ltg_client_t* client, int32_t entity_id, uint8_t sta
 
 }
 
+void phd_send_unload_chunk(ltg_client_t* client, wld_chunk_t* chunk) {
+	
+	PCK_INLINE(packet, 9, io_big_endian);
+
+	pck_write_var_int(packet, 0x1d);
+	pck_write_int32(packet, wld_get_chunk_x(chunk));
+	pck_write_int32(packet, wld_get_chunk_z(chunk));
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_initialize_world_border(ltg_client_t* client, __attribute__((unused)) wld_world_t* world) {
 
 	PCK_INLINE(packet, 57, io_big_endian);
@@ -1725,7 +1737,7 @@ void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_dis
 			for (int16_t z = -client->render_distance; z <= client->render_distance; ++z) {
 				if (x < -view_distance || x > view_distance || z < -view_distance || z > view_distance) {
 					wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
-					wld_unsubscribe_chunk(v_c, client->id);
+					phd_update_unsubscribe_chunk(client, v_c);
 				}
 			}
 		}
@@ -1761,7 +1773,7 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 			const int32_t n_x = client->render_distance + 1;
 
 			for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
-				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, o_x, c_z));
 				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, n_x, c_z);
 				phd_update_subscribe_chunk(client, new_chunk);
 			}
@@ -1788,7 +1800,7 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 			const int32_t n_x = -client->render_distance - 1;
 
 			for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
-				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
+				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, o_x, c_z));
 				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, n_x, c_z);
 				phd_update_subscribe_chunk(client, new_chunk);
 			}
@@ -1813,11 +1825,11 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 	if (z > old_z) {
 
 		{
-			const int32_t o_z = client->render_distance;
+			const int32_t o_z = -client->render_distance;
 			const int32_t n_z = client->render_distance + 1;
 			
 			for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
-				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, o_z));
 				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, c_x, n_z);
 				phd_update_subscribe_chunk(client, new_chunk);
 			}
@@ -1844,7 +1856,7 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 			const int32_t n_z = -client->render_distance - 1;
 			
 			for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
-				wld_unsubscribe_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
+				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, o_z));
 				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, c_x, n_z);
 				phd_update_subscribe_chunk(client, new_chunk);
 			}
@@ -1882,7 +1894,7 @@ void phd_update_sent_chunks_leave(ltg_client_t* client) {
 
 			const uint8_t distance = UTL_MAX(UTL_ABS(x), UTL_ABS(z));
 			if (distance <= client->render_distance) {
-				wld_unsubscribe_chunk(v_c, client->id);
+				phd_update_unsubscribe_chunk(client, v_c);
 			}
 		}
 	}
