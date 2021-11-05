@@ -93,7 +93,7 @@ wld_world_t* wld_get_world(uint16_t world_id) {
 wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 
 	wld_region_t* region = calloc(1, sizeof(wld_region_t));
-	const int64_t key = (((uint64_t) x) << 16) | (uint64_t) z;
+	const int64_t key = ((uint64_t) (uint16_t) x << 16) | (uint16_t) z;
 
 	// tick job
 	uint32_t tick_job = job_new(job_tick_region, (job_payload_t) { .region = region });
@@ -105,10 +105,10 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 			.x = x,
 			.z = z,
 			.relative = {
-				.north = utl_tree_get(&world->regions, key - 1),
-				.south = utl_tree_get(&world->regions, key + 1),
-				.west = utl_tree_get(&world->regions, key - (1 << 16)),
-				.east = utl_tree_get(&world->regions, key + (1 << 16))
+				.north = utl_tree_get(&world->regions, ((uint64_t) (uint16_t) x << 16) | (uint16_t) (z - 1)),
+				.south = utl_tree_get(&world->regions, ((uint64_t) (uint16_t) x << 16) | (uint16_t) (z + 1)),
+				.west = utl_tree_get(&world->regions, ((uint64_t) (uint16_t) (x - 1) << 16) | (uint16_t) z),
+				.east = utl_tree_get(&world->regions, ((uint64_t) (uint16_t) (x + 1) << 16) | (uint16_t) z)
 			}
 		};
 		memcpy(region, &region_init, sizeof(wld_region_t));
@@ -137,7 +137,7 @@ wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 	wld_region_t* region = NULL;
 
 	with_lock (&world->lock) {
-		region = utl_tree_get(&world->regions, (((uint64_t) x) << 16) | (uint64_t) z);
+		region = utl_tree_get(&world->regions, ((uint64_t) (uint16_t) x << 16) | (uint16_t) z);
 	}
 
 	if (region == NULL) {
@@ -148,7 +148,7 @@ wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 
 }
 
-wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max_ticket) {
+wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint8_t x, uint8_t z, uint8_t max_ticket) {
 
 	assert(x < 32 && z < 32);
 
@@ -170,7 +170,7 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, int8_t x, int8_t z, uint8_t max
 	memcpy(chunk, &chunk_init, sizeof(wld_chunk_t)); // coppy init to chunk
 	memset(chunk->sections, 0, sizeof(wld_chunk_section_t) * chunk_height); // set chunk sections to 0
 
-	region->chunks[(x << 5) + z] = chunk;
+	region->chunks[(x << 5) | z] = chunk;
 
 	// TODO generate actual chunk
 	for (uint32_t g_x  = 0; g_x < 16; ++g_x) {
@@ -192,14 +192,14 @@ wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
 
 	wld_region_t* region = wld_get_region(world, x >> 5, z >> 5);
 
-	x &= 0x1F;
-	z &= 0x1F;
+	const uint8_t c_x = x & 0x1F;
+	const uint8_t c_z = z & 0x1F;
 
-	wld_chunk_t* chunk = region->chunks[(x << 5) + z];
+	wld_chunk_t* chunk = region->chunks[(c_x << 5) | c_z];
 
 	if (chunk == NULL) {
 
-		chunk = wld_gen_chunk(region, x, z, WLD_TICKET_MAX);
+		chunk = wld_gen_chunk(region, c_x, c_z, WLD_TICKET_MAX);
 
 	}
 
@@ -215,27 +215,31 @@ wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z) 
 
 wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z, uint8_t max_ticket) {
 	
-	x += chunk->x;
-	z += chunk->z;
+	const int32_t f_x = x + wld_get_chunk_x(chunk);
+	const int32_t f_z = z + wld_get_chunk_z(chunk);
 
-	int16_t r_x = x >> 5;
-	int16_t r_z = z >> 5;
+	const int32_t c_x = x + chunk->x;
+	const int32_t c_z = z + chunk->z;
 
-	x &= 0x1F;
-	z &= 0x1F;
+	int16_t r_x = c_x >> 5;
+	int16_t r_z = c_z >> 5;
+
+	const uint16_t i_x = c_x & 0x1F;
+	const uint16_t i_z = c_z & 0x1F;
+	const uint16_t idx = (i_x << 5) | i_z;
 
 	wld_region_t* region = chunk->region;
 
 	while (r_x < 0) {
 		if (region->relative.west == NULL) {
-			return wld_get_chunk(chunk->region->world, (r_x << 5) + x, (r_z << 5) + z);
+			return wld_get_chunk(chunk->region->world, f_x, f_z);
 		}
 		region = region->relative.west;
 		r_x++;
 	}
 	while (r_x > 0) {
 		if (region->relative.east == NULL) {
-			return wld_get_chunk(chunk->region->world, (r_x << 5) + x, (r_z << 5) + z);
+			return wld_get_chunk(chunk->region->world, f_x, f_z);
 		}
 		region = region->relative.east;
 		r_x--;
@@ -243,23 +247,24 @@ wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t
 
 	while (r_z < 0) {
 		if (region->relative.north == NULL) {
-			return wld_get_chunk(chunk->region->world, (r_x << 5) + x, (r_z << 5) + z);
+			return wld_get_chunk(chunk->region->world, f_x, f_z);
 		}
 		region = region->relative.north;
 		r_z++;
 	}
 	while (r_z > 0) {
 		if (region->relative.south == NULL) {
-			return wld_get_chunk(chunk->region->world, (r_x << 5) + x, (r_z << 5) + z);
+			return wld_get_chunk(chunk->region->world, f_x, f_z);
 		}
 		region = region->relative.south;
 		r_z--;
 	}
 
-	if (region->chunks[(x << 5) + z] == NULL) {
-		wld_gen_chunk(region, x, z, max_ticket);
+	if (region->chunks[idx] == NULL) {
+		wld_gen_chunk(region, i_x, i_z, max_ticket);
 	}
-	return region->chunks[(x << 5) + z];
+
+	return region->chunks[idx];
 
 }
 

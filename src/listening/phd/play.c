@@ -981,6 +981,7 @@ struct {
 	.lock = PTHREAD_MUTEX_INITIALIZER
 };
 
+// This is one chunky function, optimize it if possible TODO
 void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	with_lock (&phd_chunk_packet.lock) {
@@ -1086,7 +1087,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 						mat_block_protocol_id_t block;
 						uint16_t palette;
 					} previous = {
-						.block = mat_get_block_default_protocol_id_by_type(mat_block_air), // mat_block_air
+						.block = palette.array[0], // mat_block_air
 						.palette = 0
 					};
 
