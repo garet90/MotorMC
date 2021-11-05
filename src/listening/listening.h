@@ -131,7 +131,7 @@ typedef enum {
 
 } ltg_locale_t;
 
-#define LTG_MAX_RECIEVE 3276 // max amount of bytes client can send
+#define LTG_MAX_RECEIVE 3276 // max amount of bytes client can send
 #define LTG_AES_KEY_LENGTH 16 // length of AES key
 
 typedef byte_t ltg_uuid_t[16];
@@ -185,8 +185,8 @@ typedef struct {
 	uint32_t keep_alive;
 
 	struct {
-		symmetric_CFB8 encrypt;
-		symmetric_CFB8 decrypt;
+		EVP_CIPHER_CTX* encrypt;
+		EVP_CIPHER_CTX* decrypt;
 		bool enabled : 1;
 	} encryption;
 

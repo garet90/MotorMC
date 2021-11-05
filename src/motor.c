@@ -1,6 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include <tomcrypt.h>
 #include <time.h>
 #include <curl/curl.h>
 #include "motor.h"
@@ -163,9 +162,6 @@ int main(int argc, char* argv[]) {
 
 	// encryption / login setup
 	curl_global_init(CURL_GLOBAL_DEFAULT);
-
-	// register aes cipher
-	register_cipher(&aes_enc_desc);
 
 	// run tests if args includes "test"
 	for (int i = 1; i < argc; ++i) {

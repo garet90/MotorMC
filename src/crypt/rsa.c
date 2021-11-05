@@ -6,53 +6,57 @@
 void cry_rsa_gen_key_pair(cry_rsa_keypair_t* keypair) {
 
 	// e for generating d
-	const byte_t e_val[] = {
-		0x01,
-		0x00,
-		0x01
-	};
-	fp_int e;
-	fp_read_unsigned_bin(&e, e_val, sizeof(e_val));
+	mpz_t e;
+	mpz_init_set_ui(e, 65537);
 
-	// generate two 64 byte primes: p and q
-	fp_int p, q;
-	cry_gen_prime(&p, 64);
-	cry_gen_prime(&q, 64);
+	mpz_t p, q;
+	mpz_init2(p, 512);
+	mpz_init2(q, 512);
+
+	cry_gen_prime(p, 64);
+	cry_gen_prime(q, 64);
 
 #ifdef CRY_DEBUG
-	char str[512];
-	fp_toradix(&p, str, 16);
+	char str[514];
+	mpz_get_str(str, 16, p);
 	log_info("p: 0x%s", str);
 	
-	fp_toradix(&q, str, 16);
+	mpz_get_str(str, 16, q);
 	log_info("q: 0x%s", str);
 #endif
 
-	fp_init(&keypair->d);
-	fp_init(&keypair->n);
+	mpz_init2(keypair->n, 1024);
+	mpz_mul(keypair->n, p, q);
 
-	fp_mul(&p, &q, &keypair->n);
+	mpz_init2(keypair->d, 1024);
 
 #ifdef CRY_DEBUG
-	fp_toradix(&keypair->n, str, 16);
+	mpz_get_str(str, 16, keypair->n);
 	log_info("n: 0x%s", str);
 #endif
 
-	const byte_t one_val[] = { 0x01 };
-	fp_int one;
-	fp_read_unsigned_bin(&one, one_val, sizeof(one_val));
+	mpz_sub_ui(p, p, 1);
+	mpz_sub_ui(q, q, 1);
 
-	fp_sub(&p, &one, &p);
-	fp_sub(&q, &one, &q);
-	
-	fp_lcm(&p, &q, &p);
+	mpz_lcm(p, q, p);
 
-	fp_invmod(&e, &p, &keypair->d);
+	mpz_invert(keypair->d, e, p);
 
 #ifdef CRY_DEBUG
-	fp_toradix(&keypair->d, str, 16);
+	mpz_get_str(str, 16, keypair->d);
 	log_info("d: 0x%s", str);
+
+	// e * d MOD lambda must be 1
+	mpz_mul(q, e, keypair->d);
+	mpz_mod(q, q, p);
+	if (mpz_cmp_ui(q, 1) == 0) {
+		log_info("RSA keys are valid");
+	} else {
+		log_error("RSA keys are invalid!!");
+	}
 #endif
+
+	mpz_clears(e, p, q, NULL);
 
 	//ASN1
 
@@ -71,7 +75,7 @@ void cry_rsa_gen_key_pair(cry_rsa_keypair_t* keypair) {
 
 	memcpy(keypair->ASN1.bytes, prefix, sizeof(prefix));
 
-	fp_to_signed_bin(&keypair->n, keypair->ASN1.bytes + sizeof(prefix));
+	mpz_export(keypair->ASN1.bytes + sizeof(prefix) + 1, NULL, 1, sizeof(byte_t), 0, 0, keypair->n);
 
 	memcpy(keypair->ASN1.bytes + sizeof(prefix) + 129, suffix, sizeof(suffix));
 
@@ -79,37 +83,34 @@ void cry_rsa_gen_key_pair(cry_rsa_keypair_t* keypair) {
 
 }
 
-void cry_gen_prime(fp_int* prime, size_t size) {
-	
-	const byte_t two_val[] = { 0x02 };
-	fp_int two;
-	fp_read_unsigned_bin(&two, two_val, sizeof(two_val));
+void cry_gen_prime(mpz_t prime, size_t size) {
 
 	byte_t bytes[size];
 	cry_random_bytes(bytes, size);
-	bytes[size - 1] |= 0x1; // make sure it's even
+	bytes[size - 1] |= 0x1; // make sure it's odd
 	bytes[0] |= 0xC0; // make sure top two bits are 1 (so the product is the correct bit length)
 
-	fp_read_unsigned_bin(prime, bytes, size);
+	mpz_import(prime, size, 1, sizeof(byte_t), 0, 0, bytes);
 
-	while (fp_isprime(prime) != FP_YES) {
-
-		fp_add(prime, &two, prime);
-
-	}
+	mpz_nextprime(prime, prime);
 
 }
-void cry_rsa_decrypt(byte_t* out, const byte_t* message, size_t size, cry_rsa_keypair_t* keypair) {
 
-	fp_int c;
-	fp_read_unsigned_bin(&c, message, size);
+size_t cry_rsa_decrypt(byte_t* out, const byte_t* message, size_t size, cry_rsa_keypair_t* keypair) {
 
-	fp_exptmod(&c, &keypair->d, &keypair->n, &c);
+	mpz_t c;
+	mpz_init2(c, size << 3);
+	mpz_import(c, size, 1, sizeof(byte_t), 0, 0, message);
 
-	uint32_t m_size = fp_unsigned_bin_size(&c);
-	uint8_t m_arr[m_size];
-	fp_to_unsigned_bin(&c, m_arr);
+	mpz_powm_sec(c, c, keypair->d, keypair->n);
 
-	utl_reverse_bytes(m_arr, out, m_size);
+	size_t out_size = 0;
+	mpz_export(out, &out_size, 1, sizeof(byte_t), 0, 0, c);
+
+	utl_reverse_bytes(out, out, out_size);
+
+	mpz_clear(c);
+
+	return out_size;
 
 }

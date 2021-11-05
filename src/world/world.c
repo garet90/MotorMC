@@ -93,7 +93,7 @@ wld_world_t* wld_get_world(uint16_t world_id) {
 wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 
 	wld_region_t* region = calloc(1, sizeof(wld_region_t));
-	const int64_t key = ((uint64_t) x << 16) + z;
+	const int64_t key = (((uint64_t) x) << 16) | (uint64_t) z;
 
 	// tick job
 	uint32_t tick_job = job_new(job_tick_region, (job_payload_t) { .region = region });
@@ -137,7 +137,7 @@ wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
 	wld_region_t* region = NULL;
 
 	with_lock (&world->lock) {
-		region = utl_tree_get(&world->regions, ((uint64_t) x << 16) + z);
+		region = utl_tree_get(&world->regions, (((uint64_t) x) << 16) | (uint64_t) z);
 	}
 
 	if (region == NULL) {
@@ -228,14 +228,14 @@ wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t
 
 	while (r_x < 0) {
 		if (region->relative.west == NULL) {
-			return wld_gen_chunk(wld_get_region(chunk->region->world, region->x - 1, region->z), x, z, max_ticket);
+			return wld_get_chunk(chunk->region->world, (r_x << 5) + x, (r_z << 5) + z);
 		}
 		region = region->relative.west;
 		r_x++;
 	}
 	while (r_x > 0) {
 		if (region->relative.east == NULL) {
-			return wld_gen_chunk(wld_get_region(chunk->region->world, region->x + 1, region->z), x, z, max_ticket);
+			return wld_get_chunk(chunk->region->world, (r_x << 5) + x, (r_z << 5) + z);
 		}
 		region = region->relative.east;
 		r_x--;
@@ -243,14 +243,14 @@ wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t
 
 	while (r_z < 0) {
 		if (region->relative.north == NULL) {
-			return wld_gen_chunk(wld_get_region(chunk->region->world, region->x, region->z - 1), x, z, max_ticket);
+			return wld_get_chunk(chunk->region->world, (r_x << 5) + x, (r_z << 5) + z);
 		}
 		region = region->relative.north;
 		r_z++;
 	}
 	while (r_z > 0) {
 		if (region->relative.south == NULL) {
-			return wld_gen_chunk(wld_get_region(chunk->region->world, region->x, region->z + 1), x, z, max_ticket);
+			return wld_get_chunk(chunk->region->world, (r_x << 5) + x, (r_z << 5) + z);
 		}
 		region = region->relative.south;
 		r_z--;
@@ -328,7 +328,7 @@ void wld_set_block_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_b
 void wld_unload_region(wld_region_t* region) {
 
 	with_lock (&region->world->lock) {
-		utl_tree_remove(&region->world->regions, ((uint64_t) region->x << 16) + region->z);
+		utl_tree_remove(&region->world->regions, ((uint64_t) region->x << 16) | (uint64_t) region->z);
 	}
 
 	wld_free_region(region);
