@@ -195,8 +195,6 @@ void job_update_entity_move(uint32_t client_id, void* args) {
 	job_payload_t* payload = args;
 	ent_entity_t* entity = payload->entity_move.entity;
 	
-	pthread_mutex_unlock(&entity->chunk->lock);
-	
 	ltg_client_t* client = ltg_get_client_by_id(client_id);
 	
 	if ((ent_entity_t*) client->entity == entity) {
@@ -206,8 +204,6 @@ void job_update_entity_move(uint32_t client_id, void* args) {
 	} else {
 		phd_send_entity_position(client, entity, payload->entity_move.d_x, payload->entity_move.d_y, payload->entity_move.d_z);
 	}
-
-	pthread_mutex_lock(&entity->chunk->lock);
 
 }
 
@@ -232,9 +228,7 @@ bool job_handle_entity_move(job_payload_t* payload) {
 	}
 
 	wld_chunk_t* chunk = entity->chunk;
-	with_lock (&chunk->lock) {
-		utl_bit_vector_foreach(&chunk->subscribers, job_update_entity_move, payload);
-	}
+	utl_bit_vector_lock_foreach(&chunk->subscribers, &chunk->lock, job_update_entity_move, payload);
 
 	return true;
 
@@ -278,9 +272,7 @@ bool job_handle_entity_teleport(job_payload_t* payload) {
 	}
 
 	wld_chunk_t* chunk = entity->chunk;
-	with_lock (&chunk->lock) {
-		utl_bit_vector_foreach(&chunk->subscribers, job_update_entity_teleport, payload);
-	}
+	utl_bit_vector_lock_foreach(&chunk->subscribers, &chunk->lock, job_update_entity_teleport, payload);
 
 	return true;
 
@@ -312,9 +304,7 @@ bool job_handle_living_entity_look(job_payload_t* payload) {
 	entity->entity.on_ground = payload->living_entity_look.on_ground;
 
 	wld_chunk_t* chunk = entity->entity.chunk;
-	with_lock (&chunk->lock) {
-		utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_look, payload);
-	}
+	utl_bit_vector_lock_foreach(&chunk->subscribers, &chunk->lock, job_update_living_entity_look, payload);
 
 	return true;
 
@@ -324,8 +314,6 @@ void job_update_living_entity_move_look(uint32_t client_id, void* args) {
 
 	job_payload_t* payload = args;
 	ent_living_entity_t* entity = payload->living_entity_move_look.entity;
-	
-	pthread_mutex_unlock(&entity->entity.chunk->lock);
 
 	ltg_client_t* client = ltg_get_client_by_id(client_id);
 	
@@ -338,8 +326,6 @@ void job_update_living_entity_move_look(uint32_t client_id, void* args) {
 		phd_send_entity_head_look(client, entity);
 	}
 	
-	pthread_mutex_lock(&entity->entity.chunk->lock);
-
 }
 
 bool job_handle_living_entity_move_look(job_payload_t* payload) {
@@ -363,9 +349,7 @@ bool job_handle_living_entity_move_look(job_payload_t* payload) {
 	}
 
 	wld_chunk_t* chunk = entity->entity.chunk;
-	with_lock (&chunk->lock) {
-		utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_move_look, payload);
-	}
+	utl_bit_vector_lock_foreach(&chunk->subscribers, &chunk->lock, job_update_living_entity_move_look, payload);
 
 	return true;
 
@@ -413,9 +397,7 @@ bool job_handle_living_entity_teleport_look(job_payload_t* payload) {
 	}
 
 	wld_chunk_t* chunk = entity->entity.chunk;
-	with_lock (&chunk->lock) {
-		utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_teleport_look, payload);
-	}
+	utl_bit_vector_lock_foreach(&chunk->subscribers, &chunk->lock, job_update_living_entity_teleport_look, payload);
 
 	return true;
 

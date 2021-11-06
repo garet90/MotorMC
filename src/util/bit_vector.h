@@ -1,4 +1,5 @@
 #pragma once
+#include <pthread.h>
 #include "../main.h"
 #include "util.h"
 #include "vector.h"
@@ -114,6 +115,31 @@ static inline void utl_bit_vector_foreach(utl_bit_vector_t* vector, void (*const
 		}
 
 	}
+
+}
+
+static inline void utl_bit_vector_lock_foreach(utl_bit_vector_t* vector, pthread_mutex_t* mutex, void (*const function) (uint32_t, void*), void* input) {
+
+	pthread_mutex_lock(mutex);
+	
+	const uint32_t size = vector->vector.size;
+
+	for (uint32_t i = 0; i < size; ++i) {
+			
+		byte_t byte = UTL_VECTOR_GET_AS(byte_t, &vector->vector, i);
+
+		pthread_mutex_unlock(mutex);
+
+		while (byte) {
+			function((i << 3) + utl_ffs[byte], input);
+			byte &= byte - 1;
+		}
+
+		pthread_mutex_lock(mutex);
+
+	}
+
+	pthread_mutex_unlock(mutex);
 
 }
 
