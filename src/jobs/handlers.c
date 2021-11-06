@@ -195,6 +195,8 @@ void job_update_entity_move(uint32_t client_id, void* args) {
 	job_payload_t* payload = args;
 	ent_entity_t* entity = payload->entity_move.entity;
 	
+	pthread_mutex_unlock(&entity->chunk->lock);
+	
 	ltg_client_t* client = ltg_get_client_by_id(client_id);
 	
 	if ((ent_entity_t*) client->entity == entity) {
@@ -204,6 +206,8 @@ void job_update_entity_move(uint32_t client_id, void* args) {
 	} else {
 		phd_send_entity_position(client, entity, payload->entity_move.d_x, payload->entity_move.d_y, payload->entity_move.d_z);
 	}
+
+	pthread_mutex_lock(&entity->chunk->lock);
 
 }
 
@@ -317,10 +321,12 @@ bool job_handle_living_entity_look(job_payload_t* payload) {
 }
 
 void job_update_living_entity_move_look(uint32_t client_id, void* args) {
-	
+
 	job_payload_t* payload = args;
 	ent_living_entity_t* entity = payload->living_entity_move_look.entity;
 	
+	pthread_mutex_unlock(&entity->entity.chunk->lock);
+
 	ltg_client_t* client = ltg_get_client_by_id(client_id);
 	
 	if ((ent_living_entity_t*) client->entity == entity) {
@@ -331,6 +337,8 @@ void job_update_living_entity_move_look(uint32_t client_id, void* args) {
 		phd_send_entity_position_and_rotation(client, entity, payload->living_entity_move_look.d_x, payload->living_entity_move_look.d_y, payload->living_entity_move_look.d_z);
 		phd_send_entity_head_look(client, entity);
 	}
+	
+	pthread_mutex_lock(&entity->entity.chunk->lock);
 
 }
 
