@@ -227,9 +227,10 @@ bool job_handle_entity_move(job_payload_t* payload) {
 		ent_set_chunk(entity);
 	}
 
-	// maybe lock the chunk for the foreach? TODO
 	wld_chunk_t* chunk = entity->chunk;
-	utl_bit_vector_foreach(&chunk->subscribers, job_update_entity_move, payload);
+	with_lock (&chunk->lock) {
+		utl_bit_vector_foreach(&chunk->subscribers, job_update_entity_move, payload);
+	}
 
 	return true;
 
@@ -273,7 +274,9 @@ bool job_handle_entity_teleport(job_payload_t* payload) {
 	}
 
 	wld_chunk_t* chunk = entity->chunk;
-	utl_bit_vector_foreach(&chunk->subscribers, job_update_entity_teleport, payload);
+	with_lock (&chunk->lock) {
+		utl_bit_vector_foreach(&chunk->subscribers, job_update_entity_teleport, payload);
+	}
 
 	return true;
 
@@ -305,7 +308,9 @@ bool job_handle_living_entity_look(job_payload_t* payload) {
 	entity->entity.on_ground = payload->living_entity_look.on_ground;
 
 	wld_chunk_t* chunk = entity->entity.chunk;
-	utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_look, payload);
+	with_lock (&chunk->lock) {
+		utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_look, payload);
+	}
 
 	return true;
 
@@ -350,8 +355,10 @@ bool job_handle_living_entity_move_look(job_payload_t* payload) {
 	}
 
 	wld_chunk_t* chunk = entity->entity.chunk;
-	utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_move_look, payload);
-	
+	with_lock (&chunk->lock) {
+		utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_move_look, payload);
+	}
+
 	return true;
 
 }
@@ -398,7 +405,9 @@ bool job_handle_living_entity_teleport_look(job_payload_t* payload) {
 	}
 
 	wld_chunk_t* chunk = entity->entity.chunk;
-	utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_teleport_look, payload);
+	with_lock (&chunk->lock) {
+		utl_bit_vector_foreach(&chunk->subscribers, job_update_living_entity_teleport_look, payload);
+	}
 
 	return true;
 
