@@ -73,7 +73,8 @@ void sch_cancel(uint32_t id) {
 
 	if (work == NULL) return;
 
-	work->canceled = 1;
+	work->repeat = false;
+	work->canceled = true;
 
 }
 

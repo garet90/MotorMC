@@ -104,6 +104,7 @@ void job_handle(uint32_t id) {
 	job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
 
 	if (work == NULL) return;
+	if (work->canceled) return;
 
 	utl_vector_t* work_handlers = UTL_VECTOR_GET_AS(utl_vector_t*, &job_handlers, work->type);
 
