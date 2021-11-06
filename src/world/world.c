@@ -101,7 +101,6 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 	with_lock (&world->lock) {
 		wld_region_t region_init = (wld_region_t) {
 			.world = world,
-			.tick = sch_schedule_repeating(tick_job, 1, 1),
 			.x = x,
 			.z = z,
 			.relative = {
@@ -126,6 +125,8 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 			region->relative.east->relative.west = region;
 		}
 		utl_tree_put(&world->regions, key, region);
+		
+		region->tick = sch_schedule_repeating(tick_job, 1, 1);
 	}
 
 	return region;
