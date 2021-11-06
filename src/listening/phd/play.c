@@ -65,6 +65,9 @@ bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		case 0x2e: {
 			return phd_handle_player_block_placement(client, packet);
 		}
+		case 0x2f: {
+			return phd_handle_use_item(client, packet);
+		}
 		default: {
 			log_warn("Unknown packet %02x received in play state!", id);
 			return false;
@@ -574,14 +577,6 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 	ent_player_t* player = client->entity;
 	wld_chunk_t* chunk = player->living_entity.entity.chunk;
 
-	const int32_t c_x = wld_get_chunk_x(chunk);
-	const int32_t c_z = wld_get_chunk_z(chunk);
-
-	const int32_t b_x = position.x >> 4;
-	const int32_t b_z = position.z >> 4;
-
-	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, b_x - c_x, b_z - c_z);
-
 	with_lock (&player->living_entity.entity.lock){
 		switch (status) {
 			case 0: { // start digging
@@ -593,10 +588,10 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 							(job_payload_t) {
 								.dig_block = {
 									.client = client,
-									.chunk = block_chunk,
-									.x = position.x & 0xF,
+									.chunk = chunk,
+									.x = position.x,
 									.y = position.y,
-									.z = position.z & 0xF,
+									.z = position.z,
 								}
 							}),
 						ent_player_get_break_speed(
@@ -604,7 +599,7 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 							wld_get_block_type_at(chunk, position.x, position.y, position.z)
 						)
 					);
-			} else {
+				} else {
 					pthread_mutex_unlock(&player->living_entity.entity.lock);
 					return false;
 				}
@@ -773,24 +768,28 @@ bool phd_handle_player_block_placement(ltg_client_t* client, pck_packet_t* packe
 		
 		if (item->block != mat_block_air) {
 
-			const wld_chunk_t* player_chunk = player->living_entity.entity.chunk;
-			
-			const int32_t p_x = wld_get_chunk_x(player_chunk);
-			const int32_t p_z = wld_get_chunk_z(player_chunk);
+			wld_chunk_t* player_chunk = player->living_entity.entity.chunk;
 
-			const int32_t b_x = position.x >> 4;
-			const int32_t b_z = position.z >> 4;
-
-			wld_chunk_t* block_chunk = wld_relative_chunk(player_chunk, b_x - p_x, b_z - p_z);
-			wld_set_block_type_at(block_chunk, position.x & 0xF, position.y, position.z & 0xF, item->block);
+			wld_set_block_type_at(player_chunk, position.x, position.y, position.z, item->block);
 
 			itm_set_count(slot, slot->count - 1);
 
 		} else {
-			return false;
+			// tried to place air, interact with block TODO
 		}
 
 	}
+
+	return true;
+
+}
+
+bool phd_handle_use_item(__attribute__((unused)) ltg_client_t* client, pck_packet_t* packet) {
+
+	const __attribute__((unused)) enum {
+		main_hand = 0,
+		off_hand = 1
+	} hand = pck_read_var_int(packet);
 
 	return true;
 
@@ -1774,8 +1773,7 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 
 			for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
 				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, o_x, c_z));
-				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, n_x, c_z);
-				phd_update_subscribe_chunk(client, new_chunk);
+				phd_update_subscribe_chunk(client, wld_relative_chunk(old_chunk, n_x, c_z));
 			}
 		}
 
@@ -1801,8 +1799,7 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 
 			for (int32_t c_z = -client->render_distance; c_z <= client->render_distance; ++c_z) {
 				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, o_x, c_z));
-				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, n_x, c_z);
-				phd_update_subscribe_chunk(client, new_chunk);
+				phd_update_subscribe_chunk(client, wld_relative_chunk(old_chunk, n_x, c_z));
 			}
 		}
 
@@ -1830,8 +1827,7 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 			
 			for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
 				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, o_z));
-				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, c_x, n_z);
-				phd_update_subscribe_chunk(client, new_chunk);
+				phd_update_subscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, n_z));
 			}
 		}
 
@@ -1857,8 +1853,7 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 			
 			for (int32_t c_x = -client->render_distance; c_x <= client->render_distance; ++c_x) {
 				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, o_z));
-				wld_chunk_t* new_chunk = wld_relative_chunk(old_chunk, c_x, n_z);
-				phd_update_subscribe_chunk(client, new_chunk);
+				phd_update_subscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, n_z));
 			}
 		}
 

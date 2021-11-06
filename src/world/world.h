@@ -123,6 +123,7 @@ struct wld_world {
 
 extern uint16_t wld_add(wld_world_t* world);
 
+extern void wld_prepare_spawn(wld_world_t* world);
 extern wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t environment);
 extern wld_world_t* wld_load(const string_t name);
 
@@ -133,17 +134,26 @@ static inline wld_world_t* wld_get_default() {
 	return wld_get_world(0);
 }
 
+extern wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z);
 extern wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z);
 static inline wld_region_t* wld_get_region_at(wld_world_t* world, int32_t x, int32_t z) {
 	return wld_get_region(world, x >> 9, z >> 9);
 }
 
+extern wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint8_t x, uint8_t z, uint8_t max_ticket);
 extern wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z);
 static inline wld_chunk_t* wld_get_chunk_at(wld_world_t* world, int32_t x, int32_t z) {
 	return wld_get_chunk(world, x >> 4, z >> 4);
 }
+
+extern wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z, uint8_t max_ticket);
+
 // This is fast for short distances (within regions to a few regions over), but for long distances this is excruciatingly slow
-extern wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z);
+static inline wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z) {
+
+	return wld_gen_relative_chunk(chunk, x, z, WLD_TICKET_MAX);
+
+}
 
 static inline int32_t wld_get_chunk_x(const wld_chunk_t* chunk) {
 	return (chunk->region->x << 5) + chunk->x;
@@ -204,7 +214,7 @@ static inline void wld_remove_player_chunk(wld_chunk_t* chunk, uint32_t client_i
 
 static inline mat_block_protocol_id_t wld_get_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z) {
 
-	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, x >> 4, z >> 4);
+	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, (x >> 4) - wld_get_chunk_x(chunk), (z >> 4) - wld_get_chunk_z(chunk));
 	const uint16_t sub_chunk = y >> 4;
 
 	mat_block_protocol_id_t ret = mat_block_air;
@@ -222,9 +232,9 @@ static inline mat_block_type_t wld_get_block_type_at(wld_chunk_t* chunk, int32_t
 
 }
 
-extern void wld_set_block_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_protocol_id_t type);
+extern void wld_set_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_protocol_id_t type);
 
-static inline void wld_set_block_type_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_type_t type) {
+static inline void wld_set_block_type_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_type_t type) {
 
 	wld_set_block_at(chunk, x, y, z, mat_get_block_default_protocol_id_by_type(type));
 

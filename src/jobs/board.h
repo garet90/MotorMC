@@ -66,8 +66,8 @@ typedef union {
 		ltg_client_t* client;
 		wld_chunk_t* chunk;
 		int16_t y;
-		uint8_t x : 4;
-		uint8_t z : 4;
+		int32_t x;
+		int32_t z;
 
 	} dig_block;
 

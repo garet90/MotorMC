@@ -1,4 +1,4 @@
-#include "world_private.h"
+#include "world.h"
 #include "../util/vector.h"
 #include "../util/id_vector.h"
 #include "../listening/listening.h"
@@ -175,7 +175,8 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint8_t x, uint8_t z, uint8_t m
 	// TODO generate actual chunk
 	for (uint32_t g_x  = 0; g_x < 16; ++g_x) {
 		for (uint32_t g_z = 0; g_z < 16; ++g_z) {
-			wld_set_block_type_at(chunk, g_x, g_x + g_z, g_z, mat_block_dirt);
+			chunk->sections[(g_x + g_z) >> 4].blocks[(((g_x + g_z) & 0xF) << 8) | (g_z << 4) | g_x] = mat_get_block_default_protocol_id_by_type(mat_block_dirt);
+			chunk->sections[(g_x + g_z) >> 4].block_count++;
 		}
 	}
 
@@ -203,13 +204,9 @@ wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
 
 	}
 
+	assert(chunk != NULL);
+
 	return chunk;
-
-}
-
-wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z) {
-
-	return wld_gen_relative_chunk(chunk, x, z, WLD_TICKET_MAX);
 
 }
 
@@ -229,42 +226,47 @@ wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t
 	const uint16_t idx = (i_x << 5) | i_z;
 
 	wld_region_t* region = chunk->region;
+	wld_world_t* world = region->world;
 
 	while (r_x < 0) {
-		if (region->relative.west == NULL) {
-			return wld_get_chunk(chunk->region->world, f_x, f_z);
-		}
 		region = region->relative.west;
+		if (region == NULL) {
+			return wld_get_chunk(world, f_x, f_z);
+		}
 		r_x++;
 	}
 	while (r_x > 0) {
-		if (region->relative.east == NULL) {
-			return wld_get_chunk(chunk->region->world, f_x, f_z);
-		}
 		region = region->relative.east;
+		if (region == NULL) {
+			return wld_get_chunk(world, f_x, f_z);
+		}
+		
 		r_x--;
 	}
 
 	while (r_z < 0) {
-		if (region->relative.north == NULL) {
-			return wld_get_chunk(chunk->region->world, f_x, f_z);
-		}
 		region = region->relative.north;
+		if (region == NULL) {
+			return wld_get_chunk(world, f_x, f_z);
+		}
 		r_z++;
 	}
 	while (r_z > 0) {
-		if (region->relative.south == NULL) {
-			return wld_get_chunk(chunk->region->world, f_x, f_z);
-		}
 		region = region->relative.south;
+		if (region == NULL) {
+			return wld_get_chunk(world, f_x, f_z);
+		}
 		r_z--;
 	}
 
-	if (region->chunks[idx] == NULL) {
-		wld_gen_chunk(region, i_x, i_z, max_ticket);
+	wld_chunk_t* found_chunk = region->chunks[idx];
+	if (found_chunk == NULL) {
+		found_chunk = wld_gen_chunk(region, i_x, i_z, max_ticket);
 	}
 
-	return region->chunks[idx];
+	assert(found_chunk != NULL);
+
+	return found_chunk;
 
 }
 
@@ -302,30 +304,55 @@ void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 
 }
 
-void wld_set_block_at(wld_chunk_t* chunk, uint8_t x, int16_t y, uint8_t z, mat_block_protocol_id_t type) {
+void wld_set_block_send(uint32_t client_id, void* arg) {
 
-	assert(z <= 0xF && x <= 0xF);
+	pck_packet_t* packet = arg;
+	ltg_client_t* client = ltg_get_client_by_id(client_id);
+
+	ltg_send(client, packet);
+
+}
+
+void wld_set_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_protocol_id_t type) {
+
+	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, (x >> 4) - wld_get_chunk_x(chunk), (z >> 4) - wld_get_chunk_z(chunk));
 
 	const uint16_t sub_chunk = y >> 4;
 
-	with_lock (&chunk->lock) {
-		const mat_block_protocol_id_t old_type = chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x];
+	const uint8_t s_x = x & 0xF;
+	const uint8_t s_y = y & 0xF;
+	const uint8_t s_z = z & 0xF;
+
+	with_lock (&block_chunk->lock) {
+		const mat_block_protocol_id_t old_type = block_chunk->sections[sub_chunk].blocks[(s_y << 8) | (s_z << 4) | s_x];
 		const bool old_type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(old_type))->air;
 		const bool type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(type))->air;
 		if (old_type_air && !type_air) {
-			chunk->sections[sub_chunk].block_count++;
+			block_chunk->sections[sub_chunk].block_count++;
 
-			if (chunk->highest.motion_blocking[(z << 4) | x] < y) {
-				chunk->highest.motion_blocking[(z << 4) | x] = y;
+			if (block_chunk->highest.motion_blocking[(s_z << 4) | s_x] < y) {
+				block_chunk->highest.motion_blocking[(s_z << 4) | s_x] = y;
 			}
 		} else if (!old_type_air && type_air) {
-			chunk->sections[sub_chunk].block_count--;
+			block_chunk->sections[sub_chunk].block_count--;
 
-			if (chunk->highest.motion_blocking[(z << 4) | x] == y) {
+			if (block_chunk->highest.motion_blocking[(s_z << 4) | s_x] == y) {
 				// TODO calculate new highest motion_blocking block
 			}
 		}
-		chunk->sections[sub_chunk].blocks[((y & 0xF) << 8) | (z << 4) | x] = type;
+		block_chunk->sections[sub_chunk].blocks[(s_y << 8) | (s_z << 4) | s_x] = type;
+
+		// send block to player
+		PCK_INLINE(packet, 14, io_big_endian);
+		pck_write_var_int(packet, 0x0C);
+		pck_write_position(packet, (pck_position_t) {
+			.x = x,
+			.y = y,
+			.z = z
+		});
+		pck_write_var_int(packet, type);
+
+		utl_bit_vector_foreach(&block_chunk->subscribers, wld_set_block_send, packet);
 	}
 
 }

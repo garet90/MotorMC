@@ -172,7 +172,7 @@ bool job_handle_unload_region(job_payload_t* payload) {
 
 bool job_handle_dig_block(job_payload_t* payload) {
 
-	ent_player_t* player = payload->client->entity;
+	ent_player_t* player = payload->dig_block.client->entity;
 
 	with_lock (&player->living_entity.entity.lock) {
 		if (player->digging_block) {

@@ -52,7 +52,7 @@ extern bool phd_handle_update_sign(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_animation(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_spectate(ltg_client_t*, pck_packet_t*);
 extern bool phd_handle_player_block_placement(ltg_client_t* client, pck_packet_t* packet);
-extern bool phd_handle_use_item(ltg_client_t*, pck_packet_t*);
+extern bool phd_handle_use_item(ltg_client_t* client, pck_packet_t* packet);
 
 extern void phd_send_spawn_entity(ltg_client_t*);
 extern void phd_send_spawn_experience_orb(ltg_client_t*);
