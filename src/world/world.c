@@ -288,7 +288,7 @@ void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
 
 void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 	
-	const ent_player_t* player = ltg_get_client_by_id(client_id)->entity;
+	const ent_player_t* player = ltg_get_entity(ltg_get_client_by_id(sky_get_listener(), client_id));
 	const int32_t c_x = wld_get_chunk_x(chunk);
 	const int32_t c_z = wld_get_chunk_z(chunk);
 	const wld_chunk_t* player_chunk = player->living_entity.entity.chunk;
@@ -297,10 +297,12 @@ void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 
 	const uint32_t distance = UTL_MIN(UTL_ABS(c_x - p_x), UTL_ABS(c_z - p_z));
 
-	if (distance < sky_main.render_distance) {
+	const uint8_t server_render_distance = sky_get_render_distance();
+
+	if (distance < server_render_distance) {
 		chunk->ticket = UTL_MIN(chunk->ticket, WLD_TICKET_TICK_ENTITIES);
 	} else {
-		chunk->ticket = UTL_MIN(chunk->ticket, distance - sky_main.render_distance + WLD_TICKET_TICK_ENTITIES);
+		chunk->ticket = UTL_MIN(chunk->ticket, distance - server_render_distance + WLD_TICKET_TICK_ENTITIES);
 	}
 
 }
@@ -308,7 +310,7 @@ void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 void wld_set_block_send(uint32_t client_id, void* arg) {
 
 	pck_packet_t* packet = arg;
-	ltg_client_t* client = ltg_get_client_by_id(client_id);
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 
 	ltg_send(client, packet);
 

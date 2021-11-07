@@ -37,8 +37,8 @@ bool job_handle_global_chat_message(job_payload_t* payload) {
 	char out[1536];
 	const size_t out_len = cht_write_translation(&translation, out);
 	// lock client vector
-	with_lock (&sky_main.listener.online.lock) {
-		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+	with_lock (&sky_get_listener()->online.lock) {
+		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
 		ltg_client_t* client = utl_dll_iterator_next(&iterator);
 		while (client != NULL) {
 			phd_send_chat_message(client, out, out_len, payload->global_chat_message.client->uuid);
@@ -66,8 +66,8 @@ bool job_handle_player_join(job_payload_t* payload) {
 	char out[128];
 	const size_t out_len = cht_write_translation(&translation, out);
 	// lock client vector
-	with_lock (&sky_main.listener.online.lock) {
-		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+	with_lock (&sky_get_listener()->online.lock) {
+		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
 		ltg_client_t* client = utl_dll_iterator_next(&iterator);
 		while (client != NULL) {
 			phd_send_player_info_add_player(client, payload->client);
@@ -103,8 +103,8 @@ bool job_handle_player_leave(job_payload_t* payload) {
 	char out[128];
 	const size_t out_len = cht_write_translation(&translation, out);
 	
-	with_lock (&sky_main.listener.online.lock) {
-		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+	with_lock (&sky_get_listener()->online.lock) {
+		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
 		ltg_client_t* client = utl_dll_iterator_next(&iterator);
 		while (client != NULL) {
 			phd_send_player_info_remove_player(client, payload->player_leave.uuid);
@@ -121,8 +121,8 @@ bool job_handle_player_leave(job_payload_t* payload) {
 
 bool job_handle_send_update_pings(__attribute__((unused)) job_payload_t* payload) {
 
-	with_lock (&sky_main.listener.online.lock) {
-		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+	with_lock (&sky_get_listener()->online.lock) {
+		utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
 		ltg_client_t* client = utl_dll_iterator_next(&iterator);
 		while (client != NULL) {
 			phd_send_player_info_update_latency(client);
@@ -195,7 +195,7 @@ void job_update_entity_move(uint32_t client_id, void* args) {
 	job_payload_t* payload = args;
 	ent_entity_t* entity = payload->entity_move.entity;
 	
-	ltg_client_t* client = ltg_get_client_by_id(client_id);
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
 	if ((ent_entity_t*) client->entity == entity) {
 		if (entity->chunk != payload->entity_move.initial_chunk) {
@@ -239,7 +239,7 @@ void job_update_entity_teleport(uint32_t client_id, void* args) {
 	job_payload_t* payload = args;
 	ent_entity_t* entity = payload->entity_teleport.entity;
 	
-	ltg_client_t* client = ltg_get_client_by_id(client_id);
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
 	if ((ent_entity_t*) client->entity == entity) {
 		if (entity->chunk != payload->entity_teleport.initial_chunk) {
@@ -283,7 +283,7 @@ void job_update_living_entity_look(uint32_t client_id, void* args) {
 	job_payload_t* payload = args;
 	ent_living_entity_t* entity = payload->living_entity_look.entity;
 	
-	ltg_client_t* client = ltg_get_client_by_id(client_id);
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
 	if ((ent_living_entity_t*) client->entity == entity) {
 		// Do nothing
@@ -315,7 +315,7 @@ void job_update_living_entity_move_look(uint32_t client_id, void* args) {
 	job_payload_t* payload = args;
 	ent_living_entity_t* entity = payload->living_entity_move_look.entity;
 
-	ltg_client_t* client = ltg_get_client_by_id(client_id);
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
 	if ((ent_living_entity_t*) client->entity == entity) {
 		if (entity->entity.chunk != payload->entity_move.initial_chunk) {
@@ -360,7 +360,7 @@ void job_update_living_entity_teleport_look(uint32_t client_id, void* args) {
 	job_payload_t* payload = args;
 	ent_living_entity_t* entity = payload->living_entity_teleport_look.entity;
 	
-	ltg_client_t* client = ltg_get_client_by_id(client_id);
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
 	if ((ent_living_entity_t*) client->entity == entity) {
 		if (entity->entity.chunk != payload->entity_teleport.initial_chunk) {

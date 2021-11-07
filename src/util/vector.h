@@ -109,6 +109,10 @@ static inline void utl_vector_set(utl_vector_t* vector, uint32_t idx, const void
 
 }
 
+static inline uint32_t utl_vector_size(const utl_vector_t* vector) {
+	return vector->size;
+}
+
 static inline void utl_term_vector(utl_vector_t* vector) {
 
 	if (vector->capacity > 0) {

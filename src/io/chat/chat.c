@@ -416,21 +416,21 @@ size_t cht_server_list_ping(char* message) {
 	mjson_val* version = mjson_obj(doc);
 
 	mjson_obj_add(version, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, UTL_CSTRTOARG("MotorMC " __MC_VER__)));
-	mjson_obj_add(version, mjson_string(doc, UTL_CSTRTOARG("protocol")), mjson_int(doc, sky_main.protocol));
+	mjson_obj_add(version, mjson_string(doc, UTL_CSTRTOARG("protocol")), mjson_int(doc, sky_get_protocol()));
 
 	mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("version")), version);
 
 	mjson_val* players = mjson_obj(doc);
 
-	with_lock (&sky_main.listener.online.lock) {
+	with_lock (&sky_get_listener()->online.lock) {
 
-		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("max")), mjson_int(doc, sky_main.listener.online.max));
+		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("max")), mjson_int(doc, sky_get_listener()->online.max));
 
-		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("online")), mjson_int(doc, sky_main.listener.online.list.length));
+		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("online")), mjson_int(doc, sky_get_listener()->online.list.length));
 		
-		if (sky_main.listener.online.list.length > 0) {
+		if (sky_get_listener()->online.list.length > 0) {
 			mjson_val* sample = mjson_arr(doc);
-			utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+			utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
 			ltg_client_t* player = utl_dll_iterator_next(&iterator);
 			while (player != NULL) {
 				mjson_val* val = mjson_obj(doc);
@@ -450,7 +450,7 @@ size_t cht_server_list_ping(char* message) {
 
 	mjson_val* description = mjson_obj(doc);
 
-	cht_jsonify(doc, description, sky_main.motd);
+	cht_jsonify(doc, description, sky_get_motd());
 
 	mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("description")), description);
 

@@ -41,7 +41,7 @@ static inline void log_put(const char* prefix, const char* format, va_list args)
 		// suffix
 		fprintf(stdout, LOG_S1);
 
-		if (sky_main.status == sky_running)
+		if (sky_get_status() == sky_running)
 			fprintf(stdout, "> ");
 
 		fflush(stdout);

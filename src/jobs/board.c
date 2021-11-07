@@ -172,7 +172,7 @@ uint32_t job_get() {
 	
 		while (job_board.queue.list.length == 0) {
 		
-			if (sky_main.status == sky_stopping) {
+			if (sky_get_status() == sky_stopping) {
 
 				pthread_mutex_unlock(&job_board.queue.lock);
 

@@ -140,6 +140,47 @@ typedef byte_t ltg_uuid_t[16];
 
 typedef struct {
 
+	pthread_t thread;
+
+	// address
+	struct {
+		int32_t socket;
+		struct sockaddr_in addr;
+		uint16_t port;
+	} address;
+
+	struct {
+		pthread_mutex_t lock;
+		utl_id_vector_t vector;
+	} clients;
+	
+	struct {
+		pthread_mutex_t lock;
+		utl_dll_t list;
+		uint32_t max : 16;
+	} online;
+
+	uint16_t network_compression_threshold;
+	bool online_mode : 1;
+	bool prevent_proxy_connections : 1;
+
+	cry_rsa_keypair_t keypair;
+
+} ltg_listener_t;
+
+typedef enum {
+
+	ltg_handshake = 0,
+	ltg_status = 1,
+	ltg_login = 2,
+	ltg_play = 3
+
+} ltg_client_state_t;
+
+typedef struct {
+
+	ltg_listener_t* listener;
+
 	// client's thread
 	pthread_t thread;
 	
@@ -202,51 +243,26 @@ typedef struct {
 
 	bool compression_enabled : 1;
 
-	enum {
-		ltg_handshake = 0,
-		ltg_status = 1,
-		ltg_login = 2,
-		ltg_play = 3
-	} state : 2;
+	ltg_client_state_t state : 2;
 
 } ltg_client_t;
-
-typedef struct {
-
-	pthread_t thread;
-
-	// address
-	struct {
-		int32_t socket;
-		struct sockaddr_in addr;
-		uint16_t port;
-	} address;
-
-	struct {
-		pthread_mutex_t lock;
-		utl_id_vector_t vector;
-	} clients;
-	
-	struct {
-		pthread_mutex_t lock;
-		utl_dll_t list;
-		uint32_t max : 16;
-	} online;
-
-	uint16_t network_compression_threshold;
-	bool online_mode : 1;
-	bool prevent_proxy_connections : 1;
-
-	cry_rsa_keypair_t keypair;
-
-} ltg_main_t;
 
 extern void ltg_init();
 extern void* t_ltg_run(void*);
 extern void ltg_accept(ltg_client_t*);
 extern void* t_ltg_client(void*);
 
-extern ltg_client_t* ltg_get_client_by_id(uint32_t id);
+static inline ltg_client_t* ltg_get_client_by_id(ltg_listener_t* listener, uint32_t id) {
+	
+	ltg_client_t* client = NULL;
+
+	with_lock (&listener->clients.lock) {
+		client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &listener->clients.vector, id);
+	}
+
+	return client;
+
+}
 
 extern bool ltg_handle_packet(ltg_client_t* client, pck_packet_t* packet);
 
@@ -254,7 +270,7 @@ extern void ltg_send(ltg_client_t*, pck_packet_t*);
 
 extern void ltg_disconnect(ltg_client_t*);
 
-extern void ltg_term();
+extern void ltg_term(ltg_listener_t* listener);
 
 static inline void ltg_uuid_to_string(ltg_uuid_t uuid, char* out) {
 	
@@ -330,4 +346,32 @@ static inline ltg_locale_t ltg_get_locale(const ltg_client_t* client) {
 
 static inline ent_player_t* ltg_get_entity(const ltg_client_t* client) {
 	return client->entity;
+}
+
+static inline pthread_t ltg_get_thread(const ltg_listener_t* listener) {
+	return listener->thread;
+}
+
+static inline uint32_t ltg_get_client_count(ltg_listener_t* listener) {
+	
+	uint32_t size = 0;
+	
+	with_lock (&listener->clients.lock) {
+		size = utl_id_vector_size(&listener->clients.vector);
+	}
+
+	return size;
+
+}
+
+static inline pthread_t ltg_get_client_thread(const ltg_client_t* client) {
+	return client->thread;
+}
+
+static inline ltg_client_state_t ltg_get_client_state(const ltg_client_t* client) {
+	return client->state;
+}
+
+static inline bool ltg_is_client_encryption_enabled(const ltg_client_t* client) {
+	return client->encryption.enabled;
 }

@@ -118,7 +118,7 @@ bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	PCK_READ_STRING(locale, packet);
 	client->locale = utl_hash(locale);
 
-	const uint8_t new_render_distance = UTL_MIN(sky_main.render_distance, pck_read_int8(packet));
+	const uint8_t new_render_distance = UTL_MIN(sky_get_render_distance(), pck_read_int8(packet));
 	phd_update_sent_chunks_view_distance(client, new_render_distance);
 	client->render_distance = new_render_distance;
 	client->chat_mode = pck_read_var_int(packet);
@@ -817,7 +817,7 @@ void phd_send_server_difficulty(ltg_client_t* client) {
 	PCK_INLINE(packet, 3, io_big_endian);
 
 	pck_write_var_int(packet, 0x0e);
-	pck_write_int8(packet, sky_main.difficulty);
+	pck_write_int8(packet, sky_get_difficulty());
 	pck_write_int8(packet, 0); // difficulty locked
 
 	ltg_send(client, packet);
@@ -1250,8 +1250,8 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	pck_write_var_int(packet, 0x26);
 	pck_write_int32(packet, player->living_entity.entity.id); // entity ID
-	pck_write_int8(packet, sky_main.hardcore);
-	pck_write_int8(packet, sky_main.gamemode);
+	pck_write_int8(packet, sky_is_hardcore());
+	pck_write_int8(packet, sky_get_default_gamemode()); // TODO player gamemode
 	pck_write_int8(packet, -1); // previous game mode
 
 	// worlds
@@ -1283,10 +1283,10 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	pck_write_int64(packet, *((uint64_t*) seed_hash)); // hashed seed
 	
-	pck_write_var_int(packet, sky_main.listener.online.max);
-	pck_write_var_int(packet, sky_main.render_distance); // view distance
-	pck_write_int8(packet, sky_main.reduced_debug_info); // reduced debug info
-	pck_write_int8(packet, sky_main.enable_respawn_screen); // enable respawn screen
+	pck_write_var_int(packet, sky_get_listener()->online.max);
+	pck_write_var_int(packet, sky_get_render_distance()); // view distance
+	pck_write_int8(packet, sky_is_reduced_debug_info()); // reduced debug info
+	pck_write_int8(packet, sky_is_enabled_respawn_screen()); // enable respawn screen
 	pck_write_int8(packet, player_world->debug); // is debug
 	pck_write_int8(packet, player_world->flat); // is flat
 
@@ -1318,7 +1318,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_player_inventory(client);
 
 	// add to online players
-	client->online_node = utl_dll_push(&sky_main.listener.online.list, client);
+	client->online_node = utl_dll_push(&sky_get_listener()->online.list, client);
 
 	job_add(job_new(job_player_join, (job_payload_t) { .client = client }));
 
@@ -1376,17 +1376,17 @@ void phd_send_entity_rotation(ltg_client_t* client, ent_living_entity_t* entity)
 
 void phd_send_player_info_add_players(ltg_client_t* client) {
 
-	if (sky_main.listener.online.list.length == 0) {
+	if (sky_get_listener()->online.list.length == 0) {
 		return;
 	}
 
-	PCK_INLINE(packet, 3 + (sky_main.listener.online.list.length * 2048), io_big_endian);
+	PCK_INLINE(packet, 3 + (sky_get_listener()->online.list.length * 2048), io_big_endian);
 	
 	pck_write_var_int(packet, 0x36);
 	pck_write_var_int(packet, 0);
-	pck_write_var_int(packet, sky_main.listener.online.list.length);
+	pck_write_var_int(packet, sky_get_listener()->online.list.length);
 
-	utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+	utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
 	ltg_client_t* player = utl_dll_iterator_next(&iterator);
 	while (player != NULL) {
 		pck_write_bytes(packet, player->uuid, 16);
@@ -1457,12 +1457,12 @@ void phd_send_player_info_update_gamemode(__attribute__((unused)) ltg_client_t* 
 
 void phd_send_player_info_update_latency(ltg_client_t* client) {
 
-	PCK_INLINE(packet, 21 * sky_main.listener.online.list.length + 6, io_big_endian);
+	PCK_INLINE(packet, 21 * sky_get_listener()->online.list.length + 6, io_big_endian);
 
 	pck_write_var_int(packet, 0x36);
 	pck_write_var_int(packet, 2); // update latency
-	pck_write_var_int(packet, sky_main.listener.online.list.length);
-	utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_main.listener.online.list);
+	pck_write_var_int(packet, sky_get_listener()->online.list.length);
+	utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
 	ltg_client_t* player = utl_dll_iterator_next(&iterator);
 	while (player != NULL) {
 		pck_write_bytes(packet, player->uuid, 16);
@@ -1708,14 +1708,16 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 
 	const wld_chunk_t* chunk = client->entity->living_entity.entity.chunk;
 
-	for (int16_t x = -(sky_main.render_distance + 2); x <= sky_main.render_distance + 2; ++x) {
-		for (int16_t z = -(sky_main.render_distance + 2); z <= sky_main.render_distance + 2; ++z) {
+	const uint8_t server_render_distance = sky_get_render_distance();
+
+	for (int16_t x = -(server_render_distance + 2); x <= server_render_distance + 2; ++x) {
+		for (int16_t z = -(server_render_distance + 2); z <= server_render_distance + 2; ++z) {
 			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
 			const uint8_t distance = UTL_MAX(UTL_ABS(x), UTL_ABS(z));
-			if (distance <= sky_main.render_distance) {
+			if (distance <= server_render_distance) {
 				wld_add_player_chunk(v_c, client->id, WLD_TICKET_TICK_ENTITIES);
 			} else {
-				wld_add_player_chunk(v_c, client->id, distance - sky_main.render_distance + WLD_TICKET_TICK_ENTITIES);
+				wld_add_player_chunk(v_c, client->id, distance - server_render_distance + WLD_TICKET_TICK_ENTITIES);
 			}
 
 			// subscribe to the chunk if it is in render distance
@@ -1763,6 +1765,8 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 	const int32_t old_x = wld_get_chunk_x(old_chunk);
 	const int32_t old_z = wld_get_chunk_z(old_chunk);
 
+	const uint8_t server_render_distance = sky_get_render_distance();
+
 	assert(x != old_x || z != old_z);
 
 	if (x > old_x) {
@@ -1778,10 +1782,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 		}
 
 		{ // ticket chunks
-			const int32_t o_x = -(sky_main.render_distance + 2);
-			const int32_t n_x = sky_main.render_distance + 3;
+			const int32_t o_x = -(server_render_distance + 2);
+			const int32_t n_x = server_render_distance + 3;
 
-			for (int32_t c_z = -(sky_main.render_distance + 2); c_z <= sky_main.render_distance + 2; ++c_z) {
+			for (int32_t c_z = -(server_render_distance + 2); c_z <= server_render_distance + 2; ++c_z) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x + 1, c_z));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x + 2, c_z));
@@ -1804,10 +1808,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 		}
 
 		{ // ticket chunks
-			const int32_t o_x = sky_main.render_distance + 2;
-			const int32_t n_x = -(sky_main.render_distance + 3);
+			const int32_t o_x = server_render_distance + 2;
+			const int32_t n_x = -(server_render_distance + 3);
 
-			for (int32_t c_z = -(sky_main.render_distance + 2); c_z <= sky_main.render_distance + 2; ++c_z) {
+			for (int32_t c_z = -(server_render_distance + 2); c_z <= server_render_distance + 2; ++c_z) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, o_x, c_z), client->id);
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x - 1, c_z));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x - 2, c_z));
@@ -1832,10 +1836,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 		}
 
 		{ // ticket chunks
-			const int32_t o_z = -(sky_main.render_distance + 2);
-			const int32_t n_z = sky_main.render_distance + 3;
+			const int32_t o_z = -(server_render_distance + 2);
+			const int32_t n_z = server_render_distance + 3;
 
-			for (int32_t c_x = -(sky_main.render_distance + 2); c_x <= sky_main.render_distance + 2; ++c_x) {
+			for (int32_t c_x = -(server_render_distance + 2); c_x <= server_render_distance + 2; ++c_x) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z + 1));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z + 2));
@@ -1858,10 +1862,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 		}
 
 		{ // ticket chunks
-			const int32_t o_z = sky_main.render_distance + 2;
-			const int32_t n_z = -(sky_main.render_distance + 3);
+			const int32_t o_z = server_render_distance + 2;
+			const int32_t n_z = -(server_render_distance + 3);
 
-			for (int32_t c_x = -(sky_main.render_distance + 2); c_x <= sky_main.render_distance + 2; ++c_x) {
+			for (int32_t c_x = -(server_render_distance + 2); c_x <= server_render_distance + 2; ++c_x) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, c_x, o_z), client->id);
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z - 1));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z - 2));
@@ -1881,9 +1885,11 @@ void phd_update_sent_chunks_leave(ltg_client_t* client) {
 	
 	const wld_chunk_t* chunk = client->entity->living_entity.entity.chunk;
 
+	const uint8_t server_render_distance = sky_get_render_distance();
+
 	// player chunks
-	for (int16_t x = -(sky_main.render_distance + 2); x <= sky_main.render_distance + 2; ++x) {
-		for (int16_t z = -(sky_main.render_distance + 2); z <= sky_main.render_distance + 2; ++z) {
+	for (int16_t x = -(server_render_distance + 2); x <= server_render_distance + 2; ++x) {
+		for (int16_t z = -(server_render_distance + 2); z <= server_render_distance + 2; ++z) {
 			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
 			wld_remove_player_chunk(v_c, client->id);
 

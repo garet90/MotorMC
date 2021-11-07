@@ -61,11 +61,11 @@ bool phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 	pck_read_bytes(packet, (byte_t*) client->username.value, client->username.length);
 	client->username.value[client->username.length] = '\0';
 
-	if (client->protocol != sky_main.protocol) {
+	if (client->protocol != sky_get_protocol()) {
 
 		cht_translation_t translation = cht_translation_new;
 
-		if (client->protocol < sky_main.protocol) {
+		if (client->protocol < sky_get_protocol()) {
 			translation.translate = cht_translation_multiplayer_disconnect_outdated_client;
 		} else {
 			translation.translate = cht_translation_multiplayer_disconnect_outdated_server;
@@ -87,7 +87,7 @@ bool phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 	}
 
 	
-	if (sky_main.listener.online_mode) {
+	if (sky_get_listener()->online_mode) {
 		phd_send_encryption_request(client);
 	} else {
 		phd_update_login_success(client);
@@ -116,7 +116,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 	pck_read_bytes(packet, secret.bytes, secret.length);
 
 	// decrypt shared secret
-	cry_rsa_decrypt(secret.bytes, secret.bytes, secret.length, &sky_main.listener.keypair);
+	cry_rsa_decrypt(secret.bytes, secret.bytes, secret.length, &sky_get_listener()->keypair);
 	utl_reverse_bytes(secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH);
 	
 	// start encryption cypher
@@ -147,7 +147,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 	pck_read_bytes(packet, verify.bytes, verify.length);
 
 	// decrypt and check verify
-	cry_rsa_decrypt(verify.bytes, verify.bytes, verify.length, &sky_main.listener.keypair);
+	cry_rsa_decrypt(verify.bytes, verify.bytes, verify.length, &sky_get_listener()->keypair);
 	if (verify.key != client->id) {
 
 		return false;
@@ -179,7 +179,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 		EVP_DigestInit_ex(hash, EVP_sha1(), NULL);
 		EVP_DigestUpdate(hash, (byte_t*) "", 0);
 		EVP_DigestUpdate(hash, secret.bytes, LTG_AES_KEY_LENGTH);
-		EVP_DigestUpdate(hash, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
+		EVP_DigestUpdate(hash, sky_get_listener()->keypair.ASN1.bytes, sky_get_listener()->keypair.ASN1.length);
 		unsigned int digest_length = 20;
 		byte_t server_id_hash[digest_length];
 		EVP_DigestFinal_ex(hash, server_id_hash, &digest_length);
@@ -363,8 +363,8 @@ void phd_send_encryption_request(ltg_client_t* client) {
 	pck_write_string(response, UTL_CSTRTOARG(""));
 
 	// the public auth_key
-	pck_write_var_int(response, sky_main.listener.keypair.ASN1.length);
-	pck_write_bytes(response, sky_main.listener.keypair.ASN1.bytes, sky_main.listener.keypair.ASN1.length);
+	pck_write_var_int(response, sky_get_listener()->keypair.ASN1.length);
+	pck_write_bytes(response, sky_get_listener()->keypair.ASN1.bytes, sky_get_listener()->keypair.ASN1.length);
 
 	// our verify token
 	pck_write_var_int(response, 4);
@@ -391,11 +391,11 @@ void phd_send_set_compression(ltg_client_t* client) {
 	PCK_INLINE(packet, 15, io_big_endian);
 
 	pck_write_var_int(packet, 0x03);
-	pck_write_var_int(packet, sky_main.listener.network_compression_threshold);
+	pck_write_var_int(packet, sky_get_listener()->network_compression_threshold);
 
 	ltg_send(client, packet);
 
-	if (sky_main.listener.network_compression_threshold > 0)
+	if (sky_get_listener()->network_compression_threshold > 0)
 		client->compression_enabled = true;
 
 }

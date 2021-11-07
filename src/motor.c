@@ -89,11 +89,11 @@ void sky_handle_signal_crash(int signal) {
 		} break;
 	}
 	log_error("\tTHREAD #%llx", pthread_self());
-	if (pthread_self() == sky_main.console_thread) {
+	if (pthread_self() == sky_get_console_thread()) {
 		log_error("\t\tCONSOLE THREAD");
-	} else if (pthread_self() == sky_main.thread) {
+	} else if (pthread_self() == sky_get_main_thread()) {
 		log_error("\t\tMAIN THREAD");
-	} else if (pthread_self() == sky_main.listener.thread) {
+	} else if (pthread_self() == ltg_get_thread(sky_get_listener())) {
 		log_error("\t\tLISTENER THREAD");
 	} else {
 		for (size_t i = 0; i < sky_main.workers.vector.size; ++i) {
@@ -104,12 +104,12 @@ void sky_handle_signal_crash(int signal) {
 			}
 		}
 
-		for (size_t i = 0; i < sky_main.listener.clients.vector.array.size; ++i) {
-			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
-			if (client != NULL && pthread_self() == client->thread) {
+		for (size_t i = 0; i < ltg_get_client_count(sky_get_listener()); ++i) {
+			ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), i);
+			if (client != NULL && pthread_self() == ltg_get_client_thread(client)) {
 				log_error("\t\tCLIENT #%lld", i);
-				log_error("\tCLIENT STATE %u", client->state);
-				log_error("\tENCRYPTION ENABLED %d", client->encryption.enabled);
+				log_error("\tCLIENT STATE %u", ltg_get_client_state(client));
+				log_error("\tENCRYPTION ENABLED %d", ltg_is_client_encryption_enabled(client));
 				goto identified;
 			}
 		}
@@ -216,7 +216,7 @@ int main(int argc, char* argv[]) {
 	plg_on_postworld();
 
 	// initiate socket
-	ltg_init();
+	ltg_init(sky_get_listener());
 
 	// we're ready for takeoff
 	sky_main.status = sky_running;
@@ -586,7 +586,7 @@ void sky_term() {
 	log_info("Stopping the server...");
 
 	// stop listening
-	ltg_term();
+	ltg_term(sky_get_listener());
 
 	// join main thread
 	pthread_join(sky_main.thread, NULL);

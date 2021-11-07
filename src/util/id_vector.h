@@ -67,6 +67,10 @@ static inline void utl_id_vector_remove(utl_id_vector_t* id_vector, uint32_t id)
 
 }
 
+static inline uint32_t utl_id_vector_size(const utl_id_vector_t* id_vector) {
+	return utl_vector_size(&id_vector->array);
+}
+
 static inline void utl_term_id_vector(utl_id_vector_t* id_vector) {
 
 	utl_term_vector(&id_vector->array);

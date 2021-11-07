@@ -15,19 +15,21 @@
 #include "phd/login.h"
 #include "phd/play.h"
 
-void ltg_init() {
+void ltg_init(ltg_listener_t* listener) {
 
 	log_info("Starting listener...");
 
 	// generate RSA keypair
-	cry_rsa_gen_key_pair(&sky_main.listener.keypair);
+	cry_rsa_gen_key_pair(&listener->keypair);
 
 	// start listening thread
-	pthread_create(&sky_main.listener.thread, NULL, t_ltg_run, NULL);
+	pthread_create(&listener->thread, NULL, t_ltg_run, listener);
 
 }
 
-void* t_ltg_run(void* input) {
+void* t_ltg_run(void* args) {
+
+	ltg_listener_t* listener = args;
 
 	// init sockets
 	if (sck_init() != SCK_OK) {
@@ -35,23 +37,23 @@ void* t_ltg_run(void* input) {
 	}
 
 	// create socket
-	sky_main.listener.address.socket = sck_create();
+	listener->address.socket = sck_create();
 
 	// set address
-	sky_main.listener.address.addr.sin_family = AF_INET;
-	sky_main.listener.address.addr.sin_addr.s_addr = INADDR_ANY;
-	sky_main.listener.address.addr.sin_port = io_htons(sky_main.listener.address.port);
+	listener->address.addr.sin_family = AF_INET;
+	listener->address.addr.sin_addr.s_addr = INADDR_ANY;
+	listener->address.addr.sin_port = io_htons(listener->address.port);
 
 	// bind socket
-	if (sck_bind(sky_main.listener.address.socket, (struct sockaddr*) &sky_main.listener.address.addr, sizeof(struct sockaddr)) != SCK_OK) {
+	if (sck_bind(listener->address.socket, (struct sockaddr*) &listener->address.addr, sizeof(struct sockaddr)) != SCK_OK) {
 		return NULL;
 	}
 
 	// listen
-	if (sck_listen(sky_main.listener.address.socket) != SCK_OK) {
+	if (sck_listen(listener->address.socket) != SCK_OK) {
 		return NULL;
 	}
-	log_info("Listening on port %u", sky_main.listener.address.port);
+	log_info("Listening on port %u", listener->address.port);
 
 	for (;;) {
 
@@ -60,7 +62,7 @@ void* t_ltg_run(void* input) {
 		int32_t socket;
 		struct sockaddr_in address;
 		int address_size = sizeof(struct sockaddr_in);
-		socket = sck_accept(sky_main.listener.address.socket, (struct sockaddr*) &address, &address_size);
+		socket = sck_accept(listener->address.socket, (struct sockaddr*) &address, &address_size);
 
 		if (socket == SCK_FAILED) {
 
@@ -71,6 +73,7 @@ void* t_ltg_run(void* input) {
 
 			// allocate new client and set address and socket
 			ltg_client_t* client = calloc(1, sizeof(ltg_client_t));
+			client->listener = listener;
 			client->socket = socket;
 			pthread_mutex_init(&client->lock, NULL);
 			client->address.addr = address;
@@ -83,15 +86,15 @@ void* t_ltg_run(void* input) {
 		}
 	}
 
-	return input;
+	return (void*) 1;
 
 }
 
 void ltg_accept(ltg_client_t* client) {
 
 	// lock clients
-	with_lock (&sky_main.listener.clients.lock) {
-		client->id = utl_id_vector_push(&sky_main.listener.clients.vector, &client);
+	with_lock (&client->listener->clients.lock) {
+		client->id = utl_id_vector_push(&client->listener->clients.vector, &client);
 	}
 
 	// create client listening thread
@@ -141,18 +144,6 @@ void* t_ltg_client(void* args) {
 	ltg_disconnect(client);
 
 	return NULL;
-}
-
-ltg_client_t* ltg_get_client_by_id(uint32_t id) {
-
-	ltg_client_t* client = NULL;
-
-	with_lock (&sky_main.listener.clients.lock) {
-		client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, id);
-	}
-
-	return client;
-
 }
 
 /*
@@ -293,7 +284,7 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 		if (client->compression_enabled) {
 
-			if (length >= sky_main.listener.network_compression_threshold) { // compress the packet
+			if (length >= client->listener->network_compression_threshold) { // compress the packet
 			
 				byte_t compressed[length + 10];
 				size_t compressed_length = 0;
@@ -363,8 +354,8 @@ void ltg_disconnect(ltg_client_t* client) {
 			sch_cancel(client->keep_alive);
 
 			// remove from online player list
-			with_lock (&sky_main.listener.online.lock) {
-				utl_dll_remove(&sky_main.listener.online.list, client->online_node);
+			with_lock (&client->listener->online.lock) {
+				utl_dll_remove(&client->listener->online.list, client->online_node);
 			}
 
 			// create player leave job
@@ -392,8 +383,8 @@ void ltg_disconnect(ltg_client_t* client) {
 	pthread_mutex_destroy(&client->lock);
 
 	// remove from client list
-	with_lock (&sky_main.listener.clients.lock) {
-		utl_id_vector_remove(&sky_main.listener.clients.vector, client->id);
+	with_lock (&client->listener->clients.lock) {
+		utl_id_vector_remove(&client->listener->clients.vector, client->id);
 	}
 
 	// free compressors
@@ -420,11 +411,11 @@ void ltg_disconnect(ltg_client_t* client) {
 
 }
 
-void ltg_term() {
+void ltg_term(ltg_listener_t* listener) {
 
 	// cancel main thread
-	sck_close(sky_main.listener.address.socket);
-	pthread_cancel(sky_main.listener.thread);
+	sck_close(listener->address.socket);
+	pthread_cancel(listener->thread);
 
 	// disconnect message
 	cht_translation_t disconnect_message = cht_translation_new;
@@ -434,17 +425,17 @@ void ltg_term() {
 	size_t message_length = cht_write_translation(&disconnect_message, message);
 
 	// disconnect all clients
-	with_lock (&sky_main.listener.clients.lock) {
-		for (uint32_t i = 0; i < sky_main.listener.clients.vector.array.size; ++i) {
-			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &sky_main.listener.clients.vector, i);
+	with_lock (&listener->clients.lock) {
+		for (uint32_t i = 0; i < listener->clients.vector.array.size; ++i) {
+			ltg_client_t* client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &listener->clients.vector, i);
 			if (client != NULL) {
-				pthread_mutex_unlock(&sky_main.listener.clients.lock);
+				pthread_mutex_unlock(&listener->clients.lock);
 				phd_send_disconnect(client, message, message_length);
 				ltg_disconnect(client);
 				if (pthread_self() != client->thread) {
 					pthread_join(client->thread, NULL);
 				}
-				pthread_mutex_lock(&sky_main.listener.clients.lock);
+				pthread_mutex_lock(&listener->clients.lock);
 			}
 		}
 	}

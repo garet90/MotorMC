@@ -13,6 +13,26 @@ typedef struct {
 } sky_worker_t;
 
 /*
+	Starting = before done message
+	Running  = after done message, before stop command
+	Stopping = after stop command or failure
+	Stopped  = after the server has been completely stopped
+*/
+typedef enum {
+	sky_starting,
+	sky_running,
+	sky_stopping,
+	sky_stopped
+} sky_status_t;
+
+typedef enum {
+	sky_peaceful,
+	sky_easy,
+	sky_normal,
+	sky_hard
+} sky_difficulty_t;
+
+/*
 	Where we hold all the big bad information
 */
 typedef struct {
@@ -42,33 +62,17 @@ typedef struct {
 	uint32_t max_tick_time;
 	
 	/* listener */
-	ltg_main_t listener;
+	ltg_listener_t listener;
 	
 	uint8_t render_distance : 6;
 	
 	const uint16_t protocol : 10;
 
-	/*
-		Starting = before done message
-		Running  = after done message, before stop command
-		Stopping = after stop command or failure
-		Stopped  = after the server has been completely stopped
-	*/
-	enum {
-		sky_starting,
-		sky_running,
-		sky_stopping,
-		sky_stopped
-	} status : 2;
+	sky_status_t status : 2;
 
 	uint8_t op_permission_level : 3;
 
-	enum {
-		sky_peaceful,
-		sky_easy,
-		sky_normal,
-		sky_hard
-	} difficulty : 2;
+	sky_difficulty_t difficulty : 2;
 	
 	bool hardcore : 1;
 
@@ -100,4 +104,79 @@ extern void sky_term();
 
 static inline uint64_t sky_to_nanos(const struct timespec time) {
 	return (time.tv_sec * SKY_NANOS_PER_SECOND) + time.tv_nsec;
+}
+
+static inline cht_component_t* sky_get_motd() {
+	return sky_main.motd;
+}
+
+static inline void sky_set_motd(cht_component_t* component) {
+	if (sky_main.motd != NULL) {
+		cht_free(sky_main.motd);
+	}
+	sky_main.motd = component;
+}
+
+static inline cmd_sender_t sky_get_console() {
+	return sky_main.console;
+}
+
+static inline ltg_listener_t* sky_get_listener() {
+	return &sky_main.listener;
+}
+
+static inline uint8_t sky_get_render_distance() {
+	return sky_main.render_distance;
+}
+
+static inline uint16_t sky_get_protocol() {
+	return sky_main.protocol;
+}
+
+static inline sky_status_t sky_get_status() {
+	return sky_main.status;
+}
+
+static inline uint8_t sky_get_op_permission_level() {
+	return sky_main.op_permission_level;
+}
+
+static inline sky_difficulty_t sky_get_difficulty() {
+	return sky_main.difficulty;
+}
+
+static inline void sky_set_difficulty(sky_difficulty_t difficulty) {
+	sky_main.difficulty = difficulty;
+}
+
+static inline bool sky_is_hardcore() {
+	return sky_main.hardcore;
+}
+
+static inline void sky_set_hardcore(bool hardcore) {
+	sky_main.hardcore = hardcore;
+}
+
+static inline ent_gamemode_t sky_get_default_gamemode() {
+	return sky_main.gamemode;
+}
+
+static inline bool sky_is_force_gamemode() {
+	return sky_main.force_gamemode;
+}
+
+static inline bool sky_is_reduced_debug_info() {
+	return sky_main.reduced_debug_info;
+}
+
+static inline bool sky_is_enabled_respawn_screen() {
+	return sky_main.enable_respawn_screen;
+}
+
+static inline pthread_t sky_get_main_thread() {
+	return sky_main.thread;
+}
+
+static inline pthread_t sky_get_console_thread() {
+	return sky_main.console_thread;
 }

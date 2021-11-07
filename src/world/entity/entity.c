@@ -32,7 +32,7 @@ ent_entity_t* ent_get_entity_by_id(uint32_t id) {
 
 void ent_destroy_entity(uint32_t client_id, void* entity) {
 
-	ltg_client_t* client = ltg_get_client_by_id(client_id);
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 
 	phd_send_destroy_entity(client, (ent_entity_t*) entity);
 
@@ -40,7 +40,7 @@ void ent_destroy_entity(uint32_t client_id, void* entity) {
 
 void ent_send_entity(uint32_t client_id, void* entity) {
 
-	ltg_client_t* client = ltg_get_client_by_id(client_id);
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 
 	phd_update_send_entity(client, (ent_entity_t*) entity);
 
@@ -73,7 +73,9 @@ void ent_set_chunk(ent_entity_t* entity) {
 		int32_t n_x = f_x >> 4;
 		int32_t n_z = f_z >> 4;
 
-		if (UTL_ABS(n_x - o_x) < sky_main.render_distance && UTL_ABS(n_z - o_z) < sky_main.render_distance) {
+		const uint8_t server_render_distance = sky_get_render_distance();
+
+		if (UTL_ABS(n_x - o_x) < server_render_distance && UTL_ABS(n_z - o_z) < server_render_distance) {
 			
 			chunk = wld_relative_chunk(entity->chunk, n_x - o_x, n_z - o_z);
 			
