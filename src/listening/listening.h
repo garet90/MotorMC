@@ -157,12 +157,8 @@ typedef struct {
 	struct {
 		pthread_mutex_t lock;
 		utl_dll_t list;
-		uint32_t max : 16;
+		atomic_uint_least32_t max;
 	} online;
-
-	uint16_t network_compression_threshold;
-	bool online_mode : 1;
-	bool prevent_proxy_connections : 1;
 
 	cry_rsa_keypair_t keypair;
 
@@ -374,4 +370,50 @@ static inline ltg_client_state_t ltg_get_client_state(const ltg_client_t* client
 
 static inline bool ltg_is_client_encryption_enabled(const ltg_client_t* client) {
 	return client->encryption.enabled;
+}
+
+static inline uint32_t ltg_get_online_max(const ltg_listener_t* listener) {
+	return listener->online.max;
+}
+
+static inline void ltg_add_online(ltg_listener_t* listener, ltg_client_t* client) {
+	
+	with_lock (&listener->online.lock) {
+		client->online_node = utl_dll_push(&listener->online.list, client);
+	}
+
+}
+
+static inline uint32_t ltg_get_online_count(ltg_listener_t* listener) {
+
+	uint32_t count = 0;
+
+	with_lock (&listener->online.lock) {
+		count = utl_dll_length(&listener->online.list);
+	}
+
+	return count;
+	
+}
+
+static inline utl_dll_iterator_t ltg_get_player_iterator(ltg_listener_t* listener) {
+
+	return UTL_DLL_ITERATOR_INITIALIZER(&listener->online.list);
+
+}
+
+static inline ltg_client_t* ltg_player_iterator_next(ltg_listener_t* listener, utl_dll_iterator_t* iterator) {
+
+	ltg_client_t* client = NULL;
+
+	with_lock (&listener->online.lock) {
+		client = utl_dll_iterator_next(iterator);
+	}
+
+	return client;
+
+}
+
+static inline cry_rsa_keypair_t* ltg_get_rsa_keys(ltg_listener_t* listener) {
+	return &listener->keypair;
 }

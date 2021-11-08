@@ -1283,7 +1283,7 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	pck_write_int64(packet, *((uint64_t*) seed_hash)); // hashed seed
 	
-	pck_write_var_int(packet, sky_get_listener()->online.max);
+	pck_write_var_int(packet, ltg_get_online_max(sky_get_listener()));
 	pck_write_var_int(packet, sky_get_render_distance()); // view distance
 	pck_write_int8(packet, sky_is_reduced_debug_info()); // reduced debug info
 	pck_write_int8(packet, sky_is_enabled_respawn_screen()); // enable respawn screen
@@ -1318,7 +1318,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_player_inventory(client);
 
 	// add to online players
-	client->online_node = utl_dll_push(&sky_get_listener()->online.list, client);
+	ltg_add_online(sky_get_listener(), client);
 
 	job_add(job_new(job_player_join, (job_payload_t) { .client = client }));
 
@@ -1376,18 +1376,20 @@ void phd_send_entity_rotation(ltg_client_t* client, ent_living_entity_t* entity)
 
 void phd_send_player_info_add_players(ltg_client_t* client) {
 
-	if (sky_get_listener()->online.list.length == 0) {
+	const uint32_t online_count = ltg_get_online_count(sky_get_listener());
+
+	if (online_count == 0) {
 		return;
 	}
 
-	PCK_INLINE(packet, 3 + (sky_get_listener()->online.list.length * 2048), io_big_endian);
+	PCK_INLINE(packet, 3 + (online_count * 2048), io_big_endian);
 	
 	pck_write_var_int(packet, 0x36);
 	pck_write_var_int(packet, 0);
-	pck_write_var_int(packet, sky_get_listener()->online.list.length);
+	pck_write_var_int(packet, online_count);
 
-	utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
-	ltg_client_t* player = utl_dll_iterator_next(&iterator);
+	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
+	ltg_client_t* player = ltg_player_iterator_next(sky_get_listener(), &iterator);
 	while (player != NULL) {
 		pck_write_bytes(packet, player->uuid, 16);
 		pck_write_string(packet, player->username.value, player->username.length);
@@ -1411,7 +1413,7 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 		
 		pck_write_var_int(packet, player->ping); // ping
 		pck_write_int8(packet, 0); // has display name
-		player = utl_dll_iterator_next(&iterator);
+		player = ltg_player_iterator_next(sky_get_listener(), &iterator);
 	}
 
 	ltg_send(client, packet);
@@ -1457,17 +1459,19 @@ void phd_send_player_info_update_gamemode(__attribute__((unused)) ltg_client_t* 
 
 void phd_send_player_info_update_latency(ltg_client_t* client) {
 
-	PCK_INLINE(packet, 21 * sky_get_listener()->online.list.length + 6, io_big_endian);
+	const uint32_t online_count = ltg_get_online_count(sky_get_listener());
+
+	PCK_INLINE(packet, 21 * online_count + 6, io_big_endian);
 
 	pck_write_var_int(packet, 0x36);
 	pck_write_var_int(packet, 2); // update latency
-	pck_write_var_int(packet, sky_get_listener()->online.list.length);
-	utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
-	ltg_client_t* player = utl_dll_iterator_next(&iterator);
+	pck_write_var_int(packet, online_count);
+	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
+	ltg_client_t* player = ltg_player_iterator_next(sky_get_listener(), &iterator);
 	while (player != NULL) {
 		pck_write_bytes(packet, player->uuid, 16);
 		pck_write_var_int(packet, player->ping);
-		player = utl_dll_iterator_next(&iterator);
+		player = ltg_player_iterator_next(sky_get_listener(), &iterator);
 	}
 
 	ltg_send(client, packet);

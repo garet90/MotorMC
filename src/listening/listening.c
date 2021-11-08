@@ -284,7 +284,7 @@ void ltg_send(ltg_client_t* client, pck_packet_t* packet) {
 
 		if (client->compression_enabled) {
 
-			if (length >= client->listener->network_compression_threshold) { // compress the packet
+			if (length >= sky_get_network_compression_threshold()) { // compress the packet
 			
 				byte_t compressed[length + 10];
 				size_t compressed_length = 0;

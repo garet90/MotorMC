@@ -422,28 +422,26 @@ size_t cht_server_list_ping(char* message) {
 
 	mjson_val* players = mjson_obj(doc);
 
-	with_lock (&sky_get_listener()->online.lock) {
+	mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("max")), mjson_int(doc, ltg_get_online_max(sky_get_listener())));
 
-		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("max")), mjson_int(doc, sky_get_listener()->online.max));
+	const uint32_t online_count = ltg_get_online_count(sky_get_listener());
 
-		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("online")), mjson_int(doc, sky_get_listener()->online.list.length));
-		
-		if (sky_get_listener()->online.list.length > 0) {
-			mjson_val* sample = mjson_arr(doc);
-			utl_dll_iterator_t iterator = UTL_DLL_ITERATOR_INITIALIZER(&sky_get_listener()->online.list);
-			ltg_client_t* player = utl_dll_iterator_next(&iterator);
-			while (player != NULL) {
-				mjson_val* val = mjson_obj(doc);
-				mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, player->username.value, player->username.length));
-				char uuid[37];
-				ltg_uuid_to_string(player->uuid, uuid);
-				mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("id")), mjson_string(doc, uuid, 36));
-				mjson_arr_append(sample, val);
-				player = utl_dll_iterator_next(&iterator);
-			}
-			mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("sample")), sample);
+	mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("online")), mjson_int(doc, online_count));
+	
+	if (online_count > 0) {
+		mjson_val* sample = mjson_arr(doc);
+		utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
+		ltg_client_t* player = ltg_player_iterator_next(sky_get_listener(), &iterator);
+		while (player != NULL) {
+			mjson_val* val = mjson_obj(doc);
+			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, player->username.value, player->username.length));
+			char uuid[37];
+			ltg_uuid_to_string(player->uuid, uuid);
+			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("id")), mjson_string(doc, uuid, 36));
+			mjson_arr_append(sample, val);
+			player = ltg_player_iterator_next(sky_get_listener(), &iterator);
 		}
-
+		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("sample")), sample);
 	}
 
 	mjson_obj_add(obj, mjson_string(doc, UTL_CSTRTOARG("players")), players);

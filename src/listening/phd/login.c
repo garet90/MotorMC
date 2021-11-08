@@ -87,7 +87,7 @@ bool phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 	}
 
 	
-	if (sky_get_listener()->online_mode) {
+	if (sky_is_online_mode()) {
 		phd_send_encryption_request(client);
 	} else {
 		phd_update_login_success(client);
@@ -116,7 +116,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 	pck_read_bytes(packet, secret.bytes, secret.length);
 
 	// decrypt shared secret
-	cry_rsa_decrypt(secret.bytes, secret.bytes, secret.length, &sky_get_listener()->keypair);
+	cry_rsa_decrypt(secret.bytes, secret.bytes, secret.length, ltg_get_rsa_keys(sky_get_listener()));
 	utl_reverse_bytes(secret.bytes, secret.bytes, LTG_AES_KEY_LENGTH);
 	
 	// start encryption cypher
@@ -147,7 +147,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 	pck_read_bytes(packet, verify.bytes, verify.length);
 
 	// decrypt and check verify
-	cry_rsa_decrypt(verify.bytes, verify.bytes, verify.length, &sky_get_listener()->keypair);
+	cry_rsa_decrypt(verify.bytes, verify.bytes, verify.length, ltg_get_rsa_keys(sky_get_listener()));
 	if (verify.key != client->id) {
 
 		return false;
@@ -179,7 +179,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 		EVP_DigestInit_ex(hash, EVP_sha1(), NULL);
 		EVP_DigestUpdate(hash, (byte_t*) "", 0);
 		EVP_DigestUpdate(hash, secret.bytes, LTG_AES_KEY_LENGTH);
-		EVP_DigestUpdate(hash, sky_get_listener()->keypair.ASN1.bytes, sky_get_listener()->keypair.ASN1.length);
+		EVP_DigestUpdate(hash, cry_get_asn1_bytes(ltg_get_rsa_keys(sky_get_listener())), cry_get_asn1_length(ltg_get_rsa_keys(sky_get_listener())));
 		unsigned int digest_length = 20;
 		byte_t server_id_hash[digest_length];
 		EVP_DigestFinal_ex(hash, server_id_hash, &digest_length);
@@ -363,8 +363,8 @@ void phd_send_encryption_request(ltg_client_t* client) {
 	pck_write_string(response, UTL_CSTRTOARG(""));
 
 	// the public auth_key
-	pck_write_var_int(response, sky_get_listener()->keypair.ASN1.length);
-	pck_write_bytes(response, sky_get_listener()->keypair.ASN1.bytes, sky_get_listener()->keypair.ASN1.length);
+	pck_write_var_int(response, cry_get_asn1_length(ltg_get_rsa_keys(sky_get_listener())));
+	pck_write_bytes(response, cry_get_asn1_bytes(ltg_get_rsa_keys(sky_get_listener())), cry_get_asn1_length(ltg_get_rsa_keys(sky_get_listener())));
 
 	// our verify token
 	pck_write_var_int(response, 4);
@@ -391,11 +391,11 @@ void phd_send_set_compression(ltg_client_t* client) {
 	PCK_INLINE(packet, 15, io_big_endian);
 
 	pck_write_var_int(packet, 0x03);
-	pck_write_var_int(packet, sky_get_listener()->network_compression_threshold);
+	pck_write_var_int(packet, sky_get_network_compression_threshold());
 
 	ltg_send(client, packet);
 
-	if (sky_get_listener()->network_compression_threshold > 0)
+	if (sky_get_network_compression_threshold() > 0)
 		client->compression_enabled = true;
 
 }

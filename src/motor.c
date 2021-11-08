@@ -41,6 +41,10 @@ sky_main_t sky_main = {
 
 	.render_distance = 10,
 
+	.network_compression_threshold = 256,
+	.online_mode = true,
+	.prevent_proxy_connections = false,
+
 	// listener
 	.listener = {
 		.address = {
@@ -54,10 +58,7 @@ sky_main_t sky_main = {
 			.lock = PTHREAD_MUTEX_INITIALIZER,
 			.list = UTL_DLL_INITIALIZER,
 			.max = 20
-		},
-		.network_compression_threshold = 256,
-		.online_mode = true,
-		.prevent_proxy_connections = false
+		}
 	}
 
 };
@@ -457,10 +458,10 @@ void sky_load_server_json() {
 					// TODO
 				} break;
 				case 0x4e682648: { // "prevent-proxy-connections"
-					sky_main.listener.prevent_proxy_connections = mjson_get_boolean(key_val.value);
+					sky_main.prevent_proxy_connections = mjson_get_boolean(key_val.value);
 				} break;
 				case 0xbb97de68: { // "network-compression-threshold"
-					sky_main.listener.network_compression_threshold = mjson_get_int(key_val.value);
+					sky_main.network_compression_threshold = mjson_get_int(key_val.value);
 				} break;
 				case 0xa009ab4e: { // "reduced-debug-info"
 					sky_main.reduced_debug_info = mjson_get_boolean(key_val.value);
@@ -469,7 +470,7 @@ void sky_load_server_json() {
 					sky_main.listener.address.port = mjson_get_int(key_val.value);
 				} break;
 				case 0x8931d3dc: { // "online-mode"
-					sky_main.listener.online_mode = mjson_get_boolean(key_val.value);
+					sky_main.online_mode = mjson_get_boolean(key_val.value);
 				} break;
 				case 0x7c9abc59: { // "motd"
 					sky_main.motd = cht_from_json(key_val.value);

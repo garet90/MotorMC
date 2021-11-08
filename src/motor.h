@@ -64,6 +64,8 @@ typedef struct {
 	/* listener */
 	ltg_listener_t listener;
 	
+	uint16_t network_compression_threshold;
+	
 	uint8_t render_distance : 6;
 	
 	const uint16_t protocol : 10;
@@ -82,6 +84,9 @@ typedef struct {
 	bool pvp : 1;
 	bool reduced_debug_info : 1;
 	bool force_gamemode : 1;
+
+	bool online_mode : 1;
+	bool prevent_proxy_connections : 1;
 	
 	ent_gamemode_t gamemode : 2;
 
@@ -179,4 +184,16 @@ static inline pthread_t sky_get_main_thread() {
 
 static inline pthread_t sky_get_console_thread() {
 	return sky_main.console_thread;
+}
+
+static inline bool sky_is_online_mode() {
+	return sky_main.online_mode;
+}
+
+static inline bool sky_is_prevent_proxy_connections() {
+	return sky_main.prevent_proxy_connections;
+}
+
+static inline uint16_t sky_get_network_compression_threshold() {
+	return sky_main.network_compression_threshold;
 }

@@ -76,6 +76,10 @@ static inline void* utl_dll_shift(utl_dll_t* dll) {
 
 extern void* utl_dll_remove(utl_dll_t* dll, uint32_t id);
 
+static inline uint32_t utl_dll_length(utl_dll_t* dll) {
+	return dll->length;
+}
+
 static inline void utl_term_dll(utl_dll_t* dll) {
 
 	utl_term_id_vector(&dll->nodes);

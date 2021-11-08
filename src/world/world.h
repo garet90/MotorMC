@@ -244,3 +244,9 @@ extern void wld_unload_region(wld_region_t* region);
 extern void wld_free_region(wld_region_t* region);
 extern void wld_unload(wld_world_t* world);
 extern void wld_unload_all();
+
+// API functions
+
+static inline wld_chunk_section_t* wld_get_chunk_section(wld_chunk_t* chunk, uint16_t index) {
+	return &chunk->sections[index];
+}
