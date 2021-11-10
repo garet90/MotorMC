@@ -1009,7 +1009,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		pck_write_int32(packet, wld_get_chunk_x(chunk));
 		pck_write_int32(packet, wld_get_chunk_z(chunk));
 
-		const uint16_t chunk_height = mat_get_chunk_height(chunk->region->world->environment);
+		const uint16_t chunk_height = mat_get_chunk_height(wld_get_environment(wld_chunk_get_world(chunk)));
 
 		with_lock (&chunk->lock) {
 
@@ -1044,8 +1044,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 			int64_t motion_blocking[heightmap_size];
 			int64_t world_surface[heightmap_size];
 
-			utl_encode_shorts_to_longs(chunk->highest.motion_blocking, 256, 9, motion_blocking);
-			utl_encode_shorts_to_longs(chunk->highest.world_surface, 256, 9, world_surface);
+			utl_encode_shorts_to_longs((int16_t*) chunk->highest.motion_blocking, 256, 9, motion_blocking);
+			utl_encode_shorts_to_longs((int16_t*) chunk->highest.world_surface, 256, 9, world_surface);
 
 			// create heightmap
 			mnbt_doc* doc = mnbt_new();

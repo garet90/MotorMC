@@ -3,6 +3,7 @@
 #include "../main.h"
 #include "util.h"
 #include "vector.h"
+#include "lock_util.h"
 
 typedef struct {
 
@@ -167,7 +168,7 @@ static inline void utl_bit_vector_or_foreach(utl_bit_vector_t* v1, utl_bit_vecto
 
 }
 
-static inline void utl_bit_vector_xor_foreach(utl_bit_vector_t* v1, utl_bit_vector_t* v2, void (*const function) (uint32_t, void*), void* input) {
+static inline void utl_bit_vector_xor_foreach(utl_bit_vector_t* v1, utl_bit_vector_t* v2, pthread_mutex_t* m1, pthread_mutex_t* m2, void (*const function) (uint32_t, void*), void* input) {
 	
 	const uint32_t size = UTL_MAX(v1->vector.size, v2->vector.size);
 
@@ -176,10 +177,14 @@ static inline void utl_bit_vector_xor_foreach(utl_bit_vector_t* v1, utl_bit_vect
 		byte_t byte = 0;
 
 		if (i < v1->vector.size) {
-			byte ^= UTL_VECTOR_GET_AS(byte_t, &v1->vector, i);
+			with_lock (m1) {
+				byte ^= UTL_VECTOR_GET_AS(byte_t, &v1->vector, i);
+			}
 		}
 		if (i < v2->vector.size) {
-			byte ^= UTL_VECTOR_GET_AS(byte_t, &v2->vector, i);
+			with_lock (m2) {
+				byte ^= UTL_VECTOR_GET_AS(byte_t, &v2->vector, i);
+			}
 		}
 
 		while (byte) {

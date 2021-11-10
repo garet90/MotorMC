@@ -22,13 +22,14 @@ typedef struct {
 typedef struct {
 
 	utl_dll_t* dll;
-	uint32_t next_idx;
+	uint32_t last_node;
 	uint32_t next_node;
 
 } utl_dll_iterator_t;
 
 #define UTL_DLL_INITIALIZER { .nodes = UTL_ID_VECTOR_INITIALIZER(utl_dll_node_t), .first = 0, .last = 0, .length = 0 }
-#define UTL_DLL_ITERATOR_INITIALIZER(ptr) (utl_dll_iterator_t) { .dll = ptr, .next_idx = 0, .next_node = (ptr)->first }
+// TODO make list updatable while iterating through
+#define UTL_DLL_ITERATOR_INITIALIZER(ptr) (utl_dll_iterator_t) { .dll = ptr, .last_node = (ptr)->first, .next_node = (ptr)->first }
 
 static inline utl_dll_t* utl_create_dll() {
 
@@ -48,10 +49,18 @@ static inline void utl_init_dll(utl_dll_t* dll) {
 
 static inline void* utl_dll_iterator_next(utl_dll_iterator_t* iterator) {
 
-	if (iterator->next_idx >= iterator->dll->length) return NULL;
+	if (iterator->next_node == iterator->dll->last) return NULL;
 
+	// if not the beginning
+	if (iterator->last_node != iterator->next_node) {
+		utl_dll_node_t* last_node = utl_id_vector_get(&iterator->dll->nodes, iterator->last_node);
+		// if last node's next node is not the current node (current node has changed), the next node is actually the last's next
+		if (last_node->next != iterator->next_node) {
+			iterator->next_node = last_node->next;
+		}
+	}
 	utl_dll_node_t* node = utl_id_vector_get(&iterator->dll->nodes, iterator->next_node);
-	iterator->next_idx++;
+	iterator->last_node = iterator->next_node;
 	iterator->next_node = node->next;
 
 	return node->element;

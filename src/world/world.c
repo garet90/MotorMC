@@ -226,7 +226,7 @@ wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t
 	const uint16_t i_z = c_z & 0x1F;
 	const uint16_t idx = (i_x << 5) | i_z;
 
-	wld_region_t* region = chunk->region;
+	wld_region_t* region = wld_chunk_get_region(chunk);
 	wld_world_t* world = region->world;
 
 	while (r_x < 0) {
@@ -275,12 +275,12 @@ void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
 	ticket = UTL_MIN(chunk->max_ticket, ticket);
 	if (chunk->ticket == WLD_TICKET_INACCESSIBLE && ticket < WLD_TICKET_INACCESSIBLE) {
 		// loading chunk
-		chunk->region->loaded_chunks += 1;
+		wld_chunk_get_region(chunk)->loaded_chunks += 1;
 	} else if (chunk->ticket < WLD_TICKET_INACCESSIBLE && ticket == WLD_TICKET_INACCESSIBLE) {
 		// unloading chunk
-		chunk->region->loaded_chunks -= 1;
-		if (chunk->region->loaded_chunks == 0) {
-			sch_schedule(job_new(job_unload_region, (job_payload_t) { .region = chunk->region }), 100); // set to try unload in 5 seconds
+		wld_chunk_get_region(chunk)->loaded_chunks -= 1;
+		if (wld_chunk_get_region(chunk)->loaded_chunks == 0) {
+			sch_schedule(job_new(job_unload_region, (job_payload_t) { .region = wld_chunk_get_region(chunk) }), 100); // set to try unload in 5 seconds
 		}
 	}
 	chunk->ticket = ticket;
@@ -319,51 +319,48 @@ void wld_set_block_send(uint32_t client_id, void* arg) {
 void wld_set_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_protocol_id_t type) {
 
 	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, (x >> 4) - wld_get_chunk_x(chunk), (z >> 4) - wld_get_chunk_z(chunk));
-
-	const uint16_t sub_chunk = y >> 4;
+	wld_chunk_section_t* section = wld_get_chunk_section(block_chunk, y >> 4);
 
 	const uint8_t s_x = x & 0xF;
 	const uint8_t s_y = y & 0xF;
 	const uint8_t s_z = z & 0xF;
 
-	with_lock (&block_chunk->lock) {
-		const mat_block_protocol_id_t old_type = block_chunk->sections[sub_chunk].blocks[(s_y << 8) | (s_z << 4) | s_x];
-		const bool old_type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(old_type))->air;
-		const bool type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(type))->air;
-		if (old_type_air && !type_air) {
-			block_chunk->sections[sub_chunk].block_count++;
+	const mat_block_protocol_id_t old_type = section->blocks[(s_y << 8) | (s_z << 4) | s_x];
+	const bool old_type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(old_type))->air;
+	const bool type_air = mat_get_block_by_type(mat_get_block_type_by_protocol_id(type))->air;
+	if (old_type_air && !type_air) {
+		section->block_count++;
 
-			if (block_chunk->highest.motion_blocking[(s_z << 4) | s_x] < y) {
-				block_chunk->highest.motion_blocking[(s_z << 4) | s_x] = y;
-			}
-		} else if (!old_type_air && type_air) {
-			block_chunk->sections[sub_chunk].block_count--;
-
-			if (block_chunk->highest.motion_blocking[(s_z << 4) | s_x] == y) {
-				// TODO calculate new highest motion_blocking block
-			}
+		if (block_chunk->highest.motion_blocking[(s_z << 4) | s_x] < y) {
+			block_chunk->highest.motion_blocking[(s_z << 4) | s_x] = y;
 		}
-		block_chunk->sections[sub_chunk].blocks[(s_y << 8) | (s_z << 4) | s_x] = type;
+	} else if (!old_type_air && type_air) {
+		section->block_count--;
 
-		// send block to player
-		PCK_INLINE(packet, 14, io_big_endian);
-		pck_write_var_int(packet, 0x0C);
-		pck_write_position(packet, (pck_position_t) {
-			.x = x,
-			.y = y,
-			.z = z
-		});
-		pck_write_var_int(packet, type);
-
-		utl_bit_vector_foreach(&block_chunk->subscribers, wld_set_block_send, packet);
+		if (block_chunk->highest.motion_blocking[(s_z << 4) | s_x] == y) {
+			// TODO calculate new highest motion_blocking block
+		}
 	}
+	section->blocks[(s_y << 8) | (s_z << 4) | s_x] = type;
+
+	// send block to player
+	PCK_INLINE(packet, 14, io_big_endian);
+	pck_write_var_int(packet, 0x0C);
+	pck_write_position(packet, (pck_position_t) {
+		.x = x,
+		.y = y,
+		.z = z
+	});
+	pck_write_var_int(packet, type);
+
+	utl_bit_vector_foreach(&block_chunk->subscribers, wld_set_block_send, packet);
 
 }
 
 void wld_unload_region(wld_region_t* region) {
 
 	with_lock (&region->world->lock) {
-		utl_tree_remove(&region->world->regions, ((uint64_t) region->x << 16) | (uint64_t) region->z);
+		utl_tree_remove(&region->world->regions, ((uint64_t) wld_region_get_x(region) << 16) | (uint64_t) wld_region_get_z(region));
 	}
 
 	wld_free_region(region);

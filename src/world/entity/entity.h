@@ -172,9 +172,7 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 
 	if (entity->chunk != NULL) {
 
-		with_lock (&entity->chunk->lock) {
-			utl_dll_remove(&entity->chunk->entities, entity->chunk_node);
-		}
+		wld_chunk_remove_entity(entity->chunk, entity->chunk_node);
 		entity->chunk = NULL;
 
 	}

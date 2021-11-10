@@ -398,7 +398,13 @@ static inline uint32_t ltg_get_online_count(ltg_listener_t* listener) {
 
 static inline utl_dll_iterator_t ltg_get_player_iterator(ltg_listener_t* listener) {
 
-	return UTL_DLL_ITERATOR_INITIALIZER(&listener->online.list);
+	utl_dll_iterator_t iterator;
+
+	with_lock (&listener->online.lock) {
+		iterator = UTL_DLL_ITERATOR_INITIALIZER(&listener->online.list);
+	}
+
+	return iterator;
 
 }
 

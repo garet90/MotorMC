@@ -86,11 +86,7 @@ void ent_set_chunk(ent_entity_t* entity) {
 		}
 
 		// update players around
-		with_lock (&entity->chunk->lock) {
-			with_lock (&chunk->lock) {
-				utl_bit_vector_xor_foreach(&entity->chunk->subscribers, &chunk->subscribers, ent_send_destroy_entity, entity);
-			}
-		}
+		wld_chunk_subscribers_xor_foreach(entity->chunk, chunk, ent_send_destroy_entity, entity);
 		ent_remove_chunk(entity);
 
 	} else {
