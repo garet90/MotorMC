@@ -178,6 +178,22 @@ static inline void wld_chunk_remove_entity(wld_chunk_t* chunk, uint32_t entity) 
 
 }
 
+static inline bool wld_chunk_has_subscriber(wld_chunk_t* chunk, uint32_t client) {
+	
+	bool has_subscriber;
+
+	with_lock (&chunk->lock) {
+		has_subscriber = utl_bit_vector_test_bit(&chunk->subscribers, client);
+	}
+
+	return has_subscriber;
+
+}
+
+static inline uint8_t wld_chunk_get_ticket(const wld_chunk_t* chunk) {
+	return chunk->ticket;
+}
+
 extern wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z, uint8_t max_ticket);
 
 // This is fast for short distances (within regions to a few regions over), but for long distances this is excruciatingly slow
@@ -244,8 +260,20 @@ static inline void wld_remove_player_chunk(wld_chunk_t* chunk, uint32_t client_i
 	}
 }
 
-static inline wld_chunk_section_t* wld_get_chunk_section(wld_chunk_t* chunk, uint16_t index) {
+static inline wld_chunk_section_t* wld_chunk_get_section(wld_chunk_t* chunk, uint16_t index) {
 	return &chunk->sections[index];
+}
+
+static inline uint_fast16_t wld_chunk_section_get_block_count(wld_chunk_section_t* section) {
+	return section->block_count;
+}
+
+static inline uint_least8_t wld_chunk_section_get_biome(wld_chunk_section_t* section, uint8_t x, uint8_t y, uint8_t z) {
+	return section->biome[(x << 4) + (z << 2) + y];
+}
+
+static inline mat_block_protocol_id_t* wld_chunk_section_get_blocks(wld_chunk_section_t* section) {
+	return (mat_block_protocol_id_t*) section->blocks;
 }
 
 static inline void wld_chunk_subscribers_xor_foreach(wld_chunk_t* c1, wld_chunk_t* c2, void (*const function) (uint32_t, void*), void* args) {
@@ -257,15 +285,9 @@ static inline void wld_chunk_subscribers_foreach(wld_chunk_t* chunk, void (*cons
 }
 
 static inline utl_dll_iterator_t wld_chunk_get_entity_iterator(wld_chunk_t* chunk) {
-	
-	utl_dll_iterator_t iterator;
 
-	with_lock (&chunk->lock) {
-		iterator = UTL_DLL_ITERATOR_INITIALIZER(&chunk->entities);
-	}
-	
-	return iterator;
-	
+	return utl_dll_get_iterator(&chunk->entities);
+
 }
 
 static inline void* wld_chunk_entity_iterator_next(wld_chunk_t* chunk, utl_dll_iterator_t* iterator) {
@@ -280,10 +302,18 @@ static inline void* wld_chunk_entity_iterator_next(wld_chunk_t* chunk, utl_dll_i
 
 }
 
+static inline int16_t* wld_chunk_get_highest_motion_blocking(wld_chunk_t* chunk) {
+	return (int16_t*) chunk->highest.motion_blocking;
+}
+
+static inline int16_t* wld_chunk_get_highest_world_surface(wld_chunk_t* chunk) {
+	return (int16_t*) chunk->highest.world_surface;
+}
+
 static inline mat_block_protocol_id_t wld_get_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z) {
 
 	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, (x >> 4) - wld_get_chunk_x(chunk), (z >> 4) - wld_get_chunk_z(chunk));
-	wld_chunk_section_t* section = wld_get_chunk_section(block_chunk, y >> 4);
+	wld_chunk_section_t* section = wld_chunk_get_section(block_chunk, y >> 4);
 
 	return section->blocks[((y & 0xF) << 8) | ((z & 0xF) << 4) | (x & 0xF)];
 

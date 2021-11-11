@@ -50,7 +50,7 @@ void ent_send_destroy_entity(uint32_t client_id, void* entity) {
 
 	wld_chunk_t* entity_chunk = ((ent_entity_t*) entity)->chunk;
 
-	if (utl_bit_vector_test_bit(&entity_chunk->subscribers, client_id)) {
+	if (wld_chunk_has_subscriber(entity_chunk, client_id)) {
 		ent_send_entity(client_id, entity);
 	} else {
 		ent_destroy_entity(client_id, entity);
@@ -96,7 +96,7 @@ void ent_set_chunk(ent_entity_t* entity) {
 		// if its a player, we must wait until it has been added to the server list
 		if (entity->type != ent_player) {
 			// spawn in chunk to listeners
-			utl_bit_vector_foreach(&chunk->subscribers, ent_send_entity, entity);
+			wld_chunk_subscribers_foreach(chunk, ent_send_entity, entity);
 		}
 	}
 
@@ -110,8 +110,8 @@ void ent_set_chunk(ent_entity_t* entity) {
 void ent_free_entity(ent_entity_t* entity) {
 
 	// remove entity from clients
-	utl_bit_vector_foreach(&entity->chunk->subscribers, ent_destroy_entity, entity);
-
+	wld_chunk_subscribers_foreach(entity->chunk, ent_destroy_entity, entity);
+	
 	ent_remove_chunk(entity);
 
 	utl_id_vector_remove(&ent_entities, entity->id);

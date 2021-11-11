@@ -319,7 +319,7 @@ void wld_set_block_send(uint32_t client_id, void* arg) {
 void wld_set_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_block_protocol_id_t type) {
 
 	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, (x >> 4) - wld_get_chunk_x(chunk), (z >> 4) - wld_get_chunk_z(chunk));
-	wld_chunk_section_t* section = wld_get_chunk_section(block_chunk, y >> 4);
+	wld_chunk_section_t* section = wld_chunk_get_section(block_chunk, y >> 4);
 
 	const uint8_t s_x = x & 0xF;
 	const uint8_t s_y = y & 0xF;

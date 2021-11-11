@@ -76,7 +76,7 @@ bool job_handle_player_join(job_payload_t* payload) {
 
 	ent_entity_t* entity = (ent_entity_t*) payload->client->entity;
 
-	utl_bit_vector_foreach(&entity->chunk->subscribers, ent_send_entity, entity);
+	wld_chunk_subscribers_foreach(entity->chunk, ent_send_entity, entity);
 
 	return true;
 
@@ -133,15 +133,15 @@ bool job_handle_tick_region(job_payload_t* payload) {
 		const wld_chunk_t* chunk = payload->region->chunks[i];
 
 		if (chunk != NULL) {
-			if (chunk->ticket <= WLD_TICKET_TICK_ENTITIES) {
+			if (wld_chunk_get_ticket(chunk) <= WLD_TICKET_TICK_ENTITIES) {
 				// entities and chunk ticks
 			}
 
-			if (chunk->ticket <= WLD_TICKET_TICK) {
+			if (wld_chunk_get_ticket(chunk) <= WLD_TICKET_TICK) {
 				// tick
 			}
 
-			if (chunk->ticket <= WLD_TICKET_BORDER) {
+			if (wld_chunk_get_ticket(chunk) <= WLD_TICKET_BORDER) {
 				// border
 			}
 		}
