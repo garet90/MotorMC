@@ -1,4 +1,4 @@
-# MotorMC [![Build](https://github.com/garet90/MotorMC/actions/workflows/build.yml/badge.svg)](https://github.com/garet90/MotorMC/actions/workflows/build.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/2715a20b263142c9b5bd25fab473cd76)](https://www.codacy.com/gh/garet90/MotorMC/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=garet90/MotorMC&amp;utm_campaign=Badge_Grade)
+# ![MotorMC](https://files.garet.holiday/motormc/logo1.png) [![](https://github.com/garet90/MotorMC/actions/workflows/build.yml/badge.svg)](https://github.com/garet90/MotorMC/actions/workflows/build.yml) [![](https://app.codacy.com/project/badge/Grade/2715a20b263142c9b5bd25fab473cd76)](https://www.codacy.com/gh/garet90/MotorMC/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=garet90/MotorMC&amp;utm_campaign=Badge_Grade)
 ***Note: MotorMC is currently in development and is not ready for production servers.***
 MotorMC is a blazing fast, multi-threaded, asynchronous version of Minecraft that aims to handle many players on a single world while still providing an experience as close to vanilla Minecraft as possible.
 ## About
