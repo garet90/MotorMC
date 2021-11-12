@@ -127,15 +127,35 @@ extern void wld_prepare_spawn(wld_world_t* world);
 extern wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t environment);
 extern wld_world_t* wld_load(const string_t name);
 
+static inline int64_t wld_get_seed(wld_world_t* world) {
+	return world->seed;
+}
+
+static inline int32_t wld_get_spawn_x(wld_world_t* world) {
+	return world->spawn.x;
+}
+
+static inline int32_t wld_get_spawn_z(wld_world_t* world) {
+	return world->spawn.z;
+}
+
+static inline bool wld_is_debug(wld_world_t* world) {
+	return world->debug;
+}
+
+static inline bool wld_is_flat(wld_world_t* world) {
+	return world->flat;
+}
+
+static inline mat_dimension_type_t wld_get_environment(wld_world_t* world) {
+	return world->environment;
+}
+
 extern uint16_t wld_get_count();
 extern wld_world_t* wld_get_world(uint16_t world_id);
 
 static inline wld_world_t* wld_get_default() {
 	return wld_get_world(0);
-}
-
-static inline mat_dimension_type_t wld_get_environment(wld_world_t* world) {
-	return world->environment;
 }
 
 extern wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z);
@@ -154,6 +174,18 @@ static inline int16_t wld_region_get_x(wld_region_t* region) {
 
 static inline int16_t wld_region_get_z(wld_region_t* region) {
 	return region->z;
+}
+
+static inline wld_chunk_t* wld_region_get_chunk_by_idx(wld_region_t* region, uint16_t idx) {
+	return region->chunks[idx];
+}
+
+static inline wld_chunk_t* wld_region_get_chunk(wld_region_t* region, uint8_t x, uint8_t z) {
+	return region->chunks[((uint16_t) x << 5) | z];
+}
+
+static inline uint_fast16_t wld_region_get_loaded_chunks(wld_region_t* region) {
+	return region->loaded_chunks;
 }
 
 extern wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint8_t x, uint8_t z, uint8_t max_ticket);

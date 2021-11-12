@@ -130,7 +130,7 @@ bool job_handle_tick_region(job_payload_t* payload) {
 	
 	for (uint32_t i = 0; i < 32 * 32; ++i) {
 
-		const wld_chunk_t* chunk = payload->region->chunks[i];
+		const wld_chunk_t* chunk = wld_region_get_chunk_by_idx(payload->region, i);
 
 		if (chunk != NULL) {
 			if (wld_chunk_get_ticket(chunk) <= WLD_TICKET_TICK_ENTITIES) {
@@ -153,7 +153,7 @@ bool job_handle_tick_region(job_payload_t* payload) {
 
 bool job_handle_unload_region(job_payload_t* payload) {
 
-	if (payload->region->loaded_chunks == 0) {
+	if (wld_region_get_loaded_chunks(payload->region) == 0) {
 		wld_unload_region(payload->region);
 		return true;
 	}

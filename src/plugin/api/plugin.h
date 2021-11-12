@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __WINDOWS__
 #define export __declspec(dllexport)
 #define import __declspec(dllimport)
@@ -397,3 +401,7 @@ static motor_api_t const* motor;
 			motor = interface;\
 			return plugin;\
 		}
+
+#ifdef __cplusplus
+}
+#endif

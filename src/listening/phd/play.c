@@ -1228,8 +1228,8 @@ void phd_send_join_game(ltg_client_t* client) {
 	player->uuid = client->uuid;
 	player->living_entity.entity.position.world = player_world;
 	player->living_entity.entity.position.y = 256;
-	player->living_entity.entity.position.x = player_world->spawn.x;
-	player->living_entity.entity.position.z = player_world->spawn.z;
+	player->living_entity.entity.position.x = wld_get_spawn_x(player_world);
+	player->living_entity.entity.position.z = wld_get_spawn_z(player_world);
 	ent_register_entity(&player->living_entity.entity);
 
 	// set last recieve packet to now
@@ -1240,7 +1240,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	client->keep_alive = sch_schedule_repeating(job_new(job_keep_alive, (job_payload_t) { .client = client }), 200, 200);
 
 	const mat_codec_t* codec = mat_get_codec();
-	const mat_codec_t* dimension_codec = mat_get_dimension_codec(player_world->environment);
+	const mat_codec_t* dimension_codec = mat_get_dimension_codec(wld_get_environment(player_world));
 
 	PCK_INLINE(packet, codec->size + dimension_codec->size + 1024, io_big_endian);
 
@@ -1271,7 +1271,8 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	EVP_MD_CTX* hash = EVP_MD_CTX_create();
 	EVP_DigestInit_ex(hash, EVP_sha256(), NULL);
-	EVP_DigestUpdate(hash, (byte_t*) &player_world->seed, 8);
+	int64_t player_world_seed = wld_get_seed(player_world);
+	EVP_DigestUpdate(hash, (byte_t*) &player_world_seed, 8);
 	unsigned int digest_length = 32;
 	byte_t seed_hash[digest_length];
 	EVP_DigestFinal_ex(hash, seed_hash, &digest_length);
@@ -1283,8 +1284,8 @@ void phd_send_join_game(ltg_client_t* client) {
 	pck_write_var_int(packet, sky_get_render_distance()); // view distance
 	pck_write_int8(packet, sky_is_reduced_debug_info()); // reduced debug info
 	pck_write_int8(packet, sky_is_enabled_respawn_screen()); // enable respawn screen
-	pck_write_int8(packet, player_world->debug); // is debug
-	pck_write_int8(packet, player_world->flat); // is flat
+	pck_write_int8(packet, wld_is_debug(player_world)); // is debug
+	pck_write_int8(packet, wld_is_flat(player_world)); // is flat
 
 	ltg_send(client, packet);
 
