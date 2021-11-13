@@ -1,18 +1,13 @@
 #pragma once
+
+#include "commands.d.h"
+#include "../../listening/listening.d.h"
+
 #include "../../main.h"
-#include "../../listening/listening.h"
-#include "../../util/str_util.h"
 #include "../chat/chat.h"
+#include "../../util/str_util.h"
 
-typedef enum {
-
-	cmd_console = 0,
-	cmd_player = 1,
-	cmd_command_block = 2
-
-} cmd_sender_type_t;
-
-typedef struct {
+struct cmd_sender {
 
 	cmd_sender_type_t type : 2;
 	uint8_t op : 3;
@@ -21,9 +16,9 @@ typedef struct {
 		ltg_client_t* player;
 	};
 
-} cmd_sender_t;
+};
 
-typedef struct {
+struct cmd_command {
 
 	const string_t label;
 	const string_t description;
@@ -34,7 +29,7 @@ typedef struct {
 	const size_t alias_count;
 	const string_t aliases[];
 
-} cmd_command_t;
+};
 
 extern utl_vector_t cmd_list;
 

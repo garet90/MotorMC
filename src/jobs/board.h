@@ -1,12 +1,17 @@
 #pragma once
 #include <assert.h>
 #include <pthread.h>
+
+#include "board.d.h"
+#include "../world/entity/entity.d.h"
+#include "../world/entity/living/living.d.h"
+#include "../world/world.d.h"
+#include "../listening/listening.d.h"
+
 #include "../main.h"
 #include "../util/list.h"
-#include "../listening/listening.h"
-#include "../world/world.h"
 
-typedef struct {
+struct job_board {
 
 	struct {
 		pthread_mutex_t lock;
@@ -19,31 +24,11 @@ typedef struct {
 		utl_id_vector_t jobs;
 	} heap;
 
-} job_board_t;
+};
 
 extern job_board_t job_board;
 
-typedef enum {
-
-	job_keep_alive,
-	job_global_chat_message,
-	job_player_join,
-	job_player_leave,
-	job_send_update_pings,
-	job_tick_region,
-	job_unload_region,
-	job_dig_block,
-	job_entity_move,
-	job_entity_teleport,
-	job_living_entity_look,
-	job_living_entity_move_look,
-	job_living_entity_teleport_look,
-
-	job_count
-
-} job_type_t;
-
-typedef union {
+union job_payload {
 
 	ltg_client_t* client;
 
@@ -147,9 +132,9 @@ typedef union {
 
 	} living_entity_teleport_look;
 
-} job_payload_t;
+};
 
-typedef struct {
+struct job_work {
 
 	const job_type_t type : 4;
 	uint8_t repeat;
@@ -158,7 +143,7 @@ typedef struct {
 
 	job_payload_t payload;
 
-} job_work_t;
+};
 
 extern uint32_t job_new(job_type_t type, job_payload_t payload);
 

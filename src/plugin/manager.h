@@ -1,5 +1,10 @@
 #pragma once
+
+#include "manager.d.h"
+#include "../world/entity/living/player/player.d.h"
+
 #include "../main.h"
+#include "../listening/listening.h"
 #include "../io/logger/logger.h"
 #include "../io/commands/commands.h"
 #include "../util/vector.h"
@@ -12,14 +17,7 @@
 
 // PLUGINS
 
-typedef enum {
-
-	plg_postworld = 0,
-	plg_startup
-
-} plg_startup_t;
-
-typedef struct {
+struct plg_plugin {
 
 	const string_t name;
 	const string_t description;
@@ -28,13 +26,11 @@ typedef struct {
 	const string_t website;
 	const plg_startup_t load;
 
-} plg_plugin_t;
+};
 
 // API (Server side)
 
-#define PLG_CURRENT_INTERFACE 0
-
-typedef struct {
+struct plg_interface {
 	
 	uint32_t interface_version;
 
@@ -108,7 +104,7 @@ typedef struct {
 
 	} chat;
 
-} plg_interface_t;
+};
 
 static const plg_interface_t plg_interface = {
 

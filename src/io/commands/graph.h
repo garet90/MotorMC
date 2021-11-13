@@ -1,10 +1,11 @@
 #pragma once
+
+#include "graph.d.h"
+
 #include "../../main.h"
 #include "../../util/vector.h"
 #include "../packet/packet.h"
 #include "commands.h"
-
-typedef struct cmd_node cmd_node_t;
 
 struct cmd_node {
 

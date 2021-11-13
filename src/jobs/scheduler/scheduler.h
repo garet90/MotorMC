@@ -1,6 +1,5 @@
 #pragma once
 #include "../../main.h"
-#include "../board.h"
 
 /*
 Schedule a job to be done at a specific time

@@ -1,4 +1,5 @@
 #include "random.h"
+#include "../io/logger/logger.h"
 
 #ifdef __WINDOWS__
 #include <windows.h>

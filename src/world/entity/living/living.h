@@ -1,7 +1,9 @@
 #pragma once
+#include "living.d.h"
+
 #include "../../../main.h"
-#include "../entity.h"
 #include "../../item/item.h"
+#include "../entity.h"
 
 struct ent_living_entity {
 

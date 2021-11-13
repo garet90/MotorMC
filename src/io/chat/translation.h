@@ -1,19 +1,13 @@
 #pragma once
+
+#include "translation.d.h"
+#include "chat.d.h"
+
 #include "../../main.h"
-#include "chat.h"
+#include "../json/mjson.h"
+#include "../../util/vector.h"
 
-typedef enum {
-
-	cht_translation_chat_type_text,
-	cht_translation_multiplayer_player_joined,
-	cht_translation_multiplayer_player_left,
-	cht_translation_multiplayer_disconnect_outdated_client,
-	cht_translation_multiplayer_disconnect_outdated_server,
-	cht_translation_multiplayer_disconnect_server_shutdown
-
-} cht_translation_type_t;
-
-typedef struct {
+struct cht_translation {
 
 	cht_translation_type_t translate;
 
@@ -21,7 +15,7 @@ typedef struct {
 
 	utl_vector_t with;
 
-} cht_translation_t;
+};
 
 static /*in-plugin*/ const cht_translation_t cht_translation_new = {
 	.color = cht_no_color,

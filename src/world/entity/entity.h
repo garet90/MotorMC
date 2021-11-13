@@ -1,6 +1,8 @@
 #pragma once
 #include <pthread.h>
-#include "entity_d.h"
+
+#include "entity.d.h"
+
 #include "../../main.h"
 #include "../../io/chat/chat.h"
 #include "../../util/lock_util.h"

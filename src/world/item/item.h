@@ -1,15 +1,18 @@
 #pragma once
+
+#include "item.d.h"
+
 #include "../../main.h"
 #include "../material/material.h"
 #include "../../io/nbt/mnbt.h"
 #include "../../io/packet/packet.h"
 
-typedef struct {
+struct itm_item {
 
 	mat_item_type_t type: 11;
 	uint8_t count: 7;
 
-} itm_item_t;
+};
 
 static const itm_item_t itm_new = {
 	.type = mat_item_air,

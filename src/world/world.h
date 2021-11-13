@@ -1,6 +1,9 @@
 #pragma once
 #include <pthread.h>
 #include <assert.h>
+
+#include "world.d.h"
+
 #include "../main.h"
 #include "../util/dll.h"
 #include "../util/id_vector.h"
@@ -9,11 +12,6 @@
 #include "../util/lock_util.h"
 #include "../util/util.h"
 #include "material/material.h"
-
-typedef struct wld_world wld_world_t;
-typedef struct wld_region wld_region_t;
-typedef struct wld_chunk wld_chunk_t;
-typedef struct wld_chunk_section wld_chunk_section_t;
 
 struct wld_chunk_section {
 
@@ -27,12 +25,6 @@ struct wld_chunk_section {
 	atomic_uint_least8_t biome[4 * 4 * 4];
 
 };
-
-#define WLD_TICKET_TICK_ENTITIES 12
-#define WLD_TICKET_TICK 13
-#define WLD_TICKET_BORDER 14
-#define WLD_TICKET_INACCESSIBLE 15
-#define WLD_TICKET_MAX 15
 
 struct wld_chunk {
 

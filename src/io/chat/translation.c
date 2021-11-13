@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "translation.h"
+#include "chat.h"
 #include "../../util/util.h"
 #include "../../util/str_util.h"
 

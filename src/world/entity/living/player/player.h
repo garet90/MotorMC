@@ -1,7 +1,10 @@
 #pragma once
+
+#include "player.d.h"
+
 #include "../../../../main.h"
-#include "../living.h"
 #include "../../../../jobs/scheduler/scheduler.h"
+#include "../living.h"
 
 struct ent_player {
 

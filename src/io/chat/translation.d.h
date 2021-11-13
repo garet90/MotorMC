@@ -1,0 +1,14 @@
+#pragma once
+
+typedef enum {
+
+	cht_translation_chat_type_text,
+	cht_translation_multiplayer_player_joined,
+	cht_translation_multiplayer_player_left,
+	cht_translation_multiplayer_disconnect_outdated_client,
+	cht_translation_multiplayer_disconnect_outdated_server,
+	cht_translation_multiplayer_disconnect_server_shutdown
+
+} cht_translation_type_t;
+
+typedef struct cht_translation cht_translation_t;
