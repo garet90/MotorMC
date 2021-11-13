@@ -126,8 +126,8 @@ bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
 
-	player->displayed_skin_parts = pck_read_int8(packet);
-	player->main_hand = (byte_t) pck_read_var_int(packet);
+	ent_player_set_displayed_skin_parts(player, pck_read_int8(packet));
+	ent_player_set_main_hand(player, pck_read_var_int(packet));
 
 	__attribute__((unused)) bool disable_text_filtering = pck_read_int8(packet);
 
@@ -145,6 +145,7 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 
 	ent_player_t* player = client->entity;
 
+	// TODO use API functions to do this
 	with_lock (&player->living_entity.entity.lock) {
 
 		struct {
@@ -485,18 +486,18 @@ bool phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
 bool phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
-	ent_player_t* player = client->entity;
+	ent_entity_t* entity = ent_player_get_entity(ltg_client_get_entity(client));
 
 	const float64_t x = pck_read_float64(packet);
 	const float64_t y = pck_read_float64(packet);
 	const float64_t z = pck_read_float64(packet);
 	const bool on_ground = pck_read_int8(packet);
 
-	const float64_t d_x = x - player->living_entity.entity.position.x;
-	const float64_t d_y = y - player->living_entity.entity.position.y;
-	const float64_t d_z = z - player->living_entity.entity.position.z;
+	const float64_t d_x = x - ent_get_x(entity);
+	const float64_t d_y = y - ent_get_y(entity);
+	const float64_t d_z = z - ent_get_z(entity);
 
-	job_add(job_new(job_entity_move, (job_payload_t) { .entity_move = { .entity = &player->living_entity.entity, .initial_chunk = player->living_entity.entity.chunk, .d_x = d_x, .d_y = d_y, .d_z = d_z, .on_ground = on_ground } }));
+	ent_move(entity, d_x, d_y, d_z, on_ground);
 
 	/*
 	if (old_chunk != player->living_entity.entity.chunk) {
@@ -513,7 +514,7 @@ bool phd_handle_player_position(ltg_client_t* client, pck_packet_t* packet) {
 
 bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* packet) {
 
-	ent_player_t* player = client->entity;
+	ent_living_entity_t* player = ent_player_get_living_entity(ltg_client_get_entity(client));
 
 	const float64_t x = pck_read_float64(packet);
 	const float64_t y = pck_read_float64(packet);
@@ -524,11 +525,11 @@ bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* pac
 
 	const bool on_ground = pck_read_int8(packet);
 
-	const float64_t d_x = x - player->living_entity.entity.position.x;
-	const float64_t d_y = y - player->living_entity.entity.position.y;
-	const float64_t d_z = z - player->living_entity.entity.position.z;
+	const float64_t d_x = x - ent_get_x(ent_living_entity_get_entity(player));
+	const float64_t d_y = y - ent_get_y(ent_living_entity_get_entity(player));
+	const float64_t d_z = z - ent_get_z(ent_living_entity_get_entity(player));
 
-	job_add(job_new(job_living_entity_move_look, (job_payload_t) { .living_entity_move_look = { .entity = &player->living_entity, .initial_chunk = player->living_entity.entity.chunk, .d_x = d_x, .d_y = d_y, .d_z = d_z, .yaw = yaw, .pitch = pitch, .on_ground = on_ground } }));
+	ent_living_entity_move_look(player, d_x, d_y, d_z, yaw, pitch, on_ground);
 
 	/*if (old_chunk != player->living_entity.entity.chunk) {
 
@@ -543,14 +544,14 @@ bool phd_handle_player_position_and_look(ltg_client_t* client, pck_packet_t* pac
 
 bool phd_handle_player_rotation(ltg_client_t* client, pck_packet_t* packet) {
 
-	ent_player_t* player = client->entity;
+	ent_living_entity_t* player = ent_player_get_living_entity(ltg_client_get_entity(client));
 
 	const float32_t yaw = pck_read_float32(packet);
 	const float32_t pitch = pck_read_float32(packet);
 
 	const bool on_ground = pck_read_int8(packet);
 
-	job_add(job_new(job_living_entity_look, (job_payload_t) { .living_entity_look = { .entity = &player->living_entity, .yaw = yaw, .pitch = pitch, .on_ground = on_ground } }));
+	ent_living_entity_look(player, yaw, pitch, on_ground);
 
 	return true;
 
@@ -558,11 +559,11 @@ bool phd_handle_player_rotation(ltg_client_t* client, pck_packet_t* packet) {
 
 bool phd_handle_player_movement(ltg_client_t* client, pck_packet_t* packet) {
 
-	ent_player_t* player = client->entity;
+	ent_entity_t* player = ent_player_get_entity(ltg_client_get_entity(client));
 
 	const bool on_ground = pck_read_int8(packet);
 
-	ent_on_ground(&player->living_entity.entity, on_ground);
+	ent_set_on_ground(player, on_ground);
 
 	return true;
 
@@ -574,15 +575,14 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 	const pck_position_t position =  pck_read_position(packet);
 	__attribute__((unused)) const wld_face_t face = pck_read_int8(packet);
 
-	ent_player_t* player = client->entity;
-	wld_chunk_t* chunk = player->living_entity.entity.chunk;
+	ent_player_t* player = ltg_client_get_entity(client);
+	wld_chunk_t* chunk = ent_get_chunk(ent_player_get_entity(player));
 
-	with_lock (&player->living_entity.entity.lock){
-		switch (status) {
-			case 0: { // start digging
-				if (!player->digging_block) {
-					player->digging_block = true;
-					player->digging = sch_schedule(
+	switch (status) {
+		case 0: { // start digging
+			if (!ent_player_is_digging_block(player)) {
+				ent_player_start_digging_block(player,
+					sch_schedule(
 						job_new(
 							job_dig_block,
 							(job_payload_t) {
@@ -598,36 +598,33 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 							player,
 							wld_get_block_type_at(chunk, position.x, position.y, position.z)
 						)
-					);
-				} else {
-					pthread_mutex_unlock(&player->living_entity.entity.lock);
-					return false;
-				}
-			} break;
-			case 1: { // cancel digging
-				if (player->digging_block) {
-					sch_cancel(player->digging);
+					)
+				);
+			} else {
+				return false;
+			}
+		} break;
+		case 1: { // cancel digging
+			if (ent_player_is_digging_block(player)) {
+				ent_player_cancel_digging_block(player);
+			}
+		} break;
+		case 2: { // finished digging
+			// not really much to do, it's the server that determines when this is done
+			// (unless were not digging then we gotta send that it was bad to resynchronize client)
+		} break;
+		case 3: { // drop item stack
 
-					player->digging_block = false;
-				}
-			} break;
-			case 2: { // finished digging
-				// not really much to do, it's the server that determines when this is done
-				// (unless were not digging then we gotta send that it was bad to resynchronize client)
-			} break;
-			case 3: { // drop item stack
+		} break;
+		case 4: { // drop item
 
-			} break;
-			case 4: { // drop item
+		} break;
+		case 5: { // shoot arrow / finish eating
 
-			} break;
-			case 5: { // shoot arrow / finish eating
+		} break;
+		case 6: { // swap item in hands
 
-			} break;
-			case 6: { // swap item in hands
-
-			} break;
-		}
+		} break;
 	}
 
 	return true;
@@ -636,11 +633,11 @@ bool phd_handle_player_digging(ltg_client_t* client, pck_packet_t* packet) {
 
 bool phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 
-	ent_player_t* player = client->entity;
+	ent_entity_t* player = ent_player_get_entity(ltg_client_get_entity(client));
 
 	// at this point, i have no idea what the client is doing
 	// it should send its own entity id
-	if (player->living_entity.entity.id != (uint32_t) pck_read_var_int(packet)) {
+	if (ent_get_id(player) != (uint32_t) pck_read_var_int(packet)) {
 		return false;
 	}
 
@@ -649,19 +646,19 @@ bool phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 
 	switch (action) {
 		case 0: { // start sneaking
-			player->living_entity.entity.crouching = true;
+			ent_set_crouching(player, true);
 		} break;
 		case 1: { // stop sneaking
-			player->living_entity.entity.crouching = false;
+			ent_set_crouching(player, false);
 		} break;
 		case 2: { // leave bed
 		
 		} break;
 		case 3: { // start sprinting
-			player->living_entity.entity.sprinting = true;
+			ent_set_sprinting(player, true);
 		} break;
 		case 4: { // stop sprinting
-			player->living_entity.entity.sprinting = false;
+			ent_set_sprinting(player, false);
 		} break;
 		case 5: { // start jump with horse
 		
@@ -673,7 +670,7 @@ bool phd_handle_entity_action(ltg_client_t* client, pck_packet_t* packet) {
 		
 		} break;
 		case 8: { // start flying with elytra
-			player->living_entity.entity.flying_with_elytra = true;
+			ent_set_flying_with_elytra(player, true);
 		} break;
 	}
 
@@ -685,9 +682,9 @@ bool phd_handle_held_item_change(ltg_client_t* client, pck_packet_t* packet) {
 
 	uint16_t slot = pck_read_int16(packet);
 	
-	ent_player_t* player = client->entity;
+	ent_player_t* player = ltg_client_get_entity(client);
 
-	player->held_item = slot;
+	ent_player_set_held_item(player, slot);
 
 	return true;
 

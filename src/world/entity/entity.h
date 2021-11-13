@@ -1,140 +1,13 @@
 #pragma once
 #include <pthread.h>
+#include "entity_d.h"
 #include "../../main.h"
 #include "../../io/chat/chat.h"
 #include "../../util/lock_util.h"
+#include "../../jobs/board.h"
 #include "../positions.h"
 
-typedef enum {
-
-	ent_standing,
-	ent_fall_flying,
-	ent_sleeping,
-	ent_spin_attack,
-	ent_sneaking,
-	ent_dying
-
-} ent_pose_t;
-
-typedef enum {
-
-	ent_area_effect_cloud,
-	ent_armor_stand,
-	ent_arrow,
-	ent_axolotl,
-	ent_bat,
-	ent_bee,
-	ent_blaze,
-	ent_boat,
-	ent_cat,
-	ent_cave_spider,
-	ent_chicken,
-	ent_cod,
-	ent_cow,
-	ent_creeper,
-	ent_dolphin,
-	ent_donkey,
-	ent_dragon_fireball,
-	ent_drowned,
-	ent_elder_guardian,
-	ent_end_crystal,
-	ent_ender_dragon,
-	ent_enderman,
-	ent_endermite,
-	ent_evoker,
-	ent_evoker_fangs,
-	ent_experience_orb,
-	ent_eye_of_ender,
-	ent_falling_block,
-	ent_firework_rocket,
-	ent_fox,
-	ent_ghast,
-	ent_giant,
-	ent_glow_item_frame,
-	ent_glow_squid,
-	ent_goat,
-	ent_guardian,
-	ent_hoglin,
-	ent_horse,
-	ent_husk,
-	ent_illusioner,
-	ent_iron_golem,
-	ent_item,
-	ent_item_frame,
-	ent_fireball,
-	ent_leash_knot,
-	ent_lightning_bolt,
-	ent_llama,
-	ent_llama_spit,
-	ent_magma_cube,
-	ent_marker,
-	ent_minecart,
-	ent_minecart_chest,
-	ent_minecart_command_block,
-	ent_minecart_furnace,
-	ent_minecart_hopper,
-	ent_minecart_spawner,
-	ent_minecart_tnt,
-	ent_mule,
-	ent_mooshroom,
-	ent_ocelot,
-	ent_painting,
-	ent_panda,
-	ent_parrot,
-	ent_phantom,
-	ent_pig,
-	ent_piglin,
-	ent_piglin_brute,
-	ent_pillager,
-	ent_polar_bear,
-	ent_tnt,
-	ent_pufferfish,
-	ent_rabbit,
-	ent_ravager,
-	ent_salmon,
-	ent_sheep,
-	ent_shulker,
-	ent_shulker_bullet,
-	ent_silverfish,
-	ent_skeleton,
-	ent_skeleton_horse,
-	ent_slime,
-	ent_small_fireball,
-	ent_snow_golem,
-	ent_snowball,
-	ent_spectral_arrow,
-	ent_spider,
-	ent_squid,
-	ent_stray,
-	ent_strider,
-	ent_thrown_egg,
-	ent_thrown_ender_pearl,
-	ent_thrown_experience_bottle,
-	ent_thrown_potion,
-	ent_thrown_trident,
-	ent_trader_llama,
-	ent_tropical_fish,
-	ent_turtle,
-	ent_vex,
-	ent_villager,
-	ent_vindicator,
-	ent_wandering_trader,
-	ent_witch,
-	ent_wither,
-	ent_wither_skeleton,
-	ent_wither_skull,
-	ent_wolf,
-	ent_zoglin,
-	ent_zombie,
-	ent_zombie_horse,
-	ent_zombie_villager,
-	ent_zombified_piglin,
-	ent_player,
-	ent_fishing_hook
-
-} ent_type_t;
-
-typedef struct {
+struct ent_entity {
 
 	wld_position_t position;
 	wld_chunk_t* _Atomic chunk;
@@ -163,10 +36,47 @@ typedef struct {
 	bool on_ground : 1;
 	uint8_t powder_snow_ticks;
 
-} ent_entity_t;
+};
 
 extern uint32_t ent_register_entity(ent_entity_t* entity);
 extern ent_entity_t* ent_get_entity_by_id(uint32_t id);
+
+static inline uint32_t ent_get_id(ent_entity_t* entity) {
+	return entity->id;
+}
+
+static inline ent_type_t ent_get_type(ent_entity_t* entity) {
+	return entity->type;
+}
+
+static inline float64_t ent_get_x(ent_entity_t* entity) {
+	return entity->position.x;
+}
+
+static inline float64_t ent_get_y(ent_entity_t* entity) {
+	return entity->position.y;
+}
+
+static inline float64_t ent_get_z(ent_entity_t* entity) {
+	return entity->position.z;
+}
+
+static inline wld_chunk_t* ent_get_chunk(ent_entity_t* entity) {
+	return entity->chunk;
+}
+
+static inline void ent_set_crouching(ent_entity_t* entity, bool crouching) {
+	// TODO maybe lock
+	entity->crouching = crouching;
+}
+
+static inline void ent_set_sprinting(ent_entity_t* entity, bool sprinting) {
+	entity->sprinting = sprinting;
+}
+
+static inline void ent_set_flying_with_elytra(ent_entity_t* entity, bool flying_with_elytra) {
+	entity->flying_with_elytra = flying_with_elytra;
+}
 
 static inline void ent_remove_chunk(ent_entity_t* entity) {
 
@@ -179,14 +89,20 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 
 }
 
+static inline void ent_move(ent_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z, bool on_ground) {
+	job_add(job_new(job_entity_move, (job_payload_t) { .entity_move = { .entity = entity, .initial_chunk = ent_get_chunk(entity), .d_x = d_x, .d_y = d_y, .d_z = d_z, .on_ground = on_ground } }));
+}
+
 extern void ent_destroy_entity(uint32_t client_id, void* entity);
 extern void ent_send_entity(uint32_t client_id, void* entity);
 
 extern void ent_set_chunk(ent_entity_t* entity);
 
-static inline void ent_on_ground(ent_entity_t* entity, bool on_ground) {
+static inline void ent_set_on_ground(ent_entity_t* entity, bool on_ground) {
 	
-	entity->on_ground = on_ground;
+	with_lock (&entity->lock) {
+		entity->on_ground = on_ground;
+	}
 
 }
 

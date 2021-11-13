@@ -4,6 +4,7 @@
 #include "../io/chat/translation.h"
 #include "../io/logger/logger.h"
 #include "../motor.h"
+#include "../world/entity/living/player/player.h"
 
 bool job_handle_keep_alive(job_payload_t* payload) {
 
@@ -76,7 +77,7 @@ bool job_handle_player_join(job_payload_t* payload) {
 
 	ent_entity_t* entity = (ent_entity_t*) payload->client->entity;
 
-	wld_chunk_subscribers_foreach(entity->chunk, ent_send_entity, entity);
+	wld_chunk_subscribers_foreach(ent_get_chunk(entity), ent_send_entity, entity);
 
 	return true;
 
@@ -164,15 +165,12 @@ bool job_handle_unload_region(job_payload_t* payload) {
 
 bool job_handle_dig_block(job_payload_t* payload) {
 
-	ent_player_t* player = payload->dig_block.client->entity;
+	ent_player_t* player = ltg_client_get_entity(payload->dig_block.client);
 
-	with_lock (&player->living_entity.entity.lock) {
-		if (player->digging_block) {
-			player->digging_block = false;
-		} else {
-			pthread_mutex_unlock(&player->living_entity.entity.lock);
-			return false;
-		}
+	if (ent_player_is_digging_block(player)) {
+		ent_player_stop_digging_block(player);
+	} else {
+		return false;
 	}
 
 	// break block
@@ -189,7 +187,7 @@ void job_update_entity_move(uint32_t client_id, void* args) {
 	
 	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
-	if ((ent_entity_t*) ltg_get_entity(client) == entity) {
+	if ((ent_entity_t*) ltg_client_get_entity(client) == entity) {
 		if (entity->chunk != payload->entity_move.initial_chunk) {
 			phd_update_sent_chunks_move(payload->entity_move.initial_chunk, client);
 		}
@@ -233,7 +231,7 @@ void job_update_entity_teleport(uint32_t client_id, void* args) {
 	
 	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
-	if ((ent_entity_t*) ltg_get_entity(client) == entity) {
+	if ((ent_entity_t*) ltg_client_get_entity(client) == entity) {
 		if (entity->chunk != payload->entity_teleport.initial_chunk) {
 			// TODO phd_update_sent_chunks_teleport(client);
 		}
@@ -277,7 +275,7 @@ void job_update_living_entity_look(uint32_t client_id, void* args) {
 	
 	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
-	if ((ent_living_entity_t*) ltg_get_entity(client) == entity) {
+	if ((ent_living_entity_t*) ltg_client_get_entity(client) == entity) {
 		// Do nothing
 	} else {
 		phd_send_entity_rotation(client, entity);
@@ -309,7 +307,7 @@ void job_update_living_entity_move_look(uint32_t client_id, void* args) {
 
 	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
-	if ((ent_living_entity_t*) ltg_get_entity(client) == entity) {
+	if ((ent_living_entity_t*) ltg_client_get_entity(client) == entity) {
 		if (entity->entity.chunk != payload->entity_move.initial_chunk) {
 			phd_update_sent_chunks_move(payload->entity_move.initial_chunk, client);
 		}
@@ -354,7 +352,7 @@ void job_update_living_entity_teleport_look(uint32_t client_id, void* args) {
 	
 	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 	
-	if ((ent_living_entity_t*) ltg_get_entity(client) == entity) {
+	if ((ent_living_entity_t*) ltg_client_get_entity(client) == entity) {
 		if (entity->entity.chunk != payload->entity_teleport.initial_chunk) {
 			// TODO phd_update_sent_chunks_teleport(client);
 		}

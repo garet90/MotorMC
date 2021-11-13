@@ -4,6 +4,7 @@
 #include "../main.h"
 #include "../util/list.h"
 #include "../listening/listening.h"
+#include "../world/world.h"
 
 typedef struct {
 

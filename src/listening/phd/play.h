@@ -1,6 +1,8 @@
 #pragma once
 #include "../../main.h"
 #include "../../io/packet/packet.h"
+#include "../../world/world.h"
+#include "../../world/entity/living/player/player.h"
 #include "../listening.h"
 
 extern bool phd_play(ltg_client_t*, pck_packet_t*);
@@ -173,8 +175,8 @@ extern void phd_send_declare_recipes(ltg_client_t* client);
 extern void phd_send_tags(ltg_client_t* client);
 
 static inline void phd_update_send_entity(ltg_client_t* client, ent_entity_t* entity) {
-	if (entity != (ent_entity_t*) client->entity) {
-		switch (entity->type) {
+	if (entity != ent_player_get_entity(ltg_client_get_entity(client))) {
+		switch (ent_get_type(entity)) {
 			case ent_player: {
 				phd_send_spawn_player(client, (ent_player_t*) entity);
 				phd_send_entity_head_look(client, (ent_living_entity_t*) entity);

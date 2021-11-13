@@ -4,10 +4,11 @@
 #include "../util/id_vector.h"
 #include "../util/dll.h"
 #include "../util/util.h"
+#include "../util/lock_util.h"
 #include "../io/packet/packet.h"
 #include "../crypt/rsa.h"
 #include "../crypt/cfb8.h"
-#include "../world/entity/living/player/player.h"
+#include "../world/entity/entity_d.h"
 #include "socket/socket.h"
 
 typedef enum {
@@ -312,35 +313,35 @@ static inline void ltg_uuid_to_string(ltg_uuid_t uuid, char* out) {
 
 // API
 
-static inline string_t ltg_get_username(const ltg_client_t* client) {
+static inline string_t ltg_client_get_username(const ltg_client_t* client) {
 	return client->username;
 }
 
-static inline const byte_t* ltg_get_uuid(const ltg_client_t* client) {
+static inline const byte_t* ltg_client_get_uuid(const ltg_client_t* client) {
 	return client->uuid;
 }
 
-static inline uint16_t ltg_get_protocol(const ltg_client_t* client) {
+static inline uint16_t ltg_client_get_protocol(const ltg_client_t* client) {
 	return client->protocol;
 }
 
-static inline uint8_t ltg_get_render_distance(const ltg_client_t* client) {
+static inline uint8_t ltg_client_get_render_distance(const ltg_client_t* client) {
 	return client->render_distance;
 }
 
-static inline int64_t ltg_get_ping(const ltg_client_t* client) {
+static inline int64_t ltg_client_get_ping(const ltg_client_t* client) {
 	return client->ping;
 }
 
-static inline string_t ltg_get_textures(const ltg_client_t* client) {
+static inline string_t ltg_client_get_textures(const ltg_client_t* client) {
 	return client->textures.value;
 }
 
-static inline ltg_locale_t ltg_get_locale(const ltg_client_t* client) {
+static inline ltg_locale_t ltg_client_get_locale(const ltg_client_t* client) {
 	return client->locale;
 }
 
-static inline ent_player_t* ltg_get_entity(const ltg_client_t* client) {
+static inline ent_player_t* ltg_client_get_entity(const ltg_client_t* client) {
 	return client->entity;
 }
 
@@ -360,15 +361,15 @@ static inline uint32_t ltg_get_client_count(ltg_listener_t* listener) {
 
 }
 
-static inline pthread_t ltg_get_client_thread(const ltg_client_t* client) {
+static inline pthread_t ltg_client_get_thread(const ltg_client_t* client) {
 	return client->thread;
 }
 
-static inline ltg_client_state_t ltg_get_client_state(const ltg_client_t* client) {
+static inline ltg_client_state_t ltg_client_get_state(const ltg_client_t* client) {
 	return client->state;
 }
 
-static inline bool ltg_is_client_encryption_enabled(const ltg_client_t* client) {
+static inline bool ltg_client_is_encryption_enabled(const ltg_client_t* client) {
 	return client->encryption.enabled;
 }
 

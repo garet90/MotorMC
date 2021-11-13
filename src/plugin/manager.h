@@ -129,14 +129,14 @@ static const plg_interface_t plg_interface = {
 	},
 
 	.player = {
-		.get_username = ltg_get_username,
-		.get_uuid = ltg_get_uuid,
-		.get_protocol = ltg_get_protocol,
-		.get_render_distance = ltg_get_render_distance,
-		.get_ping = ltg_get_ping,
-		.get_textures = ltg_get_textures,
-		.get_locale = ltg_get_locale,
-		.get_entity = ltg_get_entity
+		.get_username = ltg_client_get_username,
+		.get_uuid = ltg_client_get_uuid,
+		.get_protocol = ltg_client_get_protocol,
+		.get_render_distance = ltg_client_get_render_distance,
+		.get_ping = ltg_client_get_ping,
+		.get_textures = ltg_client_get_textures,
+		.get_locale = ltg_client_get_locale,
+		.get_entity = ltg_client_get_entity
 	},
 
 	.chat = {

@@ -107,10 +107,10 @@ void sky_handle_signal_crash(int signal) {
 
 		for (size_t i = 0; i < ltg_get_client_count(sky_get_listener()); ++i) {
 			ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), i);
-			if (client != NULL && pthread_self() == ltg_get_client_thread(client)) {
+			if (client != NULL && pthread_self() == ltg_client_get_thread(client)) {
 				log_error("\t\tCLIENT #%lld", i);
-				log_error("\tCLIENT STATE %u", ltg_get_client_state(client));
-				log_error("\tENCRYPTION ENABLED %d", ltg_is_client_encryption_enabled(client));
+				log_error("\tCLIENT STATE %u", ltg_client_get_state(client));
+				log_error("\tENCRYPTION ENABLED %d", ltg_client_is_encryption_enabled(client));
 				goto identified;
 			}
 		}

@@ -5,7 +5,7 @@
 #include "../io/logger/logger.h"
 #include "../motor.h"
 #include "../jobs/scheduler/scheduler.h"
-#include "entity/entity.h"
+#include "entity/living/player/player.h"
 #include <stdlib.h>
 
 // worlds global vector
@@ -288,10 +288,10 @@ void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
 
 void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 	
-	const ent_player_t* player = ltg_get_entity(ltg_get_client_by_id(sky_get_listener(), client_id));
+	ent_player_t* player = ltg_client_get_entity(ltg_get_client_by_id(sky_get_listener(), client_id));
 	const int32_t c_x = wld_get_chunk_x(chunk);
 	const int32_t c_z = wld_get_chunk_z(chunk);
-	const wld_chunk_t* player_chunk = player->living_entity.entity.chunk;
+	const wld_chunk_t* player_chunk = ent_get_chunk(ent_player_get_entity(player));
 	const int32_t p_x = wld_get_chunk_x(player_chunk);
 	const int32_t p_z = wld_get_chunk_z(player_chunk);
 
