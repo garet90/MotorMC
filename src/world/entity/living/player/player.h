@@ -41,7 +41,22 @@ struct ent_player {
 
 };
 
-static inline ent_living_entity_t* ent_player_get_living_entity(ent_player_t* player) {
+static inline ent_player_t* ent_alloc_player(const byte_t* uuid, wld_world_t* world, float64_t x, float64_t y, float64_t z) {
+	
+	ent_player_t* player = calloc(1, sizeof(ent_player_t));
+	ent_type_t type = ent_player;
+	memcpy((ent_type_t*) &player->living_entity.entity.type, &type, sizeof(type));
+	player->uuid = uuid;
+	player->living_entity.entity.position.world = world;
+	player->living_entity.entity.position.x = x;
+	player->living_entity.entity.position.y = y;
+	player->living_entity.entity.position.z = z;
+
+	return player;
+
+}
+
+static inline ent_living_entity_t* ent_player_get_le(ent_player_t* player) {
 	return &player->living_entity;
 }
 
@@ -156,6 +171,48 @@ static inline void ent_player_set_main_hand(ent_player_t* player, byte_t main_ha
 static inline void ent_player_set_held_item(ent_player_t* player, uint16_t held_item) {
 
 	player->held_item = held_item;
+
+}
+
+static inline uint8_t ent_player_get_held_item(ent_player_t* player) {
+	return player->held_item;
+}
+
+static inline const byte_t* ent_player_get_uuid(ent_player_t* player) {
+	return player->uuid;
+}
+
+static inline void ent_player_serialize_inventory(ent_player_t* player, pck_packet_t* packet) {
+	
+	with_lock (&player->living_entity.entity.lock) {
+		// crafting slots
+		pck_write_int8(packet, false);
+		pck_write_int8(packet, false);
+		pck_write_int8(packet, false);
+		pck_write_int8(packet, false);
+		pck_write_int8(packet, false);
+
+		// armor
+		for (uint8_t i = 0; i < 4; ++i) {
+			itm_serialize(packet, &player->living_entity.armor[i]);
+		}
+
+		// inventory
+		for (uint8_t i = 0; i < 27; ++i) {
+			itm_serialize(packet, &player->inventory[i]);
+		}
+
+		// hotbar
+		for (uint8_t i = 0; i < 9; ++i) {
+			itm_serialize(packet, &player->hotbar[i]);
+		}
+
+		// offhand
+		itm_serialize(packet, &player->living_entity.off_hand);
+
+		// carried
+		itm_serialize(packet, &player->carried);
+	}
 
 }
 

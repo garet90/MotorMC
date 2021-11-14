@@ -1,41 +1,24 @@
 #pragma once
 #include <pthread.h>
+
+#include "motor.d.h"
+
 #include "main.h"
 #include "listening/listening.h"
 #include "io/commands/commands.h"
 
 // Workers do all the dirty work, all the things on the job board and the scheduler, but are not guaranteed any time to happen
-typedef struct {
+struct sky_worker {
 
 	pthread_t thread;
 	uint16_t id;
 
-} sky_worker_t;
-
-/*
-	Starting = before done message
-	Running  = after done message, before stop command
-	Stopping = after stop command or failure
-	Stopped  = after the server has been completely stopped
-*/
-typedef enum {
-	sky_starting,
-	sky_running,
-	sky_stopping,
-	sky_stopped
-} sky_status_t;
-
-typedef enum {
-	sky_peaceful,
-	sky_easy,
-	sky_normal,
-	sky_hard
-} sky_difficulty_t;
+};
 
 /*
 	Where we hold all the big bad information
 */
-typedef struct {
+struct sky_main {
 
 	pthread_t console_thread;
 	pthread_t thread;
@@ -90,7 +73,7 @@ typedef struct {
 	
 	ent_gamemode_t gamemode : 2;
 
-} sky_main_t;
+};
 
 extern sky_main_t sky_main;
 

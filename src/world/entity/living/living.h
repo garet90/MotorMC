@@ -31,11 +31,31 @@ struct ent_living_entity {
 
 };
 
-static inline ent_entity_t* ent_living_entity_get_entity(ent_living_entity_t* living_entity) {
+static inline ent_entity_t* ent_le_get_entity(ent_living_entity_t* living_entity) {
 	return &living_entity->entity;
 }
 
-static inline void ent_living_entity_look(ent_living_entity_t* entity, float32_t yaw, float32_t pitch, bool on_ground) {
+static inline float32_t ent_le_get_yaw(ent_living_entity_t* living_entity) {
+	return living_entity->rotation.yaw;
+}
+
+static inline float32_t ent_le_get_pitch(ent_living_entity_t* living_entity) {
+	return living_entity->rotation.pitch;
+}
+
+static inline itm_item_t ent_le_get_armor(ent_living_entity_t* living_entity, uint8_t idx) {
+	return living_entity->armor[idx];
+}
+
+static inline itm_item_t ent_le_get_off_hand(ent_living_entity_t* living_entity) {
+	return living_entity->off_hand;
+}
+
+static inline itm_item_t ent_le_get_main_hand(ent_living_entity_t* living_entity) {
+	return living_entity->main_hand;
+}
+
+static inline void ent_le_look(ent_living_entity_t* entity, float32_t yaw, float32_t pitch, bool on_ground) {
 	job_add(
 		job_new(
 			job_living_entity_look,
@@ -51,14 +71,14 @@ static inline void ent_living_entity_look(ent_living_entity_t* entity, float32_t
 	);
 }
 
-static inline void ent_living_entity_move_look(ent_living_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z, float32_t yaw, float32_t pitch, bool on_ground) {
+static inline void ent_le_move_look(ent_living_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z, float32_t yaw, float32_t pitch, bool on_ground) {
 	job_add(
 		job_new(
 			job_living_entity_move_look,
 			(job_payload_t) {
 				.living_entity_move_look = {
 					.entity = entity,
-					.initial_chunk = ent_get_chunk(ent_living_entity_get_entity(entity)),
+					.initial_chunk = ent_get_chunk(ent_le_get_entity(entity)),
 					.d_x = d_x,
 					.d_y = d_y,
 					.d_z = d_z,

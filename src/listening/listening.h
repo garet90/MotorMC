@@ -181,6 +181,12 @@ static inline void ltg_uuid_to_string(ltg_uuid_t uuid, char* out) {
 
 // API
 
+// TODO make sure these don't need locking
+
+static inline uint32_t ltg_client_get_id(const ltg_client_t* client) {
+	return client->id;
+}
+
 static inline string_t ltg_client_get_username(const ltg_client_t* client) {
 	return client->username;
 }
@@ -197,6 +203,10 @@ static inline uint8_t ltg_client_get_render_distance(const ltg_client_t* client)
 	return client->render_distance;
 }
 
+static inline void ltg_client_set_render_distance(ltg_client_t* client, uint8_t render_distance) {
+	client->render_distance = render_distance;
+}
+
 static inline int64_t ltg_client_get_ping(const ltg_client_t* client) {
 	return client->ping;
 }
@@ -207,6 +217,14 @@ static inline string_t ltg_client_get_textures(const ltg_client_t* client) {
 
 static inline ltg_locale_t ltg_client_get_locale(const ltg_client_t* client) {
 	return client->locale;
+}
+
+static inline void ltg_client_set_entity(ltg_client_t* client, ent_player_t* player) {
+	client->entity = player;
+}
+
+static inline void ltg_client_set_chat_mode(ltg_client_t* client, uint8_t chat_mode) {
+	client->chat_mode = chat_mode;
 }
 
 static inline ent_player_t* ltg_client_get_entity(const ltg_client_t* client) {
