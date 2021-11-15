@@ -25,14 +25,14 @@ bool phd_handshake(ltg_client_t* client, pck_packet_t* packet) {
 
 bool phd_handle_handshake(ltg_client_t* client, pck_packet_t* packet) {
 
-	client->protocol = pck_read_var_int(packet); // protocol
+	ltg_client_set_protocol(client, pck_read_var_int(packet));
 	PCK_READ_STRING(address, packet); // connecting address
 	pck_read_int16(packet); // port
 
 	// set state to next state
 	int32_t next_state = pck_read_var_int(packet);
 	if (next_state == ltg_login || next_state == ltg_status) {
-		client->state = next_state;
+		ltg_client_set_state(client, next_state);
 		return true;
 	} else {
 		return false;
@@ -62,6 +62,6 @@ void phd_send_legacy_slp(ltg_client_t* client) {
 		pck_write_int8(packet, legacy_slp[i]);
 	}
 
-	sck_send(client->socket, (char*) packet->bytes, packet->cursor);
+	sck_send(ltg_client_get_socket(client), (char*) packet->bytes, packet->cursor);
 
 }

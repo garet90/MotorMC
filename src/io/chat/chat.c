@@ -434,9 +434,9 @@ size_t cht_server_list_ping(char* message) {
 		ltg_client_t* player = ltg_player_iterator_next(sky_get_listener(), &iterator);
 		while (player != NULL) {
 			mjson_val* val = mjson_obj(doc);
-			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, player->username.value, player->username.length));
+			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, UTL_STRTOARG(ltg_client_get_username(player))));
 			char uuid[37];
-			ltg_uuid_to_string(player->uuid, uuid);
+			ltg_uuid_to_string(ltg_client_get_uuid(player), uuid);
 			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("id")), mjson_string(doc, uuid, 36));
 			mjson_arr_append(sample, val);
 			player = ltg_player_iterator_next(sky_get_listener(), &iterator);

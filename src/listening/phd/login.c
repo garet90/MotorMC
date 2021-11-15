@@ -56,16 +56,20 @@ bool phd_login(ltg_client_t* client, pck_packet_t* packet) {
 
 bool phd_handle_login_start(ltg_client_t* client, pck_packet_t* packet) {
 
-	client->username.length = pck_read_var_int(packet);
-	client->username.value = malloc(client->username.length + 1);
-	pck_read_bytes(packet, (byte_t*) client->username.value, client->username.length);
-	client->username.value[client->username.length] = '\0';
+	string_t username = {
+		.length = pck_read_var_int(packet),
+		.value = NULL
+	};
+	username.value = malloc(username.length + 1);
+	username.value[username.length] = '\0';
+	pck_read_bytes(packet, (byte_t*) username.value, username.length);
+	ltg_client_set_username(client, username);
 
-	if (client->protocol != sky_get_protocol()) {
+	if (ltg_client_get_protocol(client) != sky_get_protocol()) {
 
 		cht_translation_t translation = cht_translation_new;
 
-		if (client->protocol < sky_get_protocol()) {
+		if (ltg_client_get_protocol(client) < sky_get_protocol()) {
 			translation.translate = cht_translation_multiplayer_disconnect_outdated_client;
 		} else {
 			translation.translate = cht_translation_multiplayer_disconnect_outdated_server;
@@ -148,7 +152,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 	// decrypt and check verify
 	cry_rsa_decrypt(verify.bytes, verify.bytes, verify.length, ltg_get_rsa_keys(sky_get_listener()));
-	if (verify.key != client->id) {
+	if (verify.key != ltg_client_get_id(client)) {
 
 		return false;
 
@@ -190,7 +194,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 		utl_to_minecraft_hex(server_id, server_id_hash, digest_length);
 
 		char request[98 + (digest_length << 1)];
-		sprintf(request, "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", client->username.value, server_id);
+		sprintf(request, "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", UTL_STRTOCSTR(ltg_client_get_username(client)), server_id);
 		curl_easy_setopt(phd_authRequest.curl, CURLOPT_URL, request);
 
 		// prepare response string
@@ -326,7 +330,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 bool phd_handle_login_plugin_response(ltg_client_t* client, pck_packet_t* packet) {
 
-	if ((uint32_t) pck_read_var_int(packet) != client->id) {
+	if ((uint32_t) pck_read_var_int(packet) != ltg_client_get_id(client)) {
 		return false;
 	}
 
@@ -368,7 +372,7 @@ void phd_send_encryption_request(ltg_client_t* client) {
 
 	// our verify token
 	pck_write_var_int(response, 4);
-	pck_write_int32(response, client->id);
+	pck_write_int32(response, ltg_client_get_id(client));
 
 	ltg_send(client, response);
 
@@ -379,8 +383,8 @@ void phd_send_login_success(ltg_client_t* client) {
 	PCK_INLINE(response, 32, io_big_endian);
 
 	pck_write_var_int(response, 0x02);
-	pck_write_bytes(response, client->uuid, 16);
-	pck_write_string(response, client->username.value, client->username.length);
+	pck_write_bytes(response, ltg_client_get_uuid(client), 16);
+	pck_write_string(response, UTL_STRTOARG(ltg_client_get_username(client)));
 
 	ltg_send(client, response);
 
@@ -405,7 +409,7 @@ void phd_send_login_plugin_request(ltg_client_t* client, const char* identifier,
 	PCK_INLINE(packet, identifier_length + data_length + 20, io_big_endian);
 
 	pck_write_var_int(packet, 0x04);
-	pck_write_var_int(packet, client->id);
+	pck_write_var_int(packet, ltg_client_get_id(client));
 	pck_write_string(packet, identifier, identifier_length);
 
 	pck_write_bytes(packet, data, data_length);
@@ -422,7 +426,7 @@ void phd_update_login_success(ltg_client_t* client) {
 	phd_send_login_success(client);
 
 	// switch to play state and join game
-	client->state = ltg_play;
+	ltg_client_set_state(client, ltg_play);
 	phd_send_join_game(client);
 
 }

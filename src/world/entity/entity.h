@@ -67,6 +67,10 @@ static inline wld_chunk_t* ent_get_chunk(ent_entity_t* entity) {
 	return entity->chunk;
 }
 
+static inline bool ent_is_on_ground(ent_entity_t* entity) {
+	return entity->on_ground;
+}
+
 static inline void ent_set_crouching(ent_entity_t* entity, bool crouching) {
 	// TODO maybe lock
 	entity->crouching = crouching;

@@ -191,12 +191,20 @@ static inline string_t ltg_client_get_username(const ltg_client_t* client) {
 	return client->username;
 }
 
+static inline void ltg_client_set_username(ltg_client_t* client, string_t username) {
+	client->username = username;
+}
+
 static inline const byte_t* ltg_client_get_uuid(const ltg_client_t* client) {
 	return client->uuid;
 }
 
 static inline uint16_t ltg_client_get_protocol(const ltg_client_t* client) {
 	return client->protocol;
+}
+
+static inline void ltg_client_set_protocol(ltg_client_t* client, uint16_t protocol) {
+	client->protocol = protocol;
 }
 
 static inline uint8_t ltg_client_get_render_distance(const ltg_client_t* client) {
@@ -209,6 +217,10 @@ static inline void ltg_client_set_render_distance(ltg_client_t* client, uint8_t 
 
 static inline int64_t ltg_client_get_ping(const ltg_client_t* client) {
 	return client->ping;
+}
+
+static inline void ltg_client_set_ping(ltg_client_t* client, int64_t ping) {
+	client->ping = ping;
 }
 
 static inline string_t ltg_client_get_textures(const ltg_client_t* client) {
@@ -229,6 +241,14 @@ static inline void ltg_client_set_chat_mode(ltg_client_t* client, uint8_t chat_m
 
 static inline ent_player_t* ltg_client_get_entity(const ltg_client_t* client) {
 	return client->entity;
+}
+
+static inline int_least64_t ltg_client_get_last_receive(const ltg_client_t* client) {
+	return client->last_recv;
+}
+
+static inline void ltg_client_set_last_receive(ltg_client_t* client, int_least64_t last_receive) {
+	client->last_recv = last_receive;
 }
 
 static inline pthread_t ltg_get_thread(const ltg_listener_t* listener) {
@@ -255,8 +275,16 @@ static inline ltg_client_state_t ltg_client_get_state(const ltg_client_t* client
 	return client->state;
 }
 
+static inline void ltg_client_set_state(ltg_client_t* client, ltg_client_state_t state) {
+	client->state = state;
+}
+
 static inline bool ltg_client_is_encryption_enabled(const ltg_client_t* client) {
 	return client->encryption.enabled;
+}
+
+static inline int32_t ltg_client_get_socket(const ltg_client_t* client) {
+	return client->socket;
 }
 
 static inline uint32_t ltg_get_online_max(const ltg_listener_t* listener) {

@@ -81,7 +81,7 @@ bool phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 	uint32_t confirm = pck_read_var_int(packet);
 
 	// the player must've not heard us right
-	if (confirm != client->entity->living_entity.entity.id) {
+	if (confirm != ent_get_id(ent_player_get_entity(ltg_client_get_entity(client)))) {
 		phd_send_player_position_and_look(client);
 	}
 
@@ -98,7 +98,7 @@ bool phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 	pck_read_bytes(packet, (byte_t*) message.value, message.length);
 
 	if (message.length > 0 && UTL_STRTOCSTR(message)[0] == '/') {
-		log_info("%s issued server command: %s", UTL_STRTOCSTR(client->username), UTL_STRTOCSTR(message));
+		log_info("%s issued server command: %s", UTL_STRTOCSTR(ltg_client_get_username(client)), UTL_STRTOCSTR(message));
 		const cmd_sender_t sender = {
 			.type = cmd_player,
 			.player = client
@@ -143,7 +143,7 @@ bool phd_handle_click_window(ltg_client_t* client, pck_packet_t* packet) {
 	const int8_t button = pck_read_int8(packet);
 	const int32_t mode = pck_read_var_int(packet);
 
-	ent_player_t* player = client->entity;
+	ent_player_t* player = ltg_client_get_entity(client);
 
 	// TODO use API functions to do this
 	with_lock (&player->living_entity.entity.lock) {
@@ -476,9 +476,9 @@ bool phd_handle_keep_alive(ltg_client_t* client, pck_packet_t* packet) {
 
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
-	client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
+	ltg_client_set_last_receive(client, time.tv_sec * 1000 + time.tv_nsec / 0xF4240);
 
-	client->ping = client->last_recv - out_ms;
+	ltg_client_set_ping(client, ltg_client_get_last_receive(client) - out_ms);
 
 	return true;
 
@@ -821,7 +821,7 @@ void phd_send_server_difficulty(ltg_client_t* client) {
 
 }
 
-void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_len, ltg_uuid_t uuid) {
+void phd_send_chat_message(ltg_client_t* client, const char* message, size_t message_len, const ltg_uuid_t uuid) {
 
 	PCK_INLINE(packet, 23 + message_len, io_big_endian);
 
@@ -1194,7 +1194,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	// set last recieve packet to now
 	struct timespec time;
 	clock_gettime(CLOCK_REALTIME, &time);
-	client->last_recv = time.tv_sec * 1000 + time.tv_nsec / 0xF4240;
+	ltg_client_set_last_receive(client, time.tv_sec * 1000 + time.tv_nsec / 0xF4240);
 
 	client->keep_alive = sch_schedule_repeating(job_new(job_keep_alive, (job_payload_t) { .client = client }), 200, 200);
 
@@ -1287,11 +1287,11 @@ void phd_send_entity_position(ltg_client_t* client, ent_entity_t* entity, float6
 
 	pck_write_var_int(packet, 0x29);
 
-	pck_write_var_int(packet, entity->id);
+	pck_write_var_int(packet, ent_get_id(entity));
 	pck_write_int16(packet, d_x * 4096);
 	pck_write_int16(packet, d_y * 4096);
 	pck_write_int16(packet, d_z * 4096);
-	pck_write_int8(packet, entity->on_ground);
+	pck_write_int8(packet, ent_is_on_ground(entity));
 
 	ltg_send(client, packet);
 
@@ -1303,13 +1303,13 @@ void phd_send_entity_position_and_rotation(ltg_client_t* client, ent_living_enti
 
 	pck_write_var_int(packet, 0x2a);
 
-	pck_write_var_int(packet, entity->entity.id);
+	pck_write_var_int(packet, ent_get_id(ent_le_get_entity(entity)));
 	pck_write_int16(packet, d_x * 4096);
 	pck_write_int16(packet, d_y * 4096);
 	pck_write_int16(packet, d_z * 4096);
-	pck_write_int8(packet, io_angle_to_byte(entity->rotation.yaw));
-	pck_write_int8(packet, io_angle_to_byte(entity->rotation.pitch));
-	pck_write_int8(packet, entity->entity.on_ground);
+	pck_write_int8(packet, io_angle_to_byte(ent_le_get_yaw(entity)));
+	pck_write_int8(packet, io_angle_to_byte(ent_le_get_pitch(entity)));
+	pck_write_int8(packet, ent_is_on_ground(ent_le_get_entity(entity)));
 
 	ltg_send(client, packet);
 
@@ -1321,11 +1321,11 @@ void phd_send_entity_rotation(ltg_client_t* client, ent_living_entity_t* entity)
 
 	pck_write_var_int(packet, 0x2b);
 
-	pck_write_var_int(packet, entity->entity.id);
+	pck_write_var_int(packet, ent_get_id(ent_le_get_entity(entity)));
 
-	pck_write_int8(packet, io_angle_to_byte(entity->rotation.yaw));
-	pck_write_int8(packet, io_angle_to_byte(entity->rotation.pitch));
-	pck_write_int8(packet, entity->entity.on_ground);
+	pck_write_int8(packet, io_angle_to_byte(ent_le_get_yaw(entity)));
+	pck_write_int8(packet, io_angle_to_byte(ent_le_get_pitch(entity)));
+	pck_write_int8(packet, ent_is_on_ground(ent_le_get_entity(entity)));
 
 	ltg_send(client, packet);
 
@@ -1506,7 +1506,7 @@ void phd_send_destroy_entity(ltg_client_t* client, ent_entity_t* entity) {
 	pck_write_var_int(packet, 0x3a);
 	pck_write_var_int(packet, 1);
 
-	pck_write_var_int(packet, entity->id);
+	pck_write_var_int(packet, ent_get_id(entity));
 
 	ltg_send(client, packet);
 
