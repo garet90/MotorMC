@@ -137,7 +137,7 @@ extern void ltg_disconnect(ltg_client_t*);
 
 extern void ltg_term(ltg_listener_t* listener);
 
-static inline void ltg_uuid_to_string(ltg_uuid_t uuid, char* out) {
+static inline void ltg_uuid_to_string(const ltg_uuid_t uuid, char* out) {
 	
 	out[0] = utl_hexmap[uuid[0] >> 4];
 	out[1] = utl_hexmap[uuid[0] & 0xF];
