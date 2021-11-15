@@ -64,6 +64,10 @@ static inline ent_entity_t* ent_player_get_entity(ent_player_t* player) {
 	return &player->living_entity.entity;
 }
 
+static inline ent_gamemode_t ent_player_get_gamemode(const ent_player_t* player) {
+	return player->gamemode;
+}
+
 // player specific functions
 static inline bool ent_player_is_best_tool(const mat_block_t* block, const mat_item_t* item) {
 
@@ -118,7 +122,7 @@ extern uint16_t ent_player_get_break_speed(ent_player_t* player, mat_block_type_
 
 static inline bool ent_player_is_digging_block(ent_player_t* player) {
 
-	bool digging;
+	bool digging = false;
 
 	with_lock (&ent_player_get_entity(player)->lock) {
 		digging = player->digging_block;

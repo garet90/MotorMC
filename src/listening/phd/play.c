@@ -1008,8 +1008,8 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		int64_t motion_blocking[heightmap_size];
 		int64_t world_surface[heightmap_size];
 
-		utl_encode_shorts_to_longs((int16_t*) wld_chunk_get_highest_motion_blocking(chunk), 256, 9, motion_blocking);
-		utl_encode_shorts_to_longs((int16_t*) wld_chunk_get_highest_world_surface(chunk), 256, 9, world_surface);
+		utl_encode_shorts_to_longs(wld_chunk_get_highest_motion_blocking(chunk), 256, 9, motion_blocking);
+		utl_encode_shorts_to_longs(wld_chunk_get_highest_world_surface(chunk), 256, 9, world_surface);
 
 		// create heightmap
 		mnbt_doc* doc = mnbt_new();
@@ -1348,15 +1348,15 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
 	ltg_client_t* player = ltg_player_iterator_next(sky_get_listener(), &iterator);
 	while (player != NULL) {
-		pck_write_bytes(packet, player->uuid, 16);
-		pck_write_string(packet, player->username.value, player->username.length);
-		if (UTL_STRTOCSTR(player->textures.value) != NULL) {
+		pck_write_bytes(packet, ltg_client_get_uuid(player), 16);
+		pck_write_string(packet, UTL_STRTOARG(ltg_client_get_username(player)));
+		if (ltg_client_has_textures(player)) {
 			pck_write_var_int(packet, 1);
 			pck_write_string(packet, UTL_CSTRTOARG("textures"));
-			pck_write_string(packet, UTL_STRTOARG(player->textures.value));
-			if (UTL_STRTOCSTR(player->textures.signature) != NULL) {
+			pck_write_string(packet, UTL_STRTOARG(ltg_client_get_textures(player)));
+			if (ltg_client_has_textures_signature(player)) {
 				pck_write_int8(packet, 1);
-				pck_write_string(packet, UTL_STRTOARG(player->textures.signature));
+				pck_write_string(packet, UTL_STRTOARG(ltg_client_get_textures_signature(player)));
 			} else {
 				pck_write_int8(packet, 0);
 			}
@@ -1364,11 +1364,11 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 			pck_write_var_int(packet, 0);
 		}
 		
-		ent_player_t* player_ent = player->entity;
+		ent_player_t* player_ent = ltg_client_get_entity(player);
 
-		pck_write_var_int(packet, player_ent->gamemode); // game mode
+		pck_write_var_int(packet, ent_player_get_gamemode(player_ent)); // game mode
 		
-		pck_write_var_int(packet, player->ping); // ping
+		pck_write_var_int(packet, ltg_client_get_ping(player)); // ping
 		pck_write_int8(packet, 0); // has display name
 		player = ltg_player_iterator_next(sky_get_listener(), &iterator);
 	}
@@ -1383,28 +1383,28 @@ void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player)
 	pck_write_var_int(packet, 0x36);
 	pck_write_var_int(packet, 0); // action
 	pck_write_var_int(packet, 1); // number of players
-	pck_write_bytes(packet, player->uuid, 16);
-	pck_write_string(packet, player->username.value, player->username.length);
-	if (player->textures.value.value != NULL) {
+	pck_write_bytes(packet, ltg_client_get_uuid(player), 16);
+	pck_write_string(packet, UTL_STRTOARG(ltg_client_get_username(player)));
+	if (ltg_client_has_textures(player)) {
 		pck_write_var_int(packet, 1);
 		pck_write_string(packet, UTL_CSTRTOARG("textures"));
-		pck_write_string(packet, UTL_STRTOARG(player->textures.value));
-		if (player->textures.signature.value != NULL) {
-			pck_write_int8(packet, 1);
-			pck_write_string(packet, UTL_STRTOARG(player->textures.signature));
+		pck_write_string(packet, UTL_STRTOARG(ltg_client_get_textures(player)));
+		if (ltg_client_has_textures_signature(player)) {
+			pck_write_int8(packet, true);
+			pck_write_string(packet, UTL_STRTOARG(ltg_client_get_textures_signature(player)));
 		} else {
-			pck_write_int8(packet, 0);
+			pck_write_int8(packet, false);
 		}
 	} else {
 		pck_write_var_int(packet, 0);
 	}
-	ent_player_t* player_ent = player->entity;
+	ent_player_t* player_ent = ltg_client_get_entity(player);
 
-	pck_write_var_int(packet, player_ent->gamemode); // game mode
+	pck_write_var_int(packet, ent_player_get_gamemode(player_ent)); // game mode
 
-	pck_write_var_int(packet, player->ping); // ping
+	pck_write_var_int(packet, ltg_client_get_ping(player)); // ping
 
-	pck_write_int8(packet, 0); // has display name
+	pck_write_int8(packet, false); // has display name
 
 	ltg_send(client, packet);
 

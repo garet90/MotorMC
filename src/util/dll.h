@@ -22,7 +22,8 @@ typedef struct {
 typedef struct {
 
 	utl_dll_t* dll;
-	uint32_t node;
+	uint32_t next_idx;
+	uint32_t next_node;
 
 } utl_dll_iterator_t;
 
@@ -44,28 +45,21 @@ static inline void utl_init_dll(utl_dll_t* dll) {
 
 }
 
-// TODO make list updatable while iterating through
 static inline utl_dll_iterator_t utl_dll_get_iterator(utl_dll_t* dll) {
 	return (utl_dll_iterator_t) {
 		.dll = dll,
-		.node = 0xFFFFFFFF
+		.next_idx = 0,
+		.next_node = dll->first
 	};
 }
 
 static inline void* utl_dll_iterator_next(utl_dll_iterator_t* iterator) {
 
-	if (iterator->node == iterator->dll->last) return NULL;
+	if (iterator->next_idx >= iterator->dll->length) return NULL;
 
-	if (iterator->node == 0xFFFFFFFF) {
-		if (iterator->dll->length == 0) return NULL;
-		iterator->node = iterator->dll->first;
-	} else {
-		utl_dll_node_t* last_node = utl_id_vector_get(&iterator->dll->nodes, iterator->node);
-		iterator->node = last_node->next;
-	}
-
-	utl_dll_node_t* node = utl_id_vector_get(&iterator->dll->nodes, iterator->node);
-	iterator->node = node->next;
+	utl_dll_node_t* node = utl_id_vector_get(&iterator->dll->nodes, iterator->next_node);
+	iterator->next_idx++;
+	iterator->next_node = node->next;
 
 	return node->element;
 

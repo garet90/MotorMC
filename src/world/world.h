@@ -17,12 +17,12 @@ struct wld_chunk_section {
 
 	// block map
 	_Atomic mat_block_protocol_id_t blocks[16 * 16 * 16];
-	atomic_uint_least16_t entity_idx[16 * 16 * 16];
+	_Atomic uint16_t entity_idx[16 * 16 * 16];
 
 	atomic_uint_fast16_t block_count;
 
 	// biome map
-	atomic_uint_least8_t biome[4 * 4 * 4];
+	_Atomic uint8_t biome[4 * 4 * 4];
 
 };
 
@@ -45,8 +45,8 @@ struct wld_chunk {
 	// highest blocks
 	struct {
 
-		_Atomic uint16_t motion_blocking[16 * 16];
-		_Atomic uint16_t world_surface[16 * 16];
+		_Atomic int16_t motion_blocking[16 * 16];
+		_Atomic int16_t world_surface[16 * 16];
 
 	} highest;
 
@@ -204,7 +204,7 @@ static inline void wld_chunk_remove_entity(wld_chunk_t* chunk, uint32_t entity) 
 
 static inline bool wld_chunk_has_subscriber(wld_chunk_t* chunk, uint32_t client) {
 	
-	bool has_subscriber;
+	bool has_subscriber = false;
 
 	with_lock (&chunk->lock) {
 		has_subscriber = utl_bit_vector_test_bit(&chunk->subscribers, client);

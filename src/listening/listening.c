@@ -379,8 +379,9 @@ void ltg_disconnect(ltg_client_t* client) {
 		} break;
 	}
 
-	sck_close(client->socket);
+	pthread_mutex_lock(&client->lock);
 	pthread_mutex_destroy(&client->lock);
+	sck_close(client->socket);
 
 	// remove from client list
 	with_lock (&client->listener->clients.lock) {

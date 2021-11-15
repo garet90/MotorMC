@@ -9,6 +9,7 @@
 #include "../util/dll.h"
 #include "../util/util.h"
 #include "../util/lock_util.h"
+#include "../util/str_util.h"
 #include "../io/packet/packet.h"
 #include "../crypt/rsa.h"
 #include "../crypt/cfb8.h"
@@ -223,10 +224,6 @@ static inline void ltg_client_set_ping(ltg_client_t* client, int64_t ping) {
 	client->ping = ping;
 }
 
-static inline string_t ltg_client_get_textures(const ltg_client_t* client) {
-	return client->textures.value;
-}
-
 static inline ltg_locale_t ltg_client_get_locale(const ltg_client_t* client) {
 	return client->locale;
 }
@@ -249,6 +246,28 @@ static inline int_least64_t ltg_client_get_last_receive(const ltg_client_t* clie
 
 static inline void ltg_client_set_last_receive(ltg_client_t* client, int_least64_t last_receive) {
 	client->last_recv = last_receive;
+}
+
+static inline string_t ltg_client_get_textures(const ltg_client_t* client) {
+	return client->textures.value;
+}
+
+static inline bool ltg_client_has_textures(const ltg_client_t* client) {
+	if (UTL_STRTOCSTR(ltg_client_get_textures(client)) != NULL) {
+		return true;
+	}
+	return false;
+}
+
+static inline string_t ltg_client_get_textures_signature(const ltg_client_t* client) {
+	return client->textures.signature;
+}
+
+static inline bool ltg_client_has_textures_signature(const ltg_client_t* client) {
+	if (UTL_STRTOCSTR(ltg_client_get_textures_signature(client)) != NULL) {
+		return true;
+	}
+	return false;
 }
 
 static inline pthread_t ltg_get_thread(const ltg_listener_t* listener) {
