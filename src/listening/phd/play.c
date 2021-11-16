@@ -1333,7 +1333,7 @@ void phd_send_entity_rotation(ltg_client_t* client, ent_living_entity_t* entity)
 
 void phd_send_player_info_add_players(ltg_client_t* client) {
 
-	const uint32_t online_count = ltg_get_online_count(sky_get_listener());
+	uint32_t online_count = ltg_get_online_count(sky_get_listener());
 
 	if (online_count == 0) {
 		return;
@@ -1372,6 +1372,8 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 			
 			pck_write_var_int(packet, ltg_client_get_ping(player)); // ping
 			pck_write_int8(packet, 0); // has display name
+
+			if (--online_count == 0) break;
 		}
 	}
 
@@ -1429,9 +1431,11 @@ void phd_send_player_info_update_latency(ltg_client_t* client) {
 	const uint32_t online_length = ltg_get_online_length(sky_get_listener());
 	for (uint32_t i = 0; i < online_length; ++i) {
 		ltg_client_t* player = ltg_get_online_client(sky_get_listener(), i);
-		if (player != NULL && online_count-- != 0) {
+		if (player != NULL) {
 			pck_write_bytes(packet, ltg_client_get_uuid(player), 16);
 			pck_write_var_int(packet, ltg_client_get_ping(player));
+
+			if (--online_count == 0) break;
 		}
 	}
 
