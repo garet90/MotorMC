@@ -194,14 +194,12 @@ static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t*
 	wld_subscribe_chunk(chunk, client->id);
 
 	// send chunk entities
-	utl_dll_iterator_t iterator = wld_chunk_get_entity_iterator(chunk);
-	ent_entity_t* entity = wld_chunk_entity_iterator_next(chunk, &iterator);
-	while (entity != NULL) {
-
-		phd_update_send_entity(client, entity);
-
-		entity = wld_chunk_entity_iterator_next(chunk, &iterator);
-
+	uint32_t entity_length = wld_chunk_get_entity_length(chunk);
+	for (uint32_t i = 0; i < entity_length; ++i) {
+		ent_entity_t* entity = wld_chunk_get_entity(chunk, i);
+		if (entity != NULL) {
+			phd_update_send_entity(client, entity);
+		}
 	}
 }
 

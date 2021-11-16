@@ -430,16 +430,17 @@ size_t cht_server_list_ping(char* message) {
 	
 	if (online_count > 0) {
 		mjson_val* sample = mjson_arr(doc);
-		utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
-		ltg_client_t* player = ltg_player_iterator_next(sky_get_listener(), &iterator);
-		while (player != NULL) {
-			mjson_val* val = mjson_obj(doc);
-			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, UTL_STRTOARG(ltg_client_get_username(player))));
-			char uuid[37];
-			ltg_uuid_to_string(ltg_client_get_uuid(player), uuid);
-			mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("id")), mjson_string(doc, uuid, 36));
-			mjson_arr_append(sample, val);
-			player = ltg_player_iterator_next(sky_get_listener(), &iterator);
+		const uint32_t online_length = ltg_get_online_length(sky_get_listener());
+		for (uint32_t i = 0; i < online_length; ++i) {
+			ltg_client_t* player = ltg_get_online_client(sky_get_listener(), i);
+			if (player != NULL) {
+				mjson_val* val = mjson_obj(doc);
+				mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("name")), mjson_string(doc, UTL_STRTOARG(ltg_client_get_username(player))));
+				char uuid[37];
+				ltg_uuid_to_string(ltg_client_get_uuid(player), uuid);
+				mjson_obj_add(val, mjson_string(doc, UTL_CSTRTOARG("id")), mjson_string(doc, uuid, 36));
+				mjson_arr_append(sample, val);
+			}
 		}
 		mjson_obj_add(players, mjson_string(doc, UTL_CSTRTOARG("sample")), sample);
 	}

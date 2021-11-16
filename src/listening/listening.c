@@ -355,7 +355,7 @@ void ltg_disconnect(ltg_client_t* client) {
 
 			// remove from online player list
 			with_lock (&client->listener->online.lock) {
-				utl_dll_remove(&client->listener->online.list, client->online_node);
+				utl_id_vector_remove(&client->listener->online.vector, client->online_node);
 			}
 
 			// create player leave job

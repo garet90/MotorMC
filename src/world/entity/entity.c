@@ -102,7 +102,7 @@ void ent_set_chunk(ent_entity_t* entity) {
 
 	assert(chunk != NULL);
 
-	entity->chunk_node = utl_dll_push(&chunk->entities, entity);
+	entity->chunk_node = wld_chunk_add_entity(chunk, entity);
 	entity->chunk = chunk;
 
 }

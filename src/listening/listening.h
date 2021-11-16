@@ -6,7 +6,6 @@
 
 #include "../main.h"
 #include "../util/id_vector.h"
-#include "../util/dll.h"
 #include "../util/util.h"
 #include "../util/lock_util.h"
 #include "../util/str_util.h"
@@ -35,8 +34,8 @@ struct ltg_listener {
 	
 	struct {
 		pthread_mutex_t lock;
-		utl_dll_t list;
-		atomic_uint_least32_t max;
+		utl_id_vector_t vector;
+		_Atomic uint32_t max;
 	} online;
 
 	cry_rsa_keypair_t keypair;
@@ -279,7 +278,7 @@ static inline uint32_t ltg_get_client_count(ltg_listener_t* listener) {
 	uint32_t size = 0;
 	
 	with_lock (&listener->clients.lock) {
-		size = utl_id_vector_size(&listener->clients.vector);
+		size = utl_id_vector_count(&listener->clients.vector);
 	}
 
 	return size;
@@ -313,7 +312,7 @@ static inline uint32_t ltg_get_online_max(const ltg_listener_t* listener) {
 static inline void ltg_add_online(ltg_listener_t* listener, ltg_client_t* client) {
 	
 	with_lock (&listener->online.lock) {
-		client->online_node = utl_dll_push(&listener->online.list, client);
+		client->online_node = utl_id_vector_push(&listener->online.vector, &client);
 	}
 
 }
@@ -323,25 +322,31 @@ static inline uint32_t ltg_get_online_count(ltg_listener_t* listener) {
 	uint32_t count = 0;
 
 	with_lock (&listener->online.lock) {
-		count = utl_dll_length(&listener->online.list);
+		count = utl_id_vector_count(&listener->online.vector);
 	}
 
 	return count;
 	
 }
 
-static inline utl_dll_iterator_t ltg_get_player_iterator(ltg_listener_t* listener) {
+static inline uint32_t ltg_get_online_length(ltg_listener_t* listener) {
 
-	return utl_dll_get_iterator(&listener->online.list);
-	
+	uint32_t length = 0;
+
+	with_lock (&listener->online.lock) {
+		length = utl_id_vector_length(&listener->online.vector);
+	}
+
+	return length;
+
 }
 
-static inline ltg_client_t* ltg_player_iterator_next(ltg_listener_t* listener, utl_dll_iterator_t* iterator) {
-
+static inline ltg_client_t* ltg_get_online_client(ltg_listener_t* listener, uint32_t idx) {
+	
 	ltg_client_t* client = NULL;
 
 	with_lock (&listener->online.lock) {
-		client = utl_dll_iterator_next(iterator);
+		client = UTL_ID_VECTOR_GET_AS(ltg_client_t*, &listener->online.vector, idx);
 	}
 
 	return client;

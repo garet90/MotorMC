@@ -82,6 +82,8 @@ static inline void* utl_vector_get(const utl_vector_t* vector, uint32_t idx) {
 	
 	if (vector == NULL) return NULL;
 
+	if (idx > vector->size) return NULL;
+
 	return (vector->array + (vector->bytes_per_element * idx));
 
 }

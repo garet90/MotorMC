@@ -1340,37 +1340,39 @@ void phd_send_player_info_add_players(ltg_client_t* client) {
 	}
 
 	PCK_INLINE(packet, 3 + (online_count * 2048), io_big_endian);
-	
+
 	pck_write_var_int(packet, 0x36);
 	pck_write_var_int(packet, 0);
 	pck_write_var_int(packet, online_count);
 
-	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
-	ltg_client_t* player = ltg_player_iterator_next(sky_get_listener(), &iterator);
-	while (player != NULL) {
-		pck_write_bytes(packet, ltg_client_get_uuid(player), 16);
-		pck_write_string(packet, UTL_STRTOARG(ltg_client_get_username(player)));
-		if (ltg_client_has_textures(player)) {
-			pck_write_var_int(packet, 1);
-			pck_write_string(packet, UTL_CSTRTOARG("textures"));
-			pck_write_string(packet, UTL_STRTOARG(ltg_client_get_textures(player)));
-			if (ltg_client_has_textures_signature(player)) {
-				pck_write_int8(packet, 1);
-				pck_write_string(packet, UTL_STRTOARG(ltg_client_get_textures_signature(player)));
+	
+	const uint32_t online_length = ltg_get_online_length(sky_get_listener());
+	for (uint32_t i = 0; i < online_length; ++i) {
+		ltg_client_t* player = ltg_get_online_client(sky_get_listener(), i);
+		if (player != NULL) {
+			pck_write_bytes(packet, ltg_client_get_uuid(player), 16);
+			pck_write_string(packet, UTL_STRTOARG(ltg_client_get_username(player)));
+			if (ltg_client_has_textures(player)) {
+				pck_write_var_int(packet, 1);
+				pck_write_string(packet, UTL_CSTRTOARG("textures"));
+				pck_write_string(packet, UTL_STRTOARG(ltg_client_get_textures(player)));
+				if (ltg_client_has_textures_signature(player)) {
+					pck_write_int8(packet, 1);
+					pck_write_string(packet, UTL_STRTOARG(ltg_client_get_textures_signature(player)));
+				} else {
+					pck_write_int8(packet, 0);
+				}
 			} else {
-				pck_write_int8(packet, 0);
+				pck_write_var_int(packet, 0);
 			}
-		} else {
-			pck_write_var_int(packet, 0);
-		}
-		
-		ent_player_t* player_ent = ltg_client_get_entity(player);
+			
+			ent_player_t* player_ent = ltg_client_get_entity(player);
 
-		pck_write_var_int(packet, ent_player_get_gamemode(player_ent)); // game mode
-		
-		pck_write_var_int(packet, ltg_client_get_ping(player)); // ping
-		pck_write_int8(packet, 0); // has display name
-		player = ltg_player_iterator_next(sky_get_listener(), &iterator);
+			pck_write_var_int(packet, ent_player_get_gamemode(player_ent)); // game mode
+			
+			pck_write_var_int(packet, ltg_client_get_ping(player)); // ping
+			pck_write_int8(packet, 0); // has display name
+		}
 	}
 
 	ltg_send(client, packet);
@@ -1416,19 +1418,21 @@ void phd_send_player_info_update_gamemode(__attribute__((unused)) ltg_client_t* 
 
 void phd_send_player_info_update_latency(ltg_client_t* client) {
 
-	const uint32_t online_count = ltg_get_online_count(sky_get_listener());
+	uint32_t online_count = ltg_get_online_count(sky_get_listener());
 
 	PCK_INLINE(packet, 21 * online_count + 6, io_big_endian);
 
 	pck_write_var_int(packet, 0x36);
 	pck_write_var_int(packet, 2); // update latency
 	pck_write_var_int(packet, online_count);
-	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
-	ltg_client_t* player = ltg_player_iterator_next(sky_get_listener(), &iterator);
-	while (player != NULL) {
-		pck_write_bytes(packet, ltg_client_get_uuid(player), 16);
-		pck_write_var_int(packet, ltg_client_get_ping(player));
-		player = ltg_player_iterator_next(sky_get_listener(), &iterator);
+	
+	const uint32_t online_length = ltg_get_online_length(sky_get_listener());
+	for (uint32_t i = 0; i < online_length; ++i) {
+		ltg_client_t* player = ltg_get_online_client(sky_get_listener(), i);
+		if (player != NULL && online_count-- != 0) {
+			pck_write_bytes(packet, ltg_client_get_uuid(player), 16);
+			pck_write_var_int(packet, ltg_client_get_ping(player));
+		}
 	}
 
 	ltg_send(client, packet);

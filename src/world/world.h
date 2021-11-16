@@ -3,9 +3,9 @@
 #include <assert.h>
 
 #include "world.d.h"
+#include "entity/entity.d.h"
 
 #include "../main.h"
-#include "../util/dll.h"
 #include "../util/id_vector.h"
 #include "../util/bit_vector.h"
 #include "../util/tree.h"
@@ -40,7 +40,7 @@ struct wld_chunk {
 	utl_bit_vector_t players;
 
 	utl_id_vector_t block_entities;
-	utl_dll_t entities;
+	utl_id_vector_t entities;
 
 	// highest blocks
 	struct {
@@ -197,7 +197,7 @@ static inline wld_world_t* wld_chunk_get_world(const wld_chunk_t* chunk) {
 static inline void wld_chunk_remove_entity(wld_chunk_t* chunk, uint32_t entity) {
 
 	with_lock (&chunk->lock) {
-		utl_dll_remove(&chunk->entities, entity);
+		utl_id_vector_remove(&chunk->entities, entity);
 	}
 
 }
@@ -308,30 +308,46 @@ static inline void wld_chunk_subscribers_foreach(wld_chunk_t* chunk, void (*cons
 	utl_bit_vector_lock_foreach(&chunk->subscribers, &chunk->lock, function, args);
 }
 
-static inline utl_dll_iterator_t wld_chunk_get_entity_iterator(wld_chunk_t* chunk) {
-
-	return utl_dll_get_iterator(&chunk->entities);
-
-}
-
-static inline void* wld_chunk_entity_iterator_next(wld_chunk_t* chunk, utl_dll_iterator_t* iterator) {
-
-	void* ent = NULL;
-
-	with_lock (&chunk->lock) {
-		ent = utl_dll_iterator_next(iterator);
-	}
-
-	return ent;
-
-}
-
 static inline int16_t* wld_chunk_get_highest_motion_blocking(wld_chunk_t* chunk) {
 	return (int16_t*) chunk->highest.motion_blocking;
 }
 
 static inline int16_t* wld_chunk_get_highest_world_surface(wld_chunk_t* chunk) {
 	return (int16_t*) chunk->highest.world_surface;
+}
+
+static inline uint32_t wld_chunk_add_entity(wld_chunk_t* chunk, ent_entity_t* entity) {
+	
+	uint32_t chunk_node = 0;
+	with_lock (&chunk->lock) {
+		chunk_node = utl_id_vector_push(&chunk->entities, &entity);
+	}
+	return chunk_node;
+	
+}
+
+static inline uint32_t wld_chunk_get_entity_count(wld_chunk_t* chunk) {
+	uint32_t count = 0;
+	with_lock (&chunk->lock) {
+		count = utl_id_vector_count(&chunk->entities);
+	}
+	return count;
+}
+
+static inline uint32_t wld_chunk_get_entity_length(wld_chunk_t* chunk) {
+	uint32_t length = 0;
+	with_lock (&chunk->lock) {
+		length = utl_id_vector_length(&chunk->entities);
+	}
+	return length;
+}
+
+static inline ent_entity_t* wld_chunk_get_entity(wld_chunk_t* chunk, uint32_t idx) {
+	ent_entity_t* entity = NULL;
+	with_lock (&chunk->lock) {
+		entity = UTL_ID_VECTOR_GET_AS(ent_entity_t*, &chunk->entities, idx);
+	}
+	return entity;
 }
 
 static inline mat_block_protocol_id_t wld_get_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z) {

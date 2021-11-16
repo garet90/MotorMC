@@ -56,7 +56,7 @@ sky_main_t sky_main = {
 		},
 		.online = {
 			.lock = PTHREAD_MUTEX_INITIALIZER,
-			.list = UTL_DLL_INITIALIZER,
+			.vector = UTL_ID_VECTOR_INITIALIZER(ltg_client_t*),
 			.max = 20
 		}
 	}

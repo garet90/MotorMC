@@ -37,12 +37,13 @@ bool job_handle_global_chat_message(job_payload_t* payload) {
 
 	char out[1536];
 	const size_t out_len = cht_write_translation(&translation, out);
-	
-	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
-	ltg_client_t* client = ltg_player_iterator_next(sky_get_listener(), &iterator);
-	while (client != NULL) {
-		phd_send_chat_message(client, out, out_len, ltg_client_get_uuid(payload->global_chat_message.client));
-		client = ltg_player_iterator_next(sky_get_listener(), &iterator);
+
+	const uint32_t online_length = ltg_get_online_length(sky_get_listener());
+	for (uint32_t i = 0; i < online_length; ++i) {
+		ltg_client_t* client = ltg_get_online_client(sky_get_listener(), i);
+		if (client != NULL) {
+			phd_send_chat_message(client, out, out_len, ltg_client_get_uuid(payload->global_chat_message.client));
+		}
 	}
 	cht_term_translation(&translation);
 
@@ -65,12 +66,13 @@ bool job_handle_player_join(job_payload_t* payload) {
 	char out[128];
 	const size_t out_len = cht_write_translation(&translation, out);
 	// lock client vector
-	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
-	ltg_client_t* client = ltg_player_iterator_next(sky_get_listener(), &iterator);
-	while (client != NULL) {
-		phd_send_player_info_add_player(client, payload->client);
-		phd_send_system_chat_message(client, out, out_len);
-		client = ltg_player_iterator_next(sky_get_listener(), &iterator);
+	const uint32_t online_length = ltg_get_online_length(sky_get_listener());
+	for (uint32_t i = 0; i < online_length; ++i) {
+		ltg_client_t* client = ltg_get_online_client(sky_get_listener(), i);
+		if (client != NULL) {
+			phd_send_player_info_add_player(client, payload->client);
+			phd_send_system_chat_message(client, out, out_len);
+		}
 	}
 
 	cht_term_translation(&translation);
@@ -100,12 +102,13 @@ bool job_handle_player_leave(job_payload_t* payload) {
 	char out[128];
 	const size_t out_len = cht_write_translation(&translation, out);
 	
-	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
-	ltg_client_t* client = ltg_player_iterator_next(sky_get_listener(), &iterator);
-	while (client != NULL) {
-		phd_send_player_info_remove_player(client, payload->player_leave.uuid);
-		phd_send_system_chat_message(client, out, out_len);
-		client = ltg_player_iterator_next(sky_get_listener(), &iterator);
+	const uint32_t online_length = ltg_get_online_length(sky_get_listener());
+	for (uint32_t i = 0; i < online_length; ++i) {
+		ltg_client_t* client = ltg_get_online_client(sky_get_listener(), i);
+		if (client != NULL) {
+			phd_send_player_info_remove_player(client, payload->player_leave.uuid);
+			phd_send_system_chat_message(client, out, out_len);
+		}
 	}
 
 	cht_term_translation(&translation);
@@ -116,11 +119,12 @@ bool job_handle_player_leave(job_payload_t* payload) {
 
 bool job_handle_send_update_pings(__attribute__((unused)) job_payload_t* payload) {
 
-	utl_dll_iterator_t iterator = ltg_get_player_iterator(sky_get_listener());
-	ltg_client_t* client = ltg_player_iterator_next(sky_get_listener(), &iterator);
-	while (client != NULL) {
-		phd_send_player_info_update_latency(client);
-		client = ltg_player_iterator_next(sky_get_listener(), &iterator);
+	const uint32_t online_length = ltg_get_online_length(sky_get_listener());
+	for (uint32_t i = 0; i < online_length; ++i) {
+		ltg_client_t* client = ltg_get_online_client(sky_get_listener(), i);
+		if (client != NULL) {
+			phd_send_player_info_update_latency(client);
+		}
 	}
 
 	return true;

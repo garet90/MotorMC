@@ -18,7 +18,7 @@ typedef struct {
 
 } utl_list_t;
 
-#define UTL_LIST_INITIALIZER(type) { .nodes = { .array = { .array = NULL, .size = 0, .capacity = 0, .bytes_per_element = (sizeof(utl_list_node_t) + sizeof(type)) }, .next_id = UTL_VECTOR_INITIALIZER(uint32_t) }, .first = 0, .last = 0, .length = 0 }
+#define UTL_LIST_INITIALIZER(type) { .nodes = { .array = { .array = NULL, .size = 0, .capacity = 0, .bytes_per_element = (sizeof(utl_list_node_t) + sizeof(type)) }, .next_id = UTL_VECTOR_INITIALIZER(uint32_t), .count = 0 }, .first = 0, .last = 0, .length = 0 }
 
 static inline void utl_init_list(utl_list_t* list, uint32_t bytes_per_element) {
 
@@ -30,7 +30,8 @@ static inline void utl_init_list(utl_list_t* list, uint32_t bytes_per_element) {
 				.capacity = 0,
 				.bytes_per_element = (sizeof(utl_list_node_t) + bytes_per_element)
 			},
-			.next_id = UTL_VECTOR_INITIALIZER(uint32_t)
+			.next_id = UTL_VECTOR_INITIALIZER(uint32_t),
+			.count = 0,
 		},
 		.first = 0,
 		.last = 0,
