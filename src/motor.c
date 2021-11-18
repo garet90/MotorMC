@@ -101,6 +101,7 @@ void sky_handle_signal_crash(int signal) {
 			sky_worker_t* worker = UTL_VECTOR_GET_AS(sky_worker_t*, &sky_main.workers.vector, i);
 			if (pthread_self() == worker->thread) {
 				log_error("\t\tWORKER #%lld", i);
+				log_error("\tJOB TYPE %d", job_get_type(worker->job));
 				goto identified;
 			}
 		}
@@ -300,12 +301,14 @@ void* t_sky_main(__attribute__((unused)) void* input) {
 
 }
 
-void* t_sky_worker(__attribute__((unused)) void* input) {
+void* t_sky_worker(void* args) {
+
+	sky_worker_t* worker = args;
 
 	while (sky_main.status != sky_stopping) {
 
 		// do work
-		job_work();
+		job_work(worker);
 
 	}
 

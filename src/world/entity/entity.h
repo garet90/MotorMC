@@ -55,12 +55,24 @@ static inline float64_t ent_get_x(ent_entity_t* entity) {
 	return entity->position.x;
 }
 
+static inline uint64_t ent_get_block_x(ent_entity_t* entity) {
+	return utl_int_floor(entity->position.x);
+}
+
 static inline float64_t ent_get_y(ent_entity_t* entity) {
 	return entity->position.y;
 }
 
+static inline uint64_t ent_get_block_y(ent_entity_t* entity) {
+	return utl_int_floor(entity->position.y);
+}
+
 static inline float64_t ent_get_z(ent_entity_t* entity) {
 	return entity->position.z;
+}
+
+static inline uint64_t ent_get_block_z(ent_entity_t* entity) {
+	return utl_int_floor(entity->position.z);
 }
 
 static inline wld_chunk_t* ent_get_chunk(ent_entity_t* entity) {

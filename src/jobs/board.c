@@ -101,27 +101,32 @@ void job_add_handler(job_type_t job, job_handler_t handler) {
 
 void job_handle(uint32_t id) {
 
-	job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
+	job_type_t type = job_count;
+	job_payload_t payload = { .client = NULL };
+	with_lock (&job_board.heap.lock) {
+		job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
+		if (work == NULL || work->canceled) {
+			pthread_mutex_unlock(&job_board.heap.lock);
+			return;
+		}
+		type = work->type;
+		payload = work->payload;
+	}
 
-	if (work == NULL) return;
-	if (work->canceled) return;
-
-	utl_vector_t* work_handlers = UTL_VECTOR_GET_AS(utl_vector_t*, &job_handlers, work->type);
+	utl_vector_t* work_handlers = UTL_VECTOR_GET_AS(utl_vector_t*, &job_handlers, type);
 
 	if (work_handlers != NULL) {
 
 		for (size_t i = 0; i < work_handlers->size; ++i) {
 
 			job_handler_t handler = UTL_VECTOR_GET_AS(job_handler_t, work_handlers, i);
-			if (!handler(&work->payload)) {
+			if (!handler(&payload)) {
 				break;
 			}
 
 		}
 
 	}
-
-	work->on_board--;
 
 	job_free(id);
 
@@ -149,17 +154,18 @@ void job_resume() {
 
 void job_free(uint32_t id) {
 
-	job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
+	with_lock (&job_board.heap.lock) {
+		job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, id);
 
-	if (work->repeat) {
-		return;
+		work->on_board--;
+
+		if (work->repeat || work->on_board != 0) {
+			pthread_mutex_unlock(&job_board.heap.lock);
+			return;
+		}
+
+		utl_id_vector_remove(&job_board.heap.jobs, id);
 	}
-
-	if (work->on_board != 0) {
-		return;
-	}
-
-	utl_id_vector_remove(&job_board.heap.jobs, id);
 
 }
 
@@ -205,8 +211,23 @@ size_t job_get_count() {
 
 }
 
-void job_work() {
+job_type_t job_get_type(uint32_t job) {
 
-	job_handle(job_get());
+	job_type_t type = job_count;
+
+	with_lock (&job_board.heap.lock) {
+		job_work_t* work = utl_id_vector_get(&job_board.heap.jobs, job);
+		type = work->type;
+	}
+
+	return type;
+
+}
+
+void job_work(sky_worker_t* worker) {
+
+	const uint32_t job = job_get();
+	worker->job = job;
+	job_handle(job);
 
 }

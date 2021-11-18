@@ -11,6 +11,7 @@
 struct sky_worker {
 
 	pthread_t thread;
+	uint32_t job;
 	uint16_t id;
 
 };

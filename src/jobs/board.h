@@ -3,6 +3,7 @@
 #include <pthread.h>
 
 #include "board.d.h"
+#include "../motor.d.h"
 #include "../world/entity/entity.d.h"
 #include "../world/entity/living/living.d.h"
 #include "../world/world.d.h"
@@ -159,5 +160,6 @@ extern void job_free(uint32_t id);
 extern uint32_t job_get();
 
 extern size_t job_get_count();
+extern job_type_t job_get_type(uint32_t job);
 
-extern void job_work();
+extern void job_work(sky_worker_t* worker);
