@@ -67,9 +67,9 @@ struct ltg_client {
 	string_t username;
 
 	// last recieved packet
-	atomic_int_least64_t last_recv;
+	_Atomic int64_t last_recv;
 
-	atomic_int_least64_t ping;
+	_Atomic int64_t ping;
 
 	ltg_uuid_t uuid;
 
@@ -181,8 +181,6 @@ static inline void ltg_uuid_to_string(const ltg_uuid_t uuid, char* out) {
 
 // API
 
-// TODO make sure these don't need locking
-
 static inline uint32_t ltg_client_get_id(const ltg_client_t* client) {
 	return client->id;
 }
@@ -239,11 +237,11 @@ static inline ent_player_t* ltg_client_get_entity(const ltg_client_t* client) {
 	return client->entity;
 }
 
-static inline int_least64_t ltg_client_get_last_receive(const ltg_client_t* client) {
+static inline int64_t ltg_client_get_last_receive(const ltg_client_t* client) {
 	return client->last_recv;
 }
 
-static inline void ltg_client_set_last_receive(ltg_client_t* client, int_least64_t last_receive) {
+static inline void ltg_client_set_last_receive(ltg_client_t* client, int64_t last_receive) {
 	client->last_recv = last_receive;
 }
 
