@@ -67,8 +67,12 @@ static inline void* utl_id_vector_get(const utl_id_vector_t* id_vector, uint32_t
 
 static inline void utl_id_vector_remove(utl_id_vector_t* id_vector, uint32_t id) {
 
+	byte_t* ptr = utl_vector_get(&id_vector->array, id);
+
+	if (ptr == NULL) return;
+
 	utl_vector_push(&id_vector->next_id, &id);
-	memset(utl_vector_get(&id_vector->array, id), 0, id_vector->array.bytes_per_element);
+	memset(ptr, 0, id_vector->array.bytes_per_element);
 	id_vector->count--;
 
 }

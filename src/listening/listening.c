@@ -389,12 +389,8 @@ void ltg_disconnect(ltg_client_t* client) {
 	}
 
 	// free compressors
-	if (client->compression.compressor != NULL) {
-		libdeflate_free_compressor(client->compression.compressor);
-	}
-	if (client->compression.decompressor != NULL) {
-		libdeflate_free_decompressor(client->compression.decompressor);
-	}
+	libdeflate_free_compressor(client->compression.compressor);
+	libdeflate_free_decompressor(client->compression.decompressor);
 
 	// free username
 	UTL_FREESTR(client->username);
