@@ -38,8 +38,8 @@ int cfb8_decrypt(EVP_CIPHER_CTX* d, byte_t* restrict data, size_t len, byte_t* r
 
 int cfb8_done(EVP_CIPHER_CTX* e, EVP_CIPHER_CTX* d) {
 
-	EVP_CIPHER_CTX_cleanup(e);
-	EVP_CIPHER_CTX_cleanup(d);
+	EVP_CIPHER_CTX_free(e);
+	EVP_CIPHER_CTX_free(d);
 
 	return 0;
 

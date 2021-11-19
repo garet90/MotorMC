@@ -389,6 +389,8 @@ void wld_free_region(wld_region_t* region) {
 			pthread_mutex_destroy(&region->chunks[i]->lock);
 			utl_term_bit_vector(&region->chunks[i]->subscribers);
 			utl_term_bit_vector(&region->chunks[i]->players);
+			utl_term_id_vector(&region->chunks[i]->entities);
+			utl_term_id_vector(&region->chunks[i]->block_entities);
 			free(region->chunks[i]);
 		}
 	}
