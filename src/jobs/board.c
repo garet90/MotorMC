@@ -142,13 +142,17 @@ void job_add(uint32_t id) {
 		utl_list_push(&job_board.queue.list, &id);
 	}
 
-	pthread_cond_signal(&job_board.queue.wait);
+	with_lock (&job_board.queue.lock) {
+		pthread_cond_signal(&job_board.queue.wait);
+	}
 
 }
 
 void job_resume() {
 
-	pthread_cond_broadcast(&job_board.queue.wait);
+	with_lock (&job_board.queue.lock) {
+		pthread_cond_broadcast(&job_board.queue.wait);
+	}
 
 }
 

@@ -108,15 +108,17 @@ void ent_set_chunk(ent_entity_t* entity) {
 
 	assert(chunk != NULL);
 
-	entity->chunk_node = wld_chunk_add_entity(chunk, entity);
-	entity->chunk = chunk;
+	with_lock (&entity->lock) {
+		entity->chunk_node = wld_chunk_add_entity(chunk, entity);
+		entity->chunk = chunk;
+	}
 
 }
 
 void ent_free_entity(ent_entity_t* entity) {
 
 	// remove entity from clients
-	wld_chunk_subscribers_foreach(entity->chunk, ent_destroy_entity, entity);
+	wld_chunk_subscribers_foreach(ent_get_chunk(entity), ent_destroy_entity, entity);
 
 	ent_remove_chunk(entity);
 

@@ -53,7 +53,7 @@ struct wld_chunk {
 	const uint8_t x : 5;
 	const uint8_t z : 5;
 
-	atomic_uint_least8_t ticket;
+	_Atomic uint8_t ticket;
 	const uint8_t max_ticket;
 
 	wld_chunk_section_t sections[]; // y = section index * 16, count of sections = World.height / 16

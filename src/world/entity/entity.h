@@ -12,8 +12,9 @@
 struct ent_entity {
 
 	wld_position_t position;
-	wld_chunk_t* _Atomic chunk;
-	uint32_t _Atomic chunk_node;
+	
+	wld_chunk_t* chunk;
+	uint32_t chunk_node;
 
 	const uint32_t id;
 	const ent_type_t type;
@@ -76,7 +77,15 @@ static inline uint64_t ent_get_block_z(ent_entity_t* entity) {
 }
 
 static inline wld_chunk_t* ent_get_chunk(ent_entity_t* entity) {
-	return entity->chunk;
+	
+	wld_chunk_t* chunk = NULL;
+
+	with_lock (&entity->lock) {
+		chunk = entity->chunk;
+	}
+
+	return chunk;
+	
 }
 
 static inline wld_world_t* ent_get_world(ent_entity_t* entity) {
@@ -102,10 +111,14 @@ static inline void ent_set_flying_with_elytra(ent_entity_t* entity, bool flying_
 
 static inline void ent_remove_chunk(ent_entity_t* entity) {
 
-	if (entity->chunk != NULL) {
+	with_lock (&entity->lock) {
 
-		wld_chunk_remove_entity(entity->chunk, entity->chunk_node);
-		entity->chunk = NULL;
+		if (entity->chunk != NULL) {
+
+			wld_chunk_remove_entity(entity->chunk, entity->chunk_node);
+			entity->chunk = NULL;
+
+		}
 
 	}
 
