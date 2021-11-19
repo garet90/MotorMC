@@ -85,12 +85,9 @@ static inline float32_t io_read_float32(const byte_t* buffer, io_endianness_t en
 
 	} else {
 
+		uint32_t bytes = io_switch_int32(*((uint32_t*) buffer));
 		float32_t out;
-		byte_t* out_b = (byte_t*) &out;
-		out_b[3] = buffer[0];
-		out_b[2] = buffer[1];
-		out_b[1] = buffer[2];
-		out_b[0] = buffer[3];
+		memcpy(&out, &bytes, sizeof(out));
 
 		return out;
 
@@ -108,16 +105,9 @@ static inline float64_t io_read_float64(const byte_t* buffer, io_endianness_t en
 
 	} else {
 
+		uint64_t bytes = io_switch_int64(*((uint64_t*) buffer));
 		float64_t out;
-		byte_t* out_b = (byte_t*) &out;
-		out_b[7] = buffer[0];
-		out_b[6] = buffer[1];
-		out_b[5] = buffer[2];
-		out_b[4] = buffer[3];
-		out_b[3] = buffer[4];
-		out_b[2] = buffer[5];
-		out_b[1] = buffer[6];
-		out_b[0] = buffer[7];
+		memcpy(&out, &bytes, sizeof(out));
 
 		return out;
 
@@ -235,12 +225,10 @@ static inline void io_write_float32(byte_t* buffer, float32_t value, io_endianne
 
 	} else {
 
-		byte_t* in = (byte_t*) &value;
-
-		buffer[0] = in[3];
-		buffer[1] = in[2];
-		buffer[2] = in[1];
-		buffer[3] = in[0];
+		uint32_t bytes;
+		memcpy(&bytes, &value, sizeof(bytes));
+		bytes = io_switch_int64(bytes);
+		memcpy(buffer, &bytes, sizeof(bytes));
 
 	}
 
@@ -254,16 +242,10 @@ static inline void io_write_float64(byte_t* buffer, float64_t value, io_endianne
 
 	} else {
 
-		byte_t* in = (byte_t*) &value;
-
-		buffer[0] = in[7];
-		buffer[1] = in[6];
-		buffer[2] = in[5];
-		buffer[3] = in[4];
-		buffer[4] = in[3];
-		buffer[5] = in[2];
-		buffer[6] = in[1];
-		buffer[7] = in[0];
+		uint64_t bytes;
+		memcpy(&bytes, &value, sizeof(bytes));
+		bytes = io_switch_int64(bytes);
+		memcpy(buffer, &bytes, sizeof(bytes));
 
 	}
 

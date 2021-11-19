@@ -6,11 +6,11 @@ size_t utl_to_minecraft_hex(char* str, const byte_t* val, size_t size) {
 
 	size_t str_size = 0;
 
+	byte_t value[size];
+	memcpy(value, val, size);
+
 	// negate if negative
-	if (val[0] & 0x80) {
-			
-		byte_t value[size];
-		memcpy(value, val, size);
+	if (value[0] & 0x80) {
 
 		// not
 		for (uint32_t i = 0; i < size; ++i) {
@@ -26,8 +26,6 @@ size_t utl_to_minecraft_hex(char* str, const byte_t* val, size_t size) {
 		str[0] = '-';
 		str_size = 1;
 
-		val = value;
-
 	}
 
 	bool begin = true;
@@ -35,23 +33,23 @@ size_t utl_to_minecraft_hex(char* str, const byte_t* val, size_t size) {
 
 		if (begin) {
 
-			if (val[i] == 0) continue;
+			if (value[i] == 0) continue;
 
-			if (val[i] & 0xF0) {
+			if (value[i] & 0xF0) {
 
-				utl_write_byte_hex(str + str_size, val[i]);
+				utl_write_byte_hex(str + str_size, value[i]);
 				str_size += 2;
 
 			} else {
 
-				str[str_size] = utl_hexmap[val[i]];
+				str[str_size] = utl_hexmap[value[i]];
 				str_size += 1;
 
 			}
 			begin = false;
 
 		} else {
-			utl_write_byte_hex(str + str_size, val[i]);
+			utl_write_byte_hex(str + str_size, value[i]);
 			str_size += 2;
 		}
 

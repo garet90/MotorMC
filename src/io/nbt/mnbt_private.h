@@ -1,4 +1,5 @@
 #pragma once
+#include <string.h>
 #include "mnbt.h"
 
 size_t _mnbt_read_tag(mnbt_doc* document, mnbt_tag** tag, const uint8_t* bytes);
@@ -47,15 +48,11 @@ static inline float _mnbt_reverse_float(float val) {
 #if __ENDIANNESS__
 	return val;
 #else
-	char* val_b = (char*) &val;
-
+	uint32_t in;
 	float out;
-	char* out_b = (char*) &out;
-
-	out_b[0] = val_b[3];
-	out_b[1] = val_b[2];
-	out_b[2] = val_b[1];
-	out_b[3] = val_b[0];
+	memcpy(&in, &val, sizeof(val));
+	in = _mnbt_reverse_int(in);
+	memcpy(&out, &in, sizeof(out));
 
 	return out;
 #endif
@@ -65,19 +62,11 @@ static inline double _mnbt_reverse_double(double val) {
 #if __ENDIANNESS__
 	return val;
 #else
-	char* val_b = (char*) &val;
-
+	uint64_t in;
 	double out;
-	char* out_b = (char*) &out;
-
-	out_b[0] = val_b[7];
-	out_b[1] = val_b[6];
-	out_b[2] = val_b[5];
-	out_b[3] = val_b[4];
-	out_b[4] = val_b[3];
-	out_b[5] = val_b[2];
-	out_b[6] = val_b[1];
-	out_b[7] = val_b[0];
+	memcpy(&in, &val, sizeof(val));
+	in = _mnbt_reverse_long(in);
+	memcpy(&out, &in, sizeof(out));
 
 	return out;
 #endif

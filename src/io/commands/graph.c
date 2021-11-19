@@ -69,8 +69,8 @@ pck_packet_t* cmd_get_graph() {
 			);
 			
 			pck_write_var_int(cmd_graph, node->children.size);
-			for (size_t i = 0; i < node->children.size; ++i) {
-				int32_t child = UTL_VECTOR_GET_AS(int32_t, &node->children, i);
+			for (size_t j = 0; j < node->children.size; ++j) {
+				int32_t child = UTL_VECTOR_GET_AS(int32_t, &node->children, j);
 				pck_write_var_int(cmd_graph, child);
 			}
 			utl_term_vector(&node->children);

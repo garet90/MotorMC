@@ -160,7 +160,7 @@ bool phd_handle_encryption_response(ltg_client_t* client, pck_packet_t* packet) 
 
 	// auth with Mojang's servers...
 
-	long http_code;
+	long http_code = 0;
 	string_t response;
 
 	with_lock (&phd_authRequest.lock) {
