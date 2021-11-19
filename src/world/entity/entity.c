@@ -30,23 +30,27 @@ ent_entity_t* ent_get_entity_by_id(uint32_t id) {
 
 }
 
-void ent_destroy_entity(uint32_t client_id, void* entity) {
+static inline void ent_send_entity(uint32_t client_id, void* entity) {
 
 	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
 
-	phd_send_destroy_entity(client, (ent_entity_t*) entity);
-
-}
-
-void ent_send_entity(uint32_t client_id, void* entity) {
-
-	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
+	if (client == NULL) return;
 
 	phd_update_send_entity(client, (ent_entity_t*) entity);
 
 }
 
-void ent_send_destroy_entity(uint32_t client_id, void* entity) {
+static inline void ent_destroy_entity(uint32_t client_id, void* entity) {
+
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
+
+	if (client == NULL) return;
+
+	phd_send_destroy_entity(client, (ent_entity_t*) entity);
+
+}
+
+static inline void ent_send_destroy_entity(uint32_t client_id, void* entity) {
 
 	wld_chunk_t* entity_chunk = ((ent_entity_t*) entity)->chunk;
 
@@ -62,14 +66,16 @@ void ent_set_chunk(ent_entity_t* entity) {
 
 	wld_chunk_t* chunk = NULL;
 
-	const int64_t f_x = utl_int_floor(entity->position.x);
-	const int64_t f_z = utl_int_floor(entity->position.z);
+	const int64_t f_x = ent_get_block_x(entity);
+	const int64_t f_z = ent_get_block_z(entity);
 
-	if (entity->chunk != NULL) {
+	if (ent_get_chunk(entity) != NULL) {
+
+		wld_chunk_t* entity_chunk = ent_get_chunk(entity);
 
 		// try relative
-		int32_t o_x = wld_get_chunk_x(entity->chunk);
-		int32_t o_z = wld_get_chunk_z(entity->chunk);
+		int32_t o_x = wld_get_chunk_x(entity_chunk);
+		int32_t o_z = wld_get_chunk_z(entity_chunk);
 		int32_t n_x = f_x >> 4;
 		int32_t n_z = f_z >> 4;
 
@@ -77,24 +83,24 @@ void ent_set_chunk(ent_entity_t* entity) {
 
 		if (UTL_ABS(n_x - o_x) < server_render_distance && UTL_ABS(n_z - o_z) < server_render_distance) {
 			
-			chunk = wld_relative_chunk(entity->chunk, n_x - o_x, n_z - o_z);
+			chunk = wld_relative_chunk(entity_chunk, n_x - o_x, n_z - o_z);
 			
 		} else { // set absolute (o(logn))
 
-			chunk = wld_get_chunk_at(entity->position.world, f_x, f_z);
+			chunk = wld_get_chunk_at(ent_get_world(entity), f_x, f_z);
 
 		}
 
 		// update players around
-		wld_chunk_subscribers_xor_foreach(entity->chunk, chunk, ent_send_destroy_entity, entity);
+		wld_chunk_subscribers_xor_foreach(entity_chunk, chunk, ent_send_destroy_entity, entity);
 		ent_remove_chunk(entity);
 
 	} else {
 		// set absolute (o(logn))
-		chunk = wld_get_chunk_at(entity->position.world, f_x, f_z);
+		chunk = wld_get_chunk_at(ent_get_world(entity), f_x, f_z);
 		
 		// if its a player, we must wait until it has been added to the server list
-		if (entity->type != ent_player) {
+		if (ent_get_type(entity) != ent_player) {
 			// spawn in chunk to listeners
 			wld_chunk_subscribers_foreach(chunk, ent_send_entity, entity);
 		}
@@ -111,7 +117,7 @@ void ent_free_entity(ent_entity_t* entity) {
 
 	// remove entity from clients
 	wld_chunk_subscribers_foreach(entity->chunk, ent_destroy_entity, entity);
-	
+
 	ent_remove_chunk(entity);
 
 	utl_id_vector_remove(&ent_entities, entity->id);

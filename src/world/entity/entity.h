@@ -55,7 +55,7 @@ static inline float64_t ent_get_x(ent_entity_t* entity) {
 	return entity->position.x;
 }
 
-static inline uint64_t ent_get_block_x(ent_entity_t* entity) {
+static inline int64_t ent_get_block_x(ent_entity_t* entity) {
 	return utl_int_floor(entity->position.x);
 }
 
@@ -63,7 +63,7 @@ static inline float64_t ent_get_y(ent_entity_t* entity) {
 	return entity->position.y;
 }
 
-static inline uint64_t ent_get_block_y(ent_entity_t* entity) {
+static inline int64_t ent_get_block_y(ent_entity_t* entity) {
 	return utl_int_floor(entity->position.y);
 }
 
@@ -77,6 +77,10 @@ static inline uint64_t ent_get_block_z(ent_entity_t* entity) {
 
 static inline wld_chunk_t* ent_get_chunk(ent_entity_t* entity) {
 	return entity->chunk;
+}
+
+static inline wld_world_t* ent_get_world(ent_entity_t* entity) {
+	return entity->position.world;
 }
 
 static inline bool ent_is_on_ground(ent_entity_t* entity) {
@@ -110,9 +114,6 @@ static inline void ent_remove_chunk(ent_entity_t* entity) {
 static inline void ent_move(ent_entity_t* entity, float64_t d_x, float64_t d_y, float64_t d_z, bool on_ground) {
 	job_add(job_new(job_entity_move, (job_payload_t) { .entity_move = { .entity = entity, .initial_chunk = ent_get_chunk(entity), .d_x = d_x, .d_y = d_y, .d_z = d_z, .on_ground = on_ground } }));
 }
-
-extern void ent_destroy_entity(uint32_t client_id, void* entity);
-extern void ent_send_entity(uint32_t client_id, void* entity);
 
 extern void ent_set_chunk(ent_entity_t* entity);
 

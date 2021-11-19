@@ -56,6 +56,16 @@ bool job_handle_global_chat_message(job_payload_t* payload) {
 
 }
 
+static inline void job_send_entity(uint32_t client_id, void* entity) {
+
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
+
+	if (client == NULL) return;
+
+	phd_update_send_entity(client, (ent_entity_t*) entity);
+
+}
+
 bool job_handle_player_join(job_payload_t* payload) {
 	
 	// what if the client disconnects by the time this is handled? TODO
@@ -85,7 +95,7 @@ bool job_handle_player_join(job_payload_t* payload) {
 
 	ent_entity_t* entity = ent_player_get_entity(ltg_client_get_entity(payload->client));
 
-	wld_chunk_subscribers_foreach(ent_get_chunk(entity), ent_send_entity, entity);
+	wld_chunk_subscribers_foreach(ent_get_chunk(entity), job_send_entity, entity);
 
 	return true;
 
