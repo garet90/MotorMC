@@ -1551,9 +1551,7 @@ void phd_send_update_view_position(ltg_client_t* client) {
 
 	ent_player_t* player = ltg_client_get_entity(client);
 
-	wld_chunk_t* chunk = NULL;
-
-	chunk = ent_get_chunk(ent_player_get_entity(player));
+	wld_chunk_t* chunk = ent_get_chunk(ent_player_get_entity(player));
 
 	assert(chunk != NULL);
 

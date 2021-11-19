@@ -192,7 +192,7 @@ static inline void phd_update_send_entity(ltg_client_t* client, ent_entity_t* en
 static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t* chunk) {
 	phd_send_update_light(client, chunk);
 	phd_send_chunk_data(client, chunk);
-	wld_subscribe_chunk(chunk, client->id);
+	wld_subscribe_chunk(chunk, ltg_client_get_id(client));
 
 	// send chunk entities
 	uint32_t entity_length = wld_chunk_get_entity_length(chunk);

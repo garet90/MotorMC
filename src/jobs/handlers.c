@@ -215,7 +215,7 @@ static inline void job_update_entity_move(uint32_t client_id, void* args) {
 
 	if (client == NULL) return;
 	
-	if (ent_player_get_entity(ltg_client_get_entity(client)) == entity) {
+	if (ent_get_type(entity) == ent_player && ent_player_get_entity(ltg_client_get_entity(client)) == entity) {
 		if (ent_get_chunk(entity) != payload->entity_move.initial_chunk) {
 			phd_update_sent_chunks_move(payload->entity_move.initial_chunk, client);
 		}
@@ -263,7 +263,7 @@ static inline void job_update_entity_teleport(uint32_t client_id, void* args) {
 	
 	if (client == NULL) return;
 	
-	if (ent_player_get_entity(ltg_client_get_entity(client)) == entity) {
+	if (ent_get_type(entity) == ent_player && ent_player_get_entity(ltg_client_get_entity(client)) == entity) {
 		if (ent_get_chunk(entity) != payload->entity_teleport.initial_chunk) {
 			// TODO phd_update_sent_chunks_teleport(client);
 		}
@@ -309,7 +309,7 @@ static inline void job_update_living_entity_look(uint32_t client_id, void* args)
 	
 	if (client == NULL) return;
 
-	if (ent_player_get_le(ltg_client_get_entity(client)) == entity) {
+	if (ent_get_type(ent_le_get_entity(entity)) == ent_player && ent_player_get_le(ltg_client_get_entity(client)) == entity) {
 		// Do nothing
 	} else {
 		phd_send_entity_rotation(client, entity);
@@ -343,7 +343,7 @@ static inline void job_update_living_entity_move_look(uint32_t client_id, void* 
 	
 	if (client == NULL) return;
 
-	if (ent_player_get_le(ltg_client_get_entity(client)) == entity) {
+	if (ent_get_type(ent_le_get_entity(entity)) == ent_player && ent_player_get_le(ltg_client_get_entity(client)) == entity) {
 		if (ent_get_chunk(ent_le_get_entity(entity)) != payload->entity_move.initial_chunk) {
 			phd_update_sent_chunks_move(payload->entity_move.initial_chunk, client);
 		}
@@ -390,7 +390,7 @@ static inline void job_update_living_entity_teleport_look(uint32_t client_id, vo
 	
 	if (client == NULL) return;
 	
-	if (ent_player_get_le(ltg_client_get_entity(client)) == entity) {
+	if (ent_get_type(ent_le_get_entity(entity)) == ent_player && ent_player_get_le(ltg_client_get_entity(client)) == entity) {
 		if (ent_get_chunk(ent_le_get_entity(entity)) != payload->entity_teleport.initial_chunk) {
 			// TODO phd_update_sent_chunks_teleport(client);
 		}
