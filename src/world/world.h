@@ -264,7 +264,7 @@ extern void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk);
 
 static inline void wld_recalc_chunk_ticket_l(wld_chunk_t* chunk) {
 	uint8_t old_ticket = chunk->ticket;
-	chunk->ticket = WLD_TICKET_MAX;
+	chunk->ticket = chunk->max_ticket;
 	utl_bit_vector_foreach(&chunk->players, (void (*) (uint32_t, void*)) wld_calc_player_ticket, chunk);
 	uint8_t new_ticket = chunk->ticket;
 	chunk->ticket = old_ticket;
