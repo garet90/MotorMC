@@ -19,6 +19,9 @@ bool job_handle_keep_alive(job_payload_t* payload) {
 		return false;
 	} else {
 		phd_send_keep_alive(payload->client, out_ms);
+		if (ltg_client_get_entity(payload->client) != NULL) {
+			ent_le_damage(ent_player_get_le(ltg_client_get_entity(payload->client)), NULL, 5);
+		}
 		return true;
 	}
 
@@ -426,6 +429,36 @@ bool job_handle_living_entity_teleport_look(job_payload_t* payload) {
 
 	wld_chunk_t* chunk = ent_get_chunk(ent_le_get_entity(entity));
 	wld_chunk_subscribers_foreach(chunk, job_update_living_entity_teleport_look, payload);
+
+	return true;
+
+}
+
+static inline void job_update_living_entity_damage(uint32_t client_id, void* args) {
+
+	job_payload_t* payload = args;
+	ent_living_entity_t* entity = payload->living_entity_damage.entity;
+
+	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
+	
+	if (client == NULL) return;
+
+	phd_send_entity_status(client, ent_le_get_entity(entity), 2);
+	
+	if (payload->living_entity_damage.damage > 0 && ent_get_type(ent_le_get_entity(entity)) == ent_player && ent_player_get_le(ltg_client_get_entity(client)) == entity) {
+		phd_send_update_health(client);
+	}
+
+}
+
+bool job_handle_living_entity_damage(job_payload_t* payload) {
+
+	ent_living_entity_t* entity = payload->living_entity_damage.entity;
+
+	entity->health = entity->health - payload->living_entity_damage.damage;
+
+	// play hurt animation
+	wld_chunk_subscribers_foreach(ent_get_chunk(ent_le_get_entity(entity)), job_update_living_entity_damage, payload);
 
 	return true;
 

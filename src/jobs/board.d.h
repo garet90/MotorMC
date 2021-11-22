@@ -17,6 +17,7 @@ typedef enum {
 	job_living_entity_look,
 	job_living_entity_move_look,
 	job_living_entity_teleport_look,
+	job_living_entity_damage,
 
 	job_count
 

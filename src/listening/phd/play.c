@@ -23,6 +23,9 @@ bool phd_play(ltg_client_t* client, pck_packet_t* packet) {
 		case 0x03: {
 			return phd_handle_chat_message(client, packet);
 		}
+		case 0x04: {
+			return phd_handle_client_status(client, packet);
+		}
 		case 0x05: {
 			return phd_handle_client_settings(client, packet);
 		}
@@ -82,7 +85,7 @@ bool phd_handle_teleport_confirm(ltg_client_t* client, pck_packet_t* packet) {
 
 	// the player must've not heard us right
 	if (confirm != ent_get_id(ent_player_get_entity(ltg_client_get_entity(client)))) {
-		phd_send_player_position_and_look(client);
+		return false;
 	}
 
 	return true;
@@ -107,6 +110,25 @@ bool phd_handle_chat_message(ltg_client_t* client, pck_packet_t* packet) {
 		free(UTL_STRTOCSTR(message));
 	} else {
 		job_add(job_new(job_global_chat_message, (job_payload_t) { .global_chat_message = { .client = client, .message = message } }));
+	}
+
+	return true;
+
+}
+
+bool phd_handle_client_status(ltg_client_t* client, pck_packet_t* packet) {
+
+	const int32_t action = pck_read_var_int(packet);
+
+	switch (action) {
+		case 0: { // respawn
+			if (ent_le_is_dead(ent_player_get_le(ltg_client_get_entity(client)))) {
+				// TODO do something
+			}
+		} break;
+		case 1: { // request stats
+
+		} break;
 	}
 
 	return true;
@@ -896,12 +918,12 @@ void phd_send_disconnect(ltg_client_t* client, const char* message, size_t messa
 
 }
 
-void phd_send_entity_status(ltg_client_t* client, int32_t entity_id, uint8_t status) {
+void phd_send_entity_status(ltg_client_t* client, ent_entity_t* entity, uint8_t status) {
 
 	PCK_INLINE(packet, 6, io_big_endian);
 
 	pck_write_var_int(packet, 0x1b);
-	pck_write_int32(packet, entity_id);
+	pck_write_int32(packet, ent_get_id(entity));
 	pck_write_int8(packet, status);
 
 	ltg_send(client, packet);
@@ -1254,7 +1276,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_send_held_item_change(client);
 	phd_send_declare_recipes(client); // TODO should be cached
 	phd_send_tags(client); // TODO should be cached
-	phd_send_entity_status(client, ent_get_id(ent_player_get_entity(player)), 24); // TODO actual op level
+	phd_send_entity_status(client, ent_player_get_entity(player), 24); // TODO actual op level
 	phd_send_declare_commands(client);
 	phd_send_unlock_recipes(client);
 	phd_send_player_position_and_look(client);
@@ -1265,6 +1287,10 @@ void phd_send_join_game(ltg_client_t* client) {
 
 	phd_send_initialize_world_border(client, player_world);
 	phd_send_spawn_position(client);
+	
+	phd_send_player_position_and_look(client);
+
+	phd_send_update_health(client);
 
 	// TODO remove this, temporarily add two stacks of stone to inventory
 	itm_set_type(&player->inventory[0], mat_item_stone);
@@ -1583,6 +1609,21 @@ void phd_send_spawn_position(ltg_client_t* client) {
 	// TODO actual spawn position
 	pck_write_int64(packet, 0); // position
 	pck_write_float32(packet, 0); // angle
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_update_health(ltg_client_t* client) {
+
+	PCK_INLINE(packet, 14, io_big_endian);
+
+	ent_player_t* player = ltg_client_get_entity(client);
+
+	pck_write_var_int(packet, 0x52);
+	pck_write_float32(packet, ent_le_get_health(ent_player_get_le(player)));
+	pck_write_var_int(packet, ent_player_get_food(player));
+	pck_write_float32(packet, ent_player_get_saturation(player));
 
 	ltg_send(client, packet);
 

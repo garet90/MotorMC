@@ -16,8 +16,12 @@ struct ent_player {
 	int32_t score;
 	
 	uint32_t digging;
+	
+	_Atomic float32_t saturation;
 
 	_Atomic byte_t displayed_skin_parts;
+
+	uint8_t food : 5;
 
 	uint8_t held_item : 4;
 	byte_t main_hand : 1;
@@ -46,6 +50,9 @@ static inline ent_player_t* ent_alloc_player(const byte_t* uuid, wld_world_t* wo
 	ent_player_t* player = calloc(1, sizeof(ent_player_t));
 	ent_type_t type = ent_player;
 	memcpy((ent_type_t*) &player->living_entity.entity.type, &type, sizeof(type));
+	player->living_entity.health = 20;
+	player->food = 20;
+	player->saturation = 5;
 	player->uuid = uuid;
 	player->living_entity.entity.position.world = world;
 	player->living_entity.entity.position.x = x;
@@ -184,6 +191,14 @@ static inline uint8_t ent_player_get_held_item(ent_player_t* player) {
 
 static inline const byte_t* ent_player_get_uuid(ent_player_t* player) {
 	return player->uuid;
+}
+
+static inline float32_t ent_player_get_saturation(ent_player_t* player) {
+	return player->saturation;
+}
+
+static inline uint8_t ent_player_get_food(ent_player_t* player) {
+	return player->food;
 }
 
 static inline void ent_player_serialize_inventory(ent_player_t* player, pck_packet_t* packet) {

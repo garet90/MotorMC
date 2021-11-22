@@ -11,7 +11,7 @@ struct ent_living_entity {
 
 	wld_rotation_t rotation;
 
-	float32_t health;
+	_Atomic float32_t health;
 
 	uint8_t potion_effect_color;
 	uint8_t arrows;
@@ -55,6 +55,14 @@ static inline itm_item_t ent_le_get_main_hand(ent_living_entity_t* living_entity
 	return living_entity->main_hand;
 }
 
+static inline float32_t ent_le_get_health(ent_living_entity_t* living_entity) {
+	return living_entity->health;
+}
+
+static inline bool ent_le_is_dead(ent_living_entity_t* living_entity) {
+	return ent_le_get_health(living_entity) <= 0;
+}
+
 static inline void ent_le_look(ent_living_entity_t* entity, float32_t yaw, float32_t pitch, bool on_ground) {
 	job_add(
 		job_new(
@@ -86,6 +94,21 @@ static inline void ent_le_move_look(ent_living_entity_t* entity, float64_t d_x, 
 					.pitch = pitch,
 					.on_ground = on_ground
 			 	}
+			}
+		)
+	);
+}
+
+static inline void ent_le_damage(ent_living_entity_t* entity, ent_entity_t* damager, float32_t damage) {
+	job_add(
+		job_new(
+			job_living_entity_damage,
+			(job_payload_t) {
+				.living_entity_damage = {
+					.entity = entity,
+					.damager = damager,
+					.damage = damage
+				}
 			}
 		)
 	);

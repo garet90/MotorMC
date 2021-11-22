@@ -45,6 +45,9 @@ UTL_VECTOR_DEFAULT(job_living_entity_move_look_handlers, job_handler_t,
 UTL_VECTOR_DEFAULT(job_living_entity_teleport_look_handlers, job_handler_t,
 	job_handle_living_entity_teleport_look
 );
+UTL_VECTOR_DEFAULT(job_living_entity_damage_handlers, job_handler_t,
+	job_handle_living_entity_damage
+);
 
 UTL_VECTOR_DEFAULT(job_handlers, utl_vector_t*,
 	&job_keep_alive_handlers,
@@ -60,6 +63,7 @@ UTL_VECTOR_DEFAULT(job_handlers, utl_vector_t*,
 	&job_living_entity_look_handlers,
 	&job_living_entity_move_look_handlers,
 	&job_living_entity_teleport_look_handlers,
+	&job_living_entity_damage_handlers,
 );
 
 job_board_t job_board = {

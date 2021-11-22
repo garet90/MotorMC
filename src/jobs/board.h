@@ -133,6 +133,14 @@ union job_payload {
 
 	} living_entity_teleport_look;
 
+	struct {
+
+		ent_living_entity_t* entity;
+		ent_entity_t* damager;
+		float32_t damage;
+
+	} living_entity_damage;
+
 };
 
 struct job_work {
