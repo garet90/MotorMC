@@ -16,3 +16,4 @@ extern bool job_handle_living_entity_look(job_payload_t* payload);
 extern bool job_handle_living_entity_move_look(job_payload_t* payload);
 extern bool job_handle_living_entity_teleport_look(job_payload_t* payload);
 extern bool job_handle_living_entity_damage(job_payload_t* payload);
+extern bool job_handle_tick_world(job_payload_t* payload);

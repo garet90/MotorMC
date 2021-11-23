@@ -463,3 +463,20 @@ bool job_handle_living_entity_damage(job_payload_t* payload) {
 	return true;
 
 }
+
+bool job_handle_tick_world(job_payload_t* payload) {
+
+	wld_world_t* world = payload->world;
+
+	world->age++;
+	
+	if (wld_is_time_progressing(world)) {
+		world->time++;
+		if (world->time >= 24000) {
+			world->time = 0;
+		}
+	}
+	
+	return true;
+
+}

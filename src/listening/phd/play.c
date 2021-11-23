@@ -1273,6 +1273,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	// NORMAL LOGIN SEQUENCE
 	phd_send_plugin_message(client, UTL_CSTRTOARG("minecraft:brand"), (const byte_t*) UTL_CSTRTOARG("\x07MotorMC"));
 	phd_send_server_difficulty(client);
+	phd_send_player_abilities(client);
 	phd_send_held_item_change(client);
 	phd_send_declare_recipes(client); // TODO should be cached
 	phd_send_tags(client); // TODO should be cached
@@ -1286,10 +1287,12 @@ void phd_send_join_game(ltg_client_t* client) {
 	phd_update_sent_chunks(client);
 
 	phd_send_initialize_world_border(client, player_world);
+	phd_send_time_update(client, player_world);
 	phd_send_spawn_position(client);
 	
 	phd_send_player_position_and_look(client);
 
+	phd_send_set_experience(client);
 	phd_send_update_health(client);
 
 	// TODO remove this, temporarily add two stacks of stone to inventory
@@ -1352,6 +1355,19 @@ void phd_send_entity_rotation(ltg_client_t* client, ent_living_entity_t* entity)
 	pck_write_int8(packet, io_angle_to_byte(ent_le_get_yaw(entity)));
 	pck_write_int8(packet, io_angle_to_byte(ent_le_get_pitch(entity)));
 	pck_write_int8(packet, ent_is_on_ground(ent_le_get_entity(entity)));
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_player_abilities(ltg_client_t* client) {
+
+	PCK_INLINE(packet, 10, io_big_endian);
+
+	pck_write_var_int(packet, 0x32);
+	pck_write_int8(packet, 0);
+	pck_write_float32(packet, 0.05);
+	pck_write_float32(packet, 0.1);
 
 	ltg_send(client, packet);
 
@@ -1614,6 +1630,19 @@ void phd_send_spawn_position(ltg_client_t* client) {
 
 }
 
+void phd_send_set_experience(ltg_client_t* client) {
+
+	PCK_INLINE(packet, 15, io_big_endian);
+
+	pck_write_var_int(packet, 0x51);
+	pck_write_float32(packet, 0);
+	pck_write_var_int(packet, 0);
+	pck_write_var_int(packet, 0);
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_update_health(ltg_client_t* client) {
 
 	PCK_INLINE(packet, 14, io_big_endian);
@@ -1624,6 +1653,22 @@ void phd_send_update_health(ltg_client_t* client) {
 	pck_write_float32(packet, ent_le_get_health(ent_player_get_le(player)));
 	pck_write_var_int(packet, ent_player_get_food(player));
 	pck_write_float32(packet, ent_player_get_saturation(player));
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_time_update(ltg_client_t* client, wld_world_t* world) {
+
+	PCK_INLINE(packet, 17, io_big_endian);
+
+	pck_write_var_int(packet, 0x58);
+	pck_write_int64(packet, wld_get_age(world));
+	if (wld_is_time_progressing(world)) {
+		pck_write_int64(packet, wld_get_time(world));
+	} else {
+		pck_write_int64(packet, wld_get_time(world) * -1);
+	}
 
 	ltg_send(client, packet);
 

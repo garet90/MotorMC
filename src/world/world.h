@@ -90,7 +90,8 @@ struct wld_world {
 	pthread_mutex_t lock;
 
 	const int64_t seed;
-	atomic_uint_least64_t time;
+
+	_Atomic uint64_t age;
 
 	const string_t name;
 
@@ -104,8 +105,12 @@ struct wld_world {
 
 	} spawn;
 	
+	uint32_t tick;
+	
+	_Atomic uint16_t time;
 	const uint16_t id;
 
+	bool time_progressing : 1;
 	const bool debug : 1;
 	const bool flat : 1;
 
@@ -141,6 +146,18 @@ static inline bool wld_is_flat(wld_world_t* world) {
 
 static inline mat_dimension_type_t wld_get_environment(wld_world_t* world) {
 	return world->environment;
+}
+
+static inline uint64_t wld_get_age(wld_world_t* world) {
+	return world->age;
+}
+
+static inline uint16_t wld_get_time(wld_world_t* world) {
+	return world->time;
+}
+
+static inline bool wld_is_time_progressing(wld_world_t* world) {
+	return world->time_progressing;
 }
 
 extern uint16_t wld_get_count();

@@ -35,11 +35,16 @@ wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t env
 		.spawn = {
 			.x = (rand() % 512) - 256,
 			.z = (rand() % 512) - 256
-		}
+		},
+		.age = 0,
+		.time = 0,
+		.time_progressing = true,
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
 
 	wld_prepare_spawn(world);
+
+	world->tick = sch_schedule_repeating(job_new(job_tick_world, (job_payload_t) { .world = world }), 1, 1);
 
 	return world;
 
@@ -52,13 +57,18 @@ wld_world_t* wld_load(const string_t name) {
 		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.name = name,
 		.regions = UTL_TREE_INITIALIZER,
-		.id = wld_add(world)
+		.id = wld_add(world),
+		.age = 0,
+		.time = 0,
+		.time_progressing = true,
 	};
 	memcpy(world, &world_init, sizeof(wld_world_t));
 
 	// TODO load world
 
 	wld_prepare_spawn(world);
+	
+	world->tick = sch_schedule_repeating(job_new(job_tick_world, (job_payload_t) { .world = world }), 1, 1);
 
 	return world;
 
@@ -402,6 +412,8 @@ void wld_free_region(wld_region_t* region) {
 void wld_unload(wld_world_t* world) {
 	
 	utl_id_vector_remove(&wld_worlds, world->id);
+
+	sch_cancel(world->tick);
 
 	with_lock (&world->lock) {
 		wld_region_t* region;

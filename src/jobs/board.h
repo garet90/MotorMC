@@ -141,6 +141,8 @@ union job_payload {
 
 	} living_entity_damage;
 
+	wld_world_t* world;
+
 };
 
 struct job_work {
