@@ -483,14 +483,14 @@ void sky_load_server_json() {
 				} break;
 			}
 		}
+		
+		mjson_free(server);
 
 	} else {
 
 		log_error("Could not read server.json file!! Is the format correct?");
 
 	}
-
-	mjson_free(server);
 
 }
 

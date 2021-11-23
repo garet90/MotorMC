@@ -159,8 +159,8 @@ bool job_handle_tick_region(job_payload_t* payload) {
 			if (wld_chunk_get_ticket(chunk) <= WLD_TICKET_TICK_ENTITIES) {
 				// entities and chunk ticks
 				const uint32_t entity_length = wld_chunk_get_entity_length(chunk);
-				for (uint32_t i = 0; i < entity_length; ++i) {
-					ent_entity_t* entity = wld_chunk_get_entity(chunk, i);
+				for (uint32_t j = 0; j < entity_length; ++j) {
+					ent_entity_t* entity = wld_chunk_get_entity(chunk, j);
 					if (entity != NULL) {
 						// void damage
 						if (ent_get_y(entity) <= -64) {
