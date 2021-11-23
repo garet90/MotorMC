@@ -138,4 +138,25 @@ static inline void ent_set_on_ground(ent_entity_t* entity, bool on_ground) {
 
 }
 
+static inline bool ent_is_le(ent_entity_t* entity) {
+
+	const uint8_t le_map[ent_type_count] = {
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false, false, false,
+		false, true , false
+	};
+
+	return le_map[entity->type];
+}
+
 extern void ent_free_entity(ent_entity_t* entity);
+extern void ent_free(ent_entity_t* entity);

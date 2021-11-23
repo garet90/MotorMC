@@ -40,8 +40,63 @@ extern void cmd_handle(char*, const cmd_sender_t*);
 
 extern bool cmd_has_permission(const cmd_command_t*, const cmd_sender_t*);
 
-extern uint32_t cmd_hash(const char*);
-extern char* cmd_hash_arg(char*, uint32_t*);
+static inline uint32_t cmd_hash(const char* string) {
+
+	uint32_t hash = 5381;
+
+	for (;;) {
+		switch (*string) {
+			case '\0':
+			case '\n':
+			case ' ':
+			case '\r':
+			case '\t':
+			case '\v':
+			case '\f': {
+				goto done;
+			}
+			default: {
+				hash = ((hash << 5) + hash) + *string;
+				++string;
+			}
+		}
+	}
+
+	done:
+	return hash;
+
+}
+
+static inline char* cmd_hash_arg(char* string, uint32_t* hash) {
+
+	*hash = 5381;
+
+	for (;;) {
+		switch (*string) {
+			case '\0':
+			case '\n':
+			case '\r':
+			case '\t':
+			case '\v':
+			case '\f': {
+				goto final;
+			}
+			case ' ': {
+				goto done;
+			}
+			default: {
+				*hash = ((*hash << 5) + *hash) + *string;
+				++string;
+			}
+		}
+	}
+
+	done:
+	return ++string;
+	final:
+	return NULL;
+
+}
 
 extern void cmd_message(const cmd_sender_t*, const cht_component_t*);
 

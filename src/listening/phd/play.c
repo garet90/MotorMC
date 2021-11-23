@@ -1645,6 +1645,7 @@ void phd_send_set_experience(ltg_client_t* client) {
 
 void phd_send_update_health(ltg_client_t* client) {
 
+	// create 14 byte long big endian packet
 	PCK_INLINE(packet, 14, io_big_endian);
 
 	ent_player_t* player = ltg_client_get_entity(client);

@@ -129,3 +129,16 @@ void ent_free_entity(ent_entity_t* entity) {
 	free(entity);
 
 }
+
+void ent_free(ent_entity_t* entity) {
+
+	switch (entity->type) {
+		case ent_player: {
+			ent_free_player((ent_player_t*) entity);
+		} break;
+		default: {
+			ent_free_entity(entity);
+		}
+	}
+
+}

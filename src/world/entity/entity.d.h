@@ -125,7 +125,9 @@ typedef enum {
 	ent_zombie_villager,
 	ent_zombified_piglin,
 	ent_player,
-	ent_fishing_hook
+	ent_fishing_hook,
+
+	ent_type_count
 
 } ent_type_t;
 

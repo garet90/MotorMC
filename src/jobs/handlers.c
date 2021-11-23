@@ -19,9 +19,6 @@ bool job_handle_keep_alive(job_payload_t* payload) {
 		return false;
 	} else {
 		phd_send_keep_alive(payload->client, out_ms);
-		if (ltg_client_get_entity(payload->client) != NULL) {
-			ent_le_damage(ent_player_get_le(ltg_client_get_entity(payload->client)), NULL, 5);
-		}
 		return true;
 	}
 
@@ -156,11 +153,27 @@ bool job_handle_tick_region(job_payload_t* payload) {
 	
 	for (uint32_t i = 0; i < 32 * 32; ++i) {
 
-		const wld_chunk_t* chunk = wld_region_get_chunk_by_idx(payload->region, i);
+		wld_chunk_t* chunk = wld_region_get_chunk_by_idx(payload->region, i);
 
 		if (chunk != NULL) {
 			if (wld_chunk_get_ticket(chunk) <= WLD_TICKET_TICK_ENTITIES) {
 				// entities and chunk ticks
+				const uint32_t entity_length = wld_chunk_get_entity_length(chunk);
+				for (uint32_t i = 0; i < entity_length; ++i) {
+					ent_entity_t* entity = wld_chunk_get_entity(chunk, i);
+					if (entity != NULL) {
+						// void damage
+						if (ent_get_y(entity) <= -64) {
+							if (ent_is_le(entity)) {
+								if (wld_get_age(ent_get_world(entity)) % 10 == 0) {
+									ent_le_damage((ent_living_entity_t*) entity, NULL, 4);
+								}
+							} else {
+								ent_free(entity);
+							}
+						}
+					}
+				}
 			}
 
 			if (wld_chunk_get_ticket(chunk) <= WLD_TICKET_TICK) {
