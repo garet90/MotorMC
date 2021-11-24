@@ -227,7 +227,7 @@ static inline void io_write_float32(byte_t* buffer, float32_t value, io_endianne
 
 		uint32_t bytes;
 		memcpy(&bytes, &value, sizeof(bytes));
-		bytes = io_switch_int64(bytes);
+		bytes = io_switch_int32(bytes);
 		memcpy(buffer, &bytes, sizeof(bytes));
 
 	}

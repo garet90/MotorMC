@@ -100,16 +100,18 @@ static inline void ent_le_move_look(ent_living_entity_t* entity, float64_t d_x, 
 }
 
 static inline void ent_le_damage(ent_living_entity_t* entity, ent_entity_t* damager, float32_t damage) {
-	job_add(
-		job_new(
-			job_living_entity_damage,
-			(job_payload_t) {
-				.living_entity_damage = {
-					.entity = entity,
-					.damager = damager,
-					.damage = damage
+	if (!ent_le_is_dead(entity)) {
+		job_add(
+			job_new(
+				job_living_entity_damage,
+				(job_payload_t) {
+					.living_entity_damage = {
+						.entity = entity,
+						.damager = damager,
+						.damage = damage
+					}
 				}
-			}
-		)
-	);
+			)
+		);
+	}
 }
