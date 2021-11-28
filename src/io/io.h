@@ -153,14 +153,14 @@ static inline int64_t io_read_var_long(const byte_t* buffer, size_t max_length, 
 
 		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
-			result |= ((read & 0x7F) << (7 * *length));
+			result |= ((uint64_t) (read & 0x7F) << (7 * *length));
 		}
 
 	} else {
 
 		for (*length = 0; *length < max_length && (read & 0x80); ++*length) {
 			read = io_read_int8(buffer + *length);
-			result |= ((read & 0x7F) << (64 - (7 * *length)));
+			result |= ((uint64_t) (read & 0x7F) << (64 - (7 * *length)));
 		}
 
 	}
@@ -266,7 +266,7 @@ static inline size_t io_var_int_length(uint32_t value) {
 
 }
 
-static inline size_t io_write_var_int(byte_t* buffer, uint32_t value, __attribute__((unused)) size_t max_length) {
+static inline size_t io_write_var_int(byte_t* buffer, uint32_t value, size_t max_length) {
 
 	size_t i = 0;
 	do {
@@ -276,7 +276,7 @@ static inline size_t io_write_var_int(byte_t* buffer, uint32_t value, __attribut
 		if (value != 0) {
 			temp |= 0x80;
 		}
-		assert(i < max_length);
+		if (i >= max_length) return 0;
 		io_write_int8(buffer + i++, temp);
 	} while (value != 0);
 
@@ -299,7 +299,7 @@ static inline void io_write_long_var_int(byte_t* buffer, uint32_t value) {
 
 }
 
-static inline size_t io_write_var_long(byte_t* buffer, uint64_t value) {
+static inline size_t io_write_var_long(byte_t* buffer, uint64_t value, size_t max_length) {
 
 	size_t i = 0;
 	do {
@@ -309,6 +309,7 @@ static inline size_t io_write_var_long(byte_t* buffer, uint64_t value) {
 		if (value != 0) {
 			temp |= 0x80;
 		}
+		if (i >= max_length) return 0;
 		io_write_int8(buffer + i++, temp);
 	} while (value != 0);
 

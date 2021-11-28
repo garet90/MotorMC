@@ -223,7 +223,7 @@ static inline void pck_write_long_var_int(pck_packet_t* packet, int32_t value) {
 
 static inline void pck_write_var_long(pck_packet_t* packet, int64_t value) {
 
-	packet->cursor += io_write_var_long(packet->bytes + packet->cursor, value);
+	packet->cursor += io_write_var_long(packet->bytes + packet->cursor, value, packet->length - packet->cursor);
 
 }
 

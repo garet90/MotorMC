@@ -11,7 +11,7 @@
 // worlds global vector
 utl_id_vector_t wld_worlds = UTL_ID_VECTOR_INITIALIZER(wld_world_t*);
 
-uint16_t wld_add(wld_world_t* world) {
+static inline uint16_t wld_add(wld_world_t* world) {
 	
 	uint16_t id = 0;
 
@@ -21,17 +21,47 @@ uint16_t wld_add(wld_world_t* world) {
 
 }
 
+static inline void wld_prepare_spawn(wld_world_t* world) {
+	
+	const wld_chunk_t* spawn_chunk = wld_gen_chunk(wld_get_region_at(world, world->spawn.x, world->spawn.z), (world->spawn.x >> 4) & 0x1F, (world->spawn.z >> 4) & 0x1F, 3);
+
+	// prepare spawn region
+	for (int32_t x = -11; x <= 11; ++x) {
+		for (int32_t z = -11; z <= 11; ++z) {
+			assert(UTL_MAX(14 - (11 - UTL_ABS(x)), 14 - (11 - UTL_ABS(z))) != WLD_TICKET_INACCESSIBLE);
+			wld_gen_relative_chunk(spawn_chunk, x, z, UTL_MAX(14 - (11 - UTL_ABS(x)), 14 - (11 - UTL_ABS(z))));
+		}
+	}
+
+}
+
+static inline uint64_t wld_hash_seed(int64_t seed) {
+	
+	EVP_MD_CTX* hash = EVP_MD_CTX_create();
+	EVP_DigestInit_ex(hash, EVP_sha256(), NULL);
+	EVP_DigestUpdate(hash, (byte_t*) &seed, 8);
+	unsigned int digest_length = 32;
+	byte_t seed_hash[digest_length];
+	EVP_DigestFinal_ex(hash, seed_hash, &digest_length);
+	EVP_MD_CTX_destroy(hash);
+
+	return *((uint64_t*) seed_hash);
+
+}
+
 wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t environment) {
 
 	wld_world_t* world = calloc(1, sizeof(wld_world_t));
 	srand(seed); // seed the random with the world seed (to choose spawn position)
+	const uint16_t id = wld_add(world);
 	wld_world_t world_init = {
 		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.seed = seed,
+		.seed_hash = wld_hash_seed(seed),
 		.environment = environment,
 		.name = name,
 		.regions = UTL_TREE_INITIALIZER,
-		.id = wld_add(world),
+		.id = id,
 		.spawn = {
 			.x = (rand() % 512) - 256,
 			.z = (rand() % 512) - 256
@@ -53,11 +83,12 @@ wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t env
 wld_world_t* wld_load(const string_t name) {
 
 	wld_world_t* world = calloc(1, sizeof(wld_world_t));
+	const uint16_t id = wld_add(world);
 	wld_world_t world_init = {
 		.lock = PTHREAD_MUTEX_INITIALIZER,
 		.name = name,
 		.regions = UTL_TREE_INITIALIZER,
-		.id = wld_add(world),
+		.id = id,
 		.age = 0,
 		.time = 0,
 		.time_progressing = true,
@@ -67,30 +98,22 @@ wld_world_t* wld_load(const string_t name) {
 	// TODO load world
 
 	wld_prepare_spawn(world);
-	
+
 	world->tick = sch_schedule_repeating(job_new(job_tick_world, (job_payload_t) { .world = world }), 1, 1);
 
 	return world;
 
 }
 
-void wld_prepare_spawn(wld_world_t* world) {
-	
-	const wld_chunk_t* spawn_chunk = wld_gen_chunk(wld_get_region_at(world, world->spawn.x, world->spawn.z), (world->spawn.x >> 4) & 0x1F, (world->spawn.z >> 4) & 0x1F, 3);
+uint16_t wld_get_count() {
 
-	// prepare spawn region
-	for (int32_t x = -11; x <= 11; ++x) {
-		for (int32_t z = -11; z <= 11; ++z) {
-			assert(UTL_MAX(14 - (11 - UTL_ABS(x)), 14 - (11 - UTL_ABS(z))) != WLD_TICKET_INACCESSIBLE);
-			wld_gen_relative_chunk(spawn_chunk, x, z, UTL_MAX(14 - (11 - UTL_ABS(x)), 14 - (11 - UTL_ABS(z))));
-		}
-	}
+	return utl_id_vector_count(&wld_worlds);
 
 }
 
-uint16_t wld_get_count() {
+uint16_t wld_get_length() {
 
-	return wld_worlds.array.size;
+	return utl_id_vector_length(&wld_worlds);
 
 }
 
@@ -143,22 +166,6 @@ wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z) {
 
 }
 
-wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
-
-	wld_region_t* region = NULL;
-
-	with_lock (&world->lock) {
-		region = utl_tree_get(&world->regions, ((uint64_t) (uint16_t) x << 16) | (uint16_t) z);
-	}
-
-	if (region == NULL) {
-		region = wld_gen_region(world, x, z);
-	}
-
-	return region;
-
-}
-
 wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint8_t x, uint8_t z, uint8_t max_ticket) {
 
 	assert(x < 32 && z < 32);
@@ -200,104 +207,10 @@ wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint8_t x, uint8_t z, uint8_t m
 
 }
 
-wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
-
-	wld_region_t* region = wld_get_region(world, x >> 5, z >> 5);
-
-	const uint8_t c_x = x & 0x1F;
-	const uint8_t c_z = z & 0x1F;
-
-	wld_chunk_t* chunk = region->chunks[(c_x << 5) | c_z];
-
-	if (chunk == NULL) {
-
-		chunk = wld_gen_chunk(region, c_x, c_z, WLD_TICKET_MAX);
-
-	}
-
-	assert(chunk != NULL);
-
-	return chunk;
-
-}
-
-wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z, uint8_t max_ticket) {
+static inline void wld_calc_player_ticket(uint32_t client_id, void* args) {
 	
-	const int32_t f_x = x + wld_get_chunk_x(chunk);
-	const int32_t f_z = z + wld_get_chunk_z(chunk);
+	wld_chunk_t* chunk = args;
 
-	const int32_t c_x = x + chunk->x;
-	const int32_t c_z = z + chunk->z;
-
-	int16_t r_x = c_x >> 5;
-	int16_t r_z = c_z >> 5;
-
-	const uint16_t i_x = c_x & 0x1F;
-	const uint16_t i_z = c_z & 0x1F;
-	const uint16_t idx = (i_x << 5) | i_z;
-
-	wld_region_t* region = wld_chunk_get_region(chunk);
-	wld_world_t* world = region->world;
-
-	while (r_x < 0) {
-		region = region->relative.west;
-		if (region == NULL) {
-			return wld_get_chunk(world, f_x, f_z);
-		}
-		r_x++;
-	}
-	while (r_x > 0) {
-		region = region->relative.east;
-		if (region == NULL) {
-			return wld_get_chunk(world, f_x, f_z);
-		}
-		
-		r_x--;
-	}
-
-	while (r_z < 0) {
-		region = region->relative.north;
-		if (region == NULL) {
-			return wld_get_chunk(world, f_x, f_z);
-		}
-		r_z++;
-	}
-	while (r_z > 0) {
-		region = region->relative.south;
-		if (region == NULL) {
-			return wld_get_chunk(world, f_x, f_z);
-		}
-		r_z--;
-	}
-
-	wld_chunk_t* found_chunk = region->chunks[idx];
-	if (found_chunk == NULL) {
-		found_chunk = wld_gen_chunk(region, i_x, i_z, max_ticket);
-	}
-
-	assert(found_chunk != NULL);
-
-	return found_chunk;
-
-}
-
-void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
-	ticket = UTL_MIN(chunk->max_ticket, ticket);
-	if (chunk->ticket == WLD_TICKET_INACCESSIBLE && ticket < WLD_TICKET_INACCESSIBLE) {
-		// loading chunk
-		wld_chunk_get_region(chunk)->loaded_chunks += 1;
-	} else if (chunk->ticket < WLD_TICKET_INACCESSIBLE && ticket == WLD_TICKET_INACCESSIBLE) {
-		// unloading chunk
-		wld_chunk_get_region(chunk)->loaded_chunks -= 1;
-		if (wld_chunk_get_region(chunk)->loaded_chunks == 0) {
-			sch_schedule(job_new(job_unload_region, (job_payload_t) { .region = wld_chunk_get_region(chunk) }), 100); // set to try unload in 5 seconds
-		}
-	}
-	chunk->ticket = ticket;
-}
-
-void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
-	
 	ent_player_t* player = ltg_client_get_entity(ltg_get_client_by_id(sky_get_listener(), client_id));
 	const int32_t c_x = wld_get_chunk_x(chunk);
 	const int32_t c_z = wld_get_chunk_z(chunk);
@@ -317,7 +230,16 @@ void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk) {
 
 }
 
-void wld_set_block_send(uint32_t client_id, void* arg) {
+void wld_recalc_chunk_ticket_l(wld_chunk_t* chunk) {
+	uint8_t old_ticket = chunk->ticket;
+	chunk->ticket = chunk->max_ticket;
+	utl_bit_vector_foreach(&chunk->players, wld_calc_player_ticket, chunk);
+	uint8_t new_ticket = chunk->ticket;
+	chunk->ticket = old_ticket;
+	wld_set_chunk_ticket(chunk, new_ticket);
+}
+
+static inline void wld_set_block_send(uint32_t client_id, void* arg) {
 
 	pck_packet_t* packet = arg;
 	ltg_client_t* client = ltg_get_client_by_id(sky_get_listener(), client_id);
@@ -368,6 +290,8 @@ void wld_set_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z, mat_b
 }
 
 void wld_unload_region(wld_region_t* region) {
+
+	// unload region crashes sometimes on stop server TODO
 
 	with_lock (&region->world->lock) {
 		utl_tree_remove(&region->world->regions, ((uint64_t) wld_region_get_x(region) << 16) | (uint64_t) wld_region_get_z(region));

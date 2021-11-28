@@ -65,7 +65,7 @@ sky_main_t sky_main = {
 
 // signal handlers
 void sky_handle_signal_terminate(__attribute__((unused)) int signal) {
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 void sky_handle_signal_crash(int signal) {
@@ -329,7 +329,7 @@ void sky_load_server_json() {
 			const char* key = mjson_get_string(key_val.label);
 			uint32_t hash = utl_hash(key);
 			switch (hash) {
-				case 0x574c2735: { // "worker_count"
+				case 0x574c2735: { // "worker-count"
 					sky_main.workers.count = mjson_get_int(key_val.value);
 				} break;
 				case 0x6f29f27f: { // "max-tick-time"

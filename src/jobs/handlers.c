@@ -156,6 +156,9 @@ bool job_handle_tick_region(job_payload_t* payload) {
 		wld_chunk_t* chunk = wld_region_get_chunk_by_idx(payload->region, i);
 
 		if (chunk != NULL) {
+
+			chunk->subtick = (chunk->subtick == 199 ? 0 : chunk->subtick + 1);
+
 			if (wld_chunk_get_ticket(chunk) <= WLD_TICKET_TICK_ENTITIES) {
 				// entities and chunk ticks
 				const uint32_t entity_length = wld_chunk_get_entity_length(chunk);
@@ -165,7 +168,7 @@ bool job_handle_tick_region(job_payload_t* payload) {
 						// void damage
 						if (ent_get_y(entity) <= -64) {
 							if (ent_is_le(entity)) {
-								if (wld_get_age(ent_get_world(entity)) % 10 == 0) {
+								if (chunk->subtick % 10 == 0) {
 									ent_le_damage((ent_living_entity_t*) entity, NULL, 4);
 								}
 							} else {

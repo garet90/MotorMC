@@ -1250,16 +1250,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	
 	// hash seed
 
-	EVP_MD_CTX* hash = EVP_MD_CTX_create();
-	EVP_DigestInit_ex(hash, EVP_sha256(), NULL);
-	int64_t player_world_seed = wld_get_seed(player_world);
-	EVP_DigestUpdate(hash, (byte_t*) &player_world_seed, 8);
-	unsigned int digest_length = 32;
-	byte_t seed_hash[digest_length];
-	EVP_DigestFinal_ex(hash, seed_hash, &digest_length);
-	EVP_MD_CTX_destroy(hash);
-
-	pck_write_int64(packet, *((uint64_t*) seed_hash)); // hashed seed
+	pck_write_int64(packet, wld_get_seed_hash(player_world)); // hashed seed
 	
 	pck_write_var_int(packet, ltg_get_online_max(sky_get_listener()));
 	pck_write_var_int(packet, sky_get_render_distance()); // view distance

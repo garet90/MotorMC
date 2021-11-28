@@ -11,6 +11,8 @@
 #include "../util/tree.h"
 #include "../util/lock_util.h"
 #include "../util/util.h"
+#include "../jobs/board.h"
+#include "../jobs/scheduler/scheduler.h"
 #include "material/material.h"
 
 struct wld_chunk_section {
@@ -53,6 +55,8 @@ struct wld_chunk {
 	const uint8_t x : 5;
 	const uint8_t z : 5;
 
+	_Atomic uint8_t subtick;
+
 	_Atomic uint8_t ticket;
 	const uint8_t max_ticket;
 
@@ -90,6 +94,7 @@ struct wld_world {
 	pthread_mutex_t lock;
 
 	const int64_t seed;
+	const uint64_t seed_hash;
 
 	_Atomic uint64_t age;
 
@@ -118,14 +123,15 @@ struct wld_world {
 
 };
 
-extern uint16_t wld_add(wld_world_t* world);
-
-extern void wld_prepare_spawn(wld_world_t* world);
 extern wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t environment);
 extern wld_world_t* wld_load(const string_t name);
 
 static inline int64_t wld_get_seed(wld_world_t* world) {
 	return world->seed;
+}
+
+static inline uint64_t wld_get_seed_hash(wld_world_t* world) {
+	return world->seed_hash;
 }
 
 static inline int32_t wld_get_spawn_x(wld_world_t* world) {
@@ -161,6 +167,7 @@ static inline bool wld_is_time_progressing(wld_world_t* world) {
 }
 
 extern uint16_t wld_get_count();
+extern uint16_t wld_get_length();
 extern wld_world_t* wld_get_world(uint16_t world_id);
 
 static inline wld_world_t* wld_get_default() {
@@ -168,7 +175,23 @@ static inline wld_world_t* wld_get_default() {
 }
 
 extern wld_region_t* wld_gen_region(wld_world_t* world, int16_t x, int16_t z);
-extern wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z);
+
+static inline wld_region_t* wld_get_region(wld_world_t* world, int16_t x, int16_t z) {
+
+	wld_region_t* region = NULL;
+
+	with_lock (&world->lock) {
+		region = utl_tree_get(&world->regions, ((uint64_t) (uint16_t) x << 16) | (uint16_t) z);
+	}
+
+	if (region == NULL) {
+		region = wld_gen_region(world, x, z);
+	}
+
+	return region;
+
+}
+
 static inline wld_region_t* wld_get_region_at(wld_world_t* world, int32_t x, int32_t z) {
 	return wld_get_region(world, x >> 9, z >> 9);
 }
@@ -198,7 +221,28 @@ static inline uint_fast16_t wld_region_get_loaded_chunks(wld_region_t* region) {
 }
 
 extern wld_chunk_t* wld_gen_chunk(wld_region_t* region, uint8_t x, uint8_t z, uint8_t max_ticket);
-extern wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z);
+
+static inline wld_chunk_t* wld_get_chunk(wld_world_t* world, int32_t x, int32_t z) {
+
+	wld_region_t* region = wld_get_region(world, x >> 5, z >> 5);
+
+	const uint8_t c_x = x & 0x1F;
+	const uint8_t c_z = z & 0x1F;
+
+	wld_chunk_t* chunk = region->chunks[(c_x << 5) | c_z];
+
+	if (chunk == NULL) {
+
+		chunk = wld_gen_chunk(region, c_x, c_z, WLD_TICKET_MAX);
+
+	}
+
+	assert(chunk != NULL);
+
+	return chunk;
+
+}
+
 static inline wld_chunk_t* wld_get_chunk_at(wld_world_t* world, int32_t x, int32_t z) {
 	return wld_get_chunk(world, x >> 4, z >> 4);
 }
@@ -235,20 +279,78 @@ static inline uint8_t wld_chunk_get_ticket(const wld_chunk_t* chunk) {
 	return chunk->ticket;
 }
 
-extern wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z, uint8_t max_ticket);
+static inline int32_t wld_get_chunk_x(const wld_chunk_t* chunk) {
+	return (wld_region_get_x(wld_chunk_get_region(chunk)) << 5) | chunk->x;
+}
+static inline int32_t wld_get_chunk_z(const wld_chunk_t* chunk) {
+	return (wld_region_get_z(wld_chunk_get_region(chunk)) << 5) | chunk->z;
+}
+
+static inline wld_chunk_t* wld_gen_relative_chunk(const wld_chunk_t* chunk, int16_t x, int16_t z, uint8_t max_ticket) {
+	
+	const int32_t f_x = x + wld_get_chunk_x(chunk);
+	const int32_t f_z = z + wld_get_chunk_z(chunk);
+
+	const int32_t c_x = x + chunk->x;
+	const int32_t c_z = z + chunk->z;
+
+	int16_t r_x = c_x >> 5;
+	int16_t r_z = c_z >> 5;
+
+	const uint16_t i_x = c_x & 0x1F;
+	const uint16_t i_z = c_z & 0x1F;
+	const uint16_t idx = (i_x << 5) | i_z;
+
+	wld_region_t* region = wld_chunk_get_region(chunk);
+	wld_world_t* world = region->world;
+
+	while (r_x < 0) {
+		region = region->relative.west;
+		if (region == NULL) {
+			return wld_get_chunk(world, f_x, f_z);
+		}
+		r_x++;
+	}
+	while (r_x > 0) {
+		region = region->relative.east;
+		if (region == NULL) {
+			return wld_get_chunk(world, f_x, f_z);
+		}
+		
+		r_x--;
+	}
+
+	while (r_z < 0) {
+		region = region->relative.north;
+		if (region == NULL) {
+			return wld_get_chunk(world, f_x, f_z);
+		}
+		r_z++;
+	}
+	while (r_z > 0) {
+		region = region->relative.south;
+		if (region == NULL) {
+			return wld_get_chunk(world, f_x, f_z);
+		}
+		r_z--;
+	}
+
+	wld_chunk_t* found_chunk = region->chunks[idx];
+	if (found_chunk == NULL) {
+		found_chunk = wld_gen_chunk(region, i_x, i_z, max_ticket);
+	}
+
+	assert(found_chunk != NULL);
+
+	return found_chunk;
+
+}
 
 // This is fast for short distances (within regions to a few regions over), but for long distances this is excruciatingly slow
 static inline wld_chunk_t* wld_relative_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z) {
 
 	return wld_gen_relative_chunk(chunk, x, z, WLD_TICKET_MAX);
 
-}
-
-static inline int32_t wld_get_chunk_x(const wld_chunk_t* chunk) {
-	return (wld_region_get_x(wld_chunk_get_region(chunk)) << 5) | chunk->x;
-}
-static inline int32_t wld_get_chunk_z(const wld_chunk_t* chunk) {
-	return (wld_region_get_z(wld_chunk_get_region(chunk)) << 5) | chunk->z;
 }
 
 static inline bool wld_in_chunk(const wld_chunk_t* chunk, int32_t x, int32_t z) {
@@ -267,7 +369,20 @@ static inline void wld_unsubscribe_chunk(wld_chunk_t* chunk, uint32_t client_id)
 	}
 }
 
-extern void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket);
+static inline void wld_set_chunk_ticket(wld_chunk_t* chunk, uint8_t ticket) {
+	ticket = UTL_MIN(chunk->max_ticket, ticket);
+	if (chunk->ticket == WLD_TICKET_INACCESSIBLE && ticket < WLD_TICKET_INACCESSIBLE) {
+		// loading chunk
+		wld_chunk_get_region(chunk)->loaded_chunks += 1;
+	} else if (chunk->ticket < WLD_TICKET_INACCESSIBLE && ticket == WLD_TICKET_INACCESSIBLE) {
+		// unloading chunk
+		wld_chunk_get_region(chunk)->loaded_chunks -= 1;
+		if (wld_chunk_get_region(chunk)->loaded_chunks == 0) {
+			sch_schedule(job_new(job_unload_region, (job_payload_t) { .region = wld_chunk_get_region(chunk) }), 100); // set to try unload in 5 seconds
+		}
+	}
+	chunk->ticket = ticket;
+}
 
 static inline void wld_add_player_chunk(wld_chunk_t* chunk, uint32_t client_id, uint8_t ticket) {
 	with_lock (&chunk->lock) {
@@ -277,16 +392,7 @@ static inline void wld_add_player_chunk(wld_chunk_t* chunk, uint32_t client_id, 
 	wld_set_chunk_ticket(chunk, ticket);
 }
 
-extern void wld_calc_player_ticket(uint32_t client_id, wld_chunk_t* chunk);
-
-static inline void wld_recalc_chunk_ticket_l(wld_chunk_t* chunk) {
-	uint8_t old_ticket = chunk->ticket;
-	chunk->ticket = chunk->max_ticket;
-	utl_bit_vector_foreach(&chunk->players, (void (*) (uint32_t, void*)) wld_calc_player_ticket, chunk);
-	uint8_t new_ticket = chunk->ticket;
-	chunk->ticket = old_ticket;
-	wld_set_chunk_ticket(chunk, new_ticket);
-}
+extern void wld_recalc_chunk_ticket_l(wld_chunk_t* chunk);
 
 static inline void wld_recalc_chunk_ticket(wld_chunk_t* chunk) {
 	with_lock (&chunk->lock) {
