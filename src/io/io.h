@@ -117,7 +117,7 @@ static inline float64_t io_read_float64(const byte_t* buffer, io_endianness_t en
 
 static inline int32_t io_read_var_int(const byte_t* buffer, size_t max_length, size_t* length) {
 	
-	int32_t result = 0;
+	uint32_t result = 0;
 	int8_t read = 0x80;
 
 	if (max_length > 5) max_length = 5;
@@ -144,7 +144,7 @@ static inline int32_t io_read_var_int(const byte_t* buffer, size_t max_length, s
 
 static inline int64_t io_read_var_long(const byte_t* buffer, size_t max_length, size_t* length) {
 	
-	int64_t result = 0;
+	uint64_t result = 0;
 	int8_t read = 0x80;
 
 	if (max_length > 10) max_length = 10;

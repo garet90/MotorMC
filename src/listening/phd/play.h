@@ -114,7 +114,7 @@ extern void phd_send_craft_recipe_response(ltg_client_t*);
 extern void phd_send_player_abilities(ltg_client_t* client);
 extern void phd_send_end_combat_event(ltg_client_t*);
 extern void phd_send_enter_combat_event(ltg_client_t*);
-extern void phd_send_death_combat_event(ltg_client_t*);
+extern void phd_send_death_combat_event(ltg_client_t* client, ent_player_t* player, ent_entity_t* killer, const char* message, size_t message_length);
 
 extern void phd_send_player_info_add_players(ltg_client_t* client);
 extern void phd_send_player_info_add_player(ltg_client_t* client, ltg_client_t* player);

@@ -459,10 +459,22 @@ static inline void job_update_living_entity_damage(uint32_t client_id, void* arg
 	
 	if (client == NULL) return;
 
-	phd_send_entity_status(client, ent_le_get_entity(entity), 2);
-	
+	phd_send_entity_status(client, ent_le_get_entity(entity), ent_le_is_dead(entity) ? 3 : 2);
+
 	if (payload->living_entity_damage.damage > 0 && ent_get_type(ent_le_get_entity(entity)) == ent_player && ent_player_get_le(ltg_client_get_entity(client)) == entity) {
 		phd_send_update_health(client);
+
+		if (ent_le_is_dead(entity)) {
+			if (sky_is_enabled_respawn_screen()) {
+				cht_component_t death_message = cht_new;
+				death_message.text = UTL_CSTRTOSTR("Eventually something will be here");
+				char message[512];
+				size_t message_length = cht_write(&death_message, message);
+				phd_send_death_combat_event(client, (ent_player_t*) entity, payload->living_entity_damage.damager, message, message_length);
+			} else {
+				// TODO immediate respawn
+			}
+		}
 	}
 
 }

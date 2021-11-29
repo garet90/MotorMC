@@ -92,6 +92,7 @@ bool test_packets() {
 	pck_write_float32(packet, 0.1234);
 	pck_write_float64(packet, 5.6789);
 	pck_write_var_int(packet, 0x1a2b);
+	pck_write_var_int(packet, -1);
 	pck_write_var_long(packet, 0x3c4d5e6f1234L);
 	pck_write_position(packet, (pck_position_t) { .x = 1, .y = 2, .z = 3});
 	pck_write_string(packet, UTL_CSTRTOARG("test string"));
@@ -130,6 +131,11 @@ bool test_packets() {
 
 	if (pck_read_var_int(packet) != 0x1a2b) {
 		log_error("FAIL ON VAR INT");
+		return false;
+	}
+
+	if (pck_read_var_int(packet) != -1) {
+		log_error("FAIL ON NEGATIVE VAR INT");
 		return false;
 	}
 

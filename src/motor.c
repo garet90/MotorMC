@@ -44,6 +44,7 @@ sky_main_t sky_main = {
 	.network_compression_threshold = 256,
 	.online_mode = true,
 	.prevent_proxy_connections = false,
+	.enable_respawn_screen = true,
 
 	// listener
 	.listener = {

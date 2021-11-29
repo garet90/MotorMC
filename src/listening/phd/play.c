@@ -124,6 +124,7 @@ bool phd_handle_client_status(ltg_client_t* client, pck_packet_t* packet) {
 		case 0: { // respawn
 			if (ent_le_is_dead(ent_player_get_le(ltg_client_get_entity(client)))) {
 				// TODO do something
+				log_info("respawn player");
 			}
 		} break;
 		case 1: { // request stats
@@ -1359,6 +1360,23 @@ void phd_send_player_abilities(ltg_client_t* client) {
 	pck_write_int8(packet, 0);
 	pck_write_float32(packet, 0.05);
 	pck_write_float32(packet, 0.1);
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_death_combat_event(ltg_client_t* client, ent_player_t* player, ent_entity_t* killer, const char* message, size_t message_length) {
+
+	PCK_INLINE(packet, 16 + message_length, io_big_endian);
+	
+	pck_write_var_int(packet, 0x35);
+	pck_write_var_int(packet, ent_get_id(ent_player_get_entity(player)));
+	if (killer != NULL) {
+		pck_write_int32(packet, ent_get_id(killer));
+	} else {
+		pck_write_int32(packet, -1);
+	}
+	pck_write_string(packet, message, message_length);
 
 	ltg_send(client, packet);
 
