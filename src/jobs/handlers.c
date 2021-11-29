@@ -236,7 +236,7 @@ static inline void job_update_entity_move(uint32_t client_id, void* args) {
 	
 	if (ent_get_type(entity) == ent_player && ent_player_get_entity(ltg_client_get_entity(client)) == entity) {
 		if (ent_get_chunk(entity) != payload->entity_move.initial_chunk) {
-			phd_update_sent_chunks_move(payload->entity_move.initial_chunk, client);
+			phd_update_sent_chunks_move(client, payload->entity_move.initial_chunk);
 		}
 	} else {
 		phd_send_entity_position(client, entity, payload->entity_move.d_x, payload->entity_move.d_y, payload->entity_move.d_z);
@@ -284,10 +284,11 @@ static inline void job_update_entity_teleport(uint32_t client_id, void* args) {
 	
 	if (ent_get_type(entity) == ent_player && ent_player_get_entity(ltg_client_get_entity(client)) == entity) {
 		if (ent_get_chunk(entity) != payload->entity_teleport.initial_chunk) {
-			// TODO phd_update_sent_chunks_teleport(client);
+			phd_update_sent_chunks_teleport(client, payload->entity_teleport.initial_chunk);
 		}
+		phd_send_player_position_and_look(client);
 	} else {
-		// TODO entering chunks, leaving chunks, etc
+		phd_send_entity_teleport(client, (ent_living_entity_t*) entity); // TODO what if this is just an entity?
 	}
 
 }
@@ -364,7 +365,7 @@ static inline void job_update_living_entity_move_look(uint32_t client_id, void* 
 
 	if (ent_get_type(ent_le_get_entity(entity)) == ent_player && ent_player_get_le(ltg_client_get_entity(client)) == entity) {
 		if (ent_get_chunk(ent_le_get_entity(entity)) != payload->living_entity_move_look.initial_chunk) {
-			phd_update_sent_chunks_move(payload->living_entity_move_look.initial_chunk, client);
+			phd_update_sent_chunks_move(client, payload->living_entity_move_look.initial_chunk);
 		}
 	} else {
 		phd_send_entity_position_and_rotation(client, entity, payload->living_entity_move_look.d_x, payload->living_entity_move_look.d_y, payload->living_entity_move_look.d_z);
@@ -411,10 +412,12 @@ static inline void job_update_living_entity_teleport_look(uint32_t client_id, vo
 	
 	if (ent_get_type(ent_le_get_entity(entity)) == ent_player && ent_player_get_le(ltg_client_get_entity(client)) == entity) {
 		if (ent_get_chunk(ent_le_get_entity(entity)) != payload->living_entity_teleport_look.initial_chunk) {
-			// TODO phd_update_sent_chunks_teleport(client);
+			phd_update_sent_chunks_teleport(client, payload->living_entity_teleport_look.initial_chunk);
 		}
+		phd_send_player_position_and_look(client);
 	} else {
-		// TODO phd_send_entity_teleport_look(...)
+		phd_send_entity_teleport(client, entity);
+		phd_send_entity_head_look(client, entity);
 	}
 
 }
@@ -432,9 +435,7 @@ bool job_handle_living_entity_teleport_look(job_payload_t* payload) {
 	entity->rotation.yaw = payload->living_entity_teleport_look.yaw;
 	entity->rotation.pitch = payload->living_entity_teleport_look.pitch;
 
-	entity->entity.on_ground = false;
-	
-	ent_remove_chunk(ent_le_get_entity(entity));
+	entity->entity.on_ground = payload->living_entity_teleport_look.on_ground;
 
 	// TODO physics
 
@@ -472,7 +473,7 @@ static inline void job_update_living_entity_damage(uint32_t client_id, void* arg
 				size_t message_length = cht_write(&death_message, message);
 				phd_send_death_combat_event(client, (ent_player_t*) entity, payload->living_entity_damage.damager, message, message_length);
 			} else {
-				// TODO immediate respawn
+				phd_update_respawn(client);
 			}
 		}
 	}

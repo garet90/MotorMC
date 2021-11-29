@@ -126,6 +126,10 @@ struct wld_world {
 extern wld_world_t* wld_new(const string_t name, int64_t seed, mat_dimension_type_t environment);
 extern wld_world_t* wld_load(const string_t name);
 
+static inline string_t wld_get_name(wld_world_t* world) {
+	return world->name;
+}
+
 static inline int64_t wld_get_seed(wld_world_t* world) {
 	return world->seed;
 }

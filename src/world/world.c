@@ -303,29 +303,34 @@ void wld_unload_region(wld_region_t* region) {
 
 void wld_free_region(wld_region_t* region) {
 
-	if (region->relative.north != NULL) {
-		region->relative.north->relative.south = NULL;
+	wld_region_t* north_region = region->relative.north;
+	if (north_region != NULL) {
+		north_region->relative.south = NULL;
 	}
-	if (region->relative.south != NULL) {
-		region->relative.south->relative.north = NULL;
+	wld_region_t* south_region = region->relative.south;
+	if (south_region != NULL) {
+		south_region->relative.north = NULL;
 	}
-	if (region->relative.west != NULL) {
-		region->relative.west->relative.east = NULL;
+	wld_region_t* west_region = region->relative.west;
+	if (west_region != NULL) {
+		west_region->relative.east = NULL;
 	}
-	if (region->relative.east != NULL) {
-		region->relative.east->relative.west = NULL;
+	wld_region_t* east_region = region->relative.east;
+	if (east_region != NULL) {
+		east_region->relative.west = NULL;
 	}
 	
 	sch_cancel(region->tick);
 
 	for (size_t i = 0; i < 32 * 32; ++i) {
-		if (region->chunks[i] != NULL) {
-			pthread_mutex_destroy(&region->chunks[i]->lock);
-			utl_term_bit_vector(&region->chunks[i]->subscribers);
-			utl_term_bit_vector(&region->chunks[i]->players);
-			utl_term_id_vector(&region->chunks[i]->entities);
-			utl_term_id_vector(&region->chunks[i]->block_entities);
-			free(region->chunks[i]);
+		wld_chunk_t* chunk = region->chunks[i];
+		if (chunk != NULL) {
+			pthread_mutex_destroy(&chunk->lock);
+			utl_term_bit_vector(&chunk->subscribers);
+			utl_term_bit_vector(&chunk->players);
+			utl_term_id_vector(&chunk->entities);
+			utl_term_id_vector(&chunk->block_entities);
+			free(chunk);
 		}
 	}
 

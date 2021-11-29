@@ -123,8 +123,7 @@ bool phd_handle_client_status(ltg_client_t* client, pck_packet_t* packet) {
 	switch (action) {
 		case 0: { // respawn
 			if (ent_le_is_dead(ent_player_get_le(ltg_client_get_entity(client)))) {
-				// TODO do something
-				log_info("respawn player");
+				phd_update_respawn(client);
 			}
 		} break;
 		case 1: { // request stats
@@ -1571,6 +1570,26 @@ void phd_send_destroy_entity(ltg_client_t* client, ent_entity_t* entity) {
 
 }
 
+void phd_send_respawn(ltg_client_t* client, wld_world_t* world, bool keep_metadata) {
+
+	const mat_codec_t* dimension_codec = mat_get_dimension_codec(wld_get_environment(world));
+
+	PCK_INLINE(packet, 19 + dimension_codec->size + UTL_STRLEN(wld_get_name(world)), io_big_endian);
+
+	pck_write_var_int(packet, 0x3d);
+	pck_write_bytes(packet, dimension_codec->bytes, dimension_codec->size);
+	pck_write_string(packet, UTL_STRTOARG(wld_get_name(world)));
+	pck_write_int64(packet, wld_get_seed_hash(world));
+	pck_write_int8(packet, ent_survival); // TODO actual gamemode
+	pck_write_int8(packet, ent_survival);
+	pck_write_int8(packet, wld_is_debug(world));
+	pck_write_int8(packet, wld_is_flat(world));
+	pck_write_int8(packet, keep_metadata);
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_entity_head_look(ltg_client_t* client, ent_living_entity_t* entity) {
 
 	PCK_INLINE(packet, 7, io_big_endian);
@@ -1684,6 +1703,24 @@ void phd_send_time_update(ltg_client_t* client, wld_world_t* world) {
 
 }
 
+void phd_send_entity_teleport(ltg_client_t* client, ent_living_entity_t* entity) {
+
+	PCK_INLINE(packet, 43, io_big_endian);
+
+	pck_write_var_int(packet, 0x61);
+	pck_write_var_int(packet, ent_get_id(ent_le_get_entity(entity)));
+	pck_write_float64(packet, ent_get_x(ent_le_get_entity(entity)));
+	pck_write_float64(packet, ent_get_y(ent_le_get_entity(entity)));
+	pck_write_float64(packet, ent_get_z(ent_le_get_entity(entity)));
+
+	pck_write_int8(packet, io_angle_to_byte(ent_le_get_yaw(entity)));
+	pck_write_int8(packet, io_angle_to_byte(ent_le_get_pitch(entity)));
+	pck_write_int8(packet, ent_is_on_ground(ent_le_get_entity(entity)));
+
+	ltg_send(client, packet);
+
+}
+
 void phd_send_declare_recipes(ltg_client_t* client) {
 
 	PCK_INLINE(packet, 6 + rec_recipes.size * 128, io_big_endian);
@@ -1772,6 +1809,7 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 	const wld_chunk_t* chunk = ent_get_chunk(ent_player_get_entity(ltg_client_get_entity(client)));
 
 	const uint8_t server_render_distance = sky_get_render_distance();
+	const uint8_t client_render_distance = ltg_client_get_render_distance(client);
 
 	for (int16_t x = -(server_render_distance + 2); x <= server_render_distance + 2; ++x) {
 		for (int16_t z = -(server_render_distance + 2); z <= server_render_distance + 2; ++z) {
@@ -1784,7 +1822,7 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 			}
 
 			// subscribe to the chunk if it is in render distance
-			if (distance <= ltg_client_get_render_distance(client)) {
+			if (distance <= client_render_distance) {
 				phd_update_subscribe_chunk(client, v_c);
 			}
 		}
@@ -1818,7 +1856,7 @@ void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_dis
 
 }
 
-void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* client) {
+void phd_update_sent_chunks_move(ltg_client_t* client, const wld_chunk_t* old_chunk) {
 	
 	phd_send_update_view_position(client);
 
@@ -1831,16 +1869,17 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 	const int32_t old_z = wld_get_chunk_z(old_chunk);
 
 	const uint8_t server_render_distance = sky_get_render_distance();
+	const uint8_t client_render_distance = ltg_client_get_render_distance(client);
 
 	assert(x != old_x || z != old_z);
 
 	if (x > old_x) {
 		
 		{ // render chunks
-			const int32_t o_x = -ltg_client_get_render_distance(client);
-			const int32_t n_x = ltg_client_get_render_distance(client) + 1;
+			const int32_t o_x = -client_render_distance;
+			const int32_t n_x = client_render_distance + 1;
 
-			for (int32_t c_z = -ltg_client_get_render_distance(client); c_z <= ltg_client_get_render_distance(client); ++c_z) {
+			for (int32_t c_z = -client_render_distance; c_z <= client_render_distance; ++c_z) {
 				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, o_x, c_z));
 				phd_update_subscribe_chunk(client, wld_relative_chunk(old_chunk, n_x, c_z));
 			}
@@ -1863,10 +1902,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 	} else if (x < old_x) {
 
 		{
-			const int32_t o_x = ltg_client_get_render_distance(client);
-			const int32_t n_x = -ltg_client_get_render_distance(client) - 1;
+			const int32_t o_x = client_render_distance;
+			const int32_t n_x = -client_render_distance - 1;
 
-			for (int32_t c_z = -ltg_client_get_render_distance(client); c_z <= ltg_client_get_render_distance(client); ++c_z) {
+			for (int32_t c_z = -client_render_distance; c_z <= client_render_distance; ++c_z) {
 				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, o_x, c_z));
 				phd_update_subscribe_chunk(client, wld_relative_chunk(old_chunk, n_x, c_z));
 			}
@@ -1891,10 +1930,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 	if (z > old_z) {
 
 		{
-			const int32_t o_z = -ltg_client_get_render_distance(client);
-			const int32_t n_z = ltg_client_get_render_distance(client) + 1;
+			const int32_t o_z = -client_render_distance;
+			const int32_t n_z = client_render_distance + 1;
 			
-			for (int32_t c_x = -ltg_client_get_render_distance(client); c_x <= ltg_client_get_render_distance(client); ++c_x) {
+			for (int32_t c_x = -client_render_distance; c_x <= client_render_distance; ++c_x) {
 				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, o_z));
 				phd_update_subscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, n_z));
 			}
@@ -1917,10 +1956,10 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 	} else if (z < old_z) {
 
 		{
-			const int32_t o_z = ltg_client_get_render_distance(client);
-			const int32_t n_z = -ltg_client_get_render_distance(client) - 1;
+			const int32_t o_z = client_render_distance;
+			const int32_t n_z = -client_render_distance - 1;
 			
-			for (int32_t c_x = -ltg_client_get_render_distance(client); c_x <= ltg_client_get_render_distance(client); ++c_x) {
+			for (int32_t c_x = -client_render_distance; c_x <= client_render_distance; ++c_x) {
 				phd_update_unsubscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, o_z));
 				phd_update_subscribe_chunk(client, wld_relative_chunk(old_chunk, c_x, n_z));
 			}
@@ -1946,11 +1985,66 @@ void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* cli
 
 }
 
-void phd_update_sent_chunks_leave(ltg_client_t* client) {
+void phd_update_sent_chunks_teleport(ltg_client_t* client, const wld_chunk_t* old_chunk) {
 	
-	const wld_chunk_t* chunk = ent_get_chunk(ent_player_get_entity(ltg_client_get_entity(client)));
+	phd_send_update_view_position(client);
+
+	// we don't want to send chunks when we don't need to because it is a lot more work than just checking if we are subscribed to it or it's in range
+
+	ent_player_t* entity = ltg_client_get_entity(client);
+	wld_chunk_t* chunk = ent_get_chunk(ent_player_get_entity(entity));
+
+	if (wld_chunk_get_world(chunk) != wld_chunk_get_world(old_chunk)) {
+		phd_update_sent_chunks_remove(client, old_chunk);
+		phd_update_sent_chunks(client);
+		return;
+	}
+
+	// check for chunks that need to be unsubscribed from
+	const int32_t x = wld_get_chunk_x(chunk);
+	const int32_t z = wld_get_chunk_z(chunk);
+
+	const int32_t old_x = wld_get_chunk_x(old_chunk);
+	const int32_t old_z = wld_get_chunk_z(old_chunk);
+
+	const uint8_t client_render_distance = ltg_client_get_render_distance(client);
+
+	assert(x != old_x || z != old_z);
+
+	{ // old chunk
+		for (int32_t c_x = -client_render_distance; c_x <= client_render_distance; ++c_x) {
+			for (int32_t c_z = -client_render_distance; c_z <= client_render_distance; ++c_z) {
+				wld_chunk_t* c_c = wld_relative_chunk(old_chunk, c_x, c_z);
+				// test if in render distance
+				if (UTL_MAX(UTL_ABS(c_x + old_x - x), UTL_ABS(c_z + old_z - z)) > client_render_distance) {
+					// no longer in view
+					phd_update_unsubscribe_chunk(client, c_c);
+					log_info("Unsubscribed from chunk");
+				}
+			}
+		}
+	}
+
+	{ // new chunk
+		for (int32_t c_x = -client_render_distance; c_x <= client_render_distance; ++c_x) {
+			for (int32_t c_z = -client_render_distance; c_z <= client_render_distance; ++c_z) {
+				wld_chunk_t* c_c = wld_relative_chunk(chunk, c_x, c_z);
+				if (!wld_chunk_has_subscriber(c_c, ltg_client_get_id(client))) {
+					phd_update_subscribe_chunk(client, c_c);
+					log_info("Subscribed to chunk");
+				}
+			}
+		}
+	}
+
+	// TODO ticket chunks
+
+}
+
+void phd_update_sent_chunks_remove(ltg_client_t* client, const wld_chunk_t* chunk) {
 
 	const uint8_t server_render_distance = sky_get_render_distance();
+	const uint8_t client_render_distance = ltg_client_get_render_distance(client);
 
 	// player chunks
 	for (int16_t x = -(server_render_distance + 2); x <= server_render_distance + 2; ++x) {
@@ -1959,10 +2053,33 @@ void phd_update_sent_chunks_leave(ltg_client_t* client) {
 			wld_remove_player_chunk(v_c, ltg_client_get_id(client));
 
 			const uint8_t distance = UTL_MAX(UTL_ABS(x), UTL_ABS(z));
-			if (distance <= ltg_client_get_render_distance(client)) {
+			if (distance <= client_render_distance) {
 				phd_update_unsubscribe_chunk(client, v_c);
 			}
 		}
 	}
+
+}
+
+void phd_update_sent_chunks_leave(ltg_client_t* client) {
+	
+	const wld_chunk_t* chunk = ent_get_chunk(ent_player_get_entity(ltg_client_get_entity(client)));
+
+	phd_update_sent_chunks_remove(client, chunk);
+
+}
+
+void phd_update_respawn(ltg_client_t* client) {
+
+	// TODO do something here
+	ent_player_t* player = ltg_client_get_entity(client);
+	
+	player->living_entity.health = 20;
+	
+	wld_world_t* world = wld_get_default();
+
+	phd_send_respawn(client, world, false);
+
+	ent_le_teleport_look(ent_player_get_le(player), world, wld_get_spawn_x(world), 256, wld_get_spawn_z(world), 0, 0, true);
 
 }

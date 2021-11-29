@@ -99,6 +99,27 @@ static inline void ent_le_move_look(ent_living_entity_t* entity, float64_t d_x, 
 	);
 }
 
+static inline void ent_le_teleport_look(ent_living_entity_t* entity, wld_world_t* world, float64_t x, float64_t y, float64_t z, float32_t yaw, float32_t pitch, bool on_ground) {
+	job_add(
+		job_new(
+			job_living_entity_teleport_look,
+			(job_payload_t) {
+				.living_entity_teleport_look = {
+					.entity = entity,
+					.initial_chunk = ent_get_chunk(ent_le_get_entity(entity)),
+					.world = world,
+					.x = x,
+					.y = y,
+					.z = z,
+					.yaw = yaw,
+					.pitch = pitch,
+					.on_ground = on_ground
+				}
+			}
+		)
+	);
+}
+
 static inline void ent_le_damage(ent_living_entity_t* entity, ent_entity_t* damager, float32_t damage) {
 	if (!ent_le_is_dead(entity)) {
 		job_add(

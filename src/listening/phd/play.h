@@ -131,7 +131,7 @@ extern void phd_send_destroy_entity(ltg_client_t* client, ent_entity_t* entity);
 extern void phd_send_destroy_entities(ltg_client_t*);
 extern void phd_send_remove_entity_effect(ltg_client_t*);
 extern void phd_send_resource_pack_send(ltg_client_t*);
-extern void phd_send_respawn(ltg_client_t*);
+extern void phd_send_respawn(ltg_client_t* client, wld_world_t* world, bool keep_metadata);
 extern void phd_send_entity_head_look(ltg_client_t* client, ent_living_entity_t* entity);
 extern void phd_send_multi_block_change(ltg_client_t*);
 extern void phd_send_select_advancement_tab(ltg_client_t*);
@@ -168,7 +168,7 @@ extern void phd_send_stop_sound(ltg_client_t*);
 extern void phd_send_player_list_header_and_footer(ltg_client_t*);
 extern void phd_send_nbt_query_response(ltg_client_t*);
 extern void phd_send_collect_item(ltg_client_t*);
-extern void phd_send_entity_teleport(ltg_client_t*);
+extern void phd_send_entity_teleport(ltg_client_t* client, ent_living_entity_t* entity);
 extern void phd_send_advancements(ltg_client_t*);
 extern void phd_send_entity_properties(ltg_client_t*);
 extern void phd_send_entity_effect(ltg_client_t*);
@@ -211,6 +211,9 @@ static inline void phd_update_unsubscribe_chunk(ltg_client_t* client, wld_chunk_
 
 extern void phd_update_sent_chunks(ltg_client_t* client);
 extern void phd_update_sent_chunks_view_distance(ltg_client_t* client, uint8_t view_distance);
-extern void phd_update_sent_chunks_move(const wld_chunk_t* old_chunk, ltg_client_t* client);
-extern void phd_update_sent_chunks_teleport(ltg_client_t* client);
+extern void phd_update_sent_chunks_move(ltg_client_t* client, const wld_chunk_t* old_chunk);
+extern void phd_update_sent_chunks_teleport(ltg_client_t* client, const wld_chunk_t* old_chunk);
+extern void phd_update_sent_chunks_remove(ltg_client_t* client, const wld_chunk_t* chunk);
 extern void phd_update_sent_chunks_leave(ltg_client_t* client);
+
+extern void phd_update_respawn(ltg_client_t* client);

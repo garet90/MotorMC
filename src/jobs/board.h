@@ -131,6 +131,8 @@ union job_payload {
 		float32_t yaw;
 		float32_t pitch;
 
+		bool on_ground;
+
 	} living_entity_teleport_look;
 
 	struct {
