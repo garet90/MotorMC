@@ -1,6 +1,8 @@
 #pragma once
 #include "../main.h"
 
+// TODO add lombard and toki pona
+
 typedef enum {
 
 	ltg_af_za = 0x0f13dbe6,

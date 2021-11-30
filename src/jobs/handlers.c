@@ -150,6 +150,8 @@ bool job_handle_send_update_pings(__attribute__((unused)) job_payload_t* payload
 bool job_handle_tick_region(job_payload_t* payload) {
 
 	// TODO what if this region is unloaded by the time this is handled?
+
+	const mat_dimension_t* dimension = mat_get_dimension_by_type(wld_get_environment(wld_region_get_world(payload->region)));
 	
 	for (uint32_t i = 0; i < 32 * 32; ++i) {
 
@@ -166,7 +168,7 @@ bool job_handle_tick_region(job_payload_t* payload) {
 					ent_entity_t* entity = wld_chunk_get_entity(chunk, j);
 					if (entity != NULL) {
 						// void damage
-						if (ent_get_y(entity) <= -64) {
+						if (ent_get_y(entity) <= (dimension->min_y - 64)) {
 							if (ent_is_le(entity)) {
 								if (chunk->subtick % 10 == 0) {
 									ent_le_damage((ent_living_entity_t*) entity, NULL, 4);

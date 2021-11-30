@@ -483,8 +483,10 @@ static inline ent_entity_t* wld_chunk_get_entity(wld_chunk_t* chunk, uint32_t id
 
 static inline mat_block_protocol_id_t wld_get_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z) {
 
+	const int16_t min_y = mat_get_dimension_by_type(wld_get_environment(wld_chunk_get_world(chunk)))->min_y;
+
 	wld_chunk_t* block_chunk = wld_relative_chunk(chunk, (x >> 4) - wld_get_chunk_x(chunk), (z >> 4) - wld_get_chunk_z(chunk));
-	wld_chunk_section_t* section = wld_chunk_get_section(block_chunk, y >> 4);
+	wld_chunk_section_t* section = wld_chunk_get_section(block_chunk, (y - min_y) >> 4);
 
 	return section->blocks[((y & 0xF) << 8) | ((z & 0xF) << 4) | (x & 0xF)];
 

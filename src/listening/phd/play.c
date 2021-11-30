@@ -1025,14 +1025,16 @@ void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chu
 		*/
 
 		// HEIGHTMAP
+		
+		const uint16_t chunk_height = mat_get_chunk_height(wld_get_environment(wld_chunk_get_world(chunk)));
 
-		// TODO vary bits based on ceil(log2(height + 1))
-		const uint32_t heightmap_size = 37;
+		const uint8_t bits_per_heightmap = ceil(log2((chunk_height << 4) + 1));
+		const uint32_t heightmap_size = 1 + (255 / (64 / bits_per_heightmap));
 		int64_t motion_blocking[heightmap_size];
 		int64_t world_surface[heightmap_size];
 
-		utl_encode_shorts_to_longs(wld_chunk_get_highest_motion_blocking(chunk), 256, 9, motion_blocking);
-		utl_encode_shorts_to_longs(wld_chunk_get_highest_world_surface(chunk), 256, 9, world_surface);
+		utl_encode_shorts_to_longs(wld_chunk_get_highest_motion_blocking(chunk), 256, bits_per_heightmap, motion_blocking);
+		utl_encode_shorts_to_longs(wld_chunk_get_highest_world_surface(chunk), 256, bits_per_heightmap, world_surface);
 
 		// create heightmap
 		mnbt_doc* doc = mnbt_new();
@@ -1067,8 +1069,6 @@ void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chu
 		// you're damn right i'm gonna waste 4 bytes, speed is key
 		const size_t data_len = packet->cursor;
 		packet->cursor += 5;
-		
-		const uint16_t chunk_height = mat_get_chunk_height(wld_get_environment(wld_chunk_get_world(chunk)));
 
 		for (uint16_t i = 0; i < chunk_height; ++i) {
 

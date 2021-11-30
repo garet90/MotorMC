@@ -73,6 +73,8 @@ struct sky_main {
 	bool online_mode : 1;
 	bool prevent_proxy_connections : 1;
 	
+	bool hide_online_players : 1;
+
 	ent_gamemode_t gamemode : 2;
 
 };
