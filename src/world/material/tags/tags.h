@@ -93,6 +93,8 @@ typedef enum {
 	mat_item_tag_oak_logs,
 	mat_item_tag_doors,
 	mat_item_tag_cluster_max_harvestables,
+	mat_item_tag_dirt,
+	mat_item_tag_terracotta,
 	
 	mat_item_tag_count
 
@@ -168,7 +170,7 @@ typedef enum {
 	mat_block_tag_iron_ores,
 	mat_block_tag_jungle_logs,
 	mat_block_tag_lapis_ores,
-	mat_block_tag_lava_pool_stone_replaceables,
+	mat_block_tag_lava_pool_stone_cannot_replace,
 	mat_block_tag_leaves,
 	mat_block_tag_logs,
 	mat_block_tag_logs_that_burn,
@@ -227,6 +229,20 @@ typedef enum {
 	mat_block_tag_wooden_stairs,
 	mat_block_tag_wooden_trapdoors,
 	mat_block_tag_wool,
+	mat_block_tag_animals_spawnable_on,
+	mat_block_tag_axolotls_spawnable_on,
+	mat_block_tag_azalea_grows_on,
+	mat_block_tag_azalea_root_replaceable,
+	mat_block_tag_big_dripleaf_placeable,
+	mat_block_tag_foxes_spawnable_on,
+	mat_block_tag_goats_spawnable_on,
+	mat_block_tag_mooshrooms_spawnable_on,
+	mat_block_tag_parrots_spawnable_on,
+	mat_block_tag_polar_bears_spawnable_on_in_frozen_ocean,
+	mat_block_tag_rabbits_spawnable_on,
+	mat_block_tag_replaceable_plants,
+	mat_block_tag_terracotta,
+	mat_block_tag_wolves_spawnable_on,
 	
 	mat_block_tag_count
 

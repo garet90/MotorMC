@@ -36,6 +36,7 @@ const mat_codec_t* mat_get_codec() {
 		UTL_CSTRTOSTR("mesa"),
 		UTL_CSTRTOSTR("savanna"),
 		UTL_CSTRTOSTR("underground"),
+		UTL_CSTRTOSTR("mountain"),
 	};
 
 	const string_t grass_color_modifiers[] = {
@@ -99,9 +100,7 @@ const mat_codec_t* mat_get_codec() {
 			mnbt_val_push_tag(&compound, mnbt_new_tag(doc, UTL_CSTRTOARG("id"), MNBT_INT, mnbt_val_int(i)));
 			mnbt_tag* element = mnbt_new_tag(doc, UTL_CSTRTOARG("element"), MNBT_COMPOUND, mnbt_val_compound());
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("precipitation"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(precipitation_types[biome->precipitation]))));
-			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("depth"), MNBT_FLOAT, mnbt_val_float(biome->depth)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("temperature"), MNBT_FLOAT, mnbt_val_float(biome->temperature)));
-			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("scale"), MNBT_FLOAT, mnbt_val_float(biome->scale)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("downfall"), MNBT_FLOAT, mnbt_val_float(biome->downfall)));
 			mnbt_push_tag(element, mnbt_new_tag(doc, UTL_CSTRTOARG("category"), MNBT_STRING, mnbt_val_string(UTL_STRTOARG(biome_categories[biome->category]))));
 			if (biome->temperature_modifier != mat_temperature_modifier_none) {

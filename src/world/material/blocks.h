@@ -1070,6 +1070,20 @@ typedef struct {
 	bool wooden_stairs : 1;
 	bool wooden_trapdoors : 1;
 	bool wool : 1;
+	bool animals_spawnable_on : 1;
+	bool axolotls_spawnable_on : 1;
+	bool azalea_grows_on : 1;
+	bool azalea_root_replaceable : 1;
+	bool big_dripleaf_placeable : 1;
+	bool foxes_spawnable_on : 1;
+	bool goats_spawnable_on : 1;
+	bool mooshrooms_spawnable_on : 1;
+	bool parrots_spawnable_on : 1;
+	bool polar_bears_spawnable_on_in_frozen_ocean : 1;
+	bool rabbits_spawnable_on : 1;
+	bool replaceable_plants : 1;
+	bool terracotta : 1;
+	bool wolves_spawnable_on : 1;
 
 	bool water : 1;
 	bool lava : 1;

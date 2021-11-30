@@ -51,6 +51,7 @@ struct sky_main {
 	uint16_t network_compression_threshold;
 	
 	uint8_t render_distance : 6;
+	uint8_t simulation_distance : 6;
 	
 	const uint16_t protocol : 10;
 
@@ -72,6 +73,8 @@ struct sky_main {
 	bool online_mode : 1;
 	bool prevent_proxy_connections : 1;
 	
+	bool hide_online_players : 1;
+
 	ent_gamemode_t gamemode : 2;
 
 };
@@ -116,6 +119,10 @@ static inline ltg_listener_t* sky_get_listener() {
 
 static inline uint8_t sky_get_render_distance() {
 	return sky_main.render_distance;
+}
+
+static inline uint8_t sky_get_simulation_distance() {
+	return sky_main.simulation_distance;
 }
 
 static inline uint16_t sky_get_protocol() {

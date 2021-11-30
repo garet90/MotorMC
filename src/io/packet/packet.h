@@ -249,7 +249,7 @@ static inline void pck_write_nbt(pck_packet_t* packet, mnbt_doc* doc) {
 
 static inline void pck_write_position(pck_packet_t* packet, pck_position_t position) {
 
-	pck_write_int64(packet, ((uint64_t) (position.x & 0x3FFFFFF) << 38) | ((uint64_t) (position.z & 0x3FFFFFF) << 12) | ((uint64_t) position.y & 0xFF));
+	pck_write_int64(packet, ((uint64_t) (position.x & 0x3FFFFFF) << 38) | ((uint64_t) (position.z & 0x3FFFFFF) << 12) | ((uint64_t) position.y & 0xFFF));
 
 }
 

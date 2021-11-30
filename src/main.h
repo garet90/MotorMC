@@ -9,11 +9,11 @@
 #define __WINDOWS__
 #endif
 
-#define __MC_VER__ "1.17.1"
-#define __MC_PRO__ 756
+#define __MC_VER__ "1.18"
+#define __MC_PRO__ 757
 //755
 
-#define __MOTOR_VER__ "MotorMC InDev 0.0.3"
+#define __MOTOR_VER__ "MotorMC InDev 0.0.4"
 #define __MOTOR_UNSAFE__ 1
 
 #define UNSET 2

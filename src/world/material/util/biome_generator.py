@@ -20,11 +20,13 @@ for f in listdir(sys.argv[1]):
     print("const mat_biome_t mat_biome_" + name + "_d = {")
     print("\t.name = UTL_CSTRTOSTR(\"minecraft:" + name + "\"),")
     print("\t.precipitation = mat_precipitation_" + data["precipitation"] + ",")
-    print("\t.depth = " + str(data["depth"]) + ",")
+    if "depth" in data:
+        print("\t.depth = " + str(data["depth"]) + ",")
     print("\t.temperature = " + str(data["temperature"]) + ",")
     if "temperature_modifier" in data:
         print("\t.temperature_modifier = mat_temperature_modifier_" + data["temperature_modifier"] + ",")
-    print("\t.scale = " + str(data["scale"]) + ",")
+    if "scale" in data:
+        print("\t.scale = " + str(data["scale"]) + ",")
     print("\t.downfall = " + str(data["downfall"]) + ",")
     print("\t.category = mat_biome_category_" + data["category"] + ",")
     print("\t.effects = {")

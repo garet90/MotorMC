@@ -376,7 +376,8 @@ const mat_tag_t mat_item_tag_lectern_books_d = MAT_TAG_INITIALIZER(
 
 #define MAT_ITEM_TAG_MUSIC_DISCS \
 	MAT_ITEM_TAG_CREEPER_DROP_MUSIC_DISCS,\
-	mat_item_music_disc_pigstep
+	mat_item_music_disc_pigstep,\
+	mat_item_music_disc_otherside
 
 const mat_tag_t mat_item_tag_music_discs_d = MAT_TAG_INITIALIZER(
 	UTL_CSTRTOSTR("minecraft:music_discs"),
@@ -981,6 +982,44 @@ const mat_tag_t mat_item_tag_occludes_vibration_signals_d = MAT_TAG_INITIALIZER(
 	MAT_ITEM_TAG_OCCLUDES_VIBRATION_SIGNALS
 );
 
+#define MAT_ITEM_TAG_DIRT \
+	mat_item_dirt,\
+	mat_item_grass_block,\
+	mat_item_podzol,\
+	mat_item_coarse_dirt,\
+	mat_item_mycelium,\
+	mat_item_rooted_dirt,\
+	mat_item_moss_block
+
+const mat_tag_t mat_item_tag_dirt_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:dirt"),
+	MAT_ITEM_TAG_DIRT
+);
+
+#define MAT_ITEM_TAG_TERRACOTTA \
+	mat_item_terracotta,\
+	mat_item_red_terracotta,\
+	mat_item_blue_terracotta,\
+	mat_item_cyan_terracotta,\
+	mat_item_gray_terracotta,\
+	mat_item_lime_terracotta,\
+	mat_item_pink_terracotta,\
+	mat_item_black_terracotta,\
+	mat_item_brown_terracotta,\
+	mat_item_green_terracotta,\
+	mat_item_white_terracotta,\
+	mat_item_orange_terracotta,\
+	mat_item_purple_terracotta,\
+	mat_item_yellow_terracotta,\
+	mat_item_magenta_terracotta,\
+	mat_item_light_blue_terracotta,\
+	mat_item_light_gray_terracotta
+
+const mat_tag_t mat_item_tag_terracotta_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:terracotta"),
+	MAT_ITEM_TAG_TERRACOTTA
+);
+
 const mat_tag_t* mat_item_tags[] = {
 
 	&mat_item_tag_banners_d,
@@ -1051,6 +1090,7 @@ const mat_tag_t* mat_item_tags[] = {
 	&mat_item_tag_iron_ores_d,
 	&mat_item_tag_oak_logs_d,
 	&mat_item_tag_doors_d,
-	&mat_item_tag_cluster_max_harvestables_d
-
+	&mat_item_tag_cluster_max_harvestables_d,
+	&mat_item_tag_dirt_d,
+	&mat_item_tag_terracotta_d,
 };

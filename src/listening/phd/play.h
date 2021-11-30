@@ -95,7 +95,7 @@ extern void phd_send_change_game_state(ltg_client_t*);
 extern void phd_send_open_horse_window(ltg_client_t*);
 extern void phd_send_initialize_world_border(ltg_client_t* client, wld_world_t* world);
 extern void phd_send_keep_alive(ltg_client_t* client, uint64_t id);
-extern void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk);
+extern void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chunk);
 extern void phd_send_effect(ltg_client_t*);
 extern void phd_send_particle(ltg_client_t*);
 extern void phd_send_update_light(ltg_client_t* client, wld_chunk_t* chunk);
@@ -158,6 +158,7 @@ extern void phd_send_scoreboard_objective(ltg_client_t*);
 extern void phd_send_set_passengers(ltg_client_t*);
 extern void phd_send_teams(ltg_client_t*);
 extern void phd_send_update_score(ltg_client_t*);
+extern void phd_send_update_simulation_distance(ltg_client_t*);
 extern void phd_send_set_tile_subtile(ltg_client_t*);
 extern void phd_send_time_update(ltg_client_t* client, wld_world_t* world);
 extern void phd_send_set_title_text(ltg_client_t*);
@@ -191,8 +192,8 @@ static inline void phd_update_send_entity(ltg_client_t* client, ent_entity_t* en
 }
 
 static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t* chunk) {
-	phd_send_update_light(client, chunk);
-	phd_send_chunk_data(client, chunk);
+
+	phd_send_chunk_data_and_update_light(client, chunk);
 	wld_subscribe_chunk(chunk, ltg_client_get_id(client));
 
 	// send chunk entities
