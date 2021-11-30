@@ -1036,6 +1036,7 @@ typedef enum {
 	mat_item_music_disc_11,
 	mat_item_music_disc_wait,
 	mat_item_music_disc_pigstep,
+	mat_item_music_disc_otherside,
 	mat_item_trident,
 	mat_item_phantom_membrane,
 	mat_item_nautilus_shell,
@@ -1196,6 +1197,8 @@ typedef struct {
 	bool wooden_stairs : 1;
 	bool wooden_trapdoors : 1;
 	bool wool : 1;
+	bool dirt : 1;
+	bool terracotta : 1;
 
 } mat_item_t;
 

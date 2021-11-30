@@ -2330,14 +2330,14 @@ const mat_tag_t mat_block_tag_logs_d = MAT_TAG_INITIALIZER(
 	MAT_BLOCK_TAG_LOGS
 );
 
-#define MAT_BLOCK_TAG_LAVA_POOL_STONE_REPLACEABLES \
+#define MAT_BLOCK_TAG_LAVA_POOL_STONE_CANNOT_REPLACE \
 	MAT_BLOCK_TAG_FEATURES_CANNOT_REPLACE,\
 	MAT_BLOCK_TAG_LEAVES,\
 	MAT_BLOCK_TAG_LOGS
 
-const mat_tag_t mat_block_tag_lava_pool_stone_replaceables_d = MAT_TAG_INITIALIZER(
-	UTL_CSTRTOSTR("minecraft:lava_pool_stone_replaceables"),
-	MAT_BLOCK_TAG_LAVA_POOL_STONE_REPLACEABLES
+const mat_tag_t mat_block_tag_lava_pool_stone_cannot_replace_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:lava_pool_stone_cannot_replace"),
+	MAT_BLOCK_TAG_LAVA_POOL_STONE_CANNOT_REPLACE
 );
 
 #define MAT_BLOCK_TAG_WART_BLOCKS \
@@ -3178,6 +3178,170 @@ const mat_tag_t mat_block_tag_air_d = MAT_TAG_INITIALIZER(
 	MAT_BLOCK_TAG_AIR
 );
 
+#define MAT_BLOCK_TAG_ANIMALS_SPAWNABLE_ON \
+	mat_block_grass_block
+
+const mat_tag_t mat_block_tag_animals_spawnable_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:animals_spawnable_on"),
+	MAT_BLOCK_TAG_ANIMALS_SPAWNABLE_ON
+);
+
+#define MAT_BLOCK_TAG_AXOLOTLS_SPAWNABLE_ON \
+	mat_block_clay
+
+const mat_tag_t mat_block_tag_axolotls_spawnable_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:axolotls_spawnable_on"),
+	MAT_BLOCK_TAG_AXOLOTLS_SPAWNABLE_ON
+);
+
+#define MAT_BLOCK_TAG_TERRACOTTA \
+	mat_block_terracotta,\
+	mat_block_red_terracotta,\
+	mat_block_blue_terracotta,\
+	mat_block_cyan_terracotta,\
+	mat_block_gray_terracotta,\
+	mat_block_lime_terracotta,\
+	mat_block_pink_terracotta,\
+	mat_block_black_terracotta,\
+	mat_block_brown_terracotta,\
+	mat_block_green_terracotta,\
+	mat_block_white_terracotta,\
+	mat_block_orange_terracotta,\
+	mat_block_purple_terracotta,\
+	mat_block_yellow_terracotta,\
+	mat_block_magenta_terracotta,\
+	mat_block_light_blue_terracotta,\
+	mat_block_light_gray_terracotta
+
+const mat_tag_t mat_block_tag_terracotta_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:terracotta"),
+	MAT_BLOCK_TAG_TERRACOTTA
+);
+
+#define MAT_BLOCK_TAG_AZALEA_GROWS_ON \
+	MAT_BLOCK_TAG_DIRT,\
+	MAT_BLOCK_TAG_SAND,\
+	MAT_BLOCK_TAG_TERRACOTTA,\
+	mat_block_snow_block,\
+	mat_block_powder_snow
+
+const mat_tag_t mat_block_tag_azalea_grows_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:azalea_grows_on"),
+	MAT_BLOCK_TAG_AZALEA_GROWS_ON
+);
+
+#define MAT_BLOCK_TAG_AZALEA_ROOT_REPLACEABLE \
+	MAT_BLOCK_TAG_LUSH_GROUND_REPLACEABLE,\
+	MAT_BLOCK_TAG_TERRACOTTA,\
+	mat_block_red_sand
+
+const mat_tag_t mat_block_tag_azalea_root_replaceable_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:azalea_root_replaceable"),
+	MAT_BLOCK_TAG_AZALEA_ROOT_REPLACEABLE
+);
+
+#define MAT_BLOCK_TAG_BIG_DRIPLEAF_PLACEABLE \
+	MAT_BLOCK_TAG_DIRT,\
+	MAT_BLOCK_TAG_SMALL_DRIPLEAF_PLACEABLE,\
+	mat_block_farmland
+
+const mat_tag_t mat_block_tag_big_dripleaf_placeable_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:big_dripleaf_placeable"),
+	MAT_BLOCK_TAG_BIG_DRIPLEAF_PLACEABLE
+);
+
+#define MAT_BLOCK_TAG_FOXES_SPAWNABLE_ON \
+	mat_block_grass_block,\
+	mat_block_snow,\
+	mat_block_snow_block,\
+	mat_block_podzol,\
+	mat_block_coarse_dirt
+
+const mat_tag_t mat_block_tag_foxes_spawnable_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:foxes_spawnable_on"),
+	MAT_BLOCK_TAG_FOXES_SPAWNABLE_ON
+);
+
+#define MAT_BLOCK_TAG_GOATS_SPAWNABLE_ON \
+	mat_block_stone,\
+	mat_block_snow,\
+	mat_block_snow_block,\
+	mat_block_powder_snow,\
+	mat_block_packed_ice,\
+	mat_block_gravel
+
+const mat_tag_t mat_block_tag_goats_spawnable_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:goats_spawnable_on"),
+	MAT_BLOCK_TAG_GOATS_SPAWNABLE_ON
+);
+
+#define MAT_BLOCK_TAG_MOOSHROOMS_SPAWNABLE_ON \
+	mat_block_mycelium
+
+const mat_tag_t mat_block_tag_mooshrooms_spawnable_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:mooshrooms_spawnable_on"),
+	MAT_BLOCK_TAG_MOOSHROOMS_SPAWNABLE_ON
+);
+
+#define MAT_BLOCK_TAG_PARROTS_SPAWNABLE_ON \
+	mat_block_grass_block,\
+	mat_block_air,\
+	MAT_BLOCK_TAG_LEAVES,\
+	MAT_BLOCK_TAG_LOGS
+
+const mat_tag_t mat_block_tag_parrots_spawnable_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:parrots_spawnable_on"),
+	MAT_BLOCK_TAG_PARROTS_SPAWNABLE_ON
+);
+
+#define MAT_BLOCK_TAG_POLAR_BEARS_SPAWNABLE_ON_IN_FROZEN_OCEAN \
+	mat_block_ice
+
+const mat_tag_t mat_block_tag_polar_bears_spawnable_on_in_frozen_ocean_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:polar_bears_spawnable_on_in_frozen_ocean"),
+	MAT_BLOCK_TAG_POLAR_BEARS_SPAWNABLE_ON_IN_FROZEN_OCEAN
+);
+
+#define MAT_BLOCK_TAG_RABBITS_SPAWNABLE_ON \
+	mat_block_grass_block,\
+	mat_block_snow,\
+	mat_block_snow_block,\
+	mat_block_sand
+
+const mat_tag_t mat_block_tag_rabbits_spawnable_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:rabbits_spawnable_on"),
+	MAT_BLOCK_TAG_RABBITS_SPAWNABLE_ON
+);
+
+#define MAT_BLOCK_TAG_REPLACEABLE_PLANTS \
+	mat_block_grass,\
+	mat_block_fern,\
+	mat_block_dead_bush,\
+	mat_block_vine,\
+	mat_block_glow_lichen,\
+	mat_block_sunflower,\
+	mat_block_lilac,\
+	mat_block_rose_bush,\
+	mat_block_peony,\
+	mat_block_tall_grass,\
+	mat_block_large_fern,\
+	mat_block_hanging_roots
+
+const mat_tag_t mat_block_tag_replaceable_plants_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:replaceable_plants"),
+	MAT_BLOCK_TAG_REPLACEABLE_PLANTS
+);
+
+#define MAT_BLOCK_TAG_WOLVES_SPAWNABLE_ON \
+	mat_block_grass_block,\
+	mat_block_snow,\
+	mat_block_snow_block
+
+const mat_tag_t mat_block_tag_wolves_spawnable_on_d = MAT_TAG_INITIALIZER(
+	UTL_CSTRTOSTR("minecraft:wolves_spawnable_on"),
+	MAT_BLOCK_TAG_WOLVES_SPAWNABLE_ON
+);
+
 const mat_tag_t* mat_block_tags[] = {
 
 	&mat_block_tag_catches_fire_from_lava_d,
@@ -3246,7 +3410,7 @@ const mat_tag_t* mat_block_tags[] = {
 	&mat_block_tag_iron_ores_d,
 	&mat_block_tag_jungle_logs_d,
 	&mat_block_tag_lapis_ores_d,
-	&mat_block_tag_lava_pool_stone_replaceables_d,
+	&mat_block_tag_lava_pool_stone_cannot_replace_d,
 	&mat_block_tag_leaves_d,
 	&mat_block_tag_logs_d,
 	&mat_block_tag_logs_that_burn_d,
@@ -3304,6 +3468,20 @@ const mat_tag_t* mat_block_tags[] = {
 	&mat_block_tag_wooden_slabs_d,
 	&mat_block_tag_wooden_stairs_d,
 	&mat_block_tag_wooden_trapdoors_d,
-	&mat_block_tag_wool_d
+	&mat_block_tag_wool_d,
+	&mat_block_tag_animals_spawnable_on_d,
+	&mat_block_tag_axolotls_spawnable_on_d,
+	&mat_block_tag_azalea_grows_on_d,
+	&mat_block_tag_azalea_root_replaceable_d,
+	&mat_block_tag_big_dripleaf_placeable_d,
+	&mat_block_tag_foxes_spawnable_on_d,
+	&mat_block_tag_goats_spawnable_on_d,
+	&mat_block_tag_mooshrooms_spawnable_on_d,
+	&mat_block_tag_parrots_spawnable_on_d,
+	&mat_block_tag_polar_bears_spawnable_on_in_frozen_ocean_d,
+	&mat_block_tag_rabbits_spawnable_on_d,
+	&mat_block_tag_replaceable_plants_d,
+	&mat_block_tag_terracotta_d,
+	&mat_block_tag_wolves_spawnable_on_d,
 
 };

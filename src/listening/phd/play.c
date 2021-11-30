@@ -1068,7 +1068,6 @@ void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chu
 		const size_t data_len = packet->cursor;
 		packet->cursor += 5;
 		
-
 		const uint16_t chunk_height = mat_get_chunk_height(wld_get_environment(wld_chunk_get_world(chunk)));
 
 		for (uint16_t i = 0; i < chunk_height; ++i) {
@@ -1125,7 +1124,9 @@ void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chu
 				}
 
 				if (palette.length == 1) {
+					pck_write_int8(packet, 0);
 					pck_write_var_int(packet, palette.array[0]);
+					pck_write_var_int(packet, 0);
 				} else if (palette.length < 255) {
 					// use palette
 					uint8_t bits_per_block;
@@ -1216,7 +1217,9 @@ void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chu
 				}
 
 				if (palette.length == 1) {
+					pck_write_int8(packet, 0);
 					pck_write_var_int(packet, palette.array[0]);
+					pck_write_var_int(packet, 0);
 				} else if (palette.length < 9) {
 					// use palette
 					uint8_t bits_per_biome;

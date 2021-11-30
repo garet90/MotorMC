@@ -46,18 +46,23 @@ const mat_item_t mat_item_dripstone_block_d = {
 };
 const mat_item_t mat_item_grass_block_d = {
 	.block = mat_block_grass_block,
+	.dirt = true,
 };
 const mat_item_t mat_item_dirt_d = {
 	.block = mat_block_dirt,
+	.dirt = true,
 };
 const mat_item_t mat_item_coarse_dirt_d = {
 	.block = mat_block_coarse_dirt,
+	.dirt = true,
 };
 const mat_item_t mat_item_podzol_d = {
 	.block = mat_block_podzol,
+	.dirt = true,
 };
 const mat_item_t mat_item_rooted_dirt_d = {
 	.block = mat_block_rooted_dirt,
+	.dirt = true,
 };
 const mat_item_t mat_item_crimson_nylium_d = {
 	.block = mat_block_crimson_nylium,
@@ -825,6 +830,7 @@ const mat_item_t mat_item_moss_carpet_d = {
 };
 const mat_item_t mat_item_moss_block_d = {
 	.block = mat_block_moss_block,
+	.dirt = true,
 };
 const mat_item_t mat_item_hanging_roots_d = {
 	.block = mat_block_hanging_roots,
@@ -1202,6 +1208,7 @@ const mat_item_t mat_item_stone_brick_stairs_d = {
 };
 const mat_item_t mat_item_mycelium_d = {
 	.block = mat_block_mycelium,
+	.dirt = true,
 };
 const mat_item_t mat_item_lily_pad_d = {
 	.block = mat_block_lily_pad,
@@ -1395,51 +1402,67 @@ const mat_item_t mat_item_quartz_stairs_d = {
 };
 const mat_item_t mat_item_white_terracotta_d = {
 	.block = mat_block_white_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_orange_terracotta_d = {
 	.block = mat_block_orange_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_magenta_terracotta_d = {
 	.block = mat_block_magenta_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_light_blue_terracotta_d = {
 	.block = mat_block_light_blue_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_yellow_terracotta_d = {
 	.block = mat_block_yellow_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_lime_terracotta_d = {
 	.block = mat_block_lime_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_pink_terracotta_d = {
 	.block = mat_block_pink_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_gray_terracotta_d = {
 	.block = mat_block_gray_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_light_gray_terracotta_d = {
 	.block = mat_block_light_gray_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_cyan_terracotta_d = {
 	.block = mat_block_cyan_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_purple_terracotta_d = {
 	.block = mat_block_purple_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_blue_terracotta_d = {
 	.block = mat_block_blue_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_brown_terracotta_d = {
 	.block = mat_block_brown_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_green_terracotta_d = {
 	.block = mat_block_green_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_red_terracotta_d = {
 	.block = mat_block_red_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_black_terracotta_d = {
 	.block = mat_block_black_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_barrier_d = {
 	.block = mat_block_barrier,
@@ -1516,6 +1539,7 @@ const mat_item_t mat_item_black_carpet_d = {
 };
 const mat_item_t mat_item_terracotta_d = {
 	.block = mat_block_terracotta,
+	.terracotta = true,
 };
 const mat_item_t mat_item_packed_ice_d = {
 	.block = mat_block_packed_ice,
@@ -3372,6 +3396,9 @@ const mat_item_t mat_item_music_disc_wait_d = {
 const mat_item_t mat_item_music_disc_pigstep_d = {
 	.music_discs = true,
 };
+const mat_item_t mat_item_music_disc_otherside_d = {
+	.music_discs = true,
+};
 const mat_item_t mat_item_trident_d = {
 };
 const mat_item_t mat_item_phantom_membrane_d = {
@@ -4635,6 +4662,7 @@ const mat_item_t* mat_items[] = {
 	&mat_item_music_disc_11_d,
 	&mat_item_music_disc_wait_d,
 	&mat_item_music_disc_pigstep_d,
+	&mat_item_music_disc_otherside_d,
 	&mat_item_trident_d,
 	&mat_item_phantom_membrane_d,
 	&mat_item_nautilus_shell_d,
