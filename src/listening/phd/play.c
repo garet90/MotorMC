@@ -152,6 +152,7 @@ bool phd_handle_client_settings(ltg_client_t* client, pck_packet_t* packet) {
 	ent_player_set_main_hand(player, pck_read_var_int(packet));
 
 	__attribute__((unused)) bool disable_text_filtering = pck_read_int8(packet);
+	__attribute__((unused)) bool allow_server_listings = pck_read_int8(packet); // TODO use this
 
 	return true;
 
@@ -981,7 +982,7 @@ struct {
 };
 
 // This is one chunky function, optimize it if possible TODO
-void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
+void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chunk) {
 
 	with_lock (&phd_chunk_packet.lock) {
 
@@ -997,10 +998,9 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		pck_write_int32(packet, wld_get_chunk_x(chunk));
 		pck_write_int32(packet, wld_get_chunk_z(chunk));
 
-		const uint16_t chunk_height = mat_get_chunk_height(wld_get_environment(wld_chunk_get_world(chunk)));
-
 		// CHUNK MASK
 
+		/*
 		const uint16_t chunk_mask_length = ((chunk_height - 1) >> 6) + 1;
 		pck_write_var_int(packet, chunk_mask_length);
 		int64_t primary_chunk_mask[chunk_mask_length];
@@ -1012,7 +1012,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		}
 		for (uint16_t i = 0; i < chunk_mask_length; ++i) {
 			pck_write_int64(packet, primary_chunk_mask[i]);
-		}
+		}*/
 
 		/*
 		int32_t primary_chunk_mask = 0;
@@ -1026,6 +1026,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 		// HEIGHTMAP
 
+		// TODO vary bits based on ceil(log2(height + 1))
 		const uint32_t heightmap_size = 37;
 		int64_t motion_blocking[heightmap_size];
 		int64_t world_surface[heightmap_size];
@@ -1046,6 +1047,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 
 		// BIOMES
 
+		/*
 		pck_write_var_int(packet, chunk_height << 6);
 
 		for (uint16_t i = 0; i < chunk_height; ++i) {
@@ -1057,6 +1059,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 				}
 			}
 		}
+		*/
 
 		// CHUNK DATA
 
@@ -1064,19 +1067,23 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		// you're damn right i'm gonna waste 4 bytes, speed is key
 		const size_t data_len = packet->cursor;
 		packet->cursor += 5;
+		
+
+		const uint16_t chunk_height = mat_get_chunk_height(wld_get_environment(wld_chunk_get_world(chunk)));
 
 		for (uint16_t i = 0; i < chunk_height; ++i) {
-			if (wld_chunk_section_get_block_count(wld_chunk_get_section(chunk, i)) != 0) {
 
-				pck_write_int16(packet, wld_chunk_section_get_block_count(wld_chunk_get_section(chunk, i)));
+			pck_write_int16(packet, wld_chunk_section_get_block_count(wld_chunk_get_section(chunk, i)));
 
+			// block state array
+			{
 				struct {
 					mat_block_protocol_id_t array[256];
 					uint8_t length;
 				} palette = {
 					.length = 1
 				};
-				palette.array[0] = mat_get_block_default_protocol_id_by_type(mat_block_air);
+				palette.array[0] = wld_chunk_section_get_blocks(wld_chunk_get_section(chunk, i))[0];
 				
 				int8_t block_array[4096];
 
@@ -1084,7 +1091,7 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 					mat_block_protocol_id_t block;
 					uint16_t palette;
 				} previous = {
-					.block = palette.array[0], // mat_block_air
+					.block = palette.array[0],
 					.palette = 0
 				};
 
@@ -1117,16 +1124,18 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 					end:{}
 				}
 
-				if (palette.length < 255) {
+				if (palette.length == 1) {
+					pck_write_var_int(packet, palette.array[0]);
+				} else if (palette.length < 255) {
 					// use palette
 					uint8_t bits_per_block;
-					if (palette.length < 16) {
+					if (palette.length < 17) {
 						bits_per_block = 4;
-					} else if (palette.length < 32) {
+					} else if (palette.length < 33) {
 						bits_per_block = 5;
-					} else if (palette.length < 64) {
+					} else if (palette.length < 65) {
 						bits_per_block = 6;
-					} else if (palette.length < 128) {
+					} else if (palette.length < 129) {
 						bits_per_block = 7;
 					} else {
 						bits_per_block = 8;
@@ -1157,6 +1166,93 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 					packet->cursor += data_array_length << 3;
 				}
 			}
+			// biome array
+			{
+				struct {
+					mat_biome_type_t array[64];
+					uint8_t length;
+				} palette = {
+					.length = 1
+				};
+				palette.array[0] = wld_chunk_section_get_biomes(wld_chunk_get_section(chunk, i))[0];
+
+				int8_t biome_array[64];
+
+				struct {
+					mat_biome_type_t biome;
+					uint16_t palette;
+				} previous = {
+					.biome = palette.array[0],
+					.palette = 0
+				};
+
+				for (uint16_t j = 0; j < 64; ++j) {
+
+					const mat_biome_type_t biome = wld_chunk_section_get_biomes(wld_chunk_get_section(chunk, i))[j];
+					if (biome == previous.biome) {
+						biome_array[j] = previous.palette;
+					} else {
+						// test if block is in palette
+						for (uint8_t k = 0; k < palette.length; ++k) {
+							if (palette.array[k] == biome) {
+								biome_array[j] = previous.palette = k;
+								previous.biome = biome;
+
+								goto endb;
+							}
+						}
+
+						// add to palette (it hasn't been found)
+						if (palette.length < 8) {
+							palette.array[palette.length] = biome;
+							biome_array[j] = previous.palette = palette.length++;
+							previous.biome = biome;
+						} else {
+							// palette is too big, use direct
+							break;
+						}
+					}
+					endb:{}
+				}
+
+				if (palette.length == 1) {
+					pck_write_var_int(packet, palette.array[0]);
+				} else if (palette.length < 9) {
+					// use palette
+					uint8_t bits_per_biome;
+					if (palette.length < 3) {
+						bits_per_biome = 1;
+					} else if (palette.length < 5) {
+						bits_per_biome = 2;
+					} else {
+						bits_per_biome = 3;
+					}
+					const uint8_t biomes_per_long = 64 / bits_per_biome;
+					const int32_t data_array_length = 1 + (63 / biomes_per_long);
+
+					pck_write_int8(packet, bits_per_biome);
+					pck_write_var_int(packet, palette.length);
+					for (uint8_t j = 0; j < palette.length; ++j) {
+						pck_write_var_int(packet, palette.array[j]);
+					}
+
+					pck_write_var_int(packet, data_array_length);
+					
+					utl_encode_bytes_to_longs_r(biome_array, 64, bits_per_biome, (int64_t*) pck_cursor(packet));
+					packet->cursor += data_array_length << 3;
+				} else {
+					// direct
+					const uint8_t bits_per_biome = 4; // log2(biome_count)
+					const uint8_t biomes_per_long = 64 / bits_per_biome;
+					const int32_t data_array_length = 1 + (63 / biomes_per_long);
+
+					pck_write_int8(packet, bits_per_biome);
+					pck_write_var_int(packet, data_array_length); // data array length
+					
+					utl_encode_bytes_to_longs_r((int8_t*) wld_chunk_section_get_biomes(wld_chunk_get_section(chunk, i)), 64, bits_per_biome, (int64_t*) pck_cursor(packet));
+					packet->cursor += data_array_length << 3;
+				}
+			}
 		}
 
 		const size_t current = packet->cursor;
@@ -1167,6 +1263,21 @@ void phd_send_chunk_data(ltg_client_t* client, wld_chunk_t* chunk) {
 		// BLOCK ENTITIES
 		// TODO block entities
 		pck_write_var_int(packet, 0);
+
+		// light
+		pck_write_int8(packet, true); // trust edges
+
+		pck_write_var_int(packet, 0); // sky light mask length
+
+		pck_write_var_int(packet, 0); // block light mask length
+
+		pck_write_var_int(packet, 0); // empty sky light mask length
+
+		pck_write_var_int(packet, 0); // empty block light mask length
+
+		pck_write_var_int(packet, 0); // sky light array count
+
+		pck_write_var_int(packet, 0); // block light array count
 
 		ltg_send(client, packet);
 
@@ -1254,6 +1365,7 @@ void phd_send_join_game(ltg_client_t* client) {
 	
 	pck_write_var_int(packet, ltg_get_online_max(sky_get_listener()));
 	pck_write_var_int(packet, sky_get_render_distance()); // view distance
+	pck_write_var_int(packet, sky_get_simulation_distance());
 	pck_write_int8(packet, sky_is_reduced_debug_info()); // reduced debug info
 	pck_write_int8(packet, sky_is_enabled_respawn_screen()); // enable respawn screen
 	pck_write_int8(packet, wld_is_debug(player_world)); // is debug
@@ -1691,7 +1803,7 @@ void phd_send_time_update(ltg_client_t* client, wld_world_t* world) {
 
 	PCK_INLINE(packet, 17, io_big_endian);
 
-	pck_write_var_int(packet, 0x58);
+	pck_write_var_int(packet, 0x59);
 	pck_write_int64(packet, wld_get_age(world));
 	if (wld_is_time_progressing(world)) {
 		pck_write_int64(packet, wld_get_time(world));
@@ -1707,7 +1819,7 @@ void phd_send_entity_teleport(ltg_client_t* client, ent_entity_t* entity) {
 	
 	PCK_INLINE(packet, 43, io_big_endian);
 
-	pck_write_var_int(packet, 0x61);
+	pck_write_var_int(packet, 0x62);
 	pck_write_var_int(packet, ent_get_id(entity));
 	pck_write_float64(packet, ent_get_x(entity));
 	pck_write_float64(packet, ent_get_y(entity));
@@ -1725,7 +1837,7 @@ void phd_send_living_entity_teleport(ltg_client_t* client, ent_living_entity_t* 
 
 	PCK_INLINE(packet, 43, io_big_endian);
 
-	pck_write_var_int(packet, 0x61);
+	pck_write_var_int(packet, 0x62);
 	pck_write_var_int(packet, ent_get_id(ent_le_get_entity(entity)));
 	pck_write_float64(packet, ent_get_x(ent_le_get_entity(entity)));
 	pck_write_float64(packet, ent_get_y(ent_le_get_entity(entity)));
@@ -1743,7 +1855,7 @@ void phd_send_declare_recipes(ltg_client_t* client) {
 
 	PCK_INLINE(packet, 6 + rec_recipes.size * 128, io_big_endian);
 	
-	pck_write_var_int(packet, 0x65);
+	pck_write_var_int(packet, 0x66);
 	pck_write_var_int(packet, rec_recipes.size);
 
 	for (size_t i = 0; i < rec_recipes.size; ++i) {
@@ -1760,7 +1872,7 @@ void phd_send_tags(ltg_client_t* client) {
 
 	PCK_INLINE(packet, 16384, io_big_endian);
 
-	pck_write_var_int(packet, 0x66);
+	pck_write_var_int(packet, 0x67);
 	pck_write_var_int(packet, 5);
 
 	pck_write_string(packet, UTL_CSTRTOARG("minecraft:block"));
@@ -1829,14 +1941,20 @@ void phd_update_sent_chunks(ltg_client_t* client) {
 	const uint8_t server_render_distance = sky_get_render_distance();
 	const uint8_t client_render_distance = ltg_client_get_render_distance(client);
 
-	for (int16_t x = -(server_render_distance + 2); x <= server_render_distance + 2; ++x) {
-		for (int16_t z = -(server_render_distance + 2); z <= server_render_distance + 2; ++z) {
+	const uint8_t server_simulation_distance = sky_get_simulation_distance();
+	const uint8_t max_loop = UTL_MAX(server_render_distance, server_simulation_distance + 2);
+
+	for (int16_t x = -max_loop; x <= max_loop; ++x) {
+		for (int16_t z = -max_loop; z <= max_loop; ++z) {
 			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
 			const uint8_t distance = UTL_MAX(UTL_ABS(x), UTL_ABS(z));
-			if (distance <= server_render_distance) {
-				wld_add_player_chunk(v_c, ltg_client_get_id(client), WLD_TICKET_TICK_ENTITIES);
-			} else {
-				wld_add_player_chunk(v_c, ltg_client_get_id(client), distance - server_render_distance + WLD_TICKET_TICK_ENTITIES);
+
+			if (distance <= server_simulation_distance + 2) {
+				if (distance <= server_simulation_distance) {
+					wld_add_player_chunk(v_c, ltg_client_get_id(client), WLD_TICKET_TICK_ENTITIES);
+				} else {
+					wld_add_player_chunk(v_c, ltg_client_get_id(client), distance - server_simulation_distance + WLD_TICKET_TICK_ENTITIES);
+				}
 			}
 
 			// subscribe to the chunk if it is in render distance
@@ -1886,8 +2004,9 @@ void phd_update_sent_chunks_move(ltg_client_t* client, const wld_chunk_t* old_ch
 	const int32_t old_x = wld_get_chunk_x(old_chunk);
 	const int32_t old_z = wld_get_chunk_z(old_chunk);
 
-	const uint8_t server_render_distance = sky_get_render_distance();
 	const uint8_t client_render_distance = ltg_client_get_render_distance(client);
+	
+	const uint8_t server_simulation_distance = sky_get_simulation_distance();
 
 	assert(x != old_x || z != old_z);
 
@@ -1904,10 +2023,10 @@ void phd_update_sent_chunks_move(ltg_client_t* client, const wld_chunk_t* old_ch
 		}
 
 		{ // ticket chunks
-			const int32_t o_x = -(server_render_distance + 2);
-			const int32_t n_x = server_render_distance + 3;
+			const int32_t o_x = -(server_simulation_distance + 2);
+			const int32_t n_x = server_simulation_distance + 3;
 
-			for (int32_t c_z = -(server_render_distance + 2); c_z <= server_render_distance + 2; ++c_z) {
+			for (int32_t c_z = -(server_simulation_distance + 2); c_z <= server_simulation_distance + 2; ++c_z) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, o_x, c_z), ltg_client_get_id(client));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x + 1, c_z));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x + 2, c_z));
@@ -1930,10 +2049,10 @@ void phd_update_sent_chunks_move(ltg_client_t* client, const wld_chunk_t* old_ch
 		}
 
 		{ // ticket chunks
-			const int32_t o_x = server_render_distance + 2;
-			const int32_t n_x = -(server_render_distance + 3);
+			const int32_t o_x = server_simulation_distance + 2;
+			const int32_t n_x = -(server_simulation_distance + 3);
 
-			for (int32_t c_z = -(server_render_distance + 2); c_z <= server_render_distance + 2; ++c_z) {
+			for (int32_t c_z = -(server_simulation_distance + 2); c_z <= server_simulation_distance + 2; ++c_z) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, o_x, c_z), ltg_client_get_id(client));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x - 1, c_z));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, o_x - 2, c_z));
@@ -1958,10 +2077,10 @@ void phd_update_sent_chunks_move(ltg_client_t* client, const wld_chunk_t* old_ch
 		}
 
 		{ // ticket chunks
-			const int32_t o_z = -(server_render_distance + 2);
-			const int32_t n_z = server_render_distance + 3;
+			const int32_t o_z = -(server_simulation_distance + 2);
+			const int32_t n_z = server_simulation_distance + 3;
 
-			for (int32_t c_x = -(server_render_distance + 2); c_x <= server_render_distance + 2; ++c_x) {
+			for (int32_t c_x = -(server_simulation_distance + 2); c_x <= server_simulation_distance + 2; ++c_x) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, c_x, o_z), ltg_client_get_id(client));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z + 1));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z + 2));
@@ -1984,10 +2103,10 @@ void phd_update_sent_chunks_move(ltg_client_t* client, const wld_chunk_t* old_ch
 		}
 
 		{ // ticket chunks
-			const int32_t o_z = server_render_distance + 2;
-			const int32_t n_z = -(server_render_distance + 3);
+			const int32_t o_z = server_simulation_distance + 2;
+			const int32_t n_z = -(server_simulation_distance + 3);
 
-			for (int32_t c_x = -(server_render_distance + 2); c_x <= server_render_distance + 2; ++c_x) {
+			for (int32_t c_x = -(server_simulation_distance + 2); c_x <= server_simulation_distance + 2; ++c_x) {
 				wld_remove_player_chunk(wld_relative_chunk(old_chunk, c_x, o_z), ltg_client_get_id(client));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z - 1));
 				wld_recalc_chunk_ticket(wld_relative_chunk(old_chunk, c_x, o_z - 2));
@@ -2059,14 +2178,21 @@ void phd_update_sent_chunks_remove(ltg_client_t* client, const wld_chunk_t* chun
 
 	const uint8_t server_render_distance = sky_get_render_distance();
 	const uint8_t client_render_distance = ltg_client_get_render_distance(client);
+	
+	const uint8_t server_simulation_distance = sky_get_simulation_distance();
+	const uint8_t max_loop = UTL_MAX(server_render_distance, server_simulation_distance + 2);
 
 	// player chunks
-	for (int16_t x = -(server_render_distance + 2); x <= server_render_distance + 2; ++x) {
-		for (int16_t z = -(server_render_distance + 2); z <= server_render_distance + 2; ++z) {
+	for (int16_t x = -max_loop; x <= max_loop; ++x) {
+		for (int16_t z = -max_loop; z <= max_loop; ++z) {
 			wld_chunk_t* v_c = wld_relative_chunk(chunk, x, z);
-			wld_remove_player_chunk(v_c, ltg_client_get_id(client));
 
 			const uint8_t distance = UTL_MAX(UTL_ABS(x), UTL_ABS(z));
+			
+			if (distance <= server_simulation_distance + 2) {
+				wld_remove_player_chunk(v_c, ltg_client_get_id(client));
+			}
+
 			if (distance <= client_render_distance) {
 				phd_update_unsubscribe_chunk(client, v_c);
 			}

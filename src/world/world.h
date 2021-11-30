@@ -24,7 +24,7 @@ struct wld_chunk_section {
 	atomic_uint_fast16_t block_count;
 
 	// biome map
-	_Atomic uint8_t biome[4 * 4 * 4];
+	_Atomic uint8_t biomes[4 * 4 * 4];
 
 };
 
@@ -419,12 +419,16 @@ static inline uint_fast16_t wld_chunk_section_get_block_count(wld_chunk_section_
 	return section->block_count;
 }
 
-static inline uint_least8_t wld_chunk_section_get_biome(wld_chunk_section_t* section, uint8_t x, uint8_t y, uint8_t z) {
-	return section->biome[(x << 4) + (z << 2) + y];
+static inline uint8_t wld_chunk_section_get_biome(wld_chunk_section_t* section, uint8_t x, uint8_t y, uint8_t z) {
+	return section->biomes[(x << 4) + (z << 2) + y];
 }
 
 static inline mat_block_protocol_id_t* wld_chunk_section_get_blocks(wld_chunk_section_t* section) {
 	return (mat_block_protocol_id_t*) section->blocks;
+}
+
+static inline uint8_t* wld_chunk_section_get_biomes(wld_chunk_section_t* section) {
+	return (uint8_t*) section->biomes;
 }
 
 static inline void wld_chunk_subscribers_xor_foreach(wld_chunk_t* c1, wld_chunk_t* c2, void (*const function) (uint32_t, void*), void* args) {
