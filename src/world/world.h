@@ -481,6 +481,7 @@ static inline ent_entity_t* wld_chunk_get_entity(wld_chunk_t* chunk, uint32_t id
 	return entity;
 }
 
+// TODO make sure the value is not out of bounds
 static inline mat_block_protocol_id_t wld_get_block_at(wld_chunk_t* chunk, int32_t x, int16_t y, int32_t z) {
 
 	const int16_t min_y = mat_get_dimension_by_type(wld_get_environment(wld_chunk_get_world(chunk)))->min_y;

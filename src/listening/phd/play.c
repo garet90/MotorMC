@@ -1072,10 +1072,12 @@ void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chu
 
 		for (uint16_t i = 0; i < chunk_height; ++i) {
 
-			pck_write_int16(packet, wld_chunk_section_get_block_count(wld_chunk_get_section(chunk, i)));
+			const uint16_t block_count = wld_chunk_section_get_block_count(wld_chunk_get_section(chunk, i));
+
+			pck_write_int16(packet, block_count);
 
 			// block state array
-			{
+			if (block_count > 0) {
 				struct {
 					mat_block_protocol_id_t array[256];
 					uint8_t length;
@@ -1166,6 +1168,10 @@ void phd_send_chunk_data_and_update_light(ltg_client_t* client, wld_chunk_t* chu
 					utl_encode_shorts_to_longs_r((int16_t*) wld_chunk_section_get_blocks(wld_chunk_get_section(chunk, i)), 4096, bits_per_block, (int64_t*) pck_cursor(packet));
 					packet->cursor += data_array_length << 3;
 				}
+			} else {
+				pck_write_int8(packet, 0);
+				pck_write_var_int(packet, mat_get_block_default_protocol_id_by_type(mat_block_air));
+				pck_write_var_int(packet, 0);
 			}
 			// biome array
 			{
