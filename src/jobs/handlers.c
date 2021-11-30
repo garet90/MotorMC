@@ -288,7 +288,7 @@ static inline void job_update_entity_teleport(uint32_t client_id, void* args) {
 		}
 		phd_send_player_position_and_look(client);
 	} else {
-		phd_send_entity_teleport(client, (ent_living_entity_t*) entity); // TODO what if this is just an entity?
+		phd_send_entity_teleport(client, entity);
 	}
 
 }
@@ -302,9 +302,7 @@ bool job_handle_entity_teleport(job_payload_t* payload) {
 	entity->position.y = payload->entity_teleport.y;
 	entity->position.z = payload->entity_teleport.z;
 	
-	ent_remove_chunk(entity);
-
-	entity->on_ground = false;
+	entity->on_ground = payload->entity_teleport.on_ground;
 
 	// TODO physics
 	
@@ -416,7 +414,7 @@ static inline void job_update_living_entity_teleport_look(uint32_t client_id, vo
 		}
 		phd_send_player_position_and_look(client);
 	} else {
-		phd_send_entity_teleport(client, entity);
+		phd_send_living_entity_teleport(client, entity);
 		phd_send_entity_head_look(client, entity);
 	}
 

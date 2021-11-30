@@ -168,7 +168,8 @@ extern void phd_send_stop_sound(ltg_client_t*);
 extern void phd_send_player_list_header_and_footer(ltg_client_t*);
 extern void phd_send_nbt_query_response(ltg_client_t*);
 extern void phd_send_collect_item(ltg_client_t*);
-extern void phd_send_entity_teleport(ltg_client_t* client, ent_living_entity_t* entity);
+extern void phd_send_entity_teleport(ltg_client_t* client, ent_entity_t* entity);
+extern void phd_send_living_entity_teleport(ltg_client_t* client, ent_living_entity_t* entity);
 extern void phd_send_advancements(ltg_client_t*);
 extern void phd_send_entity_properties(ltg_client_t*);
 extern void phd_send_entity_effect(ltg_client_t*);
@@ -205,8 +206,8 @@ static inline void phd_update_subscribe_chunk(ltg_client_t* client, wld_chunk_t*
 }
 
 static inline void phd_update_unsubscribe_chunk(ltg_client_t* client, wld_chunk_t* chunk) {
-	wld_unsubscribe_chunk(chunk, client->id);
-	//phd_send_unload_chunk(client, chunk);
+	wld_unsubscribe_chunk(chunk, ltg_client_get_id(client));
+	//phd_send_unload_chunk(client, chunk); // TODO not send this packet
 }
 
 extern void phd_update_sent_chunks(ltg_client_t* client);

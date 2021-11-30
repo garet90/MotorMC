@@ -86,6 +86,8 @@ union job_payload {
 		float64_t y;
 		float64_t z;
 
+		bool on_ground;
+
 	} entity_teleport;
 
 	struct {

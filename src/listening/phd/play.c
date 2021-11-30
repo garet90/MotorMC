@@ -1703,7 +1703,25 @@ void phd_send_time_update(ltg_client_t* client, wld_world_t* world) {
 
 }
 
-void phd_send_entity_teleport(ltg_client_t* client, ent_living_entity_t* entity) {
+void phd_send_entity_teleport(ltg_client_t* client, ent_entity_t* entity) {
+	
+	PCK_INLINE(packet, 43, io_big_endian);
+
+	pck_write_var_int(packet, 0x61);
+	pck_write_var_int(packet, ent_get_id(entity));
+	pck_write_float64(packet, ent_get_x(entity));
+	pck_write_float64(packet, ent_get_y(entity));
+	pck_write_float64(packet, ent_get_z(entity));
+
+	pck_write_int8(packet, 0);
+	pck_write_int8(packet, 0);
+	pck_write_int8(packet, ent_is_on_ground(entity));
+
+	ltg_send(client, packet);
+
+}
+
+void phd_send_living_entity_teleport(ltg_client_t* client, ent_living_entity_t* entity) {
 
 	PCK_INLINE(packet, 43, io_big_endian);
 
@@ -1981,12 +1999,10 @@ void phd_update_sent_chunks_move(ltg_client_t* client, const wld_chunk_t* old_ch
 
 	}
 
-	return;
-
 }
 
 void phd_update_sent_chunks_teleport(ltg_client_t* client, const wld_chunk_t* old_chunk) {
-	
+
 	phd_send_update_view_position(client);
 
 	// we don't want to send chunks when we don't need to because it is a lot more work than just checking if we are subscribed to it or it's in range
@@ -2000,7 +2016,6 @@ void phd_update_sent_chunks_teleport(ltg_client_t* client, const wld_chunk_t* ol
 		return;
 	}
 
-	// check for chunks that need to be unsubscribed from
 	const int32_t x = wld_get_chunk_x(chunk);
 	const int32_t z = wld_get_chunk_z(chunk);
 
@@ -2011,6 +2026,7 @@ void phd_update_sent_chunks_teleport(ltg_client_t* client, const wld_chunk_t* ol
 
 	assert(x != old_x || z != old_z);
 
+	// check for chunks that need to be unsubscribed from
 	{ // old chunk
 		for (int32_t c_x = -client_render_distance; c_x <= client_render_distance; ++c_x) {
 			for (int32_t c_z = -client_render_distance; c_z <= client_render_distance; ++c_z) {
@@ -2019,7 +2035,6 @@ void phd_update_sent_chunks_teleport(ltg_client_t* client, const wld_chunk_t* ol
 				if (UTL_MAX(UTL_ABS(c_x + old_x - x), UTL_ABS(c_z + old_z - z)) > client_render_distance) {
 					// no longer in view
 					phd_update_unsubscribe_chunk(client, c_c);
-					log_info("Unsubscribed from chunk");
 				}
 			}
 		}
@@ -2031,7 +2046,6 @@ void phd_update_sent_chunks_teleport(ltg_client_t* client, const wld_chunk_t* ol
 				wld_chunk_t* c_c = wld_relative_chunk(chunk, c_x, c_z);
 				if (!wld_chunk_has_subscriber(c_c, ltg_client_get_id(client))) {
 					phd_update_subscribe_chunk(client, c_c);
-					log_info("Subscribed to chunk");
 				}
 			}
 		}
