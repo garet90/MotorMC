@@ -46,6 +46,7 @@ jobs:
         
     - name: Install libdeflate
       run: |
+        mkdir $workspace/libs/ebiggers/libdeflate
         git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
         cd $workspace/libs/ebiggers/libdeflate
         make libdeflatestatic.lib
