@@ -46,10 +46,9 @@ jobs:
         
     - name: Install libdeflate
       run: |
-        mkdir -p $workspace/libs/ebiggers/libdeflate
         git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
         cd $workspace/libs/ebiggers/libdeflate
-        make libdeflatestatic.lib
+        make -f libdeflatestatic.lib
         mkdir -p /usr/local/lib/
         mkdir -p /usr/local/include/
         cp libdeflatestatic.lib /usr/local/lib/
@@ -97,7 +96,7 @@ jobs:
         brew install gmp
         sudo rm /usr/local/opt/gmp/lib/libgmp.10.dylib
 
-    - name: Install OpenSSL
+    - name: reinstall OpenSSL
       run: |
         brew install openssl@3
         sudo rm /usr/local/opt/openssl@3/lib/libcrypto.3.dylib
