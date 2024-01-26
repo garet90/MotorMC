@@ -98,7 +98,6 @@ jobs:
 
     - name: Install OpenSSL
       run: |
-        brew install openssl@3
         sudo rm /usr/local/opt/openssl@3/lib/libcrypto.3.dylib
         sudo rm /usr/local/opt/openssl@3/lib/libssl.3.dylib
         cp -R /usr/local/opt/openssl@3/lib/. /usr/local/lib/
