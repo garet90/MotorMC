@@ -48,8 +48,7 @@ jobs:
       run: |
         git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
         cd $workspace/libs/ebiggers/libdeflate
-        cmake -B build && cmake --build build
-        ls
+        make
         mkdir -p /usr/local/lib/
         mkdir -p /usr/local/include/
         cp libdeflatestatic.lib /usr/local/lib/
