@@ -152,6 +152,7 @@ jobs:
         git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
         cd ${{github.workspace}}/libs/ebiggers/libdeflate
         sudo make libdeflate.a
+        ls -a
         sudo mv libdeflate.a /usr/local/lib/libdeflate.a
         sudo mv libdeflate.h /usr/local/include/libdeflate.h
       
