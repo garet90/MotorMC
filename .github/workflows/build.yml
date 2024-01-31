@@ -151,7 +151,7 @@ jobs:
       run: |
         git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
         cd ${{github.workspace}}/libs/ebiggers/libdeflate
-        cmake -B build && cmake --b
+        cmake -B build && cmake --build
         sudo mv libdeflate.h /usr/local/include/libdeflate.h
         cd ${{github.workspace}}/libs/ebiggers/libdeflate/build
         sudo mv libdeflate.a /usr/local/lib/libdeflate.a
