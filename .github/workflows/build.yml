@@ -48,7 +48,8 @@ jobs:
       run: |
         git clone https://github.com/ebiggers/libdeflate.git $workspace/libs/ebiggers/libdeflate
         cd $workspace/libs/ebiggers/libdeflate
-        make
+        cd ${{github.workspace}}/libs/ebiggers/libdeflate
+        cmake -B build && cmake --build ${{github.workspace}}/libs/ebiggers/libdeflate/build
         mkdir -p /usr/local/lib/
         mkdir -p /usr/local/include/
         cp libdeflatestatic.lib /usr/local/lib/
@@ -98,11 +99,12 @@ jobs:
 
     - name: Install libdeflate
       run: |
-        git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
-        cd ${{github.workspace}}/libs/ebiggers/libdeflate
-        sudo make libdeflate.a
-        sudo mv libdeflate.a /usr/local/lib/libdeflate.a
-        sudo mv libdeflate.h /usr/local/include/libdeflate.h
+       git clone https://github.com/ebiggers/libdeflate.git ${{github.workspace}}/libs/ebiggers/libdeflate
+       cd ${{github.workspace}}/libs/ebiggers/libdeflate
+       cmake -B build && cmake --build ${{github.workspace}}/libs/ebiggers/libdeflate/build
+       sudo mv libdeflate.h /usr/local/include/libdeflate.h
+       cd ${{github.workspace}}/libs/ebiggers/libdeflate/build
+       sudo mv libdeflate.a /usr/local/lib/libdeflate.a
       
     - name: Configure CMake
       run: |
