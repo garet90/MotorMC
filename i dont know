@@ -1,0 +1,4 @@
+#i try to fix the build.yml bruh (windows fix needet)
+error while loading shared libraries: libcrypto.so.3: cannot open shared objectfile: no such file or directory
+great libarys missing using an autdated 
+its just to download an completely uptodate debian me who uses debian 11 easy notxd
